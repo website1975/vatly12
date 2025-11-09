@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô phỏng Định luật Charles (V-T)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            padding: 1rem;
+        }
+        .container-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        @media (max-width: 1024px) {
+            .container-grid {
+                grid-template-columns: 1fr;
+            }
+            .card {
+                margin-bottom: 1rem;
+            }
+        }
+        .card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            min-height: 550px; /* Đảm bảo chiều cao đồng nhất */
+        }
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 0.5rem;
+        }
+        canvas {
+            display: block;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        #temperatureSlider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(to right, #3b82f6, #ef4444);
+            outline: none;
+            opacity: 0.9;
+            transition: opacity .2s;
+            border-radius: 5px;
+        }
+        #temperatureSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 3px solid #1d4ed8;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+        #pressureSlider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(to right, #6366f1, #34d399); /* New color gradient for pressure */
+            outline: none;
+            opacity: 0.9;
+            transition: opacity .2s;
+            border-radius: 5px;
+        }
+        #pressureSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 3px solid #4f46e5;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+        .data-table th, .data-table td {
+            padding: 0.5rem;
+            text-align: center;
+        }
+        #customMessage {
+            pointer-events: none; /* Cho phép tương tác với các thành phần bên dưới */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="text-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Mô phỏng Định luật Charles (Biến đổi Áp suất)</h1>
+        <p class="text-gray-600 mt-2">Nghiên cứu mối quan hệ $V-T$ ở các áp suất khác nhau. $V/T$ sẽ thay đổi theo $P$.</p>
+    </div>
+
+    <div class="container-grid">
+        <!-- Cột 1: Mô phỏng Trực quan -->
+        <div class="card flex flex-col">
+            <h2 class="text-blue-600">Mô phỏng Xi lanh & Điều khiển</h2>
+            <canvas id="simulationCanvas" class="flex-grow w-full h-full"></canvas>
+
+            <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                <label for="temperatureSlider" class="block text-sm font-medium text-gray-700 mb-2">
+                    Điều chỉnh Nhiệt độ Nước: <span id="tempDisplay" class="font-bold text-red-600">27.0 °C</span>
+                </label>
+                <input type="range" id="temperatureSlider" min="0" max="100" value="27" step="1" class="w-full">
+            </div>
+
+            <!-- Điều khiển Áp suất Mới -->
+            <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                <label for="pressureSlider" class="block text-sm font-medium text-gray-700 mb-2">
+                    Điều chỉnh Áp suất tương đối ($P_{rel}$): <span id="pressureDisplay" class="font-bold text-indigo-600">1.00</span>
+                </label>
+                <input type="range" id="pressureSlider" min="10" max="30" value="10" step="1" class="w-full">
+            </div>
+
+            <div class="mt-4 space-y-2 text-lg">
+                <p class="text-gray-700">Nhiệt độ tuyệt đối ($T$): <span id="T_Kelvin" class="font-semibold text-blue-700">300.15 K</span></p>
+                <p class="text-gray-700">Thể tích Khí Lý tưởng ($V_{ideal}$): <span id="V_Value" class="font-semibold text-green-700">10.00 đơn vị</span></p>
+                <p class="text-gray-700">Tỉ lệ $V/T$ (Độ dốc Lý tưởng): <span id="VT_Ratio" class="font-semibold text-yellow-700">0.0332</span></p>
+                <p class="text-sm italic text-gray-500">Áp suất ($P$): <span id="P_Value" class="font-semibold text-indigo-600">1.00 $P_{base}$</span></p>
+            </div>
+            <button id="recordButton" class="mt-4 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out shadow-md hover:shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                </svg>
+                Ghi nhận Dữ liệu ($V, T$)
+            </button>
+            <p class="text-sm text-gray-500 mt-2 italic text-center">Lưu ý: Thể tích được ghi nhận có sai số ngẫu nhiên $\pm 1\%$.</p>
+
+        </div>
+
+        <!-- Cột 2: Bảng Số liệu -->
+        <div class="card flex flex-col">
+            <h2 class="text-blue-600">Bảng Số liệu Thực nghiệm (Có sai số)</h2>
+            <div class="overflow-x-auto h-full">
+                <table id="dataTable" class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg data-table">
+                    <thead class="bg-gray-50 sticky top-0">
+                        <tr>
+                            <th scope="col" class="px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Lần đo</th>
+                            <th scope="col" class="px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Nhiệt độ $T$ (K)</th>
+                            <th scope="col" class="px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Thể tích $V_{đo}$ (đơn vị)</th>
+                            <th scope="col" class="px-3 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Tỷ số $V/T$</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Dữ liệu sẽ được thêm vào đây -->
+                    </tbody>
+                </table>
+            </div>
+            <button id="resetButton" class="mt-4 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out shadow-md hover:shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.102a2 2 0 00.74 1.516L9.5 9.5l3.76-3.76a2 2 0 00.74-1.516V3a1 1 0 112 0v2.102a4 4 0 01-1.48 3.032L10 13l-4.28-4.28a4 4 0 01-1.48-3.032V3a1 1 0 011-1zM10 18a8 8 0 100-16 8 8 0 000 16z" clip-rule="evenodd" />
+                </svg>
+                Xóa Dữ liệu
+            </button>
+        </div>
+
+        <!-- Cột 3: Đồ thị V-T -->
+        <div class="card flex flex-col">
+            <h2 class="text-blue-600">Đồ thị $V$ theo $T$</h2>
+            <p class="text-sm text-gray-500 mb-2">Đường màu đỏ (nét đứt) là đẳng áp lý thuyết. Đường màu đen (nét liền) là dữ liệu thực nghiệm đã nối.</p>
+            <canvas id="graphCanvas" class="flex-grow w-full h-full"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Cấu hình Firebase để không bị lỗi console
+        var appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        var firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+
+        // === KHỞI TẠO VÀ CÁC THÔNG SỐ VẬT LÝ ===
+        var C_TO_K = 273.15; // Hằng số chuyển đổi từ Celsius sang Kelvin
+        var T0_C = 27; // Nhiệt độ ban đầu (độ C)
+        var T0_K = T0_C + C_TO_K; // Nhiệt độ ban đầu (Kelvin)
+        var V0 = 10.0; // Thể tích ban đầu (đơn vị tùy ý)
+        // K_initial là hằng số Charles's Law (V/T) khi P_rel = 1.0 (áp suất cơ sở)
+        var K_initial = V0 / T0_K;
+
+        let currentT_C = T0_C;
+        let currentT_K = T0_C + C_TO_K;
+        let currentV = V0; // Giá trị thể tích lý tưởng
+        let currentP_rel = 1.0; // Áp suất tương đối (Base = 1.0)
+        let recordedData = [];
+
+        // === ĐIỀU KHIỂN & CÁC PHẦN TỬ DOM ===
+        const slider = document.getElementById('temperatureSlider');
+        const pressureSlider = document.getElementById('pressureSlider');
+        const tempDisplay = document.getElementById('tempDisplay');
+        const pressureDisplay = document.getElementById('pressureDisplay');
+        const TKelvinDisplay = document.getElementById('T_Kelvin');
+        const VValueDisplay = document.getElementById('V_Value');
+        const VT_RatioDisplay = document.getElementById('VT_Ratio');
+        const P_ValueDisplay = document.getElementById('P_Value');
+        const recordButton = document.getElementById('recordButton');
+        const resetButton = document.getElementById('resetButton');
+        const dataBody = document.getElementById('dataBody');
+
+        const simCanvas = document.getElementById('simulationCanvas');
+        const simCtx = simCanvas.getContext('2d');
+        const graphCanvas = document.getElementById('graphCanvas');
+        const graphCtx = graphCanvas.getContext('2d');
+
+        // Điều chỉnh kích thước Canvas khi cửa sổ thay đổi
+        function resizeCanvases() {
+            // Lấy kích thước của div cha (card)
+            const simContainer = simCanvas.parentElement;
+            simCanvas.width = simContainer.clientWidth;
+            simCanvas.height = 300; // Chiều cao cố định cho mô phỏng
+
+            const graphContainer = graphCanvas.parentElement;
+            graphCanvas.width = graphContainer.clientWidth;
+            graphCanvas.height = 380; // Chiều cao cố định cho đồ thị
+        }
+
+        window.addEventListener('resize', resizeCanvases);
+
+
+        // === LOGIC VẬT LÝ ===
+
+        /**
+         * Tính thể tích mới theo Định luật Charles: V = (K_initial / P_rel) * T
+         * @param {number} t_c Nhiệt độ theo Celsius
+         * @param {number} p_rel Áp suất tương đối
+         */
+        function calculateCharlesLaw(t_c, p_rel) {
+            currentT_C = parseFloat(t_c);
+            currentT_K = currentT_C + C_TO_K;
+            currentP_rel = parseFloat(p_rel);
+
+            // V = (nR/P)T. Ta có K_new = V/T = K_initial / P_rel
+            const K_new = K_initial / currentP_rel;
+
+            // currentV là giá trị thể tích lý tưởng
+            currentV = K_new * currentT_K;
+            const currentVTRatio = K_new;
+
+            // Cập nhật hiển thị
+            tempDisplay.textContent = `${currentT_C.toFixed(1)} °C`;
+            pressureDisplay.textContent = `${currentP_rel.toFixed(2)}`;
+            TKelvinDisplay.textContent = `${currentT_K.toFixed(2)} K`;
+            VValueDisplay.textContent = `${currentV.toFixed(2)} đơn vị`;
+            VT_RatioDisplay.textContent = `${currentVTRatio.toFixed(4)}`;
+            P_ValueDisplay.textContent = `${currentP_rel.toFixed(2)} P_{base}`;
+
+            drawSimulation();
+            drawGraph();
+        }
+
+        // Cập nhật khi thanh trượt nhiệt độ thay đổi
+        slider.oninput = function() {
+            updateSimulation(this.value, currentP_rel);
+        };
+
+        // Cập nhật khi thanh trượt áp suất thay đổi
+        pressureSlider.oninput = function() {
+            // Thanh trượt có giá trị từ 10 đến 30, chia cho 10 để được 1.0 đến 3.0
+            const p_rel_val = this.value / 10;
+            updateSimulation(currentT_C, p_rel_val);
+
+            // Cảnh báo và xóa dữ liệu cũ khi thay đổi áp suất để tránh sai lệch trên đồ thị
+            if (recordedData.length > 0) {
+                showCustomMessage("Đã thay đổi áp suất. Dữ liệu thực nghiệm cũ đã được xóa.");
+                resetData(false); // Xóa dữ liệu nhưng không reset thanh trượt
+            }
+        };
+
+        function updateSimulation(t_c, p_rel) {
+            calculateCharlesLaw(t_c, p_rel);
+        }
+
+        // === CỘT 1: VẼ HÌNH MÔ PHỎNG ===
+
+        function drawSimulation() {
+            const W = simCanvas.width;
+            const H = simCanvas.height;
+            simCtx.clearRect(0, 0, W, H);
+
+            // Kiểm tra kích thước canvas để tránh vẽ khi nó chưa được resize (lỗi 0x0)
+            if (W === 0 || H === 0) return;
+
+            // Kích thước cố định của xi lanh và bình nước
+            const waterBathW = W * 0.9;
+            const waterBathH = H * 0.8;
+            const waterBathX = (W - waterBathW) / 2;
+            const waterBathY = H * 0.1;
+            const cylinderW = waterBathW / 3;
+            const cylinderX = waterBathX + (waterBathW - cylinderW) / 2;
+            const cylinderBaseY = waterBathY + waterBathH;
+
+            // Chiều cao piston (tương ứng với V) - cần tính toán lại dựa trên áp suất hiện tại
+            const K_current = K_initial / currentP_rel;
+            const V_min = K_current * C_TO_K; // V ở 0K (lý thuyết)
+            const V_max = K_current * (100 + C_TO_K);
+            const V_range = V_max - V_min;
+            const maxPistonH = waterBathH * 0.8; // Chiều cao tối đa cho piston di chuyển
+
+            // Tính toán vị trí piston: pistonH tỉ lệ với V lý tưởng
+            const pistonH = maxPistonH * ((currentV - V_min) / V_range);
+            const gasY = cylinderBaseY - pistonH;
+
+
+            // 1. Vẽ Bình nước (Water Bath)
+            const waterColor = `rgba(59, 130, 246, ${0.3 + currentT_C / 150})`; // Màu nước thay đổi theo nhiệt độ
+            simCtx.fillStyle = '#4b5563'; // Màu bình
+            simCtx.fillRect(waterBathX, waterBathY, waterBathW, 5); // Đáy bình
+            simCtx.fillRect(waterBathX, waterBathY, 5, waterBathH); // Thành trái
+            simCtx.fillRect(waterBathX + waterBathW - 5, waterBathY, 5, waterBathH); // Thành phải
+            simCtx.fillStyle = waterColor; // Nước
+            simCtx.fillRect(waterBathX + 5, waterBathY + 5, waterBathW - 10, waterBathH - 5);
+
+
+            // 2. Vẽ Xi lanh và Khí
+            const cylinderH = waterBathH * 0.9;
+            const cylinderY = cylinderBaseY - cylinderH;
+
+            // Vách xi lanh (màu xám nhạt)
+            simCtx.fillStyle = 'rgba(209, 213, 219, 0.7)';
+            simCtx.fillRect(cylinderX, cylinderY, cylinderW, cylinderBaseY - cylinderY);
+
+            // Gas (màu xanh lá cây nhạt)
+            simCtx.fillStyle = 'rgba(16, 185, 129, 0.7)';
+            simCtx.fillRect(cylinderX + 2, gasY, cylinderW - 4, cylinderBaseY - gasY);
+
+
+            // 3. Vẽ Piston (màu xám đậm)
+            const pistonThickness = 8;
+            simCtx.fillStyle = '#4b5563';
+            simCtx.fillRect(cylinderX, gasY - pistonThickness, cylinderW, pistonThickness);
+
+            // 4. Vẽ Trọng lượng Piston (mô phỏng áp suất cố định + trọng lượng thêm)
+            // Đã giảm kích thước cơ sở từ 0.7 xuống 0.4 để khối nặng nhỏ hơn
+            const weightSize = cylinderW * 0.2; 
+            // Chiều cao vật nặng tỉ lệ với áp suất tương đối
+            const totalWeightH = weightSize * currentP_rel * 0.4; // Giảm nhẹ chiều cao để không quá to
+            const weightY = gasY - pistonThickness - totalWeightH;
+            simCtx.fillStyle = '#1f2937';
+
+            // Vẽ vật nặng
+            simCtx.fillRect(cylinderX + (cylinderW - weightSize) / 2, weightY, weightSize, totalWeightH);
+            simCtx.fillStyle = 'white';
+            simCtx.font = '10px Inter';
+            simCtx.textAlign = 'center';
+            simCtx.fillText(`P`, cylinderX + cylinderW / 2, weightY + totalWeightH / 2 + 3);
+
+
+            // 5. Thêm nhãn
+            simCtx.fillStyle = '#1f2937';
+            simCtx.font = '12px Inter';
+            simCtx.textAlign = 'left';
+            simCtx.fillText(`T = ${currentT_C.toFixed(1)} °C`, cylinderX + cylinderW + 10, waterBathY + 20);
+            simCtx.fillText(`V = ${currentV.toFixed(2)}`, cylinderX + cylinderW + 10, waterBathY + 40);
+
+            // Đường nét đứt V0 (tham chiếu) - V0 ban đầu (P_rel=1, T=27C)
+            const K_ref_temp = K_initial / 1.0;
+            const V_min_ref = K_ref_temp * C_TO_K;
+            const V_max_ref = K_ref_temp * (100 + C_TO_K);
+            const V_range_ref = V_max_ref - V_min_ref;
+            
+            const V0_H_ref = maxPistonH * ((V0 - V_min_ref) / V_range_ref);
+            const V0_Y_ref = cylinderBaseY - V0_H_ref;
+            
+            simCtx.strokeStyle = 'dashed gray';
+            simCtx.setLineDash([5, 5]);
+            simCtx.beginPath();
+            simCtx.moveTo(cylinderX - 10, V0_Y_ref);
+            simCtx.lineTo(cylinderX + cylinderW + 10, V0_Y_ref);
+            simCtx.stroke();
+            simCtx.setLineDash([]);
+            simCtx.fillStyle = 'gray';
+            simCtx.fillText(`V₀ (ref)`, cylinderX + cylinderW + 15, V0_Y_ref);
+        }
+
+        // === CỘT 2: BẢNG DỮ LIỆU ===
+
+        function recordData() {
+            // 1. Tạo một hệ số sai số ngẫu nhiên trong khoảng [-0.01, 0.01] (tức là +/- 1%)
+            // Math.random() * 0.02 tạo ra [0, 0.02)
+            // Math.random() * 0.02 - 0.01 tạo ra [-0.01, 0.01)
+            const randomError = Math.random() * 0.02 - 0.01; 
+            const errorFactor = 1 + randomError;
+
+            // 2. Áp dụng sai số vào thể tích lý tưởng hiện tại
+            const recordedV = currentV * errorFactor;
+
+            const dataPoint = {
+                t_k: currentT_K,
+                v: recordedV, // Giá trị thể tích đã thêm sai số
+                p_rel: currentP_rel,
+                error_percent: randomError * 100 // Lưu sai số dưới dạng %
+            };
+            
+            recordedData.push(dataPoint);
+            updateDataTable();
+            
+            // Thông báo cho người dùng về sai số vừa áp dụng
+            showCustomMessage(`Đã ghi nhận dữ liệu với sai số ngẫu nhiên ${dataPoint.error_percent.toFixed(2)}% về Thể tích.`);
+        }
+
+        function updateDataTable() {
+            dataBody.innerHTML = '';
+            recordedData.forEach((data, index) => {
+                const row = dataBody.insertRow();
+                row.className = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+
+                // Lần đo
+                row.insertCell().textContent = index + 1;
+                // T (K)
+                row.insertCell().textContent = data.t_k.toFixed(2);
+                // V (đơn vị)
+                row.insertCell().textContent = data.v.toFixed(2);
+                // V/T (Tỷ số)
+                row.insertCell().textContent = (data.v / data.t_k).toFixed(4);
+            });
+
+            drawGraph(); // Cập nhật đồ thị sau khi thêm dữ liệu
+        }
+
+        /**
+         * Xóa dữ liệu và tùy chọn reset thanh trượt áp suất
+         * @param {boolean} resetSliders Có reset thanh trượt áp suất về 1.0 không
+         */
+        function resetData(resetSliders = true) {
+            recordedData = [];
+            updateDataTable();
+            // Đặt lại mô phỏng về trạng thái ban đầu
+            slider.value = T0_C;
+
+            if (resetSliders) {
+                pressureSlider.value = 10; // Reset to 1.0 (internal value 10)
+                updateSimulation(T0_C, 1.0);
+            } else {
+                updateSimulation(currentT_C, currentP_rel);
+            }
+        }
+
+        // Gắn sự kiện
+        recordButton.addEventListener('click', recordData);
+        resetButton.addEventListener('click', () => resetData(true)); // Nút xóa sẽ reset cả áp suất
+
+        // Thêm một hộp tin nhắn đơn giản cho phản hồi
+        function showCustomMessage(message) {
+            const existingMessage = document.getElementById('customMessage');
+            if (existingMessage) {
+                document.body.removeChild(existingMessage);
+            }
+
+            const messageBox = document.createElement('div');
+            messageBox.id = 'customMessage';
+            messageBox.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-lg shadow-xl z-50 text-center transition-opacity duration-300';
+            messageBox.innerHTML = `<p class="font-bold">${message}</p>`;
+            document.body.appendChild(messageBox);
+            setTimeout(() => {
+                // Thêm hiệu ứng mờ dần
+                messageBox.style.opacity = '0';
+                setTimeout(() => {
+                    if (document.body.contains(messageBox)) {
+                        document.body.removeChild(messageBox);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // === CỘT 3: VẼ ĐỒ THỊ V-T ===
+
+        function drawGraph() {
+            const W = graphCanvas.width;
+            const H = graphCanvas.height;
+            const padding = 40;
+            const innerW = W - 2 * padding;
+            const innerH = H - 2 * padding;
+
+            graphCtx.clearRect(0, 0, W, H);
+
+            // Kiểm tra kích thước canvas để tránh vẽ khi nó chưa được resize (lỗi 0x0)
+            if (W === 0 || H === 0) return;
+
+            // Phạm vi trục X (Nhiệt độ T): 0 K đến maxT_K
+            const T_min_graph = 0; // Bắt đầu từ 0 Kelvin
+            const T_max_graph = 100 + C_TO_K + 20; // 120 C + C_TO_K
+
+            // Tính toán V_max_graph dựa trên áp suất thấp nhất (V lớn nhất) và dữ liệu
+            const K_min_p = K_initial / 1.0; // K khi P_rel = 1.0 (Áp suất thấp nhất)
+            const V_max_P_min = K_min_p * T_max_graph;
+
+            const V_max_data = recordedData.length > 0 ? Math.max(...recordedData.map(d => d.v)) : V0;
+            const V_max_graph = Math.max(V_max_data, V_max_P_min) * 1.2;
+
+            // Hàm chuyển đổi tọa độ thực sang tọa độ canvas
+            const mapTToX = (t) => padding + innerW * (t - T_min_graph) / (T_max_graph - T_min_graph);
+            const mapVToY = (v) => padding + innerH - innerH * (v / V_max_graph);
+
+            // --- Vẽ Trục tọa độ & Nhãn ---
+            graphCtx.strokeStyle = '#374151';
+            graphCtx.lineWidth = 2;
+
+            // Trục X (T - Kelvin)
+            graphCtx.beginPath();
+            graphCtx.moveTo(padding, padding + innerH);
+            graphCtx.lineTo(padding + innerW, padding + innerH);
+            graphCtx.stroke();
+            // Trục Y (V)
+            graphCtx.beginPath();
+            graphCtx.moveTo(padding, padding);
+            graphCtx.lineTo(padding, padding + innerH);
+            graphCtx.stroke();
+
+            // Nhãn trục
+            graphCtx.fillStyle = '#374151';
+            graphCtx.font = '12px Inter';
+            graphCtx.textAlign = 'center';
+            graphCtx.fillText('T (K)', W - 20, H - 10);
+            graphCtx.textAlign = 'right';
+            graphCtx.save();
+            graphCtx.translate(10, H / 2);
+            graphCtx.rotate(-Math.PI / 2);
+            graphCtx.fillText('V (đơn vị)', 0, 0);
+            graphCtx.restore();
+
+            // Đánh dấu trục X
+            graphCtx.textAlign = 'center';
+            const T_marks = [273.15, 300, 373.15]; // 0C, ~27C, 100C
+            T_marks.forEach(t => {
+                const x = mapTToX(t);
+                graphCtx.beginPath();
+                graphCtx.moveTo(x, padding + innerH);
+                graphCtx.lineTo(x, padding + innerH + 5);
+                graphCtx.stroke();
+                graphCtx.fillText(t.toFixed(0), x, H - 20);
+            });
+
+            // Đánh dấu trục Y
+            graphCtx.textAlign = 'right';
+            const V_step = Math.ceil(V_max_graph / 5);
+            for (let v = 0; v <= V_max_graph; v += V_step) {
+                const y = mapVToY(v);
+                graphCtx.beginPath();
+                graphCtx.moveTo(padding, y);
+                graphCtx.lineTo(padding - 5, y);
+                graphCtx.stroke();
+                if (v > 0) graphCtx.fillText(v.toFixed(1), padding - 8, y + 4);
+            }
+
+            // --- Vẽ Đường Đẳng áp Tham chiếu (P_rel = 1.0, Nét đứt) ---
+            if (currentP_rel !== 1.0 || recordedData.length > 0) {
+                graphCtx.strokeStyle = 'rgba(255, 165, 0, 0.7)'; // Màu cam
+                graphCtx.setLineDash([4, 4]);
+                graphCtx.lineWidth = 1;
+                graphCtx.beginPath();
+                graphCtx.moveTo(mapTToX(T_min_graph), mapVToY(0));
+                const V_at_Tmax_base = K_initial * T_max_graph;
+                graphCtx.lineTo(mapTToX(T_max_graph), mapVToY(V_at_Tmax_base));
+                graphCtx.stroke();
+            }
+            
+
+            // --- Vẽ Đường Đẳng áp Lý thuyết HIỆN TẠI (V = K_new * T), Nét đứt ---
+            const K_current = K_initial / currentP_rel; // Độ dốc hiện tại
+            graphCtx.strokeStyle = '#ef4444'; // Màu đỏ
+            graphCtx.lineWidth = 2;
+            graphCtx.setLineDash([8, 8]); // Nét đứt cho đường ngoại suy/lý thuyết
+            graphCtx.beginPath();
+
+            // Bắt đầu từ 0 Kelvin (V=0)
+            graphCtx.moveTo(mapTToX(T_min_graph), mapVToY(0));
+
+            // Vẽ đường thẳng đến điểm cuối của trục X
+            const V_at_Tmax_current = K_current * T_max_graph;
+            graphCtx.lineTo(mapTToX(T_max_graph), mapVToY(V_at_Tmax_current));
+            graphCtx.stroke();
+            graphCtx.setLineDash([]); // Reset dash cho các lần vẽ sau
+
+
+            // --- Vẽ Đường nối Các điểm Dữ liệu Đo được (Nét liền màu đen) ---
+            if (recordedData.length > 1) {
+                // Sắp xếp dữ liệu trước khi vẽ đường nối (đảm bảo thứ tự theo T)
+                const sortedData = [...recordedData].sort((a, b) => a.t_k - b.t_k);
+                
+                graphCtx.strokeStyle = '#1f2937'; // Màu đen đậm
+                graphCtx.lineWidth = 2;
+                graphCtx.setLineDash([]); // Nét liền
+                graphCtx.beginPath();
+
+                // Di chuyển đến điểm đầu tiên
+                const firstPoint = sortedData[0];
+                graphCtx.moveTo(mapTToX(firstPoint.t_k), mapVToY(firstPoint.v));
+
+                // Nối với các điểm tiếp theo
+                for (let i = 1; i < sortedData.length; i++) {
+                    const data = sortedData[i];
+                    graphCtx.lineTo(mapTToX(data.t_k), mapVToY(data.v));
+                }
+                graphCtx.stroke();
+            }
+
+            // --- Vẽ Các điểm Dữ liệu Đo được (Chấm tròn nhỏ hơn, màu xanh lá cây) ---
+            graphCtx.fillStyle = '#10b981'; 
+            recordedData.forEach(data => {
+                const x = mapTToX(data.t_k);
+                const y = mapVToY(data.v);
+                // Vẽ chấm tròn nhỏ
+                graphCtx.beginPath();
+                graphCtx.arc(x, y, 3, 0, 2 * Math.PI); // Bán kính 3px
+                graphCtx.fill();
+            });
+        }
+
+        // Khởi động mô phỏng
+        window.onload = function() {
+            resizeCanvases();
+            
+            // Sửa lỗi: Sử dụng setTimeout để đảm bảo trình duyệt có thời gian hoàn tất việc tính toán
+            // và áp dụng kích thước mới cho Canvas trước khi vẽ lần đầu.
+            setTimeout(() => {
+                updateSimulation(T0_C, 1.0);
+            }, 50); 
+        };
+    </script>
+
+</body>
+</html>

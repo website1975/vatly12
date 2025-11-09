@@ -1,1 +1,607 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ứng Dụng Tích Hợp Định luật Charles</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải Chart.js cho đồ thị -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+    </script>
+    <style>
+        /* Thiết lập font Inter mặc định và làm cho giao diện đẹp hơn */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
 
+        /* Styling cho bình khí (Mô phỏng) */
+        #cylinder-container {
+            width: 100px;
+            height: 250px; /* Chiều cao tối đa của bình */
+            background-color: #e0f2fe; /* light blue-100 */
+            border: 3px solid #075985; /* cyan-700 */
+            border-radius: 8px;
+            position: relative;
+            margin: 20px auto 0 auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden; 
+        }
+
+        /* Đại diện cho khí - Thay đổi chiều cao dựa trên thể tích */
+        #gas-volume {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: #38bdf8; /* sky-400 */
+            transition: height 0.3s ease;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Piston - Thanh chắn phía trên khí (Giữ áp suất không đổi) */
+        #piston {
+            position: absolute;
+            bottom: 0; /* Vị trí được điều khiển bằng JS */
+            width: 120px;
+            height: 10px;
+            background-color: #10b981; /* emerald-500 - Màu xanh lá cho áp suất không đổi */
+            border: 2px solid #065f46; /* emerald-700 */
+            border-radius: 5px;
+            left: -10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        /* Thanh nhiệt độ (Sử dụng cho input range) */
+        #temperature-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            background: #cbd5e1; /* slate-300 */
+            border-radius: 5px;
+            outline: none;
+            transition: opacity .2s;
+        }
+
+        #temperature-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #ef4444; /* red-500 */
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Styling cho các tiêu đề lý thuyết */
+        .section-title {
+            @apply text-2xl font-bold text-teal-700 mt-6 mb-3 border-b pb-1;
+        }
+        .subsection-title {
+            @apply text-xl font-semibold text-gray-800 mt-4 mb-2;
+        }
+        .list-item-content {
+            @apply mb-2 p-2 bg-gray-50 rounded-lg;
+        }
+        .math-display {
+            @apply text-center text-lg font-mono my-4 p-2 bg-teal-50 rounded-lg;
+        }
+    </style>
+    <script>
+        // Hằng số và biến trạng thái
+        const T_MIN = 100; // Nhiệt độ tối thiểu (K)
+        const T_MAX = 500; // Nhiệt độ tối đa (K)
+        const INITIAL_TEMPERATURE = 300; // Nhiệt độ ban đầu (K)
+        const INITIAL_VOLUME = 100; // Thể tích ban đầu (đơn vị tùy ý)
+        
+        // Hằng số K = V/T
+        const K_CONSTANT = INITIAL_VOLUME / INITIAL_TEMPERATURE; 
+        
+        const MAX_HEIGHT = 250; // Chiều cao tối đa của bình (px)
+        const MIN_HEIGHT = 50;  // Chiều cao tối thiểu của khí (px)
+        const KELVIN_OFFSET = 273.15; // Độ chênh lệch giữa C và K
+
+        let currentTemperature = INITIAL_TEMPERATURE;
+        let currentVolume = INITIAL_VOLUME;
+        let collectedData = [];
+        let charlesLawChart; // Biến giữ đối tượng Chart.js
+
+        // Tham chiếu DOM
+        let gasVolumeElement;
+        let pistonElement;
+        let tempDisplay;
+        let volumeDisplay;
+        let tempSlider;
+        let dataTableBody;
+        let statusMessage;
+        let chartCanvas;
+
+
+        // Hàm chuyển đổi Thể tích sang chiều cao (px)
+        const volumeToHeight = (V) => {
+            const V_MAX_DISPLAY = K_CONSTANT * T_MAX; // ~ 166.67
+            // Scale V_new vào phạm vi chiều cao
+            let newHeight = (V / V_MAX_DISPLAY) * MAX_HEIGHT; 
+            
+            // Giới hạn chiều cao cho trực quan
+            if (newHeight < MIN_HEIGHT) newHeight = MIN_HEIGHT;
+            if (newHeight > MAX_HEIGHT) newHeight = MAX_HEIGHT;
+            
+            return newHeight;
+        };
+        
+        // Hàm tính toán và cập nhật mô phỏng
+        const updateSimulation = (newTemperature) => {
+            currentTemperature = newTemperature;
+            
+            // Định luật Charles: V = K_CONSTANT * T
+            currentVolume = K_CONSTANT * currentTemperature; 
+
+            // Cập nhật giao diện
+            let newHeight = volumeToHeight(currentVolume);
+
+            pistonElement.style.bottom = `${newHeight}px`;
+            gasVolumeElement.style.height = `${newHeight}px`;
+
+            // Cập nhật màn hình hiển thị
+            tempDisplay.textContent = currentTemperature.toFixed(0);
+            volumeDisplay.textContent = currentVolume.toFixed(2);
+            
+            // Nhiệt độ Celsius: t = T - 273.15
+            const tempCelsius = currentTemperature - KELVIN_OFFSET;
+            document.getElementById('temp-celsius-value').textContent = tempCelsius.toFixed(1);
+
+            statusMessage.textContent = 'Thay đổi nhiệt độ để quan sát thể tích.';
+            statusMessage.classList.remove('text-green-600', 'text-red-600');
+            statusMessage.classList.add('text-gray-600');
+        };
+
+        // --- HÀM VẼ ĐỒ THỊ ---
+        const renderChart = () => {
+            if (!charlesLawChart) return;
+            
+            // Lấy dữ liệu X (T - Nhiệt độ) và Y (V - Thể tích)
+            const T_data = collectedData.map(d => d.T);
+            const V_data = collectedData.map(d => d.V);
+
+            // Cập nhật dữ liệu cho Chart.js
+            charlesLawChart.data.datasets[0].data = T_data.map((t, index) => ({
+                x: t,
+                y: V_data[index]
+            }));
+            
+            // Vẽ lại đồ thị
+            charlesLawChart.update();
+        };
+
+        // Hàm ghi lại dữ liệu
+        const recordData = () => {
+            if (collectedData.length > 0) {
+                const lastData = collectedData[collectedData.length - 1];
+                // Kiểm tra xem nhiệt độ có thay đổi đủ để ghi lại không
+                if (Math.abs(lastData.T - currentTemperature) < 10) { 
+                    statusMessage.textContent = 'Giá trị này đã được ghi lại (thay đổi quá ít). Vui lòng điều chỉnh nhiệt độ thêm.';
+                    statusMessage.classList.remove('text-green-600');
+                    statusMessage.classList.add('text-red-600');
+                    return;
+                }
+            }
+            
+            const T = currentTemperature;
+            const V = currentVolume;
+            const V_over_T = V / T; 
+            
+            const newData = { T: T, V: V, V_over_T: V_over_T };
+            collectedData.push(newData);
+            
+            // Cập nhật bảng
+            const newRow = dataTableBody.insertRow();
+            newRow.insertCell(0).textContent = collectedData.length;
+            newRow.insertCell(1).textContent = T.toFixed(0);
+            newRow.insertCell(2).textContent = V.toFixed(2);
+            newRow.insertCell(3).textContent = V_over_T.toFixed(4); 
+            
+            // Vẽ đồ thị
+            renderChart();
+
+            statusMessage.textContent = `Đã ghi lại điểm dữ liệu #${collectedData.length}.`;
+            statusMessage.classList.remove('text-red-600');
+            statusMessage.classList.add('text-green-600');
+        };
+        
+        // --- HÀM XỬ LÝ QUIZ (Cột 2) ---
+
+        // Hàm kiểm tra đáp án cho câu hỏi trắc nghiệm (1, 2, 3)
+        const checkAnswer = (questionIndex, correctOption, elementId) => {
+            const options = document.getElementsByName('q' + questionIndex);
+            let selectedValue;
+            options.forEach(option => {
+                if (option.checked) {
+                    selectedValue = option.value;
+                }
+            });
+
+            const resultElement = document.getElementById(elementId);
+            resultElement.classList.remove('bg-green-100', 'bg-red-100', 'text-green-800', 'text-red-800');
+            resultElement.classList.add('p-2', 'rounded-lg', 'mt-2', 'font-medium');
+
+            if (selectedValue === correctOption) {
+                resultElement.textContent = 'Chính xác! 🎉';
+                resultElement.classList.add('bg-green-100', 'text-green-800');
+            } else if (selectedValue) {
+                resultElement.textContent = `Sai rồi. Đáp án đúng là ${correctOption}.`;
+                resultElement.classList.add('bg-red-100', 'text-red-800');
+            } else {
+                resultElement.textContent = 'Vui lòng chọn một đáp án.';
+                resultElement.classList.remove('bg-green-100', 'bg-red-100', 'text-green-800', 'text-red-800');
+            }
+        };
+
+        // Hàm kiểm tra câu hỏi tính toán 1 (Câu 4)
+        const checkCalculationQuestion4 = () => {
+            const v2_input = document.getElementById('q4-input').value;
+            const resultElement = document.getElementById('result4');
+
+            resultElement.classList.remove('bg-green-100', 'bg-red-100', 'text-green-800', 'text-red-800');
+            resultElement.classList.add('p-2', 'rounded-lg', 'mt-2', 'font-medium');
+
+            if (!v2_input || isNaN(v2_input)) {
+                resultElement.textContent = 'Vui lòng nhập một giá trị số hợp lệ.';
+                resultElement.classList.remove('bg-green-100', 'bg-red-100', 'text-green-800', 'text-red-800');
+                return;
+            }
+
+            // Dữ liệu: V1 = 5 L, T1 = 27 + 273.15 = 300.15 K, T2 = 127 + 273.15 = 400.15 K
+            const V1 = 5.0;
+            const T1 = 27.0 + KELVIN_OFFSET;
+            const T2 = 127.0 + KELVIN_OFFSET;
+            
+            // Công thức: V2 = V1 * (T2 / T1)
+            const V2_expected = V1 * (T2 / T1); 
+            
+            // Chấp nhận sai số nhỏ (ví dụ: 0.05 L)
+            if (Math.abs(parseFloat(v2_input) - V2_expected) < 0.05) {
+//                resultElement.textContent = `Chính xác! 🎉 V2 $\\approx$ ${V2_expected.toFixed(2)} L.`;
+                resultElement.innerHTML = `Chính xác! 🎉 V2 $\\approx$ ${V2_expected.toFixed(2)} L.`;
+		MathJax.typeset();
+                resultElement.classList.add('bg-green-100', 'text-green-800');
+            } else {
+//                resultElement.textContent = `Sai rồi. Vui lòng kiểm tra lại công thức $\\frac{V_1}{T_1} = \\frac{V_2}{T_2}$ và nhớ đổi nhiệt độ sang Kelvin. Gợi ý: V2 $\\approx$ ${V2_expected.toFixed(2)} L.`;
+	          resultElement.innerHTML = `Sai rồi. Vui lòng kiểm tra lại công thức $\\frac{V_1}{T_1} = \\frac{V_2}{T_2}$ và nhớ đổi nhiệt độ sang Kelvin. Gợi ý: V2 $\\approx$ ${V2_expected.toFixed(2)} L.`;
+		MathJax.typeset();
+                resultElement.classList.add('bg-red-100', 'text-red-800');
+            }
+        };
+
+        // Hàm kiểm tra câu hỏi tính toán 2 (Câu 5)
+        const checkCalculationQuestion5 = () => {
+            const t2_input = document.getElementById('q5-input').value;
+            const resultElement = document.getElementById('result5');
+
+            resultElement.classList.remove('bg-green-100', 'bg-red-100', 'text-green-800', 'text-red-800');
+            resultElement.classList.add('p-2', 'rounded-lg', 'mt-2', 'font-medium');
+
+            if (!t2_input || isNaN(t2_input)) {
+                resultElement.textContent = 'Vui lòng nhập một giá trị số hợp lệ.';
+                resultElement.classList.remove('bg-green-100', 'bg-red-100', 'text-green-800', 'text-red-800');
+                return;
+            }
+
+            // Dữ liệu: V1 = 10 L, T1 = 27 + 273.15 = 300.15 K, V2 = 12 L
+            const V1 = 10.0;
+            const T1 = 27.0 + KELVIN_OFFSET;
+            const V2 = 12.0;
+            
+            // Công thức: T2 = T1 * (V2 / V1) 
+            const T2_kelvin_expected = T1 * (V2 / V1);
+            // Đổi sang Celsius: t2 = T2 - 273.15
+            const t2_celsius_expected = T2_kelvin_expected - KELVIN_OFFSET;
+            
+            // Chấp nhận sai số nhỏ (ví dụ: 0.05 độ C)
+            if (Math.abs(parseFloat(t2_input) - t2_celsius_expected) < 0.05) {
+//                resultElement.textContent = `Chính xác! 🎉 $t_2 \\approx$ ${t2_celsius_expected.toFixed(2)} $\\text{}^{\\circ}\\text{C}$.`;
+                resultElement.innerHTML = `Chính xác! 🎉 $t_2 \\approx$ ${t2_celsius_expected.toFixed(2)} $\\text{}^{\\circ}\\text{C}$.`;
+		MathJax.typeset();
+                resultElement.classList.add('bg-green-100', 'text-green-800');
+            } else {
+                //resultElement.textContent = `Sai rồi. Vui lòng kiểm tra lại công thức $\\frac{V_1}{T_1} = \\frac{V_2}{T_2}$ và nhớ đổi nhiệt độ cuối cùng sang $\\text{}^{\\circ}\\text{C}$. Gợi ý: $t_2 \\approx$ ${t2_celsius_expected.toFixed(2)} $\\text{}^{\\circ}\\text{C}$.`;
+                resultElement.innerHTML = `Sai rồi. Vui lòng kiểm tra lại công thức $\\frac{V_1}{T_1} = \\frac{V_2}{T_2}$ và nhớ đổi nhiệt độ cuối cùng sang $\\text{}^{\\circ}\\text{C}$. Gợi ý: $t_2 \\approx$ ${t2_celsius_expected.toFixed(2)} $\\text{}^{\\circ}\\text{C}$.`;
+		MathJax.typeset();
+                resultElement.classList.add('bg-red-100', 'text-red-800');
+            }
+        };
+
+
+        // Khởi tạo trạng thái và sự kiện khi DOM đã tải
+        window.onload = function() {
+            gasVolumeElement = document.getElementById('gas-volume');
+            pistonElement = document.getElementById('piston');
+            tempDisplay = document.getElementById('temp-value');
+            volumeDisplay = document.getElementById('volume-value');
+            tempSlider = document.getElementById('temperature-slider');
+            dataTableBody = document.getElementById('data-table-body');
+            statusMessage = document.getElementById('status-message');
+            chartCanvas = document.getElementById('charlesLawChart'); // Lấy Canvas
+
+            document.getElementById('record-button').addEventListener('click', recordData);
+            tempSlider.addEventListener('input', (e) => {
+                updateSimulation(parseFloat(e.target.value));
+            });
+
+            // Gắn sự kiện cho các nút Kiểm tra của câu hỏi tính toán mới
+            document.getElementById('check-q4').addEventListener('click', checkCalculationQuestion4);
+            document.getElementById('check-q5').addEventListener('click', checkCalculationQuestion5);
+
+
+            // Thiết lập Chart.js
+            charlesLawChart = new Chart(chartCanvas, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Dữ liệu (V theo T)',
+                        data: [], // Dữ liệu sẽ được điền bằng JS
+                        backgroundColor: 'rgba(239, 68, 68, 0.8)', // Màu đỏ
+                        borderColor: 'rgba(239, 68, 68, 1)',
+                        pointRadius: 6,
+                        showLine: true,
+                        fill: false,
+                        tension: 0 // Đường thẳng
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: { display: true, text: 'Nhiệt độ T (K)' },
+                            min: T_MIN - 50,
+                            max: T_MAX + 50
+                        },
+                        y: {
+                            title: { display: true, text: 'Thể tích V (đơn vị)' },
+                            min: 0
+                        }
+                    },
+                    plugins: {
+                        legend: { display: true }
+                    }
+                }
+            });
+
+            // Thiết lập trạng thái ban đầu
+            tempSlider.min = T_MIN;
+            tempSlider.max = T_MAX;
+            tempSlider.value = INITIAL_TEMPERATURE;
+            updateSimulation(INITIAL_TEMPERATURE);
+        };
+    </script>
+</head>
+<body class="p-4 sm:p-8 min-h-screen">
+
+    <div class="max-w-7xl mx-auto bg-white p-6 rounded-xl shadow-2xl">
+        <h1 class="text-3xl font-bold text-center text-teal-800 mb-6 border-b-4 border-teal-200 pb-3">
+                LÝ THUYẾT ĐỊNH LUẬT CHARLES
+        </h1>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            
+            <!-- Cột 1: Mô Phỏng & Thu thập Dữ liệu (lg:w-1/3) -->
+            <div class="lg:w-1/3 flex flex-col items-center p-4 bg-teal-50 rounded-xl shadow-md border border-teal-200">
+                <h2 class="text-xl font-bold mb-4 text-teal-700">I. THÍ NGHIỆM ĐẲNG ÁP</h2>
+                <!-- Trạng thái Áp suất không đổi -->
+                <div class="w-full text-center p-2 bg-green-100 text-green-800 font-semibold rounded-lg mb-4 shadow-sm">
+			Áp suất ($p$) được giữ **KHÔNG ĐỔI**                    
+                </div>
+
+                <!-- Hiển thị Giá trị -->
+                <div class="text-center mb-6 w-full p-3 bg-white rounded-lg shadow-inner">
+                    <p class="text-xl font-medium">Nhiệt độ ($T$): <span id="temp-value" class="font-bold text-3xl text-red-600">300</span> K</p>
+                    <p class="text-sm font-medium">($t$): <span id="temp-celsius-value" class="font-bold text-lg text-red-500">26.85</span> °C</p>
+                    <p class="text-xl font-medium mt-2">Thể tích ($V$): <span id="volume-value" class="font-bold text-3xl text-blue-600">100.00</span> đơn vị</p>
+                </div>
+
+                <!-- Bình Khí và Piston -->
+                <div id="cylinder-container">
+                    <div id="gas-volume"></div>
+                    <div id="piston" style="bottom: 150px;"></div>
+                </div>
+
+                <!-- Thanh Điều chỉnh Nhiệt độ -->
+                <div class="mt-4 w-full px-4">
+                    <label for="temperature-slider" class="block text-center text-lg font-semibold text-gray-700 mb-2">
+                        Điều chỉnh Nhiệt độ ($T$)
+                    </label>
+                    <input type="range" id="temperature-slider" class="w-full" min="100" max="500" step="5">
+                </div>
+                
+                <div class="mt-6 w-full text-center">
+                    <button id="record-button" 
+                            class="w-full sm:w-auto px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-700 transition duration-200 transform hover:scale-105">
+                        Ghi lại Dữ liệu ($T, V$)
+                    </button>
+                    <p id="status-message" class="mt-3 text-sm h-5 font-medium text-gray-600">Sẵn sàng.</p>
+                </div>
+
+                <!-- Bảng Dữ liệu Thu thập -->
+                <h3 class="text-lg font-semibold mt-8 mb-2 text-teal-600">Bảng Dữ liệu Thu thập</h3>
+                <div class="overflow-x-auto w-full shadow-lg rounded-lg border border-gray-300">
+                    <table class="min-w-full divide-y divide-gray-300">
+                        <thead class="bg-teal-200">
+                            <tr>
+                                <th class="px-2 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">#</th>
+                                <th class="px-2 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">T (K)</th>
+                                <th class="px-2 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">V (đv)</th>
+                                <th class="px-2 py-3 text-left text-xs font-bold text-teal-800 uppercase tracking-wider">V/T (đv/K)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-table-body" class="bg-white divide-y divide-gray-200 text-sm">
+                            <!-- Dữ liệu sẽ được chèn vào đây -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Khu vực Đồ thị -->
+                <h3 class="text-lg font-semibold mt-8 mb-2 text-teal-600">Đồ thị V theo T (Đẳng áp)</h3>
+                <div class="w-full h-64 bg-white p-2 rounded-lg shadow-inner border border-gray-300">
+                    <canvas id="charlesLawChart"></canvas>
+                </div>
+
+            </div>
+
+            <!-- Cột 2: Lý Thuyết & Quiz (lg:w-2/3) -->
+            <div class="lg:w-2/3 p-4 bg-white rounded-xl shadow-lg border border-gray-200 overflow-y-auto">
+                <!-- I. TRẠNG THÁI VÀ QUÁ TRÌNH BIẾN ĐỔI -->
+                <h3 class="subsection-title text-indigo-600 font-bold">I. TRẠNG THÁI VÀ ĐẲNG QUÁ TRÌNH</h3>
+
+                <ul class="space-y-3 text-gray-700">
+                    <li>
+                        <p class="font-bold">1. Thông số và Trạng thái khí</p>
+                        <div class="list-item-content">
+                            Trạng thái được xác định bởi 3 thông số: **Áp suất ($p$), Thể tích ($V$), Nhiệt độ tuyệt đối ($T$)**. Quá trình biến đổi là khi ít nhất một thông số thay đổi.
+                        </div>
+                    </li>
+                    <li>
+                        <p class="font-bold">2. Định nghĩa Đẳng quá trình</p>
+                        <div class="list-item-content">
+                            Là quá trình trong đó **một thông số trạng thái được giữ không đổi**.
+                            <ul class="list-disc list-inside ml-4 mt-2 font-medium">
+                                <li>Đẳng nhiệt ($T = \text{const}$): ĐL Boyle.</li>
+                                <li>Đẳng tích ($V = \text{const}$): ĐL Charles thứ hai (ĐL Gay-Lussac).</li>
+                                <li>**Đẳng áp** ($p = \text{const}$): **ĐL Charles**. (Áp dụng cho mô phỏng cột 1)</li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+
+                <!-- II. ĐỊNH LUẬT CHARLES -->
+                <h3 class="subsection-title text-teal-600 mt-6 font-bold">II. ĐỊNH LUẬT CHARLES (Đẳng Áp: $p = \text{const}$)</h3>
+                
+                <p class="font-bold text-lg mt-4">1. Thí Nghiệm: Hướng dẫn sử dụng mô phỏng</p>
+                <div class="p-3 bg-yellow-100 border-l-4 border-yellow-500 rounded-lg text-sm text-gray-700">
+                    Mô phỏng ở **Cột 1** đang hoạt động trong điều kiện **Đẳng áp** ($p$ không đổi). Học sinh hãy kéo thanh trượt **Nhiệt độ** để tăng hoặc giảm $T$ và quan sát sự thay đổi của Thể tích ($V$). Sử dụng nút **"Ghi lại Dữ liệu"** để thu thập các cặp $(T, V)$ nhằm kiểm chứng định luật. Dữ liệu sẽ được vẽ trên đồ thị $V-T$.
+                </div>
+
+                <p class="font-bold text-lg mt-4">2. Phát biểu định luật</p>
+                <blockquote class="p-4 my-2 border-l-4 border-teal-500 bg-teal-50 italic text-gray-800 rounded-lg">
+                    Trong quá trình đẳng áp của một lượng khí nhất định, **thể tích tỉ lệ thuận với nhiệt độ tuyệt đối**.
+                </blockquote>
+                
+                <p class="font-bold mt-2">Biểu thức toán học:</p>
+                <div class="math-display">
+                    $$V \propto T \quad \text{hay} \quad \frac{V}{T} = \text{const}$$
+                    $$\frac{V_1}{T_1} = \frac{V_2}{T_2} = \dots = \frac{V_n}{T_n}$$
+                </div>
+
+                <p class="font-bold text-lg mt-6">3. Đồ thị đường đẳng áp (Isobar)</p>
+                <p class="text-sm text-gray-600 mb-2">Đường biểu diễn sự phụ thuộc của thể tích theo nhiệt độ khi áp suất không đổi được gọi là **Đường đẳng áp** (Isobar). Đồ thị $V-T$ (Kelvin) là một đường thẳng đi qua gốc tọa độ.</p>
+                
+
+                <div class="overflow-x-auto mt-3">
+                    <table class="w-full text-sm text-left text-gray-500 shadow-md rounded-lg">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-3 py-3">Hệ Tọa Độ</th>
+                                <th scope="col" class="px-3 py-3">Hình Dạng Đồ Thị</th>
+                                <th scope="col" class="px-3 py-3">Ý Nghĩa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="bg-white border-b">
+                                <td class="px-3 py-4 font-medium text-gray-900 whitespace-nowrap">$V$ **theo** $T$ (Kelvin)</td>
+                                <td class="px-3 py-4">Đường **Thẳng** đi qua gốc tọa độ</td>
+                                <td class="px-3 py-4">Thể hiện mối quan hệ tỉ lệ thuận ($V/T = \text{const}$).</td>
+                            </tr>
+                            <tr class="bg-white border-b">
+                                <td class="px-3 py-4 font-medium text-gray-900 whitespace-nowrap">$V$ **theo** $t$ (Celsius)</td>
+                                <td class="px-3 py-4">Đường **Thẳng**</td>
+                                <td class="px-3 py-4">Cắt trục hoành tại $-273.15^\circ \text{C}$ (Điểm không tuyệt đối lý thuyết).</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- III. KIỂM TRA KIẾN THỨC -->
+                <h3 class="subsection-title text-red-600 mt-8">III. KIỂM TRA KIẾN THỨC ĐỊNH LUẬT CHARLES</h3>
+
+                <!-- Câu hỏi 1 -->
+                <div class="p-4 bg-red-50 rounded-lg shadow-md mb-4">
+                    <p class="font-bold text-gray-800 mb-2">Câu 1: Quá trình đẳng áp là quá trình có thông số nào được giữ không đổi?</p>
+                    <div class="space-y-2">
+                        <label class="block"><input type="radio" name="q1" value="A"> A. Nhiệt độ tuyệt đối ($T$)</label>
+                        <label class="block"><input type="radio" name="q1" value="B"> B. Thể tích ($V$)</label>
+                        <label class="block"><input type="radio" name="q1" value="C"> C. Áp suất ($p$)</label>
+                        <label class="block"><input type="radio" name="q1" value="D"> D. Tích $p \cdot V$</label>
+                    </div>
+                    <button onclick="checkAnswer(1, 'C', 'result1')" class="mt-3 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition">Kiểm tra</button>
+                    <div id="result1"></div>
+                </div>
+
+                <!-- Câu hỏi 2 -->
+                <div class="p-4 bg-red-50 rounded-lg shadow-md mb-4">
+                    <p class="font-bold text-gray-800 mb-2">Câu 2: Hệ thức nào sau đây mô tả đúng Định luật Charles?</p>
+                    <div class="space-y-2">
+                        <label class="block"><input type="radio" name="q2" value="A"> A. $p \cdot V = \text{const}$</label>
+                        <label class="block"><input type="radio" name="q2" value="B"> B. $\frac{p}{T} = \text{const}$</label>
+                        <label class="block"><input type="radio" name="q2" value="C"> C. $\frac{V}{T} = \text{const}$</label>
+                        <label class="block"><input type="radio" name="q2" value="D"> D. $V \cdot t = \text{const}$</label>
+                    </div>
+                    <button onclick="checkAnswer(2, 'C', 'result2')" class="mt-3 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition">Kiểm tra</button>
+                    <div id="result2"></div>
+                </div>
+
+                <!-- Câu hỏi 3 -->
+                <div class="p-4 bg-red-50 rounded-lg shadow-md mb-4">
+                    <p class="font-bold text-gray-800 mb-2">Câu 3: Đồ thị đường đẳng áp trong hệ tọa độ ($V, T$) (nhiệt độ Kelvin) có hình dạng là:</p>
+                    <div class="space-y-2">
+                        <label class="block"><input type="radio" name="q3" value="A"> A. Đường hypebol.</label>
+                        <label class="block"><input type="radio" name="q3" value="B"> B. Đường thẳng song song với trục $V$</label>
+                        <label class="block"><input type="radio" name="q3" value="C"> C. Đường thẳng đi qua gốc tọa độ.</label>
+                        <label class="block"><input type="radio" name="q3" value="D"> D. Đường cong parabol.</label>
+                    </div>
+                    <button onclick="checkAnswer(3, 'C', 'result3')" class="mt-3 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition">Kiểm tra</button>
+                    <div id="result3"></div>
+                </div>
+                
+                <!-- Câu hỏi 4 (TÍNH TOÁN) -->
+                <div class="p-4 bg-red-100 rounded-lg shadow-md mb-4 border-2 border-red-500">
+                    <p class="font-bold text-gray-800 mb-2">Câu 4 (Tính toán): Một lượng khí lý tưởng có thể tích $V_1 = 5 \text{ L}$ ở nhiệt độ $t_1 = 27^\circ \text{C}$. Nếu giữ áp suất không đổi và tăng nhiệt độ lên $t_2 = 127^\circ \text{C}$, thể tích $V_2$ của khối khí là bao nhiêu? (Nhập kết quả gần đúng, đơn vị là $\text{L}$)</p>
+                    
+                    <div class="flex items-center space-x-2">
+                        <input type="number" id="q4-input" step="0.01" placeholder="Nhập V2 (L)" class="p-2 border border-gray-400 rounded-lg w-32 focus:ring-red-500 focus:border-red-500">
+                        <button id="check-q4" class="px-4 py-2 bg-red-700 text-white font-semibold rounded-lg hover:bg-red-800 transition">Kiểm tra</button>
+                    </div>
+                    <div id="result4"></div>
+                    <p class="text-sm text-gray-600 mt-2 italic">Gợi ý: Công thức $\frac{V_1}{T_1} = \frac{V_2}{T_2}$ và $\text{T} = t + 273.15$</p>
+                </div>
+
+                <!-- Câu hỏi 5 (TÍNH TOÁN) -->
+                <div class="p-4 bg-red-100 rounded-lg shadow-md mb-4 border-2 border-red-500">
+                    <p class="font-bold text-gray-800 mb-2">Câu 5 (Tính toán): Một khối khí có thể tích $V_1 = 10 \text{ L}$ ở $t_1 = 27^\circ \text{C}$. Để thể tích khối khí tăng lên $V_2 = 12 \text{ L}$ (áp suất không đổi), cần phải nung nóng khối khí đến nhiệt độ $t_2$ là bao nhiêu? (Nhập kết quả gần đúng, đơn vị là $\text{}^{\circ}\text{C}$)</p>
+                    
+                    <div class="flex items-center space-x-2">
+                        <input type="number" id="q5-input" step="0.01" placeholder="Nhập t2 (°C)" class="p-2 border border-gray-400 rounded-lg w-32 focus:ring-red-500 focus:border-red-500">
+                        <button id="check-q5" class="px-4 py-2 bg-red-700 text-white font-semibold rounded-lg hover:bg-red-800 transition">Kiểm tra</button>
+                    </div>
+                    <div id="result5"></div>
+                    <p class="text-sm text-gray-600 mt-2 italic">Gợi ý: Tìm $T_2$ trước, sau đó đổi sang $t_2$.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
