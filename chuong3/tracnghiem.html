@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bài Kiểm Tra</title>
+<style>
+  body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* Thanh menu trên */
+  #top-panel {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    text-align: center;
+  }
+
+  #top-panel a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  #top-panel a:hover {
+    text-decoration: underline;
+  }
+
+  /* Vùng hiển thị nội dung */
+  #bottom-panel {
+    flex-grow: 1;
+    border-top: 2px solid #ccc;
+  }
+
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  #click-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(255,255,255,0.6); /* nền trắng mờ, vẫn thấy bên dưới */
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  #click-overlay .spinner {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #007bff;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .loading-text {
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+</style>
+</head>
+<body>
+  <!-- Hiệu ứng chờ -->
+  <div id="click-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Đang tải nội dung, vui lòng chờ…</div>
+  </div>
+
+  <!-- Thanh menu -->
+  <div id="top-panel">
+    Trắc nghiệm củng cố : 
+<!--    <a href="thuyetdonghoc/thuyetdonghoc.html" target="content-frame">[Thuyết động học]</a> -->
+<!--    <a href="dinhluatboyle/boyle.html" target="content-frame">[Định luật Boyle]</a>-->
+<!--    <a href="dinhluatcharles/chales.html" target="content-frame">[Định luật Charles]</a>-->
+<!--    <a href="khilituong/ptttklt.html" target="content-frame">[Phương trình TTKLT]</a>-->
+<!--    <a href="apsuatdongnang/apsuatdongnang.html" target="content-frame">[Áp suất - động năng]</a>-->
+	<h1> ĐANG XÂY DỰNG </h1>
+
+  </div>
+
+  <!-- Khu vực nội dung -->
+  <div id="bottom-panel">
+    <iframe name="content-frame" id="content-frame" src="https://www.wikipedia.org"></iframe>
+  </div>
+
+  <script>
+    const overlay = document.getElementById('click-overlay');
+    const iframe = document.getElementById('content-frame');
+    const links = document.querySelectorAll('#top-panel a');
+
+    links.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const target = link.getAttribute('data-src');
+
+        // Hiện overlay
+        overlay.style.display = 'flex';
+
+        // Đổi src iframe
+        iframe.src = target;
+      });
+    });
+
+    // Khi iframe load xong, ẩn overlay
+    iframe.addEventListener('load', () => {
+      overlay.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
