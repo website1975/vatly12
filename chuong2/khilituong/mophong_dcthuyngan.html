@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng Quá Trình Nhiệt Độ Đạt Cực Đại</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- THÊM MATHJAX ĐỂ HIỂN THỊ CÔNG THỨC -->
+        <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                // Ensure MathJax is ready before trying to typeset
+                renderActions: {
+                    add: [
+                        10, 
+                        (doc) => { 
+                            if (!doc.typesetRoot) return;
+                            doc.typeset();
+                        },
+                        100,
+                    ]
+                },
+            }
+        };
+    </script>
+
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #1e293b;
+        }
+        #tube-container {
+            width: 80px;
+            height: 350px; /* Scale for L_TOTAL = 175cm (175*2 = 350) */
+            background-color: #e2e8f0;
+            border: 3px solid #64748b;
+            border-top: none;
+            border-radius: 0 0 8px 8px; 
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Thêm phần đáy bịt kín giả */
+        #sealed-bottom-cap {
+            position: absolute;
+            bottom: -3px; 
+            left: -3px;
+            width: 100%;
+            height: 6px;
+            background-color: #334155; 
+            border-radius: 0 0 8px 8px;
+            z-index: 100; 
+            border: 3px solid #64748b;
+            border-top: none;
+        }
+        
+        #mercury-column {
+            position: absolute;
+            width: 100%;
+            background-color: #4b5563; 
+            transition: all 0.3s ease-out; 
+            z-index: 10;
+        }
+        
+        #dead-space {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            background-color: transparent;
+            z-index: 15;
+            transition: height 0.3s ease-out;
+            border-bottom: 2px dashed #9ca3af; /* Marker for the top of the mercury */
+        }
+        #dead-space-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+        }
+        /* Nhãn để đánh dấu mốc 175cm */
+        #fixed-level-label {
+            position: absolute;
+            top: 0; 
+            right: 85px; /* Outside the tube */
+            font-size: 0.75rem;
+            color: #0d9488;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: top 0.3s ease-out;
+        }
+
+        #air-column {
+            position: absolute;
+            bottom: 0; 
+            width: 100%;
+            background-color: #e0f2f1; 
+            border-top: 2px solid #334155; 
+            transition: height 0.3s ease-out;
+            z-index: 5;
+        }
+        #air-label {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            color: #164e63;
+            font-weight: bold;
+            font-size: 0.8rem;
+            z-index: 7;
+        }
+        .mercury-color {
+            color: #4b5563;
+        }
+        .air-color {
+            color: #164e63;
+        }
+
+        /* Styles for Gas Particles */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: rgba(255, 0, 0, 0.7); 
+            z-index: 8;
+            opacity: 0.8;
+            filter: blur(0.5px);
+        }
+
+        /* Tmax visual indicator */
+        .tmax-highlight {
+            background-color: #fecaca; 
+            color: #dc2626;
+            border-color: #f87171;
+        }
+        .phase-indicator {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        /* Style for the explanation section */
+        .explanation-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1d4ed8; 
+            margin-top: 2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #93c5fd;
+        }
+        .explanation-section h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #059669;
+            margin-top: 1.5rem;
+        }
+        .explanation-section h4 {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #2563eb;
+            margin-top: 1rem;
+        }
+        .explanation-section p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            color: #374151;
+        }
+        .explanation-section .math-formula {
+            display: block;
+            margin: 1rem 0;
+            padding: 0.5rem;
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            font-family: 'Times New Roman', serif; /* Or MathJax if available */
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        .explanation-section strong {
+            font-weight: 700;
+            color: #1e293b;
+        }
+        #temperatureChart {
+            max-height: 400px; /* Limit chart height */
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex flex-col items-center min-h-screen">
+
+    <div class="max-w-4xl w-full bg-white p-6 md:p-10 rounded-xl shadow-2xl">
+        <h1 class="text-2xl font-extrabold text-indigo-700 mb-4 text-center">
+            🧪 Mô Phỏng Nhiệt Động Học: $T_{max}$ Ống Đứng Bịt Đáy
+        </h1>
+	<p style = "color: blue; font-size: 12px; text-align:center;" >
+		Một ống thuỷ tinh dài L, bên trong có cột thuỷ ngân cao h, phía trên để hở, khi nung nóng khí, cột thuỷ ngân di chuyển và tràn ra ngoài, Hãy quan sát sự thay đổi nhiệt độ khí trong ống, khi cột thuỷ ngân di chuyển
+	</p>
+        <p class="text-sm text-center text-gray-600 mb-6">
+		Điều khiển sự giãn nở ($L$) của khối khí trong ống **$175 \text{ cm}$** để quan sát sự thay đổi Nhiệt độ theo hai giai đoạn: **Lấp đầy khoảng trống** ($L \le 100 \text{ cm}$) và **Thủy ngân trào** ($L > 100 \text{ cm}$).
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-8 items-start">
+            
+
+<div class="flex flex-col space-y-4 p-4 bg-indigo-50 rounded-lg shadow-inner">
+                <h2 class="text-xl font-semibold text-indigo-600 mb-2">Điều Khiển và Dữ Liệu</h2>
+
+                
+
+<div class="flex flex-col">
+                    <label for="length-slider" class="text-sm font-medium text-gray-700 mb-1">
+                        Điều khiển Chiều dài Khí ($L$): <span id="current-length-air" class="font-bold text-lg air-color"></span> cm
+                        <span id="phase-status" class="phase-indicator bg-teal-100 text-teal-800"></span>
+                    </label>
+                    
+                    <input type="range" id="length-slider" min="90" max="175" value="90" step="0.5" class="w-full h-2 bg-indigo-200 rounded-lg appearance-none cursor-pointer">
+                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                        
+
+<span>$L_{min} = 90 \text{ cm}$ ($T \approx -6.00^\circ\text{C}$)</span>
+                        <span class="text-indigo-600 font-bold">$L_{spill} = 100 \text{ cm}$ ($T \approx 23.66^\circ\text{C}$)</span>
+                        <span class="text-red-600 font-bold">$L_{peak} = 125 \text{ cm}$ ($T_{max} \approx 36.03^\circ\text{C}$)</span>
+                    </div>
+                </div>
+
+                
+
+<div class="space-y-2 pt-4 border-t border-indigo-200">
+                    <p class="text-md"><span class="font-bold text-gray-800">Nhiệt độ ($T$ Celsius):</span> <span id="current-temp-c" class="font-mono font-bold text-lg text-red-600"></span></p>
+                    <p class="text-md"><span class="font-bold text-gray-800">Thủy ngân còn lại ($h_{Hg}$):</span> <span id="length-mercury" class="mercury-color font-mono"></span> cm</p>
+                    <p class="text-md"><span class="font-bold text-gray-800">Áp suất khí ($P$):</span> <span id="pressure-air" class="font-mono text-gray-800"></span> cmHg</p>
+                    <p class="text-md"><span class="font-bold text-gray-800">Khoảng trống ($D$):</span> <span id="dead-space-length" class="font-mono text-gray-600"></span> cm</p>
+                    <p class="text-md"><span class="font-bold text-gray-800">Nhiệt độ ($T$ Kelvin):</span> <span id="current-temp-k" class="font-mono text-gray-600"></span> K</p>
+                </div>
+
+                
+
+<div id="tmax-info" class="mt-4 p-3 border-l-4 border-red-500 rounded-md bg-red-100">
+                    <p class="font-semibold text-red-700">Điểm Cực Đại Tuyệt Đối ($T_{max}$):</p>
+                    <p class="font-bold text-red-800">
+                        Đạt được tại $L = 125 \text{ cm}$ (Trong Giai đoạn Trào)
+                    </p>
+                    <p class="font-bold text-red-800">
+                        $T_{max} \approx 36.03^\circ\text{C}$ (Kết quả đã sửa lỗi làm tròn)
+                    </p>
+                </div>
+            </div>
+
+            
+
+<div class="flex flex-col items-center">
+                <h2 class="text-xl font-semibold text-indigo-600 mb-4">Trực Quan Hóa Ống Thủy Tinh (175cm)</h2>
+
+                
+
+<div class="text-lg font-bold text-gray-700 mb-1 p-1 border-2 border-gray-400 rounded-t-lg bg-gray-200">
+                    Miệng Ống Hở ($P_0 = 75 \text{ cmHg}$)
+                </div>
+
+                <div id="tube-container">
+                    
+
+<div id="fixed-level-label">
+                        Mép ống (175cm) - Bắt đầu trào khi $L = 100 \text{ cm}$
+                    </div>
+
+                    
+
+<div id="dead-space" class="flex flex-col justify-center items-center">
+                        <span id="dead-space-label" class="text-xs text-gray-800 font-medium"></span>
+                    </div>
+
+                    
+
+<div id="mercury-column" class="flex flex-col justify-end">
+                        <div class="text-xs font-bold text-white text-center p-1 bg-gray-600">
+                            $h_{Hg}$
+                        </div>
+                    </div>
+                    
+                    
+
+<div id="air-column">
+                        <div id="air-label">L (Không Khí)</div>
+                        <div id="particle-container" class="absolute inset-0 top-0"></div>
+                    </div>
+                    
+                    
+
+<div id="sealed-bottom-cap"></div>
+                </div>
+
+                <div class="text-sm font-bold text-gray-700 mt-2">
+                    Đáy Ống Bịt Kín (Khối khí ban đầu)
+                </div>
+            </div>
+        </div>
+        <div class="text-xs text-gray-500 mt-4 text-center">
+            <span class="mercury-color">— Thủy Ngân đậm</span> | <span class="air-color">— Khí (Phân tử chuyển động)</span>
+        </div>
+    </div>
+    
+    
+
+<div class="max-w-4xl w-full bg-white p-6 md:p-10 mt-8 rounded-xl shadow-2xl">
+        <h2 class="text-2xl font-extrabold text-blue-700 mb-4 text-center">
+            Đồ Thị Nhiệt Độ ($T$) theo Chiều dài Khí ($L$)
+        </h2>
+        <div class="relative w-full">
+            <canvas id="temperatureChart"></canvas>
+        </div>
+    </div>
+
+    
+
+<div class="max-w-4xl w-full bg-white p-6 md:p-10 mt-8 rounded-xl shadow-2xl explanation-section">
+        <h2 class="text-2xl font-extrabold text-blue-700 mb-4 text-center">
+            🌡️ Phân Tích Nhiệt Độ Đạt Cực Đại ($T_{max}$)
+        </h2>
+        
+        <p>
+            Hiện tượng nhiệt độ ($T$) của khối khí tăng rồi giảm xuống trong quá trình giãn nở được giải thích thông qua **Nguyên lý I Nhiệt động lực học** ($\Delta U = Q + W$) và **Phương trình trạng thái khí lý tưởng** ($PV/T = \text{const}$).
+        </p>
+
+        <p>Công thức cốt lõi quyết định nhiệt độ ($T$) là:</p>
+        <div class="math-formula">
+            $$T = \frac{1}{K} \cdot P \cdot L$$
+        </div>
+        <p>Trong đó: $K$ là hằng số, $P$ là áp suất, và $L$ là chiều dài (tức Thể tích $V$) của khối khí. Nhiệt độ tăng hay giảm phụ thuộc vào sự thay đổi đồng thời của $P$ và $L$.</p>
+
+        ---
+        <h3>I. Giai đoạn Tăng Nhiệt độ ($L \le 125 \text{ cm}$): **Nhiệt cấp vào lớn hơn Công thực hiện**</h3>
+
+        <p>Nhiệt độ tăng trong toàn bộ Giai đoạn 1 ($90 \text{ cm} \to 100 \text{ cm}$) và nửa đầu Giai đoạn 2 ($100 \text{ cm} \to 125 \text{ cm}$).</p>
+
+        <h4>1. Giai đoạn Lấp đầy Khoảng trống ($90 \text{ cm} \le L \le 100 \text{ cm}$)</h4>
+        <ul class="list-disc list-inside ml-4 space-y-2">
+            <li>**Áp suất ($P$):** **Cố định** ($P = P_0 + H_{Hg} = 150 \text{ cmHg}$) vì cột thủy ngân $H_{Hg}$ chưa bị giảm chiều dài.</li>
+            <li>**Kết quả:** $T$ tỷ lệ thuận với $L$. Khi $L$ tăng, $T$ tăng tuyến tính.</li>
+            <li>**Giải thích Năng lượng (ĐL I NĐLH):** Khối khí nhận nhiệt ($Q > 0$) và thực hiện công ($W > 0$) để nâng cột thủy ngân. Vì **$T$ tăng ($\Delta U > 0$**), điều này chứng tỏ **tốc độ Nhiệt năng cấp vào ($Q$) lớn hơn tốc độ Công thực hiện ($W$)**. Năng lượng dư thừa chuyển thành Nội năng.</li>
+        </ul>
+
+        <h4>2. Nửa đầu Giai đoạn Trào ($100 \text{ cm} < L \le 125 \text{ cm}$)</h4>
+        <ul class="list-disc list-inside ml-4 space-y-2">
+            <li>**Cơ chế:** Thủy ngân trào ra, làm giảm chiều cao cột $H_{Hg}$ và giảm áp suất $P$. Khí tiếp tục giãn nở ($L$ tăng).</li>
+            <li>**Kết quả:** Cả $P$ và $L$ đều thay đổi, nhưng sự **tăng của $L$ vẫn chiếm ưu thế hơn** sự giảm của $P$, làm cho tích $P \cdot L$ (và do đó $T$) tiếp tục tăng.</li>
+        </ul>
+
+        ---
+        <h3>II. Giai đoạn Giảm Nhiệt độ ($L > 125 \text{ cm}$): **Công thực hiện trở nên chiếm ưu thế**</h3>
+
+        <p>Nhiệt độ đạt **cực đại tuyệt đối** tại $L = 125 \text{ cm}$. Sau điểm này, nhiệt độ bắt đầu giảm mặc dù khối khí vẫn đang giãn nở ($L$ vẫn tăng) và vẫn nhận nhiệt.</p>
+
+        <h4>Giải thích tại sao $T$ giảm:</h4>
+        <ul class="list-disc list-inside ml-4 space-y-2">
+            <li>**Sự Mất Áp suất:** Thủy ngân trào ra làm **áp suất $P$ giảm rất mạnh** theo $P = 250 - L$.</li>
+            <li>**Cân bằng $P \cdot L$:** Tốc độ giảm của $P$ đã **vượt qua** tốc độ tăng của $L$.</li>
+            <li>**Công và Nội năng (ĐL I NĐLH)::** Khí vẫn nhận nhiệt ($Q > 0$) nhưng công suất tiêu hao để giãn nở ($W$) vượt trội hơn tốc độ tăng Nội năng do $Q$. Dẫn đến **Nội năng giảm ($\Delta U < 0$)**, tức là **nhiệt độ $T$ giảm**.</li>
+        </ul>
+
+        <p class="mt-4 p-3 border-t border-b border-indigo-200 bg-indigo-50 font-semibold text-indigo-700 rounded-lg">
+            **Tóm lại:** $T_{max}$ đạt được tại điểm cân bằng hoàn hảo, nơi mà hiệu ứng tăng nhiệt độ do giãn nở thể tích ($L$) cân bằng chính xác với hiệu ứng giảm nhiệt độ do mất áp suất ($P$).
+        </p>
+
+    </div>
+    
+
+<script>
+        // --- KHAI BÁO HẰNG SỐ VÀ BIẾN SỐ BAN ĐẦU ---
+        const L_TOTAL = 175; // Chiều dài tổng cộng của ống (cm)
+        const P0 = 75; // Áp suất khí quyển (cmHg)
+        const L1 = 90; // Chiều dài khí ban đầu (cm)
+        const H_INITIAL = 75; // Chiều dài thủy ngân ban đầu (cm)
+        const D_INITIAL = L_TOTAL - L1 - H_INITIAL; // 10 cm
+        const T1_C = -6; // Nhiệt độ ban đầu (°C)
+        const T1_K = T1_C + 273.15; // 267.15 K
+        
+        // P1 = P0 + H_INITIAL = 75 + 75 = 150 cmHg
+        const P1 = P0 + H_INITIAL; 
+        
+        // Hằng số của quá trình (PV/T): Dùng giá trị chính xác nhất
+        const K_CONST = (P1 * L1) / T1_K; // K_CONST ≈ 50.536096
+        const PARTICLE_COUNT = 5; 
+        
+        // T_max (Giai đoạn trào)
+        const L_START_SPILL = L_TOTAL - H_INITIAL; // 175 - 75 = 100 cm
+        const L_MAX_T = 125; // L = (P0 + L_TOTAL) / 2 = 125 cm
+        const H_MAX_T = L_TOTAL - L_MAX_T; // 175 - 125 = 50 cm
+        const P_MAX_T = P0 + H_MAX_T; // 75 + 50 = 125 cmHg
+        
+        // Tính toán T_max chính xác
+        const T_MAX_K = (P_MAX_T * L_MAX_T) / K_CONST; // T_MAX_K ≈ 309.18425 K
+        const T_MAX_C = T_MAX_K - 273.15; // T_MAX_C ≈ 36.03425 °C
+
+        // Trạng thái cuối (Hg tràn hết)
+        const L_END = L_TOTAL; // 175 cm (Giới hạn lý thuyết)
+        const T_END_K = (P0 * L_END) / K_CONST; 
+        const T_END_C = T_END_K - 273.15; 
+
+
+        // Các phần tử DOM
+        const lengthSlider = document.getElementById('length-slider'); 
+        const currentLengthAir = document.getElementById('current-length-air');
+        const currentTempC = document.getElementById('current-temp-c');
+        const currentTempK = document.getElementById('current-temp-k');
+        const lengthMercury = document.getElementById('length-mercury');
+        const pressureAir = document.getElementById('pressure-air');
+        const deadSpaceLength = document.getElementById('dead-space-length');
+        const airColumn = document.getElementById('air-column');
+        const mercuryColumn = document.getElementById('mercury-column');
+        const deadSpaceDiv = document.getElementById('dead-space');
+        const deadSpaceLabel = document.getElementById('dead-space-label');
+        const airLabel = document.getElementById('air-label');
+        const tubeContainer = document.getElementById('tube-container');
+        const particleContainer = document.getElementById('particle-container');
+        const tmaxInfo = document.getElementById('tmax-info');
+        const fixedLevelLabel = document.getElementById('fixed-level-label');
+        const phaseStatus = document.getElementById('phase-status');
+
+        let particles = [];
+        let animationFrameId;
+        let temperatureChart; // Biến để lưu trữ đối tượng đồ thị
+
+        // --- HÀM TẠO VÀ CẬP NHẬT PHÂN TỬ KHÍ (Không thay đổi) ---
+        function createParticles() {
+            particleContainer.innerHTML = '';
+            particles = [];
+            
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = `${Math.random() * 80 + 10}%`; 
+                const initialHeightPx = L1 / L_TOTAL * tubeContainer.offsetHeight;
+                p.style.bottom = `${Math.random() * initialHeightPx}px`; 
+                
+                particles.push({
+                    element: p,
+                    vx: (Math.random() - 0.5) * 0.5, 
+                    vy: (Math.random() - 0.5) * 0.5, 
+                });
+                particleContainer.appendChild(p);
+            }
+        }
+
+        function animateParticles() {
+            const containerWidth = tubeContainer.offsetWidth;
+            const currentAirHeight = airColumn.offsetHeight;
+            // Sử dụng T_MAX_K đã tính toán chính xác
+            const tempInfluence = (parseFloat(currentTempK.textContent) / T_MAX_K); 
+
+            particles.forEach(p => {
+                let x = parseFloat(p.element.style.left) / 100 * containerWidth;
+                let y = parseFloat(p.element.style.bottom);
+
+                const speedMultiplier = 1 + tempInfluence * 0.8; 
+                x += p.vx * speedMultiplier;
+                y += p.vy * speedMultiplier;
+
+                if (x < 0 || x > containerWidth) {
+                    p.vx *= -1;
+                }
+                if (y < 0 || y > currentAirHeight) {
+                    p.vy *= -1;
+                }
+                
+                p.vx += (Math.random() - 0.5) * 0.05;
+                p.vy += (Math.random() - 0.5) * 0.05;
+
+                const maxV = 2; 
+                p.vx = Math.min(maxV, Math.max(-maxV, p.vx));
+                p.vy = Math.min(maxV, Math.max(-maxV, p.vy));
+                
+                p.element.style.left = `${x / containerWidth * 100}%`;
+                p.element.style.bottom = `${y}px`;
+            });
+
+            animationFrameId = requestAnimationFrame(animateParticles);
+        }
+
+        // --- HÀM TÍNH TOÁN T(L) cho đồ thị ---
+        function calculateTemperatureAtL(L_val) {
+            let H_Hg_val, P_val;
+
+            if (L_val <= L_START_SPILL) {
+                // Giai đoạn 1: Lấp đầy khoảng trống (H_Hg cố định = 75 cm)
+                H_Hg_val = H_INITIAL; 
+                P_val = P1; 
+            } else {
+                // Giai đoạn 2: Thủy ngân trào (Đỉnh Hg cố định tại 175 cm)
+                H_Hg_val = Math.max(0, L_TOTAL - L_val); 
+                P_val = P0 + H_Hg_val; 
+            }
+            return (P_val * L_val) / K_CONST - 273.15; // Trả về nhiệt độ Celsius
+        }
+
+        // --- HÀM KHỞI TẠO ĐỒ THỊ ---
+        function initChart() {
+            const ctx = document.getElementById('temperatureChart').getContext('2d');
+            const dataPoints = [];
+            for (let L = L1; L <= L_END; L += 1) { // Lấy mẫu với bước 1cm
+                dataPoints.push({ x: L, y: calculateTemperatureAtL(L) });
+            }
+
+            temperatureChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'Nhiệt độ T (°C)',
+                        data: dataPoints,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1,
+                        fill: false,
+                        pointRadius: 0 // Hide points on the line
+                    },
+                    {
+                        label: 'Vị trí hiện tại',
+                        data: [{ x: parseFloat(lengthSlider.value), y: calculateTemperatureAtL(parseFloat(lengthSlider.value)) }],
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgb(255, 99, 132)',
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        showLine: false
+                    },
+                    {
+                        label: `Tmax (${T_MAX_C.toFixed(2)}°C)`,
+                        data: [{ x: L_MAX_T, y: T_MAX_C }],
+                        borderColor: 'rgb(255, 205, 86)',
+                        backgroundColor: 'rgb(255, 205, 86)',
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        showLine: false,
+                        pointStyle: 'star'
+                    },
+                    {
+                        label: `Bắt đầu trào (${L_START_SPILL}cm)`,
+                        data: [{ x: L_START_SPILL, y: calculateTemperatureAtL(L_START_SPILL) }],
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgb(54, 162, 235)',
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        showLine: false,
+                        pointStyle: 'triangle'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'Chiều dài Khí L (cm)'
+                            },
+                            min: L1,
+                            max: L_TOTAL
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Nhiệt độ T (°C)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: L = ${context.parsed.x.toFixed(2)}cm, T = ${context.parsed.y.toFixed(2)}°C`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- HÀM CẬP NHẬT ĐỒ THỊ ---
+        function updateChart(L_cm, T_c) {
+            if (temperatureChart) {
+                temperatureChart.data.datasets[1].data = [{ x: L_cm, y: T_c }]; // Cập nhật điểm hiện tại
+                temperatureChart.update();
+            }
+        }
+
+
+        // --- HÀM TÍNH TOÁN VÀ CẬP NHẬT (Input L, Output T) ---
+        function calculateAndRender(L_cm) {
+            
+            let H_Hg, P, D, phase;
+            
+            if (L_cm <= L_START_SPILL) {
+                // Giai đoạn 1: Lấp đầy khoảng trống (H_Hg cố định = 75 cm)
+                phase = "GĐ 1: Lấp Khoảng trống";
+                H_Hg = H_INITIAL; 
+                P = P1; 
+                D = L_TOTAL - L_cm - H_Hg; // Khoảng trống giảm từ 10 cm về 0 cm
+                
+                // Giới hạn D không âm (D=0 khi L=100)
+                D = Math.max(0, D); 
+
+            } else {
+                // Giai đoạn 2: Thủy ngân trào (Đỉnh Hg cố định tại 175 cm)
+                phase = "GĐ 2: Thủy ngân Trào";
+                D = 0; // Khoảng trống = 0
+                
+                // Chiều dài Hg giảm do trào, không thể âm
+                H_Hg = Math.max(0, L_TOTAL - L_cm); 
+                
+                // Áp suất giảm
+                P = P0 + H_Hg; 
+            }
+            
+            // Tính T: T = (P * L) / K_CONST
+            const T_K = (P * L_cm) / K_CONST;
+            const T_C = T_K - 273.15;
+            
+            // 2. Tính toán tỷ lệ hiển thị
+            const SCALE = tubeContainer.offsetHeight / L_TOTAL;
+            const airHeight = L_cm * SCALE;
+            const mercuryHeight = H_Hg * SCALE;
+            const deadSpaceHeight = D * SCALE;
+            
+            // 3. Cập nhật Giao Diện (Dữ liệu)
+            currentLengthAir.textContent = L_cm.toFixed(2);
+            lengthMercury.textContent = H_Hg.toFixed(2);
+            pressureAir.textContent = P.toFixed(2);
+            deadSpaceLength.textContent = D.toFixed(2);
+            currentTempK.textContent = T_K.toFixed(2);
+            currentTempC.textContent = `${T_C.toFixed(2)}°C`;
+            phaseStatus.textContent = phase;
+            
+            // Đánh dấu T_max
+            currentTempC.classList.remove('text-green-600', 'text-yellow-600', 'text-red-600');
+            
+            if (L_cm < L_MAX_T) {
+                currentTempC.classList.add('text-green-600');
+                tmaxInfo.classList.remove('tmax-highlight');
+            } else if (L_cm >= L_MAX_T - 0.5 && L_cm <= L_MAX_T + 0.5) {
+                currentTempC.classList.add('text-red-600');
+                tmaxInfo.classList.add('tmax-highlight');
+            } else {
+                currentTempC.classList.add('text-yellow-600');
+                tmaxInfo.classList.remove('tmax-highlight');
+            }
+
+            // 4. Cập nhật Mô Phỏng (Visuals)
+            
+            // Cập nhật cột khí: Luôn ở đáy
+            airColumn.style.height = `${airHeight}px`;
+            airLabel.style.bottom = `${airHeight / 2 - 8}px`; 
+            particleContainer.style.height = `${airHeight}px`;
+
+            // Cập nhật cột thủy ngân: Nằm trên cột khí
+            mercuryColumn.style.height = `${mercuryHeight}px`;
+            mercuryColumn.style.bottom = `${airHeight}px`; 
+            mercuryColumn.style.opacity = H_Hg < 0.1 ? '0.2' : '1'; // Mờ đi khi gần hết
+            
+            // Cập nhật khoảng trống
+            deadSpaceDiv.style.height = `${deadSpaceHeight}px`;
+            deadSpaceDiv.style.bottom = `${airHeight + mercuryHeight}px`;
+            
+            // Cập nhật nhãn khoảng trống
+            if (D > 0.1) {
+                deadSpaceLabel.innerHTML = `<span class="text-xs text-gray-800 font-medium">D = ${D.toFixed(2)} cm</span>`;
+                deadSpaceDiv.style.opacity = '1';
+                deadSpaceDiv.style.borderBottom = '2px dashed #9ca3af';
+            } else {
+                deadSpaceLabel.textContent = ``;
+                deadSpaceDiv.style.opacity = '0';
+                deadSpaceDiv.style.borderBottom = 'none';
+            }
+
+            // Cập nhật trạng thái pha cho nhãn
+            if (L_cm < L_START_SPILL) {
+                 phaseStatus.classList.remove('bg-red-100', 'text-red-800');
+                 phaseStatus.classList.add('bg-teal-100', 'text-teal-800');
+            } else {
+                 phaseStatus.classList.remove('bg-teal-100', 'text-red-800');
+                 phaseStatus.classList.add('bg-red-100', 'text-red-800');
+            }
+
+            // Cập nhật vị trí hạt
+            if (particles.length > 0) {
+                particles.forEach(p => {
+                    let y = parseFloat(p.element.style.bottom);
+                    if (y > airHeight) {
+                        p.element.style.bottom = `${airHeight * Math.random()}px`;
+                    }
+                });
+            }
+            updateChart(L_cm, T_C); // Cập nhật đồ thị
+        }
+
+        // --- XỬ LÝ SỰ KIỆN ---
+        lengthSlider.addEventListener('input', (e) => {
+            const L_cm = parseFloat(e.target.value);
+            requestAnimationFrame(() => calculateAndRender(L_cm));
+        });
+
+        // Khởi tạo trạng thái ban đầu
+        window.onload = () => {
+             // Thêm thông tin T_max vào chú thích (Đã sửa lỗi làm tròn)
+             const minMaxDiv = document.querySelector('.flex.justify-between.text-xs.text-gray-500.mt-1');
+             minMaxDiv.innerHTML = `
+                <span>$L_{min} = 90 \text{ cm}$ ($T \approx ${T1_C.toFixed(2)}^\circ\text{C}$)</span>
+                <span class="text-indigo-600 font-bold">$L_{spill} = 100 \text{ cm}$ ($T \approx 23.66^\circ\text{C}$)</span>
+                <span class="text-red-600 font-bold">$L_{peak} = 125 \text{ cm}$ ($T_{max} \approx ${T_MAX_C.toFixed(2)}^\circ\text{C}$)</span>
+             `;
+             
+             initChart(); // Khởi tạo đồ thị trước
+             calculateAndRender(L1);
+             createParticles();
+             animateParticles();
+        }
+
+    </script>
+</body>
+</html>

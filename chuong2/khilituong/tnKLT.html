@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Khí Lý Tưởng</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font (Tailwind Default) -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Gray 100 */
+        }
+    </style>
+    <!-- KaTeX for fast mathematical formula rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" xintegrity="sha384-Gvr4j/c14k/z8i2m11p/jXzUqg3cE3s/N1Gf3h5A1Lg==" crossorigin="anonymous">
+    <!-- Đã xóa 'defer' và lệnh 'onload' để ngăn KaTeX render trước khi DOM được tạo -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" xintegrity="sha384-6kX6Zg6t3x/rT/11p/jXzUqg3cE3s/N1Gf3h5A1Lg==" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" xintegrity="sha384-5R5F+T6x/rT/11p/jXzUqg3cE3s/N1Gf3h5A1Lg==" crossorigin="anonymous"></script>
+</head>
+<body class="min-h-screen antialiased">
+
+    <div id="quiz-container" class="max-w-7xl mx-auto p-4 md:p-8 grid md:grid-cols-4 gap-6">
+
+        <!-- Cột 1: Thông tin và Điều hướng (Navigation) -->
+        <div id="sidebar" class="md:col-span-1 p-6 bg-white rounded-xl shadow-lg h-fit sticky top-8">
+            <div class="font-size:11px font-bold text-blue-800 mb-4 border-b pb-2 text-center">20 Câu KHÍ LÝ TƯỞNG</div>
+            
+            <!-- Đồng hồ đếm ngược -->
+            <div class="mb-4">
+                <div class="text-sm font-semibold text-gray-600">Thời gian còn lại</div>
+                <div id="countdown-timer" class="text-3xl font-extrabold text-red-600 mt-1">30:00</div>
+            </div>
+
+            <!-- Điều hướng câu hỏi -->
+            <div class="mt-6">
+                <div class="text-sm font-semibold text-gray-600 mb-3">Điều hướng câu hỏi</div>
+                <div id="question-nav" class="grid grid-cols-5 gap-2">
+                    <!-- Các nút câu hỏi sẽ được render tại đây -->
+                </div>
+            </div>
+            
+            <!-- Nộp bài -->
+            <button id="submit-button" onclick="confirmSubmission()" 
+                    class="w-full mt-8 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg shadow-md transition duration-200 focus:outline-none focus:ring-4 focus:ring-red-300">
+                Nộp bài
+            </button>
+        </div>
+
+        <!-- Cột 2: Nội dung Câu hỏi và Điều khiển (Main Content) -->
+        <div class="md:col-span-3">
+            <div id="main-content" class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                <!-- Nội dung câu hỏi/kết quả sẽ được render tại đây -->
+                <div id="question-view">
+                    <h2 class="text-2xl font-bold text-blue-700 mb-4">Câu <span id="current-q-number">1</span></h2>
+                    <div id="question-text" class="text-gray-900 text-lg mb-6 leading-relaxed"></div>
+                    
+                    <div id="options-container" class="space-y-4">
+                        <!-- Các lựa chọn A, B, C, D sẽ được render tại đây -->
+                    </div>
+                    
+                    <!-- Phần giải thích (chỉ hiển thị sau khi nộp bài) -->
+                    <div id="solution-guide" class="mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-500 hidden rounded-lg">
+                        <div class="font-bold text-yellow-700 mb-2">Hướng dẫn giải:</div>
+                        <p id="solution-text" class="text-gray-700 text-base"></p>
+                    </div>
+
+                </div>
+
+                <!-- Footer điều hướng chính -->
+                <div class="mt-8 pt-6 border-t flex justify-between">
+                    <button id="prev-button" onclick="navigate(-1)" disabled
+                            class="py-2 px-6 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold rounded-lg transition duration-200">
+                        &larr; Trước
+                    </button>
+                    <button id="next-button" onclick="navigate(1)"
+                            class="py-2 px-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200">
+                        Tiếp &rarr;
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Modal xác nhận nộp bài -->
+            <div id="confirmation-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+                <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full">
+                    <h3 class="text-xl font-bold mb-4 text-gray-800">Xác nhận nộp bài</h3>
+                    <p class="text-gray-600 mb-6">Bạn có chắc chắn muốn nộp bài? Bài thi sẽ kết thúc và kết quả sẽ được hiển thị.</p>
+                    <div class="flex justify-end space-x-3">
+                        <button onclick="closeModal()" class="py-2 px-4 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold">Hủy</button>
+                        <button onclick="submitQuiz()" class="py-2 px-4 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold">Nộp bài</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Dữ liệu câu hỏi được nhúng trực tiếp để tải nhanh
+    const quizData = [
+        { id: 1, level: "BIẾT", text: "Phương trình trạng thái khí lý tưởng (phương trình Clapeyron) thể hiện mối liên hệ giữa các thông số trạng thái ($P, V, T$) của một lượng khí xác định là:", options: ["$\\frac{P_1 V_1}{P_2 V_2} = T_1 T_2$", "$\\frac{P_1 V_1}{T_1} = \\frac{P_2 V_2}{T_2}$", "$P_1 V_1 T_1 = P_2 V_2 T_2$", "$P_1 T_1 = P_2 T_2$"], correct: 1, solution: "Theo phương trình Clapeyron, tỉ số giữa tích áp suất và thể tích với nhiệt độ tuyệt đối là hằng số cho một lượng khí xác định." },
+        { id: 2, level: "BIẾT", text: "Trong phương trình Mendeleev-Clapeyron ($PV = \\frac{m}{M}RT$), đại lượng $M$ đại diện cho:", options: ["Khối lượng riêng của khí.", "Thể tích mol.", "Khối lượng của lượng khí đang xét.", "Khối lượng mol của chất khí."], correct: 3, solution: "Đại lượng $M$ trong công thức là Khối lượng mol (Molecular weight), đơn vị $\\text{kg/mol}$ hoặc $\\text{g/mol}$." },
+        { id: 3, level: "BIẾT", text: "Khí lý tưởng là chất khí mà các phân tử của nó:", options: ["Có thể tích rất lớn so với thể tích bình chứa và tương tác mạnh với nhau.", "Có thể tích rất nhỏ và tương tác mạnh với nhau.", "Có thể tích rất nhỏ và tương tác có thể bỏ qua.", "Chuyển động hỗn loạn và tương tác với nhau bằng lực hấp dẫn."], correct: 2, solution: "Định nghĩa khí lý tưởng là khí mà thể tích phân tử và lực tương tác giữa các phân tử đều được bỏ qua." },
+        // ĐÃ SỬA: Dùng cú pháp KaTeX $\text{}^{\circ}\text{C}$ để đảm bảo ký hiệu độ (degree symbol) hiển thị chính xác.
+        { id: 4, level: "BIẾT", text: "Đơn vị đo nhiệt độ tuyệt đối ($T$) được sử dụng trong các phương trình khí lý tưởng là:", options: ["Độ Celsius ($\text{}^{\circ}\\text{C}$)", "Độ Fahrenheit ($\text{}^{\circ}\\text{F}$)", "Kelvin (K)", "Jun (J)"], correct: 2, solution: "Nhiệt độ tuyệt đối $T$ luôn được đo bằng Kelvin (K), với $T = t + 273$." },
+        { id: 5, level: "BIẾT", text: "Quá trình đẳng nhiệt là quá trình biến đổi trạng thái của một lượng khí xác định khi:", options: ["Áp suất được giữ không đổi.", "Thể tích được giữ không đổi.", "Nhiệt độ được giữ không đổi.", "Khối lượng mol được giữ không đổi."], correct: 2, solution: "Quá trình đẳng nhiệt (Isothermal process) là quá trình có nhiệt độ không đổi ($T = \\text{const}$)." },
+        { id: 6, level: "HIỂU", text: "Khi nhiệt độ của một lượng khí xác định tăng gấp đôi (tính bằng Kelvin) trong điều kiện đẳng tích, áp suất của khí sẽ:", options: ["Giảm đi một nửa.", "Tăng gấp đôi.", "Không thay đổi.", "Tăng gấp bốn lần."], correct: 1, solution: "Theo định luật Charles (quá trình đẳng tích): $\\frac{P}{T} = \\text{const}$. Nếu $T$ tăng 2 lần thì $P$ cũng phải tăng 2 lần." },
+        { id: 7, level: "HIỂU", text: "Vì sao lốp xe đạp bơm căng để ngoài trời nắng nóng có thể bị nổ?", options: ["Do nhiệt độ tăng làm khối lượng khí trong lốp tăng lên.", "Do nhiệt độ tăng làm thể tích khí tăng, kéo theo áp suất giảm, gây nổ.", "Do nhiệt độ tăng làm áp suất khí trong lốp tăng lên vượt quá giới hạn chịu đựng của lốp (Quá trình đẳng tích).", "Do nhiệt độ tăng làm khối lượng riêng của khí tăng."], correct: 2, solution: "Thể tích lốp xe gần như không đổi (đẳng tích). Nhiệt độ tăng dẫn đến áp suất tăng ($P \\sim T$), gây nổ." },
+        { id: 8, level: "HIỂU", text: "Một khối khí bị nén đẳng nhiệt (nhiệt độ không đổi). Khi thể tích giảm đi 4 lần thì:", options: ["Áp suất tăng 4 lần.", "Áp suất giảm 4 lần.", "Áp suất không đổi.", "Áp suất tăng 2 lần."], correct: 0, solution: "Theo định luật Boyle-Mariotte (quá trình đẳng nhiệt): $PV = \\text{const}$. $V_2 = V_1/4 \\Rightarrow P_2 = 4P_1$." },
+        { id: 9, level: "HIỂU", text: "Trong quá trình đẳng áp (áp suất không đổi), nếu khối khí được làm lạnh (giảm nhiệt độ), thì:", options: ["Thể tích khí giảm.", "Thể tích khí tăng.", "Thể tích khí không đổi.", "Áp suất tăng."], correct: 0, solution: "Theo định luật Gay-Lussac (quá trình đẳng áp): $\\frac{V}{T} = \\text{const}$. $T$ giảm thì $V$ cũng giảm." },
+        // ĐÃ SỬA: Dùng cú pháp KaTeX $\text{}^{\circ}\text{C}$
+        { id: 10, level: "HIỂU", text: "Khi một khối khí được làm nóng từ $27\text{}^{\circ}\\text{C}$ lên $127\text{}^{\circ}\\text{C}$ ở áp suất không đổi, tỉ số giữa thể tích cuối ($V_2$) và thể tích đầu ($V_1$) là:", options: ["$\\frac{127}{27}$", "$\\frac{400}{300}$", "$\\frac{127-27}{127}$", "$\\frac{273+27}{273+127}$"], correct: 1, solution: "Đổi sang Kelvin: $T_1 = 27 + 273 = 300K$, $T_2 = 127 + 273 = 400K$. Quá trình đẳng áp: $\\frac{V_2}{V_1} = \\frac{T_2}{T_1} = \\frac{400}{300}$." },
+        { id: 11, level: "VẬN DỤNG", text: "Một lượng khí đựng trong bình có thể tích $5L$ ở áp suất $1.5 \\times 10^5 \\text{ Pa}$. Nếu nén khí đẳng nhiệt để áp suất tăng lên gấp đôi thì thể tích khí lúc đó là:", options: ["$10 \\text{ L}$", "$7.5 \\text{ L}$", "$2.5 \\text{ L}$", "$5 \\text{ L}$"], correct: 2, solution: "Đẳng nhiệt: $P_1V_1 = P_2V_2$. $P_2 = 2P_1 \\Rightarrow V_2 = \\frac{P_1V_1}{2P_1} = \\frac{V_1}{2} = \\frac{5}{2} = 2.5 \\text{ L}$." },
+        // ĐÃ SỬA: Dùng cú pháp KaTeX $\text{}^{\circ}\text{C}$
+        { id: 12, level: "VẬN DỤNG", text: "Một bình chứa $4 \\text{ mol}$ khí $\\text{O}_2$ ở nhiệt độ $27\text{}^{\circ}\\text{C}$ và có thể tích $20 \\text{ L}$. Áp suất của khí trong bình là bao nhiêu? (Lấy $R = 8.31 \\text{ J/(mol}\\cdot\\text{K)}$).", options: ["$4.986 \\times 10^5 \\text{ Pa}$", "$2.493 \\times 10^5 \\text{ Pa}$", "$1.246 \\times 10^5 \\text{ Pa}$", "$9.972 \\times 10^5 \\text{ Pa}$"], correct: 0, solution: "$T = 300 \\text{ K}$, $V = 0.02 \\text{ m}^3$. $P = \\frac{nRT}{V} = \\frac{4 \\times 8.31 \\times 300}{0.02} \\approx 498600 \\text{ Pa}$." },
+        { id: 13, level: "VẬN DỤNG", text: "Một lượng khí được nung nóng từ $300 \\text{ K}$ đến $400 \\text{ K}$ dưới áp suất không đổi. Nếu thể tích ban đầu là $10 \\text{ m}^3$, thể tích sau khi nung là:", options: ["$7.5 \\text{ m}^3$", "$13.33 \\text{ m}^3$", "$10 \\text{ m}^3$", "$30 \\text{ m}^3$"], correct: 1, solution: "Đẳng áp: $\\frac{V_1}{T_1} = \\frac{V_2}{T_2} \\Rightarrow V_2 = V_1 \\frac{T_2}{T_1} = 10 \\times \\frac{400}{300} \\approx 13.33 \\text{ m}^3$." },
+        { id: 14, level: "VẬN DỤNG", text: "Một lượng khí xác định có thể tích $10 \\text{ L}$ ở nhiệt độ $27\text{}^{\circ}\\text{C}$ và áp suất $2 \\text{ atm}$. Sau khi biến đổi, khí có thể tích $15 \\text{ L}$ và áp suất $3 \\text{ atm}$. Nhiệt độ cuối cùng của khí là:", options: ["$675 \\text{ K}$", "$450 \\text{ K}$", "$200 \\text{ K}$", "$900 \\text{ K}$"], correct: 0, solution: "$T_1 = 300 \\text{ K}$. $\\frac{P_1V_1}{T_1} = \\frac{P_2V_2}{T_2} \\Rightarrow T_2 = T_1 \\frac{P_2V_2}{P_1V_1} = 300 \\times \\frac{3 \\times 15}{2 \\times 10} = 675 \\text{ K}$." },
+        { id: 15, level: "VẬN DỤNG", text: "Để áp suất của một khối khí tăng lên 4 lần, người ta đã thực hiện quá trình vừa nén (giảm thể tích 2 lần) vừa nung nóng. Nhiệt độ tuyệt đối cuối cùng ($T_2$) so với nhiệt độ tuyệt đối ban đầu ($T_1$) là:", options: ["$T_2 = 8 T_1$", "$T_2 = 2 T_1$", "$T_2 = 4 T_1$", "$T_2 = T_1$"], correct: 1, solution: "Áp dụng phương trình trạng thái: $\\frac{P_1V_1}{T_1} = \\frac{P_2V_2}{T_2}$. Với $P_2 = 4P_1$ và $V_2 = 0.5V_1$. $\\Rightarrow T_2 = T_1 \\frac{P_2V_2}{P_1V_1} = T_1 \\frac{4P_1 \\times 0.5V_1}{P_1V_1} = 2T_1$." },
+	{ id: 16, level: "VẬN DỤNG CAO", text: "Một khinh khí cầu có thể tích $V = 100 \\text{ m}^3$ chứa đầy khí $\\text{H}_2$ ($M_1 = 2 \\text{ g/mol}$) ở nhiệt độ $T=300 \\text{ K}$ và áp suất $P=1 \\text{ atm}$ ($101325 \\text{ Pa}$). Khối lượng mol trung bình của không khí bên ngoài là $M_0 = 29 \\text{ g/mol}$ ở cùng điều kiện. Tính khối lượng tối đa (vỏ và tải trọng) mà khinh khí cầu có thể nâng lên. (Lấy $R = 8.31 \\text{ J/(mol}\\cdot\\text{K)}$).", options: ["$109.8 \\text{ kg}$", "$117.9 \\text{ kg}$", "$8.1 \\text{ kg}$", "$126.0 \\text{ kg}$"], correct: 0, solution: "Lực đẩy Archimedes tối đa (tổng khối lượng có thể nâng) là $M_{\\text{total}} = \\rho_0 V$. Khối lượng khí bên trong là $m_1 = \\rho_1 V$. Khối lượng tối đa có thể nâng ($m_{\\text{max}}$) là $M_{\\text{total}} - m_1$. Áp dụng $\\rho = \\frac{PM}{RT}$: $\\rho_0 = \\frac{101325 \\times 0.029}{8.31 \\times 300} \\approx 1.179 \\text{ kg/m}^3$, $\\rho_1 = \\frac{101325 \\times 0.002}{8.31 \\times 300} \\approx 0.0813 \\text{ kg/m}^3 \\to m_{max}=109,77 kg$."},        	{ id: 17, level: "VẬN DỤNG CAO", text: "Một bình chứa khí ở nhiệt độ $T_1 = 400 \\text{ K}$. Khi một phần khí bị thoát ra, nhiệt độ giảm xuống còn $T_2 = 300 \\text{ K}$ và áp suất giảm đi $1.5$ lần. Tỉ lệ khối lượng khí còn lại ($m_2$) so với khối lượng khí ban đầu ($m_1$) là:", options: ["$75\\%$", "$88.9\\%$", "$66.7\\%$", "$50\\%$"], correct: 1, solution: "Áp dụng $\\frac{P_1V}{P_2V} = \\frac{m_1/M RT_1}{m_2/M RT_2}$. $\\frac{P_1}{P_2} = 1.5$. $\\Rightarrow 1.5 = \\frac{m_1}{m_2} \\frac{400}{300} = \\frac{m_1}{m_2} \\frac{4}{3}$. $\\Rightarrow \\frac{m_1}{m_2} = 1.5 \\times \\frac{3}{4} = \\frac{9}{8}$. $\\Rightarrow \\frac{m_2}{m_1} = \\frac{8}{9} \\approx 88.9\\%$." },
+        { id: 18, level: "VẬN DỤNG CAO", text: "Hai bình có thể tích $V_1 = V_2 = V$ chứa cùng một loại khí lý tưởng. Bình 1 có áp suất $P_1 = 2 \\text{ atm}$ ở $T_1 = 300 \\text{ K}$, bình 2 có áp suất $P_2 = 3 \\text{ atm}$ ở $T_2 = 400 \\text{ K}$. Nếu nối hai bình thông nhau và giữ nhiệt độ của hai bình không đổi, áp suất cuối cùng của hệ là $P_{\\text{chung}}$. Giá trị của $P_{\\text{chung}}$ là:", options: ["$2.5 \\text{ atm}$", "$2.4 \\text{ atm}$", "$5.0 \\text{ atm}$", "$2.75 \\text{ atm}$"], correct: 1, solution: "Tổng số mol khí không đổi: $n_{chung} = n_1 + n_2$. $P_{\\text{chung}} = \\frac{P_1 T_2 + P_2 T_1}{T_1 + T_2}$. $P_{\\text{chung}} = \\frac{2 \\times 400 + 3 \\times 300}{300 + 400} = \\frac{1700}{700} \\approx 2.43 \\text{ atm}$." },
+	{id: 19, level: "VẬN DỤNG CAO", text: "Một lượng khí lý tưởng thực hiện chu trình biến đổi $1 \\rightarrow 2 \\rightarrow 3 \\rightarrow 1$. Biết quá trình $1 \\rightarrow 2$ là đẳng tích (áp suất tăng), $2 \\rightarrow 3$ là đẳng áp (thể tích tăng). Hỏi nhiệt độ lớn nhất ($T_{\\text{max}}$) mà khối khí đạt được trong chu trình nằm ở trạng thái nào?", options: ["Trạng thái 1", "Trạng thái 2", "Trạng thái 3", "Có thể là 1 hoặc 3"], correct: 2, solution: "Nhiệt độ $T$ tỉ lệ với tích $P \\cdot V$ ($T \\sim PV$).\\n- $1 \\rightarrow 2$ (Đẳng tích, $V_1=V_2$): Áp suất tăng ($P_2 > P_1$) $\\Rightarrow T_2 > T_1$.\\n- $2 \\rightarrow 3$ (Đẳng áp, $P_2=P_3$): Thể tích tăng ($V_3 > V_2$) $\\Rightarrow T_3 > T_2$. \\nTừ đó suy ra $T_3$ là nhiệt độ lớn nhất trong ba trạng thái 1, 2, 3. Nhiệt độ trong quá trình $3 \\rightarrow 1$ (kéo dài từ $T_3$ về $T_1$) không thể lớn hơn $T_3$." },
+        { id: 20, level: "VẬN DỤNG CAO", text: "Một lượng khí lý tưởng biến đổi trạng thái theo đường thẳng trong hệ tọa độ $(V, T)$ đi qua các trạng thái $A(V_A, T_A)$ và $B(V_B, T_B)$. Biết $V_A = 1 \\text{ m}^3, T_A = 300 \\text{ K}$ và $V_B = 3 \\text{ m}^3, T_B = 600 \\text{ K}$. Tỉ số giữa áp suất lớn nhất ($P_{\\text{max}}$) và áp suất nhỏ nhất ($P_{\\text{min}}$) trong quá trình này là:", options: ["$P_{\\text{max}}/P_{\\text{min}} = 1$", "$P_{\\text{max}}/P_{\\text{min}} = 1.2$", "$P_{\\text{max}}/P_{\\text{min}} = 1.5$", "$P_{\\text{max}}/P_{\\text{min}} = 2$"], correct: 2, solution: "Áp suất $P = \\frac{nRT}{V}$. Phương trình đường thẳng: $V = \\frac{T}{150} - 1$. Khảo sát cho thấy hàm $P(T)$ nghịch biến trên đoạn $[300K, 600K]$. $P_{\\text{max}}$ tại $T_A = 300 \\text{ K}$, $P_{\\text{min}}$ tại $T_B = 600 \\text{ K}$. Tỉ số: $\\frac{P_{\\text{max}}}{P_{\\text{min}}} = \\frac{P_A}{P_B} = \\frac{T_A/V_A}{T_B/V_B} = \\frac{300/1}{600/3} = \\frac{300}{200} = 1.5$." },
+    ];
+
+    const totalQuestions = quizData.length;
+    let currentQuestionIndex = 0;
+    let userAnswers = {}; // { 0: 2, 1: 0, ... } -> {questionIndex: selectedOptionIndex}
+    let timerInterval;
+    const timeLimitMinutes = 30;
+
+    // --- Core Functions ---
+
+    function initQuiz() {
+        // Khởi tạo các biến global và giao diện
+        userAnswers = Array(totalQuestions).fill(null);
+        renderQuiz();
+        startTimer();
+    }
+
+    function renderQuiz() {
+        if (currentQuestionIndex < 0 || currentQuestionIndex >= totalQuestions) return;
+
+        const question = quizData[currentQuestionIndex];
+        const qNumEl = document.getElementById('current-q-number');
+        const qTextEl = document.getElementById('question-text');
+        const optionsEl = document.getElementById('options-container');
+        const prevBtn = document.getElementById('prev-button');
+        const nextBtn = document.getElementById('next-button');
+        const solutionGuideEl = document.getElementById('solution-guide');
+
+        // 1. Cập nhật số câu và nội dung
+        qNumEl.textContent = question.id;
+        qTextEl.innerHTML = question.text;
+        
+        // 2. Render Options
+        optionsEl.innerHTML = '';
+        question.options.forEach((optText, index) => {
+            const isChecked = userAnswers[currentQuestionIndex] === index;
+            const optionLetter = String.fromCharCode(65 + index); // A, B, C, D
+            
+            const optionDiv = document.createElement('div');
+            optionDiv.className = `option-item p-3 border rounded-lg cursor-pointer transition duration-150 ${isChecked ? 'bg-blue-100 border-blue-500' : 'bg-white hover:bg-gray-50'}`;
+            optionDiv.setAttribute('onclick', `selectOption(${index})`);
+            
+            optionDiv.innerHTML = `
+                <input type="radio" id="q${question.id}-opt${index}" name="q${question.id}" value="${index}" class="hidden" ${isChecked ? 'checked' : ''}>
+                <label for="q${question.id}-opt${index}" class="flex items-start text-gray-800">
+                    <span class="font-bold mr-3 min-w-[20px] text-center">${optionLetter}.</span> 
+                    <span class="flex-1">${optText}</span>
+                </label>
+            `;
+            optionsEl.appendChild(optionDiv);
+        });
+
+        // 3. Render Navigation
+        prevBtn.disabled = currentQuestionIndex === 0;
+        nextBtn.disabled = currentQuestionIndex === totalQuestions - 1;
+
+        // 4. Render Sidebar Navigation
+        renderSidebarNav();
+        
+        // 5. Ẩn/Hiện giải thích (Mặc định ẩn)
+        solutionGuideEl.classList.add('hidden');
+        
+        // 6. Render công thức toán học (Sau khi nội dung đã được chèn)
+        // Đây là bước quan trọng để KaTeX hoạt động đúng với nội dung động
+        if (typeof renderMathInElement !== 'undefined') {
+            renderMathInElement(document.getElementById('question-view'), {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\(", right: "\\)", display: false},
+                    {left: "\\[", right: "\\]", display: true}
+                ]
+            });
+        }
+    }
+    
+    function renderSidebarNav() {
+        const navEl = document.getElementById('question-nav');
+        navEl.innerHTML = '';
+        
+        quizData.forEach((q, index) => {
+            const isCurrent = index === currentQuestionIndex;
+            const isAnswered = userAnswers[index] !== null;
+            
+            let btnClass = 'w-full aspect-square text-sm font-semibold rounded-lg transition duration-150';
+            
+            if (isCurrent) {
+                btnClass += ' bg-blue-600 text-white shadow-lg ring-4 ring-blue-300';
+            } else if (isAnswered) {
+                btnClass += ' bg-green-500 text-white hover:bg-green-600';
+            } else {
+                btnClass += ' bg-gray-200 text-gray-700 hover:bg-gray-300';
+            }
+            
+            const button = document.createElement('button');
+            button.className = btnClass;
+            button.textContent = q.id;
+            button.setAttribute('onclick', `jumpToQuestion(${index})`);
+            navEl.appendChild(button);
+        });
+    }
+
+    function selectOption(selectedIndex) {
+        userAnswers[currentQuestionIndex] = selectedIndex;
+        renderQuiz(); // Re-render để cập nhật trạng thái chọn và sidebar
+    }
+
+    function navigate(direction) {
+        const newIndex = currentQuestionIndex + direction;
+        if (newIndex >= 0 && newIndex < totalQuestions) {
+            currentQuestionIndex = newIndex;
+            renderQuiz();
+        }
+    }
+    
+    function jumpToQuestion(index) {
+        currentQuestionIndex = index;
+        renderQuiz();
+    }
+
+    // --- Timer Logic ---
+
+    function startTimer() {
+        let endTime = new Date().getTime() + timeLimitMinutes * 60 * 1000;
+        const timerEl = document.getElementById('countdown-timer');
+        
+        timerInterval = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = endTime - now;
+
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            if (distance < 0) {
+                clearInterval(timerInterval);
+                timerEl.textContent = "HẾT GIỜ";
+                submitQuiz(true); // Tự động nộp bài khi hết giờ
+            } else {
+                timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }, 1000);
+    }
+    
+    // --- Submission Logic ---
+
+    function confirmSubmission() {
+        document.getElementById('confirmation-modal').classList.remove('hidden');
+    }
+    
+    function closeModal() {
+        document.getElementById('confirmation-modal').classList.add('hidden');
+    }
+
+    function submitQuiz(isTimeout = false) {
+        clearInterval(timerInterval);
+        closeModal();
+        
+        let score = 0;
+        let correctAnswers = 0;
+        
+        quizData.forEach((q, index) => {
+            if (userAnswers[index] === q.correct) {
+                score++;
+                correctAnswers++;
+            }
+        });
+
+        // Tắt nút điều hướng và nộp bài
+        document.getElementById('prev-button')?.remove();
+        document.getElementById('next-button')?.remove();
+        document.getElementById('submit-button')?.remove();
+        
+        // Render kết quả
+        const mainContentEl = document.getElementById('main-content');
+        mainContentEl.innerHTML = generateResultHtml(score, correctAnswers, isTimeout);
+        
+        // Render hướng dẫn giải chi tiết
+        renderSolutions();
+
+        // Cập nhật timer
+        document.getElementById('countdown-timer').classList.remove('text-red-600');
+        document.getElementById('countdown-timer').classList.add('text-green-600');
+        document.getElementById('countdown-timer').textContent = "Đã nộp bài";
+
+        // Render công thức toán học cho kết quả và giải thích
+        if (typeof renderMathInElement !== 'undefined') {
+            renderMathInElement(document.getElementById('main-content'), {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\(", right: "\\)", display: false},
+                    {left: "\\[", right: "\\]", display: true}
+                ]
+            });
+        }
+    }
+    
+    function generateResultHtml(score, correctAnswers, isTimeout) {
+        const total = totalQuestions;
+        const scoreRatio = (score / total) * 10;
+        
+        return `
+            <div class="text-center py-8">
+                <h1 class="text-4xl font-extrabold text-green-700 mb-4">
+                    ${isTimeout ? 'HẾT GIỜ & KẾT QUẢ' : 'HOÀN THÀNH BÀI THI!'}
+                </h1>
+                <p class="text-lg text-gray-600 mb-6">Bạn đã hoàn thành ${correctAnswers} trên ${total} câu hỏi.</p>
+                
+                <div class="inline-block p-6 bg-green-50 border-4 border-green-500 rounded-xl shadow-lg">
+                    <div class="text-sm font-semibold text-gray-600">Điểm số (Thang 10)</div>
+                    <div class="text-6xl font-black text-green-800">${scoreRatio.toFixed(2)}</div>
+                </div>
+            </div>
+            
+            <h2 class="text-2xl font-bold text-gray-800 mt-10 mb-6 border-b pb-2">Hướng Dẫn Giải Chi Tiết</h2>
+            <div id="solutions-container">
+                <!-- Solutions will be rendered here -->
+            </div>
+        `;
+    }
+
+    function renderSolutions() {
+        const solutionsContainer = document.getElementById('solutions-container');
+        solutionsContainer.innerHTML = '';
+
+        quizData.forEach((q, index) => {
+            const userChoiceIndex = userAnswers[index];
+            const correctChoiceIndex = q.correct;
+            const isCorrect = userChoiceIndex === correctChoiceIndex;
+            
+            const userChoiceLetter = userChoiceIndex !== null ? String.fromCharCode(65 + userChoiceIndex) : 'Chưa trả lời';
+            const correctChoiceLetter = String.fromCharCode(65 + correctChoiceIndex);
+            
+            const cardClass = isCorrect ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300';
+            const statusText = isCorrect ? 'Đúng' : 'Sai';
+            const statusColor = isCorrect ? 'text-green-600' : 'text-red-600';
+
+            const solutionHtml = `
+                <div class="${cardClass} p-5 mb-6 rounded-xl border-2 shadow">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Câu ${q.id}. <span class="${statusColor} ml-2">(${statusText})</span></h3>
+                    <div class="text-lg text-gray-900 mb-4">${q.text}</div>
+
+                    <div class="mb-4">
+                        <p class="font-semibold">Lựa chọn của bạn: 
+                            <span class="${isCorrect ? 'text-green-600' : 'text-red-600'} font-bold">${userChoiceLetter}</span>
+                        </p>
+                        <p class="font-semibold">Đáp án đúng: 
+                            <span class="text-green-600 font-bold">${correctChoiceLetter}</span>
+                        </p>
+                    </div>
+
+                    <div class="p-3 bg-white rounded-lg border border-gray-200">
+                        <p class="font-bold text-blue-700 mb-1">Hướng dẫn giải:</p>
+                        <p class="text-gray-700">${q.solution}</p>
+                    </div>
+                </div>
+            `;
+            solutionsContainer.innerHTML += solutionHtml;
+        });
+    }
+
+
+    // --- Initialization ---
+    window.onload = initQuiz;
+
+</script>
+</body>
+</html>

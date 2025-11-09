@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- THÊM MATHJAX ĐỂ HIỂN THỊ CÔNG THỨC -->
+        <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                // Ensure MathJax is ready before trying to typeset
+                renderActions: {
+                    add: [
+                        10, 
+                        (doc) => { 
+                            if (!doc.typesetRoot) return;
+                            doc.typeset();
+                        },
+                        100,
+                    ]
+                },
+            }
+        };
+    </script>
+
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <title>Mô Phỏng Khinh Khí Cầu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .balloon-container {
+            /* Ẩn overflow để khinh khí cầu có thể bay lên khỏi màn hình */
+            overflow: hidden;
+            position: relative;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* Bắt đầu từ dưới */
+        }
+        .balloon-wrapper {
+            transition: transform 3s ease-in-out; /* Hiệu ứng di chuyển mượt mà */
+            position: absolute;
+            bottom: 0;
+            width: 150px; /* Kích thước cố định */
+            z-index: 10;
+        }
+        .balloon-basket {
+            width: 40px;
+            height: 30px;
+            background-color: #6a4c3f;
+            border-radius: 4px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 20;
+        }
+        .balloon-lines {
+            width: 2px;
+            height: 50px;
+            background-color: #6a4c3f;
+            position: absolute;
+            bottom: 30px;
+            left: calc(50% - 1px);
+            z-index: 15;
+        }
+        .balloon-lines::before, .balloon-lines::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 50px;
+            background-color: #6a4c3f;
+            transform: rotate(15deg);
+            transform-origin: top center;
+            top: 0;
+        }
+        .balloon-lines::before {
+            left: -15px;
+            transform: rotate(-15deg);
+        }
+        .balloon-lines::after {
+            right: -15px;
+            transform: rotate(15deg);
+        }
+        .balloon-envelope {
+            width: 150px;
+            height: 180px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffe66d 50%, #4ecdc4 100%);
+            border-radius: 50% 50% 10% 10% / 60% 60% 40% 40%;
+            position: relative;
+            margin-bottom: -10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            z-index: 10;
+            overflow: hidden;
+        }
+        .balloon-shadow {
+            position: absolute;
+            bottom: 0;
+            left: 5%;
+            width: 90%;
+            height: 15px;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            z-index: 5;
+            filter: blur(5px);
+            transition: opacity 3s ease-in-out;
+        }
+
+        /* -------------------------- */
+        /* Custom styles for status UI */
+        /* -------------------------- */
+        .status-box {
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        /* Custom class cho hiển thị bước giải */
+        .calculation-step {
+            padding: 8px 0;
+            border-bottom: 1px dashed #e0e0e0;
+        }
+        .calculation-step:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-extrabold text-indigo-700 mb-6 text-center">Mô Phỏng Vật Lý Khinh Khí Cầu</h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-[75vh] bg-white rounded-xl shadow-2xl p-6">
+
+            <!-- Phần 1: Bảng điều khiển (Controls) -->
+            <div class="control-panel space-y-6 overflow-y-auto">
+                <h2 class="text-2xl font-bold text-indigo-600 border-b pb-2 mb-4">1. Thông Số Đầu Vào</h2>
+
+                <div id="statusOutput" class="status-box bg-gray-100 p-4 rounded-lg shadow-inner">
+                    <p class="text-xl font-semibold text-gray-700">Đang chờ tính toán...</p>
+                    <p id="netForceDisplay" class="text-sm mt-1 text-gray-500"></p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Input 1: Thể tích -->
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">Thể Tích Vỏ (V, m³)</span>
+                        <input type="number" id="volume" value="1500" min="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    </label>
+                    <!-- Input 2: Khối lượng vỏ -->
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">Khối Lượng Vỏ (m_vỏ, kg)</span>
+                        <input type="number" id="shellMass" value="200" min="10" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    </label>
+                    <!-- Input 3: Nhiệt độ bên ngoài -->
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">Nhiệt Độ Ngoài (T_ngoài, °C)</span>
+                        <input type="number" id="outsideTemp" value="20" min="-50" max="50" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    </label>
+                    <!-- Input 4: Áp suất -->
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">Áp Suất (P, atm)</span>
+                        <input type="number" id="pressure" value="1" min="0.5" max="2" step="0.01" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    </label>
+                    <!-- Input 5: Khối lượng mol -->
+                    <label class="block md:col-span-2">
+                        <span class="text-sm font-medium text-gray-700">Khối Lượng Mol Không Khí (M, kg/mol)</span>
+                        <input type="number" id="molarMass" value="0.02896" min="0.01" step="0.00001" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <p class="text-xs text-gray-500 mt-1">Giá trị tiêu chuẩn cho không khí là 0.02896 kg/mol.</p>
+                    </label>
+                </div>
+
+                <!-- Slider: Nhiệt độ bên trong -->
+                <div class="pt-4 border-t">
+                    <h3 class="text-xl font-bold text-indigo-600 mb-3">2. Điều Chỉnh Nhiệt Độ Bên Trong</h3>
+                    <label class="block">
+                        <span class="text-lg font-medium text-gray-700">Nhiệt Độ Bên Trong (T_trong): <span id="insideTempValue" class="text-2xl text-red-600 font-extrabold">100</span> °C</span>
+                        <input type="range" id="insideTempSlider" min="20" max="150" value="100" step="1" class="w-full h-2 bg-indigo-100 rounded-lg appearance-none cursor-pointer range-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-2">
+                    </label>
+                </div>
+                
+                <!-- Khu vực hiển thị chi tiết các bước giải -->
+                <div class="pt-4 border-t">
+                    <h3 class="text-xl font-bold text-indigo-600 mb-3">3. Phân Tích Vật Lý Chi Tiết</h3>
+                    <div id="calculationSteps" class="bg-gray-50 p-4 rounded-lg text-sm space-y-2">
+                        <!-- Nội dung sẽ được cập nhật bằng JavaScript -->
+                        Đang chờ dữ liệu...
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Phần 2: Hình ảnh Khinh khí cầu và Mô phỏng -->
+            <div class="balloon-container bg-blue-100/50 rounded-lg shadow-inner relative">
+                <div class="absolute inset-x-0 bottom-0 h-4 bg-green-500 z-50"></div>
+                <div class="balloon-wrapper" id="balloonWrapper">
+                    <!-- Vỏ Khinh khí cầu (Envelope) -->
+                    <div class="balloon-envelope">
+                        <!-- Hiệu ứng ánh lửa (Fire effect) -->
+                        <div id="fireEffect" class="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-orange-400 opacity-0 transition-opacity duration-300 shadow-[0_0_15px_5px_rgba(255,165,0,0.8)]"></div>
+                    </div>
+                    <!-- Dây treo (Lines) -->
+                    <div class="balloon-lines"></div>
+                    <!-- Giỏ (Basket) -->
+                    <div class="balloon-basket"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sử dụng Immediately Invoked Function Expression (IIFE) để tạo phạm vi cục bộ
+        // và tránh lỗi khai báo lại biến trong môi trường thực thi.
+        (function() {
+            // Hằng số vật lý (SI Units)
+            const R = 8.314;        // Universal Gas Constant (J/(mol·K))
+            const g = 9.81;         // Acceleration due to gravity (m/s²)
+            const ATM_TO_PA = 101325; // Conversion: 1 atm to Pascals (Pa)
+            const CELSIUS_TO_KELVIN = 273.15; // Conversion: Celsius to Kelvin
+
+            // Lấy các phần tử DOM
+            const volumeInput = document.getElementById('volume');
+            const shellMassInput = document.getElementById('shellMass');
+            const outsideTempInput = document.getElementById('outsideTemp');
+            const pressureInput = document.getElementById('pressure');
+            const molarMassInput = document.getElementById('molarMass');
+            const insideTempSlider = document.getElementById('insideTempSlider');
+
+            const insideTempValueDisplay = document.getElementById('insideTempValue');
+            const statusOutput = document.getElementById('statusOutput');
+            const netForceDisplay = document.getElementById('netForceDisplay');
+            const balloonWrapper = document.getElementById('balloonWrapper');
+            const fireEffect = document.getElementById('fireEffect');
+            const calculationSteps = document.getElementById('calculationSteps');
+
+            // Hàm chuyển đổi từ °C sang K
+            const toKelvin = (celsius) => parseFloat(celsius) + CELSIUS_TO_KELVIN;
+
+            // Hàm tính toán và cập nhật trạng thái
+            function calculateAndAnimate() {
+                // Đọc và chuyển đổi đầu vào sang SI Units
+                const V = parseFloat(volumeInput.value);               // m³
+                const m_shell = parseFloat(shellMassInput.value);       // kg
+                const T_out_C = parseFloat(outsideTempInput.value);     // °C
+                const P_atm = parseFloat(pressureInput.value);          // atm
+                const M = parseFloat(molarMassInput.value);             // kg/mol
+                const T_in_C = parseFloat(insideTempSlider.value);      // °C
+
+                // Cập nhật giá trị hiển thị của thanh trượt
+                insideTempValueDisplay.textContent = T_in_C.toFixed(0);
+
+                // Chuyển đổi sang SI Units (Kelvin, Pascal)
+                const T_out_K = toKelvin(T_out_C);
+                const T_in_K = toKelvin(T_in_C);
+                const P = P_atm * ATM_TO_PA;
+
+                // Kiểm tra các giá trị cơ bản (tránh chia cho 0 hoặc NaN)
+                if (isNaN(V) || isNaN(m_shell) || isNaN(T_out_K) || isNaN(T_in_K) || isNaN(P) || isNaN(M) || T_out_K <= 0 || T_in_K <= 0) {
+                    statusOutput.innerHTML = '<p class="text-xl font-semibold text-red-600">Lỗi dữ liệu đầu vào. Vui lòng kiểm tra lại.</p>';
+                    calculationSteps.innerHTML = 'Lỗi dữ liệu đầu vào.';
+                    return;
+                }
+
+                // =================================================================
+                // BƯỚC 1: Tính Mật độ Khí Bên Ngoài (D_out / rho_out) và Lực đẩy F_B
+                // Công thức: D_out = (P * M) / (R * T_out)
+                // =================================================================
+                const rho_out = (P * M) / (R * T_out_K); // Mật độ không khí bên ngoài (kg/m³)
+                const F_B = rho_out * V * g; // Lực đẩy Archimedes (N)
+                
+                // =================================================================
+                // BƯỚC 2: Điều kiện CÂN BẰNG - Khối lượng khí TỐI THIỂU cần thiết (m_k, cần)
+                // Công thức: m_k, cần = D_out * V - m_vỏ
+                // Tương đương với ĐK Bay: D_out * V >= m_vỏ + m_k
+                // =================================================================
+                const m_k_required = (rho_out * V) - m_shell; // Khối lượng khí cần để cân bằng (F_net = 0)
+
+                // Tính Nhiệt độ cất cánh tối thiểu (T_in, min)
+                let T_in_min_C;
+                let m_k_required_safe = m_k_required > 0 ? m_k_required : 0.000001; // Tránh chia cho 0 hoặc giá trị âm
+                
+                // Công thức: T_in, min = (P * M * V) / (R * m_k, cần)
+                if (m_k_required > 0) {
+                    let T_in_min_K = (P * M * V) / (R * m_k_required);
+                    T_in_min_C = T_in_min_K - CELSIUS_TO_KELVIN;
+                } else {
+                    // Nếu m_vỏ quá nặng (rho_out * V <= m_shell), thì không thể bay được
+                    T_in_min_C = Infinity;
+                }
+
+                // =================================================================
+                // BƯỚC 3: Tính Khối lượng Khí Trong THỰC TẾ (m_k, thực) và Trọng lực F_g
+                // Công thức: T_in (K) => rho_in = (P * M) / (R * T_in)
+                // m_k, thực = rho_in * V
+                // =================================================================
+                const rho_in = (P * M) / (R * T_in_K);   // Mật độ không khí bên trong (kg/m³)
+                const m_gas_in_actual = rho_in * V;             // Khối lượng khí nóng thực tế bên trong (kg)
+                const m_total = m_shell + m_gas_in_actual;      // Tổng khối lượng (vỏ + khí nóng thực tế) (kg)
+                const F_g = m_total * g;                 // Trọng lực (N)
+                
+                // =================================================================
+                // KẾT LUẬN: Tính Lực ròng (F_net)
+                // =================================================================
+                const F_net = F_B - F_g;     // Lực ròng (N)
+
+
+                // =================================================================
+                // Cập nhật giao diện Trạng thái và Hoạt ảnh
+                // =================================================================
+
+                let statusText;
+                let netForceText = `Lực đẩy (F_B): ${F_B.toFixed(0)} N | Trọng lực (F_g): ${F_g.toFixed(0)} N`;
+                let fireOpacity = 0;
+                let translateY = 0; 
+
+                if (F_net > 0) {
+                    statusOutput.classList.remove('bg-gray-100', 'bg-yellow-100');
+                    statusOutput.classList.add('bg-green-100');
+                    statusText = `🚀 CẤT CÁNH! Lực ròng: +${F_net.toFixed(2)} N`;
+                    translateY = -90; 
+                    fireOpacity = 1;
+
+                } else if (F_net < 0) {
+                    statusOutput.classList.remove('bg-gray-100', 'bg-green-100');
+                    statusOutput.classList.add('bg-yellow-100');
+                    statusText = `⬇️ HẠ XUỐNG! Lực ròng: ${F_net.toFixed(2)} N`;
+                    translateY = 0; 
+                    fireOpacity = 0.5;
+
+                } else {
+                    statusOutput.classList.remove('bg-green-100', 'bg-yellow-100');
+                    statusOutput.classList.add('bg-gray-100');
+                    statusText = `⚖️ CÂN BẰNG! Lực ròng: 0 N`;
+                    translateY = -15; 
+                    fireOpacity = 0.7;
+                }
+
+                // Hiển thị thông tin trạng thái
+                let minTempDisplay = isFinite(T_in_min_C) ? T_in_min_C.toFixed(1) : 'Không thể cất cánh';
+                statusOutput.querySelector('p:first-child').innerHTML = statusText + `<br><span class="text-sm font-normal text-gray-500">T_cất cánh tối thiểu: ${minTempDisplay} °C</span>`;
+                netForceDisplay.textContent = netForceText;
+
+                // Cập nhật hoạt ảnh khinh khí cầu
+                balloonWrapper.style.transform = `translateY(${translateY}%)`;
+                fireEffect.style.opacity = fireOpacity;
+                
+                // =================================================================
+                // Cập nhật khu vực chi tiết các bước giải (Đã thay đổi logic)
+                // =================================================================
+                
+                const stepsHTML = `
+                    <div class="calculation-step">
+                        <p class="font-semibold">Bước 1: Tính Mật độ Khí Ngoài ($D_{out}$) & Lực đẩy ($F_B$)</p>
+                        <p class="text-xs italic text-gray-600">Công thức: $D_{out} = \\frac{P_{out} \\cdot M}{R \\cdot T_{out}}$ | $F_B = D_{out} \\cdot V \\cdot g$</p>
+                        <p class="mt-1">Kết quả: $D_{out} = ${rho_out.toFixed(4)}$ $kg/m^3$. $F_B = ${F_B.toFixed(0)}$ N</p>
+                    </div>
+                    
+                    <div class="calculation-step bg-yellow-50 rounded-lg p-2">
+                        <p class="font-semibold text-orange-700">Bước 2: Xác định Khối lượng Khí Tối thiểu cần thiết</p>
+                        <p class="text-xs italic text-gray-600">Áp dụng điều kiện cất cánh ($F_B = F_g$): $D_{out} \\cdot V = m_{vỏ} + m_{k, cần}$</p>
+                        <p class="mt-1">Khối lượng khí nóng cần ($m_{k, cần}$): ${m_k_required.toFixed(2)} kg</p>
+                        <p class="mt-1 font-bold">Nhiệt độ tối thiểu ($T_{in, min}$): ${minTempDisplay} °C</p>
+                    </div>
+
+                    
+                `;
+
+                calculationSteps.innerHTML = stepsHTML;
+		if (window.MathJax) {
+			    MathJax.typesetPromise([calculationSteps]);
+		}
+
+            }
+
+            // Gắn sự kiện lắng nghe
+            document.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', calculateAndAnimate);
+            });
+
+            // Gắn sự kiện cho thanh trượt
+            insideTempSlider.addEventListener('input', calculateAndAnimate);
+
+            // Chạy lần đầu tiên để thiết lập trạng thái ban đầu
+            window.onload = function() {
+                calculateAndAnimate();
+            };
+        })(); // Kết thúc IIFE
+    </script>
+</body>
+</html>

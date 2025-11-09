@@ -1,1 +1,601 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phương trình Trạng thái Khí lí tưởng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            color: #1f2937;
+        }
+        .container-lesson {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 24px;
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
 
+        }
+        .column {
+            background-color: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+        }
+        .header-box {
+            background-color: white;
+            color: blue;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            text-align: center;
+	    border-bottom: 3px solid blue;	    
+
+        }
+        .interactive-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .question-item {
+            padding: 12px;
+            border-left: 3px solid #f97316;
+            background-color: #fff7ed;
+            border-radius: 4px;
+        }
+        /* Mobile adjustment */
+        @media (max-width: 768px) {
+            .container-lesson {
+                grid-template-columns: 1fr;
+            }
+            .column {
+                max-height: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<br>
+<div class="header-box text-3xl uppercase tracking-wider">
+Khí lí tưởng
+</div>
+
+<div class="container-lesson">
+    <!-- CỘT 1: MÔ PHỎNG THÍ NGHIỆM TƯƠNG TÁC -->
+    <div id="simulation-column" class="column">
+        <h2 class="text-xl font-semibold mb-4 text-blue-600">
+            Mô phỏng Thí nghiệm: Kiểm chứng $\frac{pV}{T} = \text{const}$
+        </h2>
+        
+        <p class="text-sm italic mb-4 text-gray-600">
+            Mục tiêu: Quan sát sự thay đổi của áp suất (p), thể tích (V), và nhiệt độ tuyệt đối (T) của một khối khí xác định để kiểm chứng tỉ số $\frac{pV}{T}$ là một hằng số.
+        </p>
+
+        <!-- Thanh điều khiển -->
+        <div class="interactive-section p-4 border rounded-lg bg-blue-50">
+            <h3 class="text-lg font-medium text-blue-800 mb-2">Điều khiển Trạng thái Khí</h3>
+            
+            <div class="flex flex-col space-y-3">
+                <!-- Thể tích (V) -->
+                <div>
+                    <label for="volume-slider" class="block text-sm font-medium text-gray-700">Thể tích (V): <span id="volume-value" class="font-bold text-blue-600">1.0</span> (m³)</label>
+                    <input type="range" id="volume-slider" min="0.5" max="2.0" value="1.0" step="0.1" class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <!-- Nhiệt độ (T) -->
+                <div>
+                    <label for="temp-slider" class="block text-sm font-medium text-gray-700">Nhiệt độ (T): <span id="temp-value" class="font-bold text-blue-600">300</span> (K)</label>
+                    <input type="range" id="temp-slider" min="200" max="500" value="300" step="10" class="w-full h-2 bg-red-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <!-- Áp suất (P) - Kết quả tính toán -->
+                <div class="p-2 border border-blue-300 bg-white rounded">
+                    <span class="block text-sm font-medium text-gray-700">Áp suất mô phỏng (P): <span id="pressure-value" class="font-extrabold text-2xl text-red-600">1.013</span> (atm)</span>
+                </div>
+            </div>
+            
+            <button id="record-button" class="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md hover:shadow-lg">
+                Ghi lại Dữ liệu (State 1)
+            </button>
+            <button id="reset-button" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md hover:shadow-lg">
+                Reset
+            </button>
+        </div>
+
+        <!-- Bảng Dữ liệu -->
+        <div class="mt-6">
+            <h3 class="text-lg font-medium text-gray-800 mb-2">Bảng Dữ liệu Thí nghiệm</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">V (m³)</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">T (K)</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">p (atm)</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">pV/T</th>
+                            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-table-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Dữ liệu sẽ được thêm vào đây -->
+                    </tbody>
+                </table>
+            </div>
+            <p id="result-message" class="mt-4 text-center font-bold text-gray-700"></p>
+        </div>
+        
+        <!-- Biểu đồ Dữ liệu -->
+        <div class="mt-6">
+            <h3 class="text-lg font-medium text-gray-800 mb-2">Đồ thị Kiểm chứng Tỉ số pV/T</h3>
+            <canvas id="gas-graph" width="500" height="250" class="w-full border rounded-lg bg-white"></canvas>
+        </div>
+        
+    </div>
+
+    <!-- CỘT 2: KIẾN THỨC BÀI HỌC CHI TIẾT -->
+    <div class="column lg:w-5/4" >
+        <h2 class="text-xl font-semibold mb-4 text-red-600">
+		Phương trình trạng thái Khí lý tưởng.
+        </h2>
+        
+        <div class="space-y-6 text-gray-700 text-justify">
+            
+            <!-- 1. KHÍ LÍ TƯỞNG -->
+            <div>
+                <h3 class="text-lg font-bold text-red-700 mb-2">I. Khí lí tưởng</h3>
+                <p>
+                    Boyle và Charles đã tìm ra các định luật bằng phương pháp thực nghiệm với các chất khí thực tế (gọi tắt là **khí thực**). Tuy nhiên, khi áp suất khí quá lớn hoặc nhiệt độ khí quá thấp, các kết quả thực nghiệm của khí thực không còn tuân theo định luật Boyle và Charles.
+                </p>
+                <div class="p-3 my-3 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+                    <p class="font-semibold text-red-800">Định nghĩa Khí lí tưởng:</p>
+                    <p>
+                        **Khí lí tưởng** là khí tuân theo đúng định luật Boyle và định luật Charles. 
+                    </p>
+                    <p class="mt-1 italic text-sm">
+                        *Trong nghiên cứu, khí lí tưởng giúp đơn giản hóa các quá trình vật lí, coi các phân tử khí không tương tác và có kích thước không đáng kể.*
+                    </p>
+                </div>
+            </div>
+
+            <!-- 2. PHƯƠNG TRÌNH TRẠNG THÁI CỦA KHÍ LÍ TƯỞNG -->
+            <div>
+                <h3 class="text-lg font-bold text-red-700 mb-2">II. Phương trình Trạng thái của Khí lí tưởng</h3>
+                
+                <h4 class="font-semibold mt-3">1. Thiết lập phương trình</h4>
+                <p>
+                    Xét một khối khí lí tưởng xác định biến đổi từ trạng thái 1 $(p_{1}, V_{1}, T_{1})$ sang trạng thái 2 $(p_{2}, V_{2}, T_{2})$ thông qua trạng thái trung gian $1^{\prime} (p_{2}, V^{\prime}, T_{1})$.                 </p>
+                <ul class="list-disc list-inside ml-4 text-sm">
+                    <li>Quá trình $(1) \rightarrow (1^{\prime})$ là **đẳng nhiệt** ($T_1 = \text{const}$): $p_1 V_1 = p_2 V'$.</li>
+                    <li>Quá trình $(1^{\prime}) \rightarrow (2)$ là **đẳng áp** ($p_2 = \text{const}$): $\frac{V'}{T_1} = \frac{V_2}{T_2}$.</li>
+                </ul>
+                <p class="mt-2">
+                    Từ hai biểu thức trên, ta thiết lập được mối liên hệ:
+                </p>
+                <div class="text-center font-mono text-xl py-3 my-2 bg-gray-100 rounded-lg border border-gray-200">
+                    $$\frac{p_{1}V_{1}}{T_{1}} = \frac{p_{2}V_{2}}{T_{2}}$$
+                    $$\text{hay } \frac{pV}{T} = C$$
+                </div>
+                <p class="text-sm italic">
+                    Trong đó, $C$ là hằng số phụ thuộc vào số mol khí.
+                </p>
+
+                <h4 class="font-semibold mt-4">2. Xác định Hằng số $C$ và Phương trình Mendeleev-Clapeyron</h4>
+                <p>
+                    Nếu xét $n$ mol khí lí tưởng trong điều kiện tiêu chuẩn (áp suất $p = 1 \text{ atm} \approx 1,013 \times 10^5 \text{ Pa}$; nhiệt độ $T = 273 \text{ K}$; thể tích $V = 0,0224 \times n \text{ (m}^3)$), ta có:
+                </p>
+                <p class="text-center font-mono text-sm">
+                    $C = \frac{pV}{T} = \frac{1,013 \times 10^5 \times 0,0224 \times n}{273} \approx 8,31n$
+                </p>
+                <p>
+                    Đặt: $$R \approx 8,31 \frac{\text{J}}{\text{mol} \cdot \text{K}}$$ gọi là **hằng số khí lí tưởng**.
+                </p>
+                <div class="text-center font-mono text-xl py-4 my-2 bg-red-100 rounded-lg border border-red-200">
+                    $$\mathbf{pV = nRT}$$
+                </div>
+                <p class="text-sm italic">
+                    Đây là **phương trình trạng thái của khí lí tưởng** (hay phương trình Mendeleev-Clapeyron).
+                </p>
+            </div>
+            
+            <!-- 3. VẬN DỤNG -->
+            <div>
+                <h3 class="text-lg font-bold text-red-700 mb-2">III. Vận dụng Phương trình Trạng thái</h3>
+                <p>
+                    Phương trình trạng thái cho phép nghiên cứu các quá trình biến đổi không phải là đẳng quá trình (quá trình thay đổi cả ba thông số $p, V, T$).
+                </p>
+                <h4 class="font-semibold mt-3">Quá trình biến đổi đẳng tích ($V = \text{const}$)</h4>
+                <p>
+                    Từ $\frac{pV}{T} = \text{const}$, khi $V$ không đổi, ta có:
+                </p>
+                <div class="text-center font-mono text-xl py-3 my-2 bg-gray-100 rounded-lg border border-gray-200">
+                    $$\frac{p}{T} = \text{hằng số} \text{ hay } \frac{p_{1}}{T_{1}} = \frac{p_{2}}{T_{2}}$$
+                </div>
+                <p class="mt-2">
+                    Trong quá trình biến đổi đẳng tích của một khối lượng khí xác định, **áp suất tỉ lệ thuận với nhiệt độ tuyệt đối** (Định luật Charles).
+                </p>
+                <p class="text-sm italic mt-2">
+                    Đường biểu diễn sự phụ thuộc của $p$ theo $T$ khi thể tích không đổi gọi là **đường đẳng tích** (là đường thẳng kéo dài đi qua gốc tọa độ trong hệ tọa độ $p-T$).                 </p>
+            </div>
+
+            <!-- 4. CỦNG CỐ KIẾN THỨC (CÓ NÚT XEM ĐÁP ÁN) -->
+            <div class="pt-6 border-t border-gray-200 mt-6">
+                <h3 class="text-lg font-bold text-orange-600 mb-4">IV. Củng cố Kiến thức</h3>
+                
+                <ol class="space-y-4 text-sm">
+                    <li class="question-item">
+                        <span class="font-bold">Câu 1:</span> Theo định nghĩa, khí lí tưởng là khí...
+                        <ul class="list-disc list-inside ml-4 mt-1">
+                            <li>A. Luôn tuân theo định luật Boyle và Charles ở mọi điều kiện.</li>
+                            <li>B. Chỉ tuân theo định luật Boyle và Charles trong điều kiện áp suất thấp và nhiệt độ cao.</li>
+                            <li>C. Tuân theo định luật Charles nhưng không tuân theo định luật Boyle.</li>
+                        </ul>
+                        <button onclick="toggleAnswer('answer-q1')" class="mt-2 text-blue-600 hover:text-blue-800 font-medium text-xs bg-blue-100 px-2 py-1 rounded">Xem Đáp án</button>
+                        <div id="answer-q1" class="hidden">
+                            <p class="mt-2 italic text-xs text-orange-800 font-semibold">(Đáp án: A)</p>
+                        </div>
+                    </li>
+
+                    <li class="question-item">
+                        <span class="font-bold">Câu 2:</span> Điền vào chỗ trống: Phương trình trạng thái của khí lí tưởng cho một khối lượng khí xác định có dạng $\frac{pV}{T} = \rule{2.5cm}{0.15mm}$.
+                        <button onclick="toggleAnswer('answer-q2')" class="mt-2 text-blue-600 hover:text-blue-800 font-medium text-xs bg-blue-100 px-2 py-1 rounded">Xem Đáp án</button>
+                        <div id="answer-q2" class="hidden">
+                            <p class="mt-2 italic text-xs text-orange-800 font-semibold">(Đáp án: Hằng số C / const)</p>
+                        </div>
+                    </li>
+
+                    <li class="question-item">
+                        <span class="font-bold">Câu 3 (Điền số):</span> Một khối khí lí tưởng có trạng thái 1 là $V_1 = 10 \text{ L}, T_1 = 27^{\circ}\text{C}, p_1 = 1 \text{ atm}$. Nếu khí được chuyển sang trạng thái 2 với $V_2 = 5 \text{ L}$ và nhiệt độ $T_2 = 177^{\circ}\text{C}$, thì áp suất $p_2$ là khoảng $\rule{2.5cm}{0.15mm}$ atm.
+                        <p class="text-xs text-gray-500 italic mt-1">(Lưu ý: $27^{\circ}\text{C} = 300 \text{ K}$, $177^{\circ}\text{C} = 450 \text{ K}$)</p>
+                        <button onclick="toggleAnswer('answer-q3')" class="mt-2 text-blue-600 hover:text-blue-800 font-medium text-xs bg-blue-100 px-2 py-1 rounded">Xem Đáp án và Lời giải</button>
+                        <div id="answer-q3" class="hidden">
+                            <p class="mt-2 italic text-xs text-orange-800 font-semibold">
+                                (Tính toán: $p_2 = p_1 \frac{V_1}{V_2} \frac{T_2}{T_1} = 1 \cdot \frac{10}{5} \cdot \frac{450}{300} = 3,0 \text{ atm}$. Đáp án: 3.0)
+                            </p>
+                        </div>
+                    </li>
+
+                    <li class="question-item">
+                        <span class="font-bold">Câu 4 (Điền số):</span> Một lượng khí trong bình kín (đẳng tích) có áp suất $p_1 = 2 \text{ atm}$ ở nhiệt độ $T_1 = 27^{\circ}\text{C}$. Nếu đun nóng khí đến nhiệt độ $T_2 = 127^{\circ}\text{C}$, áp suất $p_2$ là khoảng $\rule{2.5cm}{0.15mm}$ atm.
+                        <p class="text-xs text-gray-500 italic mt-1">(Lưu ý: $27^{\circ}\text{C} = 300 \text{ K}$, $127^{\circ}\text{C} = 400 \text{ K}$)</p>
+                        <button onclick="toggleAnswer('answer-q4')" class="mt-2 text-blue-600 hover:text-blue-800 font-medium text-xs bg-blue-100 px-2 py-1 rounded">Xem Đáp án và Lời giải</button>
+                        <div id="answer-q4" class="hidden">
+                            <p class="mt-2 italic text-xs text-orange-800 font-semibold">
+                                (Tính toán: $p_2 = p_1 \frac{T_2}{T_1} = 2 \cdot \frac{400}{300} \approx 2,67 \text{ atm}$. Đáp án: 2.67)
+                            </p>
+                        </div>
+                    </li>
+
+                    <li class="question-item">
+                        <span class="font-bold">Câu 5:</span> Trong hệ tọa độ $V-T$, đường đẳng áp là một đường thẳng kéo dài đi qua gốc tọa độ. (Đúng/Sai)
+                        <button onclick="toggleAnswer('answer-q5')" class="mt-2 text-blue-600 hover:text-blue-800 font-medium text-xs bg-blue-100 px-2 py-1 rounded">Xem Đáp án</button>
+                        <div id="answer-q5" class="hidden">
+                            <p class="mt-2 italic text-xs text-orange-800 font-semibold">(Đáp án: Đúng. Vì $\frac{V}{T} = \text{const}$)</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- KHỞI TẠO BIẾN TOÀN CỤC ---
+    // nR (atm·m³/K)
+    const N_R_CONSTANT = 0.003376667; // Tương đương p=1.013 atm, V=1.0 m³, T=300 K
+    let stateCounter = 1;
+    let dataPoints = [];
+
+    // --- DOM ELEMENTS ---
+    const volumeSlider = document.getElementById('volume-slider');
+    const tempSlider = document.getElementById('temp-slider');
+    const volumeValue = document.getElementById('volume-value');
+    const tempValue = document.getElementById('temp-value');
+    const pressureValue = document.getElementById('pressure-value');
+    const recordButton = document.getElementById('record-button');
+    const resetButton = document.getElementById('reset-button');
+    const dataTableBody = document.getElementById('data-table-body');
+    const resultMessage = document.getElementById('result-message');
+    const gasGraph = document.getElementById('gas-graph');
+    const ctx = gasGraph.getContext('2d');
+    
+    // Đảm bảo canvas có kích thước chính xác cho độ phân giải
+    function resizeCanvas() {
+        // Lấy kích thước hiển thị thực tế của canvas
+        const styleWidth = getComputedStyle(gasGraph).width;
+        const styleHeight = getComputedStyle(gasGraph).height;
+        gasGraph.width = parseInt(styleWidth);
+        gasGraph.height = parseInt(styleHeight);
+        if (dataPoints.length > 0) {
+            drawGraph();
+        }
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+
+    // --- FUNCTIONS ---
+    
+    // Hàm làm tròn số
+    const roundTo = (num, decimals) => {
+        const factor = Math.pow(10, decimals);
+        return Math.round(num * factor) / factor;
+    };
+
+    // Hàm tính áp suất (p) dựa trên pV = nRT
+    const calculatePressure = (V, T) => {
+        // p = nRT / V
+        const pressure = (N_R_CONSTANT * T) / V;
+        return pressure;
+    };
+
+    // Hàm cập nhật trạng thái UI
+    const updateState = () => {
+        const V = parseFloat(volumeSlider.value);
+        const T = parseFloat(tempSlider.value);
+        
+        // Cập nhật giá trị hiển thị
+        volumeValue.textContent = V.toFixed(1);
+        tempValue.textContent = T.toFixed(0);
+
+        // Tính áp suất
+        const P = calculatePressure(V, T);
+        pressureValue.textContent = P.toFixed(3);
+    };
+
+    // Hàm vẽ đồ thị
+    const drawGraph = () => {
+        const W = gasGraph.width;
+        const H = gasGraph.height;
+        
+        // Xóa canvas
+        ctx.clearRect(0, 0, W, H);
+
+        // Thiết lập padding và kích thước vẽ
+        const PADDING_X = 50;
+        const PADDING_Y = 30;
+        const DRAW_W = W - 2 * PADDING_X;
+        const DRAW_H = H - 2 * PADDING_Y;
+        const ORIGIN_X = PADDING_X;
+        const ORIGIN_Y = H - PADDING_Y;
+
+        // Cấu hình trục Y: Tỉ số pV/T. Đồ thị sẽ hiển thị sự "hằng số"
+        // Chọn biên độ Y nhỏ quanh hằng số N_R_CONSTANT
+        const Y_MIN = N_R_CONSTANT * 0.99;
+        const Y_MAX = N_R_CONSTANT * 1.01;
+        const Y_RANGE = Y_MAX - Y_MIN;
+
+        // Cấu hình trục X: State Number
+        const X_MAX = Math.max(5, dataPoints.length + 1); // Đảm bảo luôn có ít nhất 5 điểm
+        const X_RANGE = X_MAX - 1;
+
+        // Vẽ trục tọa độ
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        
+        // Trục X (State Number)
+        ctx.beginPath();
+        ctx.moveTo(ORIGIN_X, ORIGIN_Y);
+        ctx.lineTo(ORIGIN_X + DRAW_W, ORIGIN_Y);
+        ctx.stroke();
+
+        // Trục Y (pV/T)
+        ctx.beginPath();
+        ctx.moveTo(ORIGIN_X, ORIGIN_Y);
+        ctx.lineTo(ORIGIN_X, PADDING_Y);
+        ctx.stroke();
+
+        // Vẽ đường Hằng số pV/T (Đường lý thuyết)
+        const C_Y_POS = ORIGIN_Y - ((N_R_CONSTANT - Y_MIN) / Y_RANGE) * DRAW_H;
+        ctx.strokeStyle = '#ef4444'; // Màu đỏ
+        ctx.lineWidth = 1;
+        ctx.setLineDash([5, 5]); // Nét đứt
+        ctx.beginPath();
+        ctx.moveTo(ORIGIN_X, C_Y_POS);
+        ctx.lineTo(ORIGIN_X + DRAW_W, C_Y_POS);
+        ctx.stroke();
+        ctx.setLineDash([]); // Trở lại nét liền
+
+        // Chú thích
+        ctx.fillStyle = '#1f2937';
+        ctx.font = '10px Inter';
+        ctx.textAlign = 'right';
+        ctx.fillText('pV/T', ORIGIN_X - 5, PADDING_Y + 5);
+        ctx.fillText('(State)', ORIGIN_X + DRAW_W, ORIGIN_Y + 20);
+
+        // Ghi nhãn trục Y
+        ctx.textAlign = 'right';
+        ctx.fillText(Y_MAX.toFixed(5), ORIGIN_X - 5, PADDING_Y + 5);
+        ctx.fillText(Y_MIN.toFixed(5), ORIGIN_X - 5, ORIGIN_Y - 5);
+        ctx.fillText(N_R_CONSTANT.toFixed(5) + ' (C)', ORIGIN_X - 5, C_Y_POS + 3);
+
+
+        // Vẽ dữ liệu điểm và nối chúng
+        ctx.strokeStyle = '#3b82f6'; // Màu xanh dương
+        ctx.fillStyle = '#3b82f6';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); 
+        
+        if (dataPoints.length > 0) {
+            dataPoints.forEach((data, index) => {
+                const state = data.state;
+                const pVT = data.pV_over_T;
+                
+                // Tính toán vị trí X và Y
+                const x = ORIGIN_X + (state / X_MAX) * DRAW_W;
+                const y = ORIGIN_Y - ((pVT - Y_MIN) / Y_RANGE) * DRAW_H;
+
+                // Nối các điểm (tạo đường)
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+
+                // Vẽ điểm
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2, true);
+                ctx.fill();
+                
+                // Ghi nhãn trục X cho State
+                ctx.textAlign = 'center';
+                ctx.fillText(state, x, ORIGIN_Y + 15);
+            });
+            // Kết thúc vẽ đường nối
+            ctx.stroke();
+        } else {
+            // Khi không có dữ liệu
+            ctx.fillStyle = '#aaa';
+            ctx.textAlign = 'center';
+            ctx.fillText('Chưa có dữ liệu. Hãy ghi lại Trạng thái 1.', W / 2, H / 2);
+        }
+    };
+
+    // Hàm ghi lại dữ liệu
+    const recordData = () => {
+        const V = parseFloat(volumeSlider.value);
+        const T = parseFloat(tempSlider.value);
+        const P = calculatePressure(V, T);
+        const pV_over_T = (P * V) / T;
+
+        const data = {
+            state: stateCounter++,
+            V: V,
+            T: T,
+            P: P,
+            pV_over_T: pV_over_T
+        };
+
+        // Ghi chú trạng thái
+        if (dataPoints.length === 0) {
+            data.note = "Trạng thái Gốc";
+            recordButton.textContent = "Ghi lại Dữ liệu (State 2)";
+        } else if (dataPoints.length === 1) {
+            data.note = "Trạng thái Cuối";
+            recordButton.textContent = "Ghi thêm Dữ liệu";
+        } else {
+            data.note = `State ${data.state}`;
+        }
+        
+        // Kiểm tra trùng lặp
+        const isDuplicate = dataPoints.some(point => 
+            point.V === data.V && point.T === data.T
+        );
+
+        if (isDuplicate) {
+            resultMessage.textContent = "⚠️ Dữ liệu đã trùng với trạng thái đã ghi trước đó. Vui lòng thay đổi V hoặc T.";
+            resultMessage.classList.remove('text-green-600', 'text-red-600');
+            resultMessage.classList.add('text-yellow-600');
+            stateCounter--; // Hoàn lại state counter
+            return;
+        }
+
+
+        dataPoints.push(data);
+        renderTable();
+        drawGraph(); // Gọi hàm vẽ đồ thị sau khi ghi dữ liệu
+        
+        // Kiểm tra hằng số sau khi ghi 2 trạng thái
+        if (dataPoints.length >= 2) {
+            const pVT1 = dataPoints[0].pV_over_T;
+            const pVT2 = dataPoints[1].pV_over_T;
+            
+            // So sánh 2 giá trị đầu tiên
+            if (Math.abs(pVT1 - pVT2) < 0.0001) {
+                resultMessage.textContent = `✅ $\\frac{p_1 V_1}{T_1} \\approx \\frac{p_2 V_2}{T_2}$ (${pVT1.toFixed(5)} $\\approx$ ${pVT2.toFixed(5)}). Phương trình trạng thái được kiểm chứng.`;
+                resultMessage.classList.remove('text-yellow-600', 'text-red-600');
+                resultMessage.classList.add('text-green-600');
+            } else {
+                resultMessage.textContent = `❓ Kiểm tra lại: $\\frac{p_1 V_1}{T_1}$ khác $\\frac{p_2 V_2}{T_2}$ (${pVT1.toFixed(5)} vs ${pVT2.toFixed(5)}).`;
+                resultMessage.classList.remove('text-yellow-600', 'text-green-600');
+                resultMessage.classList.add('text-red-600');
+            }
+        } else {
+            resultMessage.textContent = "Đã ghi lại Trạng thái 1. Vui lòng thay đổi V hoặc T và ghi lại Trạng thái 2.";
+            resultMessage.classList.remove('text-green-600', 'text-red-600');
+            resultMessage.classList.add('text-gray-700');
+        }
+    };
+
+    // Hàm hiển thị dữ liệu ra bảng
+    const renderTable = () => {
+        dataTableBody.innerHTML = '';
+        dataPoints.forEach(data => {
+            const row = dataTableBody.insertRow();
+            row.className = 'whitespace-nowrap';
+            row.innerHTML = `
+                <td class="px-3 py-2 text-sm font-medium text-gray-900">${data.state}</td>
+                <td class="px-3 py-2 text-sm text-gray-500">${data.V.toFixed(1)}</td>
+                <td class="px-3 py-2 text-sm text-gray-500">${data.T.toFixed(0)}</td>
+                <td class="px-3 py-2 text-sm text-gray-500">${data.P.toFixed(3)}</td>
+                <td class="px-3 py-2 text-sm font-bold text-blue-600">${data.pV_over_T.toFixed(5)}</td>
+                <td class="px-3 py-2 text-sm italic text-gray-500">${data.note}</td>
+            `;
+        });
+    };
+
+    // Hàm reset mô phỏng
+    const resetSimulation = () => {
+        volumeSlider.value = 1.0;
+        tempSlider.value = 300;
+        stateCounter = 1;
+        dataPoints = [];
+        updateState();
+        renderTable();
+        drawGraph(); // Gọi hàm vẽ đồ thị khi reset
+        recordButton.textContent = "Ghi lại Dữ liệu (State 1)";
+        resultMessage.innerHTML = "Hãy chọn ít nhất 2 trạng thái để kiểm chứng $\\frac{pV}{T}$ là hằng số.";
+	MathJax.typeset();
+	
+        resultMessage.classList.remove('text-green-600', 'text-red-600', 'text-yellow-600');
+        resultMessage.classList.add('text-gray-700');
+    };
+    
+    // Hàm mới: Chuyển đổi hiển thị đáp án
+    const toggleAnswer = (answerId) => {
+        const answerDiv = document.getElementById(answerId);
+        const button = answerDiv.previousElementSibling;
+        
+        if (answerDiv.classList.contains('hidden')) {
+            answerDiv.classList.remove('hidden');
+            button.textContent = "Ẩn Đáp án";
+        } else {
+            answerDiv.classList.add('hidden');
+            button.textContent = (answerId.includes('q3') || answerId.includes('q4')) ? "Xem Đáp án và Lời giải" : "Xem Đáp án";
+        }
+    };
+    window.toggleAnswer = toggleAnswer; // Đặt hàm vào scope toàn cục để nút onclick có thể truy cập
+
+    // --- EVENTS ---
+    volumeSlider.addEventListener('input', updateState);
+    tempSlider.addEventListener('input', updateState);
+    recordButton.addEventListener('click', recordData);
+    resetButton.addEventListener('click', resetSimulation);
+
+    // --- KHỞI CHẠY LẦN ĐẦU ---
+    window.onload = () => {
+        resizeCanvas();
+        resetSimulation();
+    };
+
+</script>
+
+</body>
+</html>
