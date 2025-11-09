@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thang Nhiệt Độ - Bài Học Tương Tác</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải Lucide Icons for aesthetic feedback -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- MATHJAX INTEGRATION for rendering LaTeX formulas -->
+    <script>
+        // Cấu hình MathJax
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <!-- Cấu hình Font Inter và màu sắc -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Màu nền nhẹ nhàng */
+        }
+        .slide-container {
+            max-width: 900px;
+            min-height: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        /* Hiệu ứng gradient cho nút Bắt đầu */
+        .btn-primary {
+            background-image: linear-gradient(to right, #4c51bf, #6b46c1);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(107, 70, 193, 0.4);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        .quiz-button {
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .quiz-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        /* Đảm bảo MathJax hiển thị sạch sẽ */
+        .slide-content-area .mjx-container {
+            vertical-align: middle !important;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex items-center justify-center min-h-screen text-gray-800">
+
+    <!-- Container chính cho nội dung slide động -->
+    <div id="app" class="w-full bg-white rounded-xl overflow-hidden p-6 md:p-10 transition-all duration-500 relative">
+        <!-- Nội dung sẽ được render động ở đây -->
+        <div class="h-full flex items-center justify-center text-center">
+            <div class="text-xl text-gray-500 flex items-center">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Đang tải nội dung...
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for feedback -->
+    <div id="feedback-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50">
+        <div id="feedback-content" class="p-8 rounded-xl text-center shadow-2xl transform transition-all duration-300 scale-95">
+            <!-- Feedback content will be inserted here -->
+        </div>
+    </div>
+
+    <!-- Script logic -->
+    <script>
+        // Global state
+        let currentSlide = 0; // 0 là trang tiêu đề
+        let score = 0;
+        let quizRunning = false;
+        let quizTimerInterval;
+        let timeLeft = 15; // Time for each question (seconds)
+        
+        // Cấu hình Review Slides (10 slide) và Quiz Start (Slide 11)
+        const TOTAL_REVIEW_SLIDES = 11; 
+
+        // --- DATA CONTENT ---
+
+        // Dữ liệu nội dung các Slide ôn tập (index 0 là tiêu đề, 1-10 là nội dung)
+        const reviewSlidesContent = [
+            // Slide 0: Trang tiêu đề (Đã chỉnh sửa theo yêu cầu mới)
+            `
+            <div class="h-full flex flex-col items-center justify-center text-center p-4">
+                <p class="text-xl font-medium text-indigo-600 mb-4">Chủ Đề</p>
+                <h1 class="text-6xl md:text-7xl font-extrabold text-gray-900 leading-tight mb-8">
+                    THANG NHIỆT ĐỘ
+                </h1>
+                <div class="space-y-4 mb-12">
+                    <p class="text-2xl text-gray-600 font-light">Bài học tương tác và trắc nghiệm củng cố</p>
+                </div>
+                <button 
+                    id="start-button"
+                    class="btn-primary text-white font-bold py-4 px-12 rounded-full text-xl shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-indigo-300 transition duration-150 ease-in-out"
+                    onclick="nextSlide()"
+                >
+                    Bắt đầu bài học
+                </button>
+            </div>
+            `,
+            // Slide 1: Định nghĩa Nhiệt độ & Chiều truyền nhiệt
+            `
+            <div class="h-full slide-content-area">
+                <h2 class="text-3xl font-bold text-indigo-600 border-b-4 border-indigo-400 pb-2 mb-6">1. Bản chất & Chiều truyền nhiệt</h2>
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-semibold text-gray-800 flex items-center"><i data-lucide="thermometer" class="w-6 h-6 mr-3 text-red-500"></i> Nhiệt độ là gì?</h3>
+                    <p class="text-xl text-gray-700 pl-8">Nhiệt độ là đại lượng đặc trưng cho <strong class="text-red-600">trạng thái nóng hay lạnh</strong> của một vật, đồng thời liên quan đến động năng trung bình của các phân tử cấu tạo nên vật đó.</p>
+                    
+                    <h3 class="text-2xl font-semibold text-gray-800 flex items-center"><i data-lucide="arrow-right-left" class="w-6 h-6 mr-3 text-indigo-500"></i> Chiều truyền nhiệt</h3>
+                    <p class="text-xl text-gray-700 pl-8">Năng lượng nhiệt luôn truyền từ vật có <strong class="text-green-600">nhiệt độ cao hơn</strong> sang vật có <strong class="text-blue-600">nhiệt độ thấp hơn</strong>. Quá trình dừng lại khi đạt trạng thái cân bằng nhiệt (cùng nhiệt độ).</p>
+                </div>
+            </div>
+            `,
+            // Slide 2: Nguyên tắc đo nhiệt độ & Nhiệt kế
+            `
+            <div class="h-full slide-content-area">
+                <h2 class="text-3xl font-bold text-indigo-600 border-b-4 border-indigo-400 pb-2 mb-6">2. Nguyên tắc hoạt động của Nhiệt kế</h2>
+                <div class="space-y-6">
+                    <div class="p-4 bg-yellow-50 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-yellow-700 mb-3 flex items-center"><i data-lucide="ruler" class="w-6 h-6 mr-3"></i> Nguyên tắc chung:</h3>
+                        <p class="text-xl text-gray-700 pl-8">Dựa trên sự phụ thuộc của một <strong class="text-orange-600">đại lượng vật lí</strong> có thể đo được vào nhiệt độ (ví dụ: thể tích, điện trở, suất điện động cặp nhiệt điện...).</p>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-gray-800 flex items-center"><i data-lucide="droplet" class="w-6 h-6 mr-3 text-red-500"></i> Nhiệt kế Thủy ngân:</h3>
+                    <p class="text-xl text-gray-700 pl-8">Hoạt động nhờ hiện tượng <strong class="text-red-600">dãn nở vì nhiệt</strong> của chất lỏng (thủy ngân) để xác định nhiệt độ.</p>
+                </div>
+            </div>
+            `,
+            // Slide 3: Thang Nhiệt độ Celsius (°C)
+            `
+            <div class="h-full slide-content-area">
+                <h2 class="text-3xl font-bold text-indigo-600 border-b-4 border-indigo-400 pb-2 mb-6">3. Thang Nhiệt độ Celsius ($^{\\circ}C$)</h2>
+                <div class="p-4 bg-indigo-50 rounded-lg shadow-md space-y-3">
+                    <ul class="list-disc list-inside space-y-3 text-gray-700 text-xl">
+                        <li><strong class="text-indigo-700">Kí hiệu:</strong> $t$ (đơn vị: $^{\\circ}C$).</li>
+                        <li><strong class="text-indigo-700">Mốc 1:</strong> Nhiệt độ nước đá đang tan ở áp suất $1 \\text{ atm}$ được chọn là $0^{\\circ}C$.</li>
+                        <li><strong class="text-indigo-700">Mốc 2:</strong> Nhiệt độ nước đang sôi ở áp suất $1 \\text{ atm}$ được chọn là $100^{\\circ}C$.</li>
+                        <li><strong class="text-indigo-700">Khoảng chia:</strong> Khoảng cách giữa hai mốc được chia thành <strong class="text-red-600">100 phần</strong> bằng nhau.</li>
+                    </ul>
+                </div>
+            </div>
+            `,
+            // Slide 4: Thang Nhiệt độ Kelvin (K) - Tuyệt đối
+            `
+            <div class="h-full slide-content-area">
+                <h2 class="text-3xl font-bold text-indigo-600 border-b-4 border-indigo-400 pb-2 mb-6">4. Thang Nhiệt độ Kelvin (K) - Tuyệt đối</h2>
+                <div class="p-4 bg-purple-50 rounded-lg shadow-md space-y-3">
+                    <ul class="list-disc list-inside space-y-3 text-gray-700 text-xl">
+                        <li><strong class="text-purple-700">Kí hiệu:</strong> $T$ (đơn vị: $\\text{K}$). Đây là thang nhiệt độ <strong class="text-red-600">SI</strong>.</li>
+                        <li><strong class="text-purple-700">Mốc 0:</strong> <strong class="text-red-600">Độ không tuyệt đối</strong> ($0 \\text{ K}$). Tại nhiệt độ này, động năng chuyển động nhiệt của các phân tử bằng không.</li>
+                        <li><strong class="text-purple-700">Mốc đặc biệt:</strong> Nhiệt độ điểm ba của nước là $273.16 \\text{ K}$.</li>
+                        <li><strong class="text-purple-700">Không có giá trị âm:</strong> Nhiệt độ Kelvin luôn có giá trị <strong class="text-red-600">không âm</strong> ($T \\ge 0$).</li>
+                    </ul>
+                </div>
+            </div>
+            `,
+            // Slide 5: So sánh 1°C và 1 K
+            `
+            <div class="h-full flex flex-col items-center justify-center text-center slide-content-area">
+                <h2 class="text-3xl font-bold text-indigo-600 border-b-4 border-indigo-400 pb-2 mb-8 w-full text-center">5. Độ lớn của khoảng nhiệt độ</h2>
+                <div class="bg-gradient-to-r from-green-400 to-emerald-500 text-white p-10 rounded-2xl shadow-xl transform hover:scale-105 transition duration-300">
+                    <div class="text-5xl font-extrabold mb-4">
+                        $1^{\\circ}C \\approx 1 \\text{ K}$
+                    </div>
+                    <p class="text-2xl">Độ lớn của $1^{\\circ}C$ bằng độ lớn của $1 \\text{ K}$.</p>
+                    <p class="text-lg mt-2 font-light">Sự khác biệt chỉ nằm ở mốc $0$ (zero reference).</p>
+                </div>
+                <p class="text-xl text-gray-700 mt-8">Do đó, chênh lệch nhiệt độ trong $^{\\circ}C$ cũng bằng chênh lệch nhiệt độ trong $\\text{K}$: $\\Delta t = \\Delta T$.</p>
+            </div>
+            `,
+            // Slide 6: Công thức chuyển đổi Celsius ↔ Kelvin
+            `
+            <div class="h-full slide-content-area">
+                <h2 class="text-3xl font-bold text-indigo-600 border-b-4 border-indigo-400 pb-2 mb-6">6. Công Thức Chuyển Đổi ($^{\\circ}C \\leftrightarrow \\text{K}$)</h2>
+                <p class="text-xl text-gray-700 mb-6">Mối liên hệ giữa nhiệt độ Kelvin ($T$) và Celsius ($t$):</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-6 bg-cyan-100 rounded-lg shadow-lg text-center">
+                        <h3 class="text-2xl font-bold text-cyan-800 mb-3">Từ $^{\\circ}C$ sang $\\text{K}$</h3>
+                        <div class="text-4xl font-extrabold text-cyan-600">
+                            $$T = t + 273.15$$
+                        </div>
+                        <p class="text-base mt-2">(Thường dùng $273$ cho tính toán cơ bản)</p>
+                    </div>
+                    <div class="p-6 bg-cyan-100 rounded-lg shadow-lg text-center">
+                        <h3 class="text-2xl font-bold text-cyan-800 mb-3">Từ $\\text{K}$ sang $^{\\circ}C$</h3>
+                        <div class="text-4xl font-extrabold text-cyan-600">
+                            $$t = T - 273.15$$
+                        </div>
+                        <p class="text-base mt-2">Đảo ngược phép tính để có $t$.</p>
+                    </div>
+                </div>
+            </div>
+            `,
+            // Slide 7: Giới thiệu Thang Fahrenheit (°F)
+            `
+            <div class="h-full slide-content-area">
+                <h2 class="text-3xl font-bold text-indigo-600 border-b-4 border-indigo-400 pb-2 mb-6">7. Thang Nhiệt độ Fahrenheit ($^{\\circ}F$)</h2>
+                <div class="p-4 bg-red-50 rounded-lg shadow-md space-y-3">
+                    <p class="text-xl text-gray-700">Thang Fahrenheit được sử dụng chủ yếu tại Mỹ và một số quốc gia khác.</p>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700 text-lg">
+                        <li><strong class="text-red-700">Mốc nước đá tan:</strong> $32^{\\circ}F$.</li>
+                        <li><strong class="text-red-700">Mốc nước sôi:</strong> $212^{\\circ}F$.</li>
+                        <li><strong class="text-red-700">Khoảng chia:</strong> Được chia thành $180$ khoảng bằng nhau.</li>
+                    </ul>
+                    <p class="text-base mt-4 text-gray-500">Công thức chuyển đổi: $\\frac{t}{5} = \\frac{F - 32}{9}$</p>
+                </div>
+            </div>
+            `,
+            // Slide 8: Điểm ba của nước (Triple Point) (ĐÃ SỬA LỖI)
+            `
+            <div class="h-full slide-content-area">
+                <h2 class="text-3xl font-bold text-indigo-600 border-b-4 border-indigo-400 pb-2 mb-6">8. Điểm Ba của Nước (Triple Point)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-4 bg-blue-50 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-bold text-blue-700 mb-3">Trạng thái Ba</h3>
+                        <p class="text-xl text-gray-700">Là trạng thái duy nhất mà tại đó nước tồn tại <strong class="text-blue-600">đồng thời cả ba thể: Rắn, Lỏng và Hơi</strong> trong điều kiện cân bằng nhiệt.</p>
+                        <p class="text-lg mt-4 text-red-600">Đây là mốc nhiệt độ quan trọng nhất dùng để định nghĩa thang Kelvin.</p>
+                    </div>
+                    <div class="p-4 bg-blue-50 rounded-lg shadow-lg text-center">
+                        <h3 class="text-2xl font-bold text-blue-700 mb-3">Giá trị Điểm Ba</h3>
+                        <div class="text-xl font-semibold mb-2">Nhiệt độ:</div>
+                        <div class="text-3xl font-extrabold text-red-600 mb-4">
+                            $0.01^{\\circ}C$ hoặc $273.16 \\text{ K}$
+                        </div>
+                        <div class="text-xl font-semibold mb-2">Áp suất:</div>
+                        <div class="text-3xl font-extrabold text-red-600">
+                            $\\approx 0.61 \\text{ kPa}$
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `,
+            // Slide 9: Tóm tắt & Ứng dụng
+            `
+            <div class="h-full slide-content-area">
+                <h2 class="text-3xl font-bold text-indigo-600 border-b-4 border-indigo-400 pb-2 mb-6">9. Tóm Tắt Các Khái Niệm Chính</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                    <div class="p-4 bg-green-100 rounded-lg shadow-md">
+                        <i data-lucide="zap" class="w-8 h-8 text-green-600 mx-auto mb-2"></i>
+                        <p class="font-bold text-lg">Chiều Nhiệt</p>
+                        <p class="text-sm">Nóng $\\to$ Lạnh</p>
+                    </div>
+                    <div class="p-4 bg-blue-100 rounded-lg shadow-md">
+                        <i data-lucide="layers-3" class="w-8 h-8 text-blue-600 mx-auto mb-2"></i>
+                        <p class="font-bold text-lg">Mốc quan trọng</p>
+                        <p class="text-sm">$0^{\\circ}C$, $100^{\\circ}C$ và $0 \\text{ K}$, $273.16 \\text{ K}$</p>
+                    </div>
+                    <div class="p-4 bg-red-100 rounded-lg shadow-md">
+                        <i data-lucide="snowflake" class="w-8 h-8 text-red-600 mx-auto mb-2"></i>
+                        <p class="font-bold text-lg">Độ không tuyệt đối</p>
+                        <p class="text-sm">$0 \\text{ K}$ (Động năng phân tử $= 0$)</p>
+                    </div>
+                </div>
+                <div class="mt-8 text-center">
+                    <p class="text-2xl font-semibold text-gray-800">Sẵn sàng để thử thách bản thân với Quiz Game?</p>
+                </div>
+            </div>
+            `,
+            // Slide 10: Bắt đầu Quiz (New index)
+            `
+            <div class="h-full flex flex-col items-center justify-center text-center p-4">
+                <div class="text-5xl font-extrabold text-red-600 mb-4">CỦNG CỐ KIẾN THỨC</div>
+                <div class="text-2xl font-bold text-gray-800 mb-8">QUIZ GAME: 10 CÂU HỎI TRẮC NGHIỆM</div>
+                <div class="text-lg text-gray-600 space-y-3 p-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-lg">
+                    <p>💡 Mỗi câu hỏi có <strong class="text-red-500">15 giây</strong> để trả lời.</p>
+                    <p>🏆 Trả lời đúng nhận điểm, trả lời sai sẽ bị tính sai.</p>
+                    <p>🎯 Câu hỏi được sắp xếp từ dễ đến khó.</p>
+                </div>
+                <button onclick="startQuiz()" class="mt-10 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+                    BẮT ĐẦU THỬ THÁCH NGAY!
+                </button>
+            </div>
+            `
+        ];
+
+        // Data for Quiz (10 questions, easy to hard)
+        const quizData = [
+            // Dễ: Chiều truyền nhiệt
+            { q: "Chiều truyền năng lượng nhiệt giữa hai vật chênh lệch nhiệt độ tiếp xúc nhau là?", options: ["Từ vật lạnh hơn sang vật nóng hơn", "Từ vật có khối lượng lớn hơn", "Từ vật nóng hơn sang vật lạnh hơn", "Theo hướng bất kỳ"], answerIndex: 2, difficulty: "Dễ" },
+            // Dễ: Kết thúc truyền nhiệt
+            { q: "Quá trình truyền năng lượng nhiệt giữa hai vật kết thúc khi nào?", options: ["Vật nóng hơn hết nhiệt", "Hai vật ở cùng nhiệt độ (cân bằng nhiệt)", "Vật lạnh hơn bắt đầu bốc hơi", "Sau 5 phút kể từ khi tiếp xúc"], answerIndex: 1, difficulty: "Dễ" },
+            // Trung bình: Thang Celsius
+            { q: "Hai mốc nhiệt độ quan trọng trong thang nhiệt độ Celsius (ở áp suất $1 \\text{ atm}$) là gì?", options: ["$10^{\\circ}C$ và $90^{\\circ}C$", "$0 \\text{ K}$ và $273.15 \\text{ K}$", "$0^{\\circ}C$ (nước đá tan) và $100^{\\circ}C$ (nước sôi)", "$32^{\\circ}F$ và $212^{\\circ}F$"], answerIndex: 2, difficulty: "Trung bình" },
+            // Trung bình: Nguyên lý nhiệt kế
+            { q: "Nhiệt kế thủy ngân hoạt động dựa trên nguyên tắc vật lý nào?", options: ["Hiện tượng cảm ứng từ", "Sự thay đổi màu sắc", "Hiện tượng dãn nở vì nhiệt của thủy ngân", "Sự phụ thuộc điện trở theo nhiệt độ"], answerIndex: 2, difficulty: "Trung bình" },
+            // Trung bình: Thang Kelvin
+            { q: "Độ không tuyệt đối ($0 \\text{ K}$) là nhiệt độ mà tại đó...", options: ["Nước tinh khiết đóng băng", "Động năng chuyển động nhiệt của các phân tử bằng không", "Nhiệt độ sôi của nước", "Thế năng của vật chất là tối đa"], answerIndex: 1, difficulty: "Trung bình" },
+            // Trung bình: Công thức chuyển đổi (Lý thuyết)
+            { q: "Mốc $0^{\\circ}C$ trong thang nhiệt độ Celsius tương ứng với bao nhiêu Kelvin?", options: ["$100 \\text{ K}$", "$273.15 \\text{ K}$", "$32 \\text{ K}$", "$0 \\text{ K}$"], answerIndex: 1, difficulty: "Trung bình" },
+            // Khó: Vận dụng công thức 1
+            { q: "Nhiệt độ trong phòng là $27^{\\circ}C$. Giá trị này tương ứng với bao nhiêu Kelvin?", options: ["$27 \\text{ K}$", "$273 \\text{ K}$", "$300 \\text{ K}$", "$246 \\text{ K}$"], answerIndex: 2, difficulty: "Khó" },
+            // Khó: Vận dụng công thức 2
+            { q: "Một lò nung có nhiệt độ là $1273 \\text{ K}$. Nhiệt độ này tương ứng với bao nhiêu độ Celsius?", options: ["$1000^{\\circ}C$", "$1273^{\\circ}C$", "$1546^{\\circ}C$", "$950^{\\circ}C$"], answerIndex: 0, difficulty: "Khó" },
+            // Khó: Thang Fahrenheit
+            { q: "Khoảng cách giữa nhiệt độ nước đá tan ($32^{\\circ}F$) và nước sôi ($212^{\\circ}F$) trong thang Fahrenheit được chia thành bao nhiêu khoảng bằng nhau?", options: ["100", "180", "212", "273"], answerIndex: 1, difficulty: "Khó" },
+            // Rất khó: Điểm Ba
+            { q: "Điểm ba (Triple Point) của nước là trạng thái mà tại đó nước tồn tại đồng thời ở 3 thể Rắn, Lỏng, Hơi với nhiệt độ và áp suất xác định là bao nhiêu?", options: ["$0^{\\circ}C$ và $1 \\text{ atm}$", "$100^{\\circ}C$ và $1 \\text{ atm}$", "$0.01^{\\circ}C$ và khoảng $0.61 \\text{ kPa}$", "$273.15 \\text{ K}$ và $100 \\text{ kPa}$"], answerIndex: 2, difficulty: "Rất khó" }
+        ];
+
+        // --- CORE RENDERING & NAVIGATION ---
+
+        function renderSlideContent(index) {
+            if (quizRunning) return; // Không can thiệp nếu đang trong Quiz
+
+            const appDiv = document.getElementById('app');
+            appDiv.innerHTML = reviewSlidesContent[index]; // Lấy nội dung slide từ mảng
+
+            // RENDER NAVIGATION BUTTONS
+            // Vị trí slide review: 1 đến 9 (nội dung), 10 (bắt đầu quiz)
+            const maxContentSlide = TOTAL_REVIEW_SLIDES - 1; // 10
+            
+            let navHTML = '';
+            
+            // Nếu là trang nội dung (1 đến 9)
+            if (index > 0 && index < maxContentSlide) {
+                navHTML = `
+                    <div class="absolute bottom-4 left-4">
+                        <button onclick="prevSlide()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-full transition duration-150">
+                            ← Quay lại
+                        </button>
+                    </div>
+                    <div class="absolute bottom-4 right-4">
+                        <button onclick="nextSlide()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full transition duration-150">
+                            Tiếp theo →
+                        </button>
+                    </div>
+                    <div class="absolute bottom-5 left-1/2 transform -translate-x-1/2 text-gray-500 text-sm">
+                        Slide ${index} / ${maxContentSlide - 1}
+                    </div>
+                `;
+            } 
+            // Nếu là trang Bắt đầu Quiz (10)
+            else if (index === maxContentSlide) {
+                 navHTML = `
+                    <div class="absolute bottom-4 left-4">
+                        <button onclick="prevSlide()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-full transition duration-150">
+                            ← Quay lại
+                        </button>
+                    </div>
+                `;
+            }
+
+            appDiv.innerHTML += navHTML;
+
+
+            // RENDER MATHJAX: Process the newly added content for LaTeX formulas
+            if (typeof MathJax !== 'undefined') {
+                MathJax.typesetPromise([appDiv]).catch((err) => console.error("MathJax typesetting failed:", err));
+            }
+
+            // RENDER ICONS
+            if (typeof lucide !== 'undefined') {
+                 lucide.createIcons(); 
+            }
+        }
+
+        function nextSlide() {
+            if (quizRunning) return;
+            const maxSlideIndex = TOTAL_REVIEW_SLIDES - 1; 
+            if (currentSlide < maxSlideIndex) {
+                currentSlide++;
+                renderSlideContent(currentSlide);
+            }
+        }
+
+        function prevSlide() {
+            if (quizRunning) return;
+            if (currentSlide > 0) { 
+                currentSlide--;
+                renderSlideContent(currentSlide);
+            }
+        }
+        
+        // --- QUIZ LOGIC ---
+
+        function startQuiz() {
+            currentSlide = 0; // Reset slide index for quiz (Q1 starts at 0)
+            score = 0;
+            quizRunning = true;
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            if (currentSlide >= quizData.length) {
+                renderQuizResult();
+                return;
+            }
+
+            const qData = quizData[currentSlide];
+            const appDiv = document.getElementById('app');
+
+            appDiv.innerHTML = `
+                <div class="flex justify-between items-center mb-6 border-b pb-4">
+                    <h2 class="text-2xl font-extrabold text-red-600">Câu ${currentSlide + 1} / ${quizData.length}</h2>
+                    <div class="text-lg font-semibold text-gray-600 px-3 py-1 rounded-full bg-yellow-100">
+                        Mức độ: ${qData.difficulty}
+                    </div>
+                    <div id="quiz-timer" class="text-2xl font-bold text-white bg-indigo-600 rounded-full w-12 h-12 flex items-center justify-center shadow-lg">
+                        ${timeLeft}
+                    </div>
+                </div>
+
+                <p class="text-xl md:text-2xl font-semibold mb-8 text-gray-800 slide-content-area">${qData.q}</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="options-container">
+                    ${qData.options.map((option, index) => `
+                        <button class="quiz-button bg-gray-100 text-gray-700 p-4 rounded-lg text-left text-lg font-medium border-2 border-transparent hover:border-indigo-500 slide-content-area"
+                            onclick="checkAnswer(${index}, this)">
+                            <span class="font-bold text-indigo-500 mr-2">${String.fromCharCode(65 + index)}.</span> ${option}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            
+            // RENDER MATHJAX FOR QUESTION OPTIONS (và câu hỏi)
+            if (typeof MathJax !== 'undefined') {
+                MathJax.typesetPromise([appDiv]).catch((err) => console.error("MathJax typesetting failed:", err));
+            }
+
+            resetTimer();
+        }
+
+        function resetTimer() {
+            clearInterval(quizTimerInterval);
+            timeLeft = 15;
+            const timerElement = document.getElementById('quiz-timer');
+            if(timerElement) timerElement.textContent = timeLeft;
+            
+            quizTimerInterval = setInterval(() => {
+                timeLeft--;
+                const timerElement = document.getElementById('quiz-timer');
+                if (timerElement) {
+                    timerElement.classList.remove('bg-red-500', 'animate-pulse');
+                    timerElement.classList.add('bg-indigo-600');
+                    timerElement.textContent = timeLeft;
+                    if (timeLeft <= 5) {
+                        timerElement.classList.remove('bg-indigo-600');
+                        timerElement.classList.add('bg-red-500', 'animate-pulse');
+                    } 
+                }
+                if (timeLeft <= 0) {
+                    clearInterval(quizTimerInterval);
+                    handleAnswer(false, `Hết giờ! Đáp án đúng là: ${quizData[currentSlide].options[quizData[currentSlide].answerIndex]}`);
+                }
+            }, 1000);
+        }
+
+        function checkAnswer(selectedIndex, buttonElement) {
+            clearInterval(quizTimerInterval);
+
+            // Disable all buttons after selecting an answer
+            document.querySelectorAll('#options-container button').forEach(btn => btn.disabled = true);
+
+            const qData = quizData[currentSlide];
+            const isCorrect = selectedIndex === qData.answerIndex;
+
+            // Highlight the selected button
+            buttonElement.classList.remove('bg-gray-100', 'hover:border-indigo-500');
+
+            if (isCorrect) {
+                score++;
+                buttonElement.classList.add('bg-green-100', 'border-green-500');
+                handleAnswer(true, 'Chính xác! Cùng xem câu tiếp theo nhé.');
+            } else {
+                buttonElement.classList.add('bg-red-100', 'border-red-500');
+                // Highlight the correct answer
+                const correctButton = document.querySelectorAll('#options-container button')[qData.answerIndex];
+                correctButton.classList.remove('bg-gray-100', 'hover:border-indigo-500');
+                correctButton.classList.add('bg-green-200', 'border-green-600');
+                handleAnswer(false, 'Sai rồi! Đừng nản chí, ôn lại bài giảng và thử lại nhé!');
+            }
+        }
+
+        function handleAnswer(isCorrect, message) {
+            const modal = document.getElementById('feedback-modal');
+            const content = document.getElementById('feedback-content');
+
+            if (isCorrect) {
+                // Correct Answer - Congratulations
+                content.className = 'p-8 rounded-xl text-center shadow-2xl transform transition-all duration-300 scale-100 bg-green-600 text-white';
+                content.innerHTML = `
+                    <i data-lucide="trophy" class="w-16 h-16 mx-auto mb-4 text-yellow-300"></i>
+                    <h3 class="text-3xl font-bold mb-2">CHÚC MỪNG!</h3>
+                    <p class="text-xl">${message}</p>
+                `;
+            } else {
+                // Incorrect Answer - Encouragement
+                content.className = 'p-8 rounded-xl text-center shadow-2xl transform transition-all duration-300 scale-100 bg-red-600 text-white';
+                content.innerHTML = `
+                    <i data-lucide="thumbs-down" class="w-16 h-16 mx-auto mb-4 text-white"></i>
+                    <h3 class="text-3xl font-bold mb-2">CHƯA CHÍNH XÁC!</h3>
+                    <p class="text-xl">${message}</p>
+                `;
+            }
+            lucide.createIcons();
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            setTimeout(() => {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+                currentSlide++;
+                renderQuizQuestion();
+            }, 2000); // Wait 2 seconds before moving to the next question
+        }
+
+        function renderQuizResult() {
+            clearInterval(quizTimerInterval);
+            quizRunning = false; // Cho phép điều hướng sau khi kết thúc Quiz
+            
+            const appDiv = document.getElementById('app');
+
+            let resultMessage, icon;
+            if (score === quizData.length) {
+                resultMessage = "Hoàn hảo! Em đã nắm vững kiến thức bài học.";
+                icon = '<i data-lucide="crown" class="w-20 h-20 mx-auto mb-6 text-yellow-500"></i>';
+            } else if (score >= quizData.length * 0.7) {
+                resultMessage = "Rất tốt! Cần ôn tập thêm một chút ở các câu khó hơn.";
+                icon = '<i data-lucide="medal" class="w-20 h-20 mx-auto mb-6 text-yellow-500"></i>';
+            } else {
+                resultMessage = "Em cần xem lại phần kiến thức và ôn tập kỹ hơn nhé!";
+                icon = '<i data-lucide="book-open" class="w-20 h-20 mx-auto mb-6 text-indigo-500"></i>';
+            }
+
+            appDiv.innerHTML = `
+                <div class="h-full flex flex-col items-center justify-center text-center p-4">
+                    <h2 class="text-4xl font-extrabold text-green-600 mb-6">HOÀN THÀNH BÀI CỦNG CỐ!</h2>
+                    ${icon}
+                    <p class="text-5xl font-bold text-gray-800 mb-4">
+                        Điểm của em: <span class="text-indigo-600">${score} / ${quizData.length}</span>
+                    </p>
+                    <p class="text-xl text-gray-600 mb-10">${resultMessage}</p>
+
+                    <div class="space-x-4">
+                        <button onclick="currentSlide = 1; renderSlideContent(currentSlide);" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300">
+                            Ôn lại Bài Giảng
+                        </button>
+                        <button onclick="startQuiz();" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300">
+                            Chơi Lại Quiz
+                        </button>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+        
+        // Hàm khởi tạo ứng dụng, chỉ gọi sau khi MathJax đã sẵn sàng
+        function initApp() {
+            // currentSlide = 0: Trang tiêu đề
+            // currentSlide = 1: Bắt đầu nội dung bài học
+            renderSlideContent(currentSlide);
+            lucide.createIcons();
+        }
+
+        // Bắt đầu ứng dụng chỉ sau khi MathJax đã được tải và khởi tạo.
+        window.onload = () => {
+            if (window.MathJax) {
+                window.MathJax.startup.promise.then(() => {
+                    initApp();
+                }).catch((err) => {
+                    console.error("MathJax failed to initialize:", err);
+                    initApp(); 
+                });
+            } else {
+                initApp();
+            }
+        };
+    </script>
+</body>
+</html>

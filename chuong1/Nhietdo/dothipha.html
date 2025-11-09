@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng Biểu Đồ Pha Nước - Co Giãn Tự Động (Responsive)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* CSS tùy chỉnh cho đồ họa và bố cục */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; 
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+        }
+        .container {
+            background-color: #ffffff;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            width: 95%; /* Chiếm 95% chiều rộng màn hình */
+            max-width: 550px; /* ĐÃ GIẢM KÍCH THƯỚC TỐI ĐA theo yêu cầu */
+        }
+        .diagram-container {
+            border: 2px solid #dc2626; 
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            background-color: #fff;
+            position: relative;
+            width: 100%; 
+        }
+        svg {
+            display: block;
+            margin: 0 auto;
+        }
+        /* Kích thước chữ và nét */
+        .phase-text { 
+            fill: #0f172a;
+            text-anchor: middle;
+            font-size: 0.8rem; 
+        }
+        .label-text {
+            fill: #0f172a;
+            font-size: 0.75rem; 
+            pointer-events: none;
+        }
+        .draggable-point {
+            cursor: grab;
+            stroke: #1e3a8a;
+            stroke-width: 0.8; 
+        }
+        .ref-line {
+            stroke: #059669;
+            stroke-dasharray: 3;
+            stroke-width: 0.8; 
+        }
+        .isobar-line {
+            stroke: #374151; 
+            stroke-dasharray: 4, 2;
+            stroke-width: 1.5; /* ĐÃ TĂNG độ đậm */
+            cursor: ns-resize;
+        }
+        .intersection-point-m { fill: #0f172a; stroke: #0f172a; stroke-width: 0.4; } 
+        .intersection-point-b { fill: #ef4444; stroke: #be123c; stroke-width: 0.4; }
+        
+        /* Điều chỉnh font cho trục tọa độ */
+        .tick text {
+            font-size: 0.7rem; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-xl font-bold text-center text-red-700 mb-4">Biểu Đồ Pha Nước (Dạng Lý Tưởng, Độ Dốc Âm)</h1>
+        <p class="text-xs text-center text-gray-600 mb-4">Mặc định: Áp suất khí quyển ($101.325 \text{ kPa}$), $T_M \approx 0^\circ\text{C}$, $T_B \approx 100^\circ\text{C}$. Kéo **Đường Áp suất** để tương tác.</p>
+        <div id="diagram" class="diagram-container">
+            <!-- SVG sẽ được D3.js chèn vào đây -->
+        </div>
+    </div>
+
+    <script>
+        // --- HẰNG SỐ VẬT LÝ THỰC TẾ (REAL PHYSICAL CONSTANTS) ---
+        const REAL_T_TP = 0.01;         // Nhiệt độ Điểm Ba (°C)
+        const REAL_P_TP = 0.611657;     // Áp suất Điểm Ba (kPa)
+        const REAL_T_CP = 373.946;      // Nhiệt độ Điểm Tới hạn (°C)
+        const REAL_P_CP = 22064;        // Áp suất Điểm Tới hạn (kPa)
+        const REAL_P_ATM = 101.325;     // Áp suất Khí quyển Tiêu chuẩn (kPa)
+        
+        const FUSION_SLOPE = -13500;    // Độ dốc Clapeyron (Âm cho Nước) kPa/°C 
+
+        // --- TỌA ĐỘ D3 CỐ ĐỊNH CHO HÌNH DẠNG LÝ TƯỞNG (VISUAL D3 COORDINATES 0-10) ---
+        const D3_X_TP = 3.0; 
+        const D3_Y_TP = 1.0; 
+        const D3_X_CP = 8.0; 
+        const D3_Y_CP = 9.0; 
+        
+        // CÁC ĐIỂM D3 CỐ ĐỊNH CHO ĐƯỜNG RANH GIỚI PHA
+        const FUSION_POINTS = [
+            { x: 1.0, y: 10.0 }, 
+            { x: D3_X_TP, y: D3_Y_TP } 
+        ].sort((a, b) => a.y - b.y); 
+
+        const VAPORIZATION_POINTS = [
+            { x: D3_X_TP, y: D3_Y_TP }, 
+            { x: 5.5, y: 3.0 },
+            { x: 7.0, y: 6.0 },
+            { x: D3_X_CP, y: D3_Y_CP } 
+        ].sort((a, b) => a.y - b.y);
+
+        const SUBLIMATION_POINTS = [
+            { x: 0.0, y: 0.0 }, 
+            { x: 2.0, y: 0.5 },
+            { x: D3_X_TP, y: D3_Y_TP } 
+        ].sort((a, b) => a.y - b.y);
+
+        // Biến toàn cục D3 (sẽ được gán động)
+        let diagram_svg;
+        let ref_line_h, ref_line_v;
+        let isobar_line;
+        let tm_point, tb_point;
+        let tm_label, tb_label;
+        let triple_point;
+        let width, height; // Kích thước động
+        let xScale, yScale; // Scales động
+        
+        // Dữ liệu ban đầu cho Isobar (giá trị D3-Y)
+        // Tính toán D3_P mặc định tương ứng với 101.325 kPa (áp suất khí quyển tiêu chuẩn)
+        const LN_P_ATM = Math.log(REAL_P_ATM);
+        const LN_P_TP = Math.log(REAL_P_TP);
+        const LN_P_CP = Math.log(REAL_P_CP);
+        const D3_Y_RANGE = D3_Y_CP - D3_Y_TP;
+        const LN_RANGE = LN_P_CP - LN_P_TP;
+        const T_ATM = (LN_P_ATM - LN_P_TP) / LN_RANGE;
+        const D3_P_ATM = D3_Y_TP + T_ATM * D3_Y_RANGE; // ~ 4.9304
+        
+        let isobarData = { d3P: D3_P_ATM }; // Vị trí mặc định là Áp suất Khí quyển
+
+        // Lề (margin) cố định cho biểu đồ
+        const margin = { top: 20, right: 70, bottom: 40, left: 70 };
+
+        // --- HÀM TÍNH TOÁN VẬT LÝ ---
+
+        function mapD3PToRealP(d3P) {
+            const D3_P_TP_VISUAL = D3_Y_TP; 
+            const D3_P_CP_VISUAL = D3_Y_CP; 
+            
+            // Xử lý vùng áp suất thấp (dưới TP)
+            if (d3P <= D3_P_TP_VISUAL) {
+                const logP_TP = Math.log(REAL_P_TP);
+                const logP_MIN = Math.log(0.01); 
+                let t = (d3P - 0) / (D3_P_TP_VISUAL - 0);
+                if (t < 0) t = 0;
+                return Math.exp(logP_MIN + t * (logP_TP - logP_MIN));
+            }
+            
+            // Xử lý vùng áp suất cao (trên TP)
+            const logP_TP_calc = Math.log(REAL_P_TP);
+            const logP_CP_calc = Math.log(REAL_P_CP);
+            
+            let t = (d3P - D3_P_TP_VISUAL) / (D3_P_CP_VISUAL - D3_P_TP_VISUAL);
+            if (t > 1) t = 1;
+            
+            return Math.exp(logP_TP_calc + t * (logP_CP_calc - logP_TP_calc));
+        }
+        
+        function getApproximateTM(P_REF) {
+            // Sử dụng công thức Clapeyron tuyến tính cho đường Rắn-Lỏng (chỉ là mô phỏng)
+            return REAL_T_TP + (P_REF - REAL_P_TP) / FUSION_SLOPE;
+        }
+
+        function getApproximateTB(P_REF) {
+            // Hàm mô phỏng điểm sôi/thăng hoa dựa trên P_REF
+            if (P_REF < REAL_P_TP) {
+                return REAL_T_TP * Math.pow((P_REF / REAL_P_TP), 0.1); 
+            }
+            if (P_REF >= REAL_P_CP) {
+                return REAL_T_CP;
+            } else {
+                const T_NB = 100; // Nhiệt độ sôi tiêu chuẩn
+                const P_NB = REAL_P_ATM; // Áp suất tiêu chuẩn (101.325 kPa)
+                
+                if (P_REF <= P_NB) {
+                    // Dưới áp suất tiêu chuẩn (gần 100°C)
+                    return T_NB - 100 * (1 - Math.pow(P_REF / P_NB, 0.1));
+                } else {
+                    // Trên áp suất tiêu chuẩn (lên đến CP)
+                    return T_NB + (REAL_T_CP - T_NB) * Math.pow((P_REF - P_NB) / (REAL_P_CP - P_NB), 0.25);
+                }
+            }
+        }
+        
+        // Tìm tọa độ D3 X (Nhiệt độ) dựa trên tọa độ D3 Y (Áp suất) trên các đường cong
+        function findD3XIntersection(d3Y, points) {
+            let p1 = null;
+            let p2 = null;
+            
+            for (let i = 0; i < points.length - 1; i++) {
+                if ((points[i].y <= d3Y && points[i+1].y >= d3Y) || 
+                    (points[i].y >= d3Y && points[i+1].y <= d3Y)) {
+                    p1 = points[i];
+                    p2 = points[i+1];
+                    break;
+                }
+            }
+
+            if (!p1 || !p2 || p1.y === p2.y) {
+                if (d3Y <= points[0].y) return points[0].x;
+                if (d3Y >= points[points.length - 1].y) return points[points.length - 1].x;
+                return null; 
+            }
+
+            const t = (d3Y - p1.y) / (p2.y - p1.y);
+            return p1.x + t * (p2.x - p1.x);
+        }
+
+        // --- HÀM VẼ CHÍNH (RESPONSIVE) ---
+
+        function drawDiagram() {
+            // 1. Tính toán kích thước động
+            const container = document.getElementById('diagram');
+            const containerWidth = container.clientWidth;
+            
+            // Tỷ lệ 1:0.7 (rộng:cao) 
+            width = containerWidth - margin.left - margin.right;
+            height = width * 0.7; 
+
+            if (width <= 0 || height <= 0) return;
+
+            // Xóa SVG cũ trước khi vẽ lại
+            d3.select("#diagram svg").remove();
+
+            // 2. Khởi tạo lại scales với kích thước mới
+            xScale = d3.scaleLinear().domain([0, 10]).range([0, width]);
+            yScale = d3.scaleLinear().domain([0, 10]).range([height, 0]);
+
+            // 3. Thiết lập container SVG
+            diagram_svg = d3.select("#diagram")
+                .append("svg")
+                .attr("width", containerWidth)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // Lấy lại vị trí Y của đường isobar ban đầu (theo D3-P cũ)
+            let isobarDatumInit = { y: yScale(isobarData.d3P), d3P: isobarData.d3P };
+            
+            // --- TRỤC TỌA ĐỘ ---
+            
+            // Trục X (Nhiệt độ)
+            diagram_svg.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(xScale).ticks(5)); 
+            diagram_svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", height + margin.bottom - 5)
+                .attr("text-anchor", "middle")
+                .attr("class", "label-text") 
+                .text("Nhiệt độ (°C) - (Tỷ lệ D3)");
+
+            // Trục Y (Áp suất)
+            diagram_svg.append("g")
+                .call(d3.axisLeft(yScale).ticks(5)); 
+            diagram_svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .attr("text-anchor", "middle")
+                .attr("class", "label-text") 
+                .text("Áp suất (kPa) - (Tỷ lệ D3)");
+            
+            // --- HÀM KÉO/THAO TÁC ---
+            const dragTP = d3.drag()
+                .on("start", function(event, d) { d3.select(this).attr("r", 4).style("fill", "#dc2626"); }) 
+                .on("drag", function(event, d) { }) 
+                .on("end", function(event, d) { d3.select(this).attr("r", 2.5).style("fill", "#f97316"); }); 
+
+            const dragIsobar = d3.drag()
+                .on("drag", function(event, d) {
+                    // Giới hạn vị trí Y trong phạm vi biểu đồ
+                    d.y = Math.max(yScale(9.8), Math.min(height - 5, event.y)); 
+                    d.d3P = yScale.invert(d.y); // Cập nhật giá trị D3-Y
+                    
+                    // Cập nhật đường và tay cầm
+                    d3.select("#isobar_ref").attr("y1", d.y).attr("y2", d.y);
+                    d3.select("#isobar_handle").attr("y", d.y - 5);
+
+                    updateDiagram(); // Tính toán lại giao điểm
+                });
+
+            // --- ĐƯỜNG BIÊN GIỚI PHA ---
+            const lineGenerator = d3.line()
+                .x(p => xScale(p.x))
+                .y(p => yScale(p.y));
+
+            diagram_svg.append("path")
+                .datum(SUBLIMATION_POINTS)
+                .attr("fill", "none")
+                .attr("stroke", "#3b82f6")
+                .attr("stroke-width", 2.0) /* ĐÃ TĂNG ĐỘ ĐẬM */
+                .attr("id", "sublimation_curve")
+                .attr("d", lineGenerator.curve(d3.curveLinear)); 
+
+            diagram_svg.append("path")
+                .datum(VAPORIZATION_POINTS)
+                .attr("fill", "none")
+                .attr("stroke", "#ef4444")
+                .attr("stroke-width", 2.0) /* ĐÃ TĂNG ĐỘ ĐẬM */
+                .attr("id", "vaporization_curve")
+                .attr("d", lineGenerator.curve(d3.curveLinear)); 
+
+            diagram_svg.append("path")
+                .datum(FUSION_POINTS)
+                .attr("fill", "none")
+                .attr("stroke", "#0f172a") 
+                .attr("stroke-width", 2.0) /* ĐÃ TĂNG ĐỘ ĐẬM */
+                .attr("id", "fusion_curve")
+                .attr("d", lineGenerator.curve(d3.curveLinear));
+
+            // --- ĐIỂM CỐ ĐỊNH VÀ ĐIỂM BA ---
+            
+            // Điểm Tới hạn (CP)
+            diagram_svg.append("circle")
+                .attr("cx", xScale(D3_X_CP))
+                .attr("cy", yScale(D3_Y_CP)) 
+                .attr("r", 2.5) 
+                .attr("fill", "#9d174d")
+                .attr("title", "Critical Point");
+            diagram_svg.append("text")
+                .attr("x", xScale(D3_X_CP) + 5)
+                .attr("y", yScale(D3_Y_CP) + 5)
+                .attr("class", "label-text")
+                .style("fill", "#9d174d")
+                .text("CP");
+
+            // Đường tham chiếu ngang (P_TP)
+            ref_line_h = diagram_svg.append("line").attr("class", "ref-line");
+
+            // Đường tham chiếu dọc (T_TP)
+            ref_line_v = diagram_svg.append("line").attr("class", "ref-line");
+            
+            // VẼ ĐIỂM BA
+            triple_point = diagram_svg.append("circle")
+                .datum({ x: xScale(D3_X_TP), y: yScale(D3_Y_TP), T_real: REAL_T_TP, P_real: REAL_P_TP })
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y)
+                .attr("r", 2.5) 
+                .attr("fill", "#f97316")
+                .attr("class", "draggable-point")
+                .call(dragTP); 
+
+            // Nhãn Điểm Ba 
+            diagram_svg.append("text")
+                .attr("id", "tp_label")
+                .attr("text-anchor", "start")
+                .attr("class", "phase-text")
+                .text("Điểm Ba");
+            
+            // Giá trị trục tọa độ Điểm Ba
+             diagram_svg.append("text")
+                .attr("id", "triple_p_value")
+                .attr("x", -5)
+                .attr("text-anchor", "end")
+                .attr("class", "label-text")
+                .style("fill", "#059669");
+
+            diagram_svg.append("text")
+                .attr("id", "triple_t_value")
+                .attr("y", height + 15)
+                .attr("text-anchor", "middle")
+                .attr("class", "label-text")
+                .style("fill", "#059669");
+                
+            // --- ĐƯỜNG ISOBAR (ÁP SUẤT CỐ ĐỊNH CÓ THỂ KÉO) ---
+            
+            // Đường Isobar 
+            isobar_line = diagram_svg.append("line")
+                .datum(isobarDatumInit)
+                .attr("id", "isobar_ref")
+                .attr("class", "isobar-line")
+                .attr("x1", 0)
+                .attr("y1", d => d.y)
+                .attr("x2", width)
+                .attr("y2", d => d.y);
+            
+            // Tay cầm vô hình để dễ kéo
+            diagram_svg.append("rect")
+                .datum(isobarDatumInit)
+                .attr("id", "isobar_handle")
+                .attr("x", 0)
+                .attr("y", d => d.y - 5)
+                .attr("width", width)
+                .attr("height", 10)
+                .attr("fill", "transparent")
+                .call(dragIsobar);
+                
+            diagram_svg.append("text")
+                .attr("id", "isobar_p_value")
+                .attr("x", width + 5)
+                .attr("class", "label-text");
+
+            // Các điểm giao nhau
+            tm_point = diagram_svg.append("circle").attr("r", 2.5).attr("class", "intersection-point-m").attr("id", "tm_point"); 
+            tb_point = diagram_svg.append("circle").attr("r", 2.5).attr("class", "intersection-point-b").attr("id", "tb_point"); 
+            
+            // Nhãn điểm giao nhau
+            tm_label = diagram_svg.append("text").attr("id", "tm_label").attr("class", "label-text").text("Điểm nóng chảy");
+            tb_label = diagram_svg.append("text").attr("id", "tb_label").attr("class", "label-text").text("Điểm sôi/thăng hoa");
+            
+            // Nhãn Vùng Pha
+            diagram_svg.append("text").attr("class", "phase-text").attr("x", xScale(1.2)).attr("y", yScale(5)).text("Rắn"); 
+            diagram_svg.append("text").attr("class", "phase-text").attr("x", xScale(5.5)).attr("y", yScale(5.5)).text("Lỏng"); 
+            diagram_svg.append("text").attr("class", "phase-text").attr("x", xScale(6.5)).attr("y", yScale(2)).text("Hơi"); 
+                
+            // Gọi hàm cập nhật lần đầu
+            updateDiagram();
+        }
+
+        // Hàm cập nhật trạng thái biểu đồ (Tính toán giao điểm và nhãn)
+        function updateDiagram() {
+            const tp_datum = triple_point.datum(); 
+
+            const isobarDatum = d3.select("#isobar_ref").datum();
+            const D3_P_REF = isobarDatum.d3P; 
+            const Y_REF = isobarDatum.y;      
+            
+            const P_REF = mapD3PToRealP(D3_P_REF); 
+
+            // --- 1. CẬP NHẬT ĐƯỜNG THAM CHIẾU & GIÁ TRỊ ---
+            
+            // Đường Tham chiếu TP
+            ref_line_h
+                .attr("x2", tp_datum.x)
+                .attr("y1", tp_datum.y)
+                .attr("y2", tp_datum.y);
+            ref_line_v
+                .attr("x1", tp_datum.x)
+                .attr("y1", tp_datum.y)
+                .attr("x2", tp_datum.x);
+            
+            // Nhãn TP
+            d3.select("#tp_label")
+                .attr("x", tp_datum.x + 6) 
+                .attr("y", tp_datum.y - 6) 
+                .text(`Điểm Ba (${tp_datum.T_real.toFixed(2)}°C, ${tp_datum.P_real.toFixed(2)}kPa)`);
+
+            d3.select("#triple_p_value").text(`${tp_datum.P_real.toFixed(2)} kPa`).attr("y", tp_datum.y + 3); 
+            d3.select("#triple_t_value").text(`${tp_datum.T_real.toFixed(2)} °C`).attr("x", tp_datum.x);
+            
+            // Nhãn Isobar
+            let p_ref_display = P_REF < 1000 ? `${P_REF.toFixed(2)} kPa` : `${(P_REF/1000).toFixed(2)} MPa`;
+            d3.select("#isobar_p_value")
+                .text(`P = ${p_ref_display}`)
+                .attr("y", Y_REF + 3); 
+
+            // --- 2. TÍNH TOÁN VÀ CẬP NHẬT T_M và T_B ---
+
+            // A. VỊ TRÍ TRÊN BIỂU ĐỒ D3
+            let D3_T_M = findD3XIntersection(D3_P_REF, FUSION_POINTS);
+            let D3_T_B;
+            if (D3_P_REF < D3_Y_TP) {
+                // Thăng hoa
+                D3_T_B = findD3XIntersection(D3_P_REF, SUBLIMATION_POINTS);
+            } else {
+                // Bay hơi/Sôi
+                D3_T_B = findD3XIntersection(D3_P_REF, VAPORIZATION_POINTS);
+            }
+
+            // B. GIÁ TRỊ THỰC TẾ 
+            let T_M = P_REF >= REAL_P_TP ? getApproximateTM(P_REF) : null; 
+            let T_B = getApproximateTB(P_REF); 
+            
+            // Cập nhật Điểm nóng chảy (T_M)
+            if (D3_T_M !== null && T_M !== null) {
+                tm_point
+                    .attr("cx", xScale(D3_T_M))
+                    .attr("cy", Y_REF)
+                    .style("display", "initial");
+                
+                let tm_display = T_M.toFixed(3);
+                tm_label
+                    .attr("x", xScale(D3_T_M))
+                    .attr("y", Y_REF - 6) 
+                    .attr("text-anchor", "middle")
+                    .style("display", "initial")
+                    .text(`T_M: ${tm_display} °C`);
+            } else {
+                tm_point.style("display", "none");
+                tm_label.style("display", "none").text("Không nóng chảy"); 
+            }
+
+            // Cập nhật Điểm sôi/thăng hoa (T_B)
+            if (D3_T_B !== null && D3_P_REF <= D3_Y_CP) {
+                tb_point
+                    .attr("cx", xScale(D3_T_B))
+                    .attr("cy", Y_REF)
+                    .style("display", "initial");
+
+                let tb_display = T_B.toFixed(2);
+                let label_text = D3_P_REF < D3_Y_TP ? `T_S: ${tb_display} °C` : `T_B: ${tb_display} °C`;
+                tb_label
+                    .attr("x", xScale(D3_T_B))
+                    .attr("y", Y_REF - 6) 
+                    .attr("text-anchor", "middle")
+                    .style("display", "initial")
+                    .text(label_text);
+            } else {
+                tb_point.style("display", "none");
+                tb_label.style("display", "none");
+            }
+        }
+
+        // --- KHỞI TẠO VÀ LẮNG NGHE SỰ KIỆN RESIZE ---
+        function initialize() {
+            // Lần vẽ đầu tiên
+            drawDiagram();
+            
+            // Thêm trình lắng nghe sự kiện thay đổi kích thước cửa sổ (có debouncing để tối ưu hiệu suất)
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(drawDiagram, 150); 
+            });
+        }
+
+        // Bắt đầu khởi tạo khi cửa sổ tải xong
+        window.onload = initialize;
+    </script>
+</body>
+</html>

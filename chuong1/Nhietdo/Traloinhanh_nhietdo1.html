@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc nghiệm Tính toán Nhiệt độ - Hỗ trợ Quay Lại</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tích hợp MathJax để hiển thị công thức LaTeX -->
+    <script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <script>
+        // Cấu hình MathJax để nhận các delimiter $...$ và $$...$$
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+
+    <style>
+        /* Thiết lập font Inter mặc định */
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        /* Style cho các nút đáp án */
+        .answer-option {
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex; 
+            align-items: center;
+        }
+        /* Thay đổi màu khi hover */
+        .answer-option:hover {
+            background-color: #e0f2fe; /* blue-100 */
+        }
+        /* Đánh dấu lựa chọn đã chọn (chỉ màu xanh, không đánh giá đúng/sai ngay lập tức) */
+        .selected {
+            background-color: #bfdbfe; /* blue-300 */
+            border-color: #3b82f6 !important; /* blue-500 */
+            border-width: 2px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+        }
+        /* Style cho công thức toán học */
+        .MathJax {
+            display: inline-block !important;
+        }
+    </style>
+    <!-- Cấu hình Tailwind cho font Inter -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="p-4 sm:p-8">
+
+    <div id="quiz-container" class="max-w-3xl mx-auto bg-white shadow-2xl rounded-xl p-6 sm:p-10 border border-gray-100">
+
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-4">
+            Trắc nghiệm Tính toán Nhiệt độ
+        </h1>
+
+        <!-- Vùng hiển thị tiến trình -->
+        <div id="quiz-header" class="mb-6 space-y-3">
+            <div class="flex justify-center text-lg font-bold text-indigo-600">
+                <span id="progress-text">Câu 1 / 10</span>
+            </div>
+        </div>
+
+        <!-- Vùng hiển thị câu hỏi -->
+        <div id="question-area" class="space-y-6">
+            <p id="question-text" class="text-xl font-semibold text-gray-700">
+                <!-- Nội dung câu hỏi sẽ được chèn vào đây -->
+            </p>
+            <div id="options-container" class="space-y-4">
+                <!-- Các lựa chọn đáp án sẽ được chèn vào đây -->
+            </div>
+        </div>
+
+        <!-- Vùng nút điều hướng (Previous, Next/Finish) -->
+        <div class="mt-8 pt-6 border-t flex justify-between items-center">
+            <button id="prev-button"
+                    class="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-400 transition duration-150 disabled:opacity-50"
+                    disabled>
+                &larr; Quay Lại
+            </button>
+            <button id="next-button"
+                    class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150">
+                Câu Kế Tiếp &rarr;
+            </button>
+        </div>
+
+        <!-- Vùng kết quả cuối cùng (Ẩn ban đầu) -->
+        <div id="results-screen" class="hidden text-center p-10 mt-6 bg-blue-50 rounded-lg">
+            <h2 class="text-3xl font-bold text-indigo-700 mb-4">Kết Quả Bài Trắc Nghiệm</h2>
+            <p id="final-score" class="text-2xl text-gray-800 font-extrabold mb-4">
+                <!-- Điểm số cuối cùng -->
+            </p>
+            <button onclick="location.reload()"
+                    class="mt-4 px-8 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-lg hover:bg-green-700 transition duration-150">
+                Làm Lại (Thứ tự mới)
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // Dữ liệu trắc nghiệm
+        let quizData = [
+            { question: "Một người đo được nhiệt độ cơ thể là $37,0^{\\circ}\\text{C}$. Hỏi nhiệt độ này tương ứng với bao nhiêu độ Fahrenheit ($^{\\circ}\\text{F}$)?", answerOptions: [{ text: "$96,8^{\\circ}\\text{F}$", isCorrect: false }, { text: "$98,6^{\\circ}\\text{F}$", isCorrect: true }, { text: "$99,2^{\\circ}\\text{F}$", isCorrect: false }, { text: "$100,0^{\\circ}\\text{F}$", isCorrect: false }] },
+            { question: "Nhiệt độ tại một thành phố là $59^{\\circ}\\text{F}$. Hỏi nhiệt độ này tương ứng với bao nhiêu độ Celsius ($^{\\circ}\\text{C}$)?", answerOptions: [{ text: "$27^{\\circ}\\text{C}$", isCorrect: false }, { text: "$18^{\\circ}\\text{C}$", isCorrect: false }, { text: "$15^{\\circ}\\text{C}$", isCorrect: true }, { text: "$10^{\\circ}\\text{C}$", isCorrect: false }] },
+            { question: "Điểm đóng băng của nước là $0,00^{\\circ}\\text{C}$. Hỏi nhiệt độ này là bao nhiêu trong thang Kelvin ($\\text{K}$)?", answerOptions: [{ text: "$100,00\\text{ K}$", isCorrect: false }, { text: "$0,00\\text{ K}$", isCorrect: false }, { text: "$273,15\\text{ K}$", isCorrect: true }, { text: "$373,15\\text{ K}$", isCorrect: false }] },
+            { question: "Một nhiệt giai mới ($^{\\circ}\\text{X}$) có điểm đóng băng của nước là $10^{\\circ}\\text{X}$ và điểm sôi là $160^{\\circ}\\text{X}$. Hỏi nhiệt độ $30^{\\circ}\\text{C}$ tương ứng với bao nhiêu độ $\\text{X}$?", answerOptions: [{ text: "$45^{\\circ}\\text{X}$", isCorrect: false }, { text: "$55^{\\circ}\\text{X}$", isCorrect: true }, { text: "$60^{\\circ}\\text{X}$", isCorrect: false }, { text: "$70^{\\circ}\\text{X}$", isCorrect: false }] },
+            { question: "Một thanh thép có chiều dài $5,000\\text{ m}$ ở nhiệt độ $15^{\\circ}\\text{C}$. Cho hệ số nở dài của thép là $\\alpha = 1,2 \\times 10^{-5}\\text{ K}^{-1}$. Hỏi chiều dài của thanh thép là bao nhiêu khi nhiệt độ tăng lên $40^{\\circ}\\text{C}$?", answerOptions: [{ text: "$5,00150\\text{ m}$", isCorrect: true }, { text: "$5,00125\\text{ m}$", isCorrect: false }, { text: "$5,00075\\text{ m}$", isCorrect: false }, { text: "$5,00300\\text{ m}$", isCorrect: false }] },
+            { question: "Một dây đồng dài $10,00\\text{ m}$ ở $20^{\\circ}\\text{C}$. Cho hệ số nở dài của đồng là $\\alpha = 1,7 \\times 10^{-5}\\text{ K}^{-1}$. Hỏi cần giảm nhiệt độ bao nhiêu độ ($^{\\circ}\\text{C}$) để chiều dài dây giảm $0,0051\\text{ m}$?", answerOptions: [{ text: "Giảm $30^{\\circ}\\text{C}$", isCorrect: true }, { text: "Giảm $25^{\\circ}\\text{C}$", isCorrect: false }, { text: "Giảm $50^{\\circ}\\text{C}$", isCorrect: false }, { text: "Giảm $60^{\\circ}\\text{C}$", isCorrect: false }] },
+            { question: "Một nhiệt kế thủy ngân có chiều dài cột thủy ngân là $1,0\\text{ cm}$ ở $0^{\\circ}\\text{C}$ và $11,0\\text{ cm}$ ở $100^{\\circ}\\text{C}$. Giả sử mối quan hệ chiều dài ($L$) và nhiệt độ ($T$) là tuyến tính. Hỏi chiều dài cột thủy ngân là bao nhiêu khi nhiệt độ là $40^{\\circ}\\text{C}$?", answerOptions: [{ text: "$4,0\\text{ cm}$", isCorrect: false }, { text: "$5,0\\text{ cm}$", isCorrect: true }, { text: "$6,0\\text{ cm}$", isCorrect: false }, { text: "$7,0\\text{ cm}$", isCorrect: false }] },
+            { question: "Vẫn nhiệt kế ở câu 8 (chiều dài $1,0\\text{ cm}$ ở $0^{\\circ}\\text{C}$ và $11,0\\text{ cm}$ ở $100^{\\circ}\\text{C}$). Hỏi nhiệt độ ($^{\\circ}\\text{C}$) là bao nhiêu khi chiều dài cột thủy ngân là $7,0\\text{ cm}$?", answerOptions: [{ text: "$60^{\\circ}\\text{C}$", isCorrect: true }, { text: "$70^{\\circ}\\text{C}$", isCorrect: false }, { text: "$55^{\\circ}\\text{C}$", isCorrect: false }, { text: "$50^{\\circ}\\text{C}$", isCorrect: false }] },
+            { question: "Nếu độ chênh lệch nhiệt độ giữa hai vật là $30\\text{ K}$. Hỏi độ chênh lệch này tương ứng với bao nhiêu độ Fahrenheit ($^{\\circ}\\text{F}$)?", answerOptions: [{ text: "$30^{\\circ}\\text{F}$", isCorrect: false }, { text: "$48^{\\circ}\\text{F}$", isCorrect: false }, { text: "$54^{\\circ}\\text{F}$", isCorrect: true }, { text: "$86^{\\circ}\\text{F}$", isCorrect: false }] },
+            { question: "Thang $\\text{A}$ có điểm đóng băng là $-10^{\\circ}\\text{A}$ và điểm sôi là $140^{\\circ}\\text{A}$. Hỏi $20^{\\circ}\\text{A}$ tương ứng với bao nhiêu độ Celsius ($^{\\circ}\\text{C}$)?", answerOptions: [{ text: "$20^{\\circ}\\text{C}$", isCorrect: true }, { text: "$24^{\\circ}\\text{C}$", isCorrect: false }, { text: "$15^{\\circ}\\text{C}$", isCorrect: false }, { text: "$30^{\\circ}\\text{C}$", isCorrect: false }] }
+        ];
+
+        let currentQuestionIndex = 0;
+        // Mảng lưu trữ câu trả lời của người dùng. Giá trị là index của lựa chọn (0, 1, 2, 3), hoặc -1 nếu chưa trả lời.
+        let userAnswers = Array(quizData.length).fill(-1);
+
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const nextButton = document.getElementById('next-button');
+        const prevButton = document.getElementById('prev-button');
+        const progressText = document.getElementById('progress-text');
+        const quizHeader = document.getElementById('quiz-header');
+        const questionArea = document.getElementById('question-area');
+        const resultsScreen = document.getElementById('results-screen');
+        const finalScore = document.getElementById('final-score');
+
+        // Hàm xáo trộn mảng (thuật toán Fisher-Yates)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // --- Logic Hiển thị Câu hỏi ---
+        function renderQuestion() {
+            // Cập nhật trạng thái nút
+            prevButton.disabled = currentQuestionIndex === 0;
+            
+            // Cập nhật nút Next
+            if (currentQuestionIndex === quizData.length - 1) {
+                nextButton.textContent = 'Hoàn Thành';
+                nextButton.classList.remove('bg-indigo-600');
+                nextButton.classList.add('bg-green-600');
+                nextButton.classList.add('hover:bg-green-700');
+            } else {
+                nextButton.textContent = 'Câu Kế Tiếp →';
+                nextButton.classList.add('bg-indigo-600');
+                nextButton.classList.remove('bg-green-600');
+                nextButton.classList.remove('hover:bg-green-700');
+            }
+
+            const currentQuestion = quizData[currentQuestionIndex];
+            const selectedIndex = userAnswers[currentQuestionIndex];
+
+            // Cập nhật tiến trình
+            progressText.textContent = `Câu ${currentQuestionIndex + 1} / ${quizData.length}`;
+
+            // Hiển thị câu hỏi (để nguyên LaTeX)
+            questionText.innerHTML = `Câu ${currentQuestionIndex + 1}: ${currentQuestion.question}`;
+
+            // Hiển thị các lựa chọn
+            optionsContainer.innerHTML = '';
+            currentQuestion.answerOptions.forEach((option, index) => {
+                const optionElement = document.createElement('button');
+                optionElement.className = 'answer-option w-full text-left p-4 border border-gray-300 rounded-lg text-gray-800 focus:outline-none';
+                optionElement.dataset.index = index;
+                optionElement.innerHTML = option.text; 
+                optionElement.addEventListener('click', selectAnswer);
+
+                // Kiểm tra và đánh dấu lựa chọn đã lưu
+                if (index === selectedIndex) {
+                    optionElement.classList.add('selected');
+                }
+                
+                optionsContainer.appendChild(optionElement);
+            });
+
+            // Yêu cầu MathJax render lại nội dung vừa được chèn
+            if (window.MathJax) {
+                MathJax.typesetPromise([questionText, optionsContainer]);
+            }
+        }
+
+        // --- Logic Xử lý Đáp án ---
+        function selectAnswer(event) {
+            const clickedOption = event.currentTarget;
+            const selectedIndex = parseInt(clickedOption.dataset.index);
+
+            // Xóa đánh dấu lựa chọn cũ và đánh dấu lựa chọn mới
+            Array.from(optionsContainer.children).forEach(option => {
+                option.classList.remove('selected');
+            });
+            clickedOption.classList.add('selected');
+
+            // Lưu câu trả lời vào mảng userAnswers
+            userAnswers[currentQuestionIndex] = selectedIndex;
+
+            // Log để kiểm tra
+            console.log(`Câu ${currentQuestionIndex + 1} đã chọn: ${selectedIndex}`);
+        }
+
+        // --- Logic Điều hướng ---
+        nextButton.addEventListener('click', () => {
+            if (currentQuestionIndex < quizData.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                // Đã ở câu cuối, Hoàn thành
+                showResults();
+            }
+        });
+
+        prevButton.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        });
+
+        // --- Logic Kết quả Cuối cùng ---
+        function showResults() {
+            let finalScoreValue = 0;
+            const totalQuestions = quizData.length;
+
+            // Tính điểm dựa trên mảng câu trả lời đã lưu
+            userAnswers.forEach((answerIndex, qIndex) => {
+                // Chỉ tính điểm nếu người dùng đã chọn (answerIndex != -1)
+                if (answerIndex !== -1) {
+                    const correctAnswer = quizData[qIndex].answerOptions.find(opt => opt.isCorrect);
+                    const selectedAnswer = quizData[qIndex].answerOptions[answerIndex];
+
+                    if (selectedAnswer && selectedAnswer.isCorrect) {
+                        finalScoreValue++;
+                    }
+                }
+            });
+
+            quizHeader.classList.add('hidden');
+            questionArea.classList.add('hidden');
+            nextButton.classList.add('hidden');
+            prevButton.classList.add('hidden');
+
+            finalScore.innerHTML = `Bạn đã đạt được ${finalScoreValue} / ${totalQuestions} điểm.`;
+            resultsScreen.classList.remove('hidden');
+
+            if (finalScoreValue / totalQuestions >= 0.8) {
+                finalScore.classList.add('text-green-600');
+            } else if (finalScoreValue / totalQuestions >= 0.5) {
+                finalScore.classList.add('text-yellow-600');
+            } else {
+                finalScore.classList.add('text-red-600');
+            }
+        }
+
+        // Khởi động bài trắc nghiệm
+        window.onload = () => {
+            // Xáo trộn thứ tự các câu hỏi trước khi bắt đầu
+            shuffleArray(quizData);
+            // Bắt đầu bài trắc nghiệm
+            renderQuestion();
+        };
+
+    </script>
+</body>
+</html>
