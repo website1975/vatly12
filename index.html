@@ -67,6 +67,15 @@
     height: 100%;
     border: none;
   }
+  /* Panel dưới (footer) */
+  #bottom-panel {
+    background-color: #1e3c72;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 15px;
+    box-shadow: 0 -3px 8px rgba(0, 0, 0, 0.2);
+  }
 </style>
 </head>
 <body>
@@ -77,12 +86,12 @@
     <button class="menu-btn" onclick="openLink('chuong2/index.html')">KHÍ LÝ TƯỞNG</button>
     <button class="menu-btn" onclick="openLink('chuong3/index.html')">TỪ TRƯỜNG</button>
     <button class="menu-btn" onclick="openLink('chuong4/index.html')">VẬT LÝ HẠT NHÂN</button>
+    <center><p style="font-size:13px"><strong>Tác giả:<br> GV: Hà Văn Thạnh <br> Phone: 0909091634</strong> </center>
   </div>
 
   <div id="right-panel">
     <iframe id="content-frame" src="chuong1/index.html"></iframe>
   </div>
-
 <script>
   function openLink(url) {
     document.getElementById('content-frame').src = url;
