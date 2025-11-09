@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vật Lý 12</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* Panel trên */
+  #top-panel {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    text-align: center;
+  }
+
+  #top-panel a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+  }
+
+  #top-panel a:hover {
+    text-decoration: underline;
+  }
+
+  /* Panel dưới (hiển thị nội dung) */
+  #bottom-panel {
+    flex-grow: 1;
+    border-top: 2px solid #ccc;
+  }
+
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+</style>
+</head>
+
+<body>
+	
+  <div id="top-panel">Tóm tắt : 
+    <a href="Suchuyenthe/chuyenthe.html" target="content-frame">[Sự Chuyển Thể]</a>
+    <a href="Nhietdo/nhietdo.html" target="content-frame">[Nhiệt Độ]</a>
+    <a href="noinang/noinang.html" target="content-frame">[Nội Năng]</a>
+    <a href="nhietdungrieng/nhietdungrieng.html" target="content-frame">[Nhiệt Dung Riêng]</a>
+
+  </div>
+
+  <div id="bottom-panel">
+    <iframe name="content-frame" src="https://www.wikipedia.org"></ifra
