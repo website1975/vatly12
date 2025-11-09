@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn Tập: Nội Năng & Định Luật I NĐLH</title>
+    <!-- MathJax CDN để hiển thị công thức LaTeX -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Cấu hình Font và Tailwind -->
+<script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+</script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#4f46e5',
+                        'secondary': '#8b5cf6',
+                        'accent': '#10b981',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .card {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+        }
+        .math {
+            font-family: 'Times New Roman', serif; /* Font cổ điển cho công thức */
+            font-size: 1.15rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- HEADER -->
+        <header class="text-center mb-10 p-6 bg-white rounded-xl shadow-lg">
+            <h1 class="text-4xl font-extrabold text-primary mb-2">TÓM TẮT CHUYÊN ĐỀ VẬT LÝ</h1>
+            <p class="text-xl text-gray-700">NỘI NĂNG VÀ ĐỊNH LUẬT I NHIỆT ĐỘNG LỰC HỌC</p>
+        </header>
+
+        <!-- SLIDES CONTAINER -->
+        <!-- PHẦN 1: NỘI NĂNG -->
+        <div class="card bg-white p-6 md:p-8 rounded-xl mb-8 border-t-4 border-primary">
+            <h2 class="text-3xl font-bold text-primary mb-4 flex items-center">
+                <span class="mr-3 text-secondary text-4xl">1.</span> NỘI NĂNG ($U$)
+            </h2>
+
+            <div class="space-y-4 text-gray-700">
+                <p class="text-lg">
+                    <span class="font-semibold text-accent">Định nghĩa:</span> Nội năng là tổng động năng và thế năng của các phân tử cấu tạo nên vật.
+                </p>
+                <div class="bg-indigo-50 p-4 rounded-lg">
+                    <p class="font-bold text-indigo-700">Ký hiệu: $U$ | Đơn vị: Jun ($J$)</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-6 text-gray-800 border-b pb-1">Phụ thuộc vào:</h3>
+                <ul class="list-disc ml-6 space-y-2">
+                    <li>
+                        <span class="font-semibold">Nhiệt độ ($T$):</span> Nhiệt độ tăng $\rightarrow$ Động năng phân tử tăng $\rightarrow$ Nội năng ($U$) tăng.
+                    </li>
+                    <li>
+                        <span class="font-semibold">Thể tích ($V$):</span> Thể tích thay đổi $\rightarrow$ Thế năng tương tác phân tử thay đổi $\rightarrow$ Nội năng ($U$) thay đổi.
+                    </li>
+                </ul>
+
+                <h3 class="text-xl font-semibold mt-6 text-gray-800 border-b pb-1">Các cách làm thay đổi Nội năng ($\Delta U$):</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-green-100 p-4 rounded-lg">
+                        <p class="font-bold text-green-800 mb-2">1. Thực hiện Công ($A$)</p>
+                        <p class="text-sm">Là sự chuyển hóa từ **Cơ năng** sang **Nội năng** (hoặc ngược lại).</p>
+                        <ul class="text-sm mt-1 list-disc ml-4">
+                            <li>Hệ nhận công: $A > 0$</li>
+                            <li>Hệ thực hiện công: $A < 0$</li>
+                        </ul>
+                    </div>
+                    <div class="bg-yellow-100 p-4 rounded-lg">
+                        <p class="font-bold text-yellow-800 mb-2">2. Truyền Nhiệt ($Q$)</p>
+                        <p class="text-sm">Là sự truyền Nội năng giữa các vật có nhiệt độ khác nhau.</p>
+                        <ul class="text-sm mt-1 list-disc ml-4">
+                            <li>Hệ nhận nhiệt: $Q > 0$</li>
+                            <li>Hệ truyền nhiệt: $Q < 0$</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PHẦN 2: ĐỊNH LUẬT I NHIỆT ĐỘNG LỰC HỌC -->
+        <div class="card bg-white p-6 md:p-8 rounded-xl mb-8 border-t-4 border-secondary">
+            <h2 class="text-3xl font-bold text-secondary mb-4 flex items-center">
+                <span class="mr-3 text-primary text-4xl">2.</span> ĐỊNH LUẬT I NHIỆT ĐỘNG LỰC HỌC
+            </h2>
+
+            <div class="space-y-4 text-gray-700">
+                <p class="text-lg">
+                    <span class="font-semibold text-accent">Phát biểu:</span> Độ biến thiên nội năng ($\Delta U$) của hệ bằng tổng công ($A$) và nhiệt lượng ($Q$) mà hệ nhận được.
+                </p>
+
+                <div class="bg-red-50 p-4 rounded-lg text-center">
+                    <p class="text-2xl font-extrabold text-red-700 math">
+                        $$\Delta U = A + Q$$
+                    </p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-6 text-gray-800 border-b pb-1">Bảng Quy ước dấu:</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="py-2 px-4 border-b">Đại lượng</th>
+                                <th class="py-2 px-4 border-b">Hành động của Hệ</th>
+                                <th class="py-2 px-4 border-b">Dấu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="py-2 px-4 border-b font-mono text-center">$\Delta U$</td>
+                                <td class="py-2 px-4 border-b">Nội năng tăng ($U_{sau} > U_{đầu}$)</td>
+                                <td class="py-2 px-4 border-b text-green-600 font-bold text-center">$> 0$</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4 border-b font-mono text-center"></td>
+                                <td class="py-2 px-4 border-b">Nội năng giảm ($U_{sau} < U_{đầu}$)</td>
+                                <td class="py-2 px-4 border-b text-red-600 font-bold text-center"> $< 0$</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4 border-b font-mono text-center">Công ($A$)</td>
+                                <td class="py-2 px-4 border-b">Hệ **nhận** công</td>
+                                <td class="py-2 px-4 border-b text-green-600 font-bold text-center"> $> 0$</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4 border-b font-mono text-center"></td>
+                                <td class="py-2 px-4 border-b">Hệ **thực hiện** công</td>
+                                <td class="py-2 px-4 border-b text-red-600 font-bold text-center"> $< 0$</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4 font-mono text-center">Nhiệt ($Q$)</td>
+                                <td class="py-2 px-4">Hệ **nhận** nhiệt</td>
+                                <td class="py-2 px-4 text-green-600 font-bold text-center"> $> 0$</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4 font-mono text-center"></td>
+                                <td class="py-2 px-4">Hệ **truyền** nhiệt</td>
+                                <td class="py-2 px-4 text-red-600 font-bold text-center"> $< 0$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PHẦN 3: HIỆU SUẤT ĐỘNG CƠ NHIỆT -->
+        <div class="card bg-white p-6 md:p-8 rounded-xl mb-8 border-t-4 border-accent">
+            <h2 class="text-3xl font-bold text-accent mb-4 flex items-center">
+                <span class="mr-3 text-secondary text-4xl">3.</span> HIỆU SUẤT ĐỘNG CƠ NHIỆT ($H$)
+            </h2>
+
+            <div class="space-y-4 text-gray-700">
+                <p class="text-lg">
+                    <span class="font-semibold text-primary">Định nghĩa:</span> Tỉ số giữa Công có ích ($A$) và Nhiệt lượng ($Q_1$) mà tác nhân nhận được từ nguồn nóng.
+                </p>
+
+                <h3 class="text-xl font-semibold mt-6 text-gray-800 border-b pb-1">Công thức chung:</h3>
+                <div class="bg-blue-50 p-4 rounded-lg text-center">
+                    <p class="text-2xl font-extrabold text-blue-700 math">
+                        $$\mathrm{H} = \frac{\mathrm{A}}{\mathrm{Q}_1} = 1 - \frac{|\mathrm{Q}_2|}{|\mathrm{Q}_1|}$$
+                    </p>
+                    <p class="text-sm text-blue-600 mt-2">($Q_1$: Nhiệt nhận từ nguồn nóng; $Q_2$: Nhiệt truyền cho nguồn lạnh)</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-6 text-gray-800 border-b pb-1">Hiệu suất Động cơ nhiệt lí tưởng (Carnot):</h3>
+                <div class="bg-purple-50 p-4 rounded-lg text-center">
+                    <p class="text-2xl font-extrabold text-purple-700 math">
+                        $$\mathrm{H}_{max} = 1 - \frac{\mathrm{T}_2}{\mathrm{T}_1}$$
+                    </p>
+                    <p class="text-sm text-purple-600 mt-2">($T_1$: Nhiệt độ nguồn nóng; $T_2$: Nhiệt độ nguồn lạnh - đơn vị **Kelvin (K)**)</p>
+                </div>
+
+                <p class="text-sm italic pt-4 text-center text-gray-500">
+                    *Lưu ý: Hiệu suất thực tế luôn nhỏ hơn hiệu suất lí tưởng (H < 1).*
+                </p>
+            </div>
+        </div>
+        <!-- END SLIDES CONTAINER -->
+        
+        <!-- NAVIGATION CONTROLS -->
+        <div class="flex justify-between items-center mt-6 mb-8 p-4 bg-white rounded-xl shadow-md">
+            <button id="prevBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
+                &larr; Quay lại
+            </button>
+            <span id="slideCounter" class="text-lg font-semibold text-gray-700"></span>
+            <button id="nextBtn" class="bg-primary hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
+                Tiếp theo &rarr;
+            </button>
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="text-center mt-10 p-4 text-gray-500 text-sm">
+            <p>&copy; Tóm tắt kiến thức Vật lý - Chủ đề Nội năng và Định luật I NĐLH.</p>
+        </footer>
+    </div>
+
+    <!-- JAVASCRIPT FOR SLIDE SHOW FUNCTIONALITY -->
+    <script>
+        let currentSlide = 0;
+        let slides; 
+        let prevBtn;
+        let nextBtn;
+        let slideCounter;
+
+        const showSlide = (n) => {
+            // Check if slides are loaded
+            if (!slides || slides.length === 0) return;
+            
+            // Keep currentSlide within bounds
+            if (n >= slides.length) { currentSlide = slides.length - 1; }
+            if (n < 0) { currentSlide = 0; }
+            
+            // Hide all slides
+            slides.forEach(slide => slide.classList.add('hidden'));
+
+            // Show the current slide
+            slides[currentSlide].classList.remove('hidden');
+
+            // Update buttons and counter
+            const isFirst = (currentSlide === 0);
+            const isLast = (currentSlide === slides.length - 1);
+            
+            // Disable button if at start/end
+            prevBtn.disabled = isFirst;
+            nextBtn.disabled = isLast;
+            
+            // Toggle opacity for visual feedback
+            prevBtn.classList.toggle('opacity-50', isFirst);
+            nextBtn.classList.toggle('opacity-50', isLast);
+            
+            slideCounter.textContent = `Slide ${currentSlide + 1} / ${slides.length}`;
+        };
+
+        const changeSlide = (n) => {
+            currentSlide += n;
+            showSlide(currentSlide);
+        };
+
+        window.onload = () => {
+            // Find slides (the cards) and navigation elements
+            slides = document.querySelectorAll('.card');
+            prevBtn = document.getElementById('prevBtn');
+            nextBtn = document.getElementById('nextBtn');
+            slideCounter = document.getElementById('slideCounter');
+            
+            // Initial setup only if slides exist
+            if (slides.length > 0) {
+                // Attach event listeners
+                prevBtn.addEventListener('click', () => changeSlide(-1));
+                nextBtn.addEventListener('click', () => changeSlide(1));
+                
+                // Display the first slide and update UI
+                showSlide(currentSlide);
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Vật Lý: Nội năng & Nguyên lý I Nhiệt động lực học</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- KHỐI CẤU HÌNH MATHJAX MỚI -->
+    <script>
+        // Cấu hình MathJax để cho phép sử dụng dấu $ cho công thức inline
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']], // Thêm '$' cho inline math
+                displayMath: [['$$', '$$'], ['\\[', '\\]']] // Giữ nguyên cho display math
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    
+    <!-- Tải MathJax để render công thức LaTeX -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* Thiết lập font Inter mặc định */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            /* Đảm bảo nội dung chung là font-normal/mảnh */
+            font-weight: 400; 
+        }
+        /* Style cho nút câu hỏi đã trả lời */
+        .question-nav-button.answered {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        .question-nav-button.correct {
+            background-color: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+        .question-nav-button.incorrect {
+            background-color: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+        /* Animation cho nút được chọn */
+        .option-item:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2p x rgba(0, 0, 0, 0.1);
+        }
+        .selected-option {
+            border: 3px solid #3b82f6; /* Màu xanh dương nổi bật khi chọn */
+            background-color: #eff6ff; /* Nền xanh nhạt */
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -4px rgba(59, 130, 246, 0.1);
+        }
+        .correct-answer {
+            border: 3px solid #10b981; /* Màu xanh lá cây khi đúng */
+            background-color: #d1fae5;
+        }
+        .incorrect-answer {
+            border: 3px solid #ef4444; /* Màu đỏ khi sai */
+            background-color: #fee2e2;
+        }
+        .answer-label {
+            min-width: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Giữ độ đậm cho nhãn A/B/C/D để nổi bật */
+            font-weight: 600; 
+        }
+        /* Custom modal animation */
+        .modal {
+            transition: opacity 0.3s ease-in-out;
+        }
+        /* Điều chỉnh kích thước công thức để không bị tràn */
+        .MathJax {
+             overflow-x: auto;
+             max-width: 100%;
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased">
+
+    <!-- Toast Notification (Cổ vũ/Động viên) -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 space-y-2">
+        <!-- Toasts will be injected here -->
+    </div>
+
+    <!-- Main Application Container -->
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-10">
+            <!-- Tiêu đề vẫn giữ bold -->
+            <h1 class="text-3xl font-bold text-blue-700">ÔN TẬP VẬT LÝ 12</h1>
+            <p class="mt-2 text-xl text-gray-600 font-normal">Nội năng và Nguyên lý I Nhiệt động lực học</p>
+            <p class="text-sm italic text-gray-500 mt-1 font-normal">20 câu hỏi phân loại theo 4 trình độ nhận thức</p>
+        </header>
+
+        <!-- LAYOUT CHÍNH: Flex-col trên mobile (Content trên, Sidebar dưới), Flex-row trên màn hình lớn (Content trái, Sidebar phải) -->
+        <main id="quiz-app" class="flex flex-col lg:flex-row gap-8">
+            
+            <!-- Quiz Content Area (Bây giờ nằm ở VỊ TRÍ ĐẦU TIÊN trong HTML) -->
+            <div id="content-area" class="flex-grow bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                <!-- Question and Results views will be rendered here -->
+            </div>
+            
+            <!-- Question Navigation Sidebar (Bây giờ nằm ở VỊ TRÍ THỨ HAI trong HTML) -->
+            <!-- Sticky top-8 giữ sidebar cố định khi cuộn trên màn hình lớn -->
+            <div id="sidebar" class="w-full lg:w-64 bg-white p-4 rounded-xl shadow-lg h-fit lg:sticky top-8">
+                <h2 class="text-lg font-semibold mb-4 border-b pb-2 text-gray-700">Thanh điều hướng</h2>
+                <div id="question-nav" class="grid grid-cols-5 gap-3 sm:grid-cols-7 lg:grid-cols-4 xl:grid-cols-5">
+                    <!-- Navigation buttons will be injected here -->
+                </div>
+                <button id="submit-quiz-button" onclick="showResults()" class="mt-6 w-full py-3 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition duration-300 shadow-md focus:outline-none focus:ring-4 focus:ring-red-300">
+                    Nộp bài & Xem kết quả
+                </button>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // --- 1. QUIZ DATA ---
+        const rawQuestions = [
+            // Cấp độ 1: Ghi nhớ (5 câu)
+            { id: 1, level: "Ghi nhớ", question: "Nội năng của một vật (hệ) là:", options: ["Tổng động năng và thế năng của vật.", "Tổng động năng của các phân tử cấu tạo nên vật.", "Tổng động năng và thế năng tương tác của các phân tử cấu tạo nên vật.", "Nhiệt lượng vật nhận được trong một quá trình."], correctIndex: 2, explanation: "Nội năng là tổng động năng chuyển động nhiệt và thế năng tương tác của các phân tử cấu tạo nên vật. Công thức: $\\Delta U = \\sum E_{d} + \\sum E_{t}$.", },
+            { id: 2, level: "Ghi nhớ", question: "Trong công thức của nguyên lí I nhiệt động lực học, khi vật nhận công ($A > 0$), điều đó có nghĩa là:", options: ["Vật sinh công cho môi trường ngoài.", "Vật nhận nhiệt lượng.", "Môi trường ngoài thực hiện công lên vật.", "Nội năng của vật giảm."], correctIndex: 2, explanation: "Theo quy ước, $A > 0$ khi công được thực hiện bởi môi trường ngoài lên hệ (hệ nhận công). Công thức: $\\Delta U = Q + A$.", },
+            { id: 3, level: "Ghi nhớ", question: "Nội năng của một khối khí lí tưởng chỉ phụ thuộc vào yếu tố nào?", options: ["Áp suất và thể tích.", "Áp suất và nhiệt độ.", "Thể tích và nhiệt độ.", "Nhiệt độ."], correctIndex: 3, explanation: "Khí lí tưởng không có thế năng tương tác giữa các phân tử, do đó nội năng chỉ là tổng động năng của các phân tử, và động năng này chỉ phụ thuộc vào nhiệt độ tuyệt đối ($T$).", },
+            { id: 4, level: "Ghi nhớ", question: "Nguyên lí I nhiệt động lực học là sự phát biểu của định luật bảo toàn và chuyển hóa năng lượng áp dụng cho:", options: ["Quá trình trao đổi nhiệt.", "Quá trình truyền công.", "Các hiện tượng cơ học.", "Sự biến thiên nội năng của vật."], correctIndex: 3, explanation: "Nguyên lí I nhiệt động lực học phát biểu: Độ biến thiên nội năng ($\\Delta U$) của một vật bằng tổng nhiệt lượng ($Q$) và công ($A$) mà vật nhận được: $\\Delta U = Q + A$.", },
+            { id: 5, level: "Ghi nhớ", question: "Đại lượng nào sau đây là số đo độ biến thiên nội năng của hệ trong quá trình truyền nhiệt?", options: ["Công.", "Nhiệt lượng.", "Nhiệt dung riêng.", "Thế năng."], correctIndex: 1, explanation: "Trong quá trình truyền nhiệt thuần túy (không thực hiện công, $A=0$), công thức $\\Delta U = Q + A$ trở thành $\\Delta U = Q$. Nhiệt lượng ($Q$) chính là số đo độ biến thiên nội năng.", },
+
+            // Cấp độ 2: Hiểu (5 câu)
+            { id: 6, level: "Hiểu", question: "Trong quá trình đoạn nhiệt, vật trao đổi nhiệt với môi trường như thế nào?", options: ["Vật nhận nhiệt lượng $Q > 0$.", "Vật truyền nhiệt lượng $Q < 0$.", "Vật không trao đổi nhiệt với môi trường ($Q = 0$).", "Vật nhận nhiệt lượng đúng bằng công thực hiện $Q = A$.",], correctIndex: 2, explanation: "Quá trình đoạn nhiệt là quá trình xảy ra nhanh đến mức không kịp trao đổi nhiệt, hoặc hệ được cách nhiệt hoàn toàn. Do đó $Q = 0$.", },
+            { id: 7, level: "Hiểu", question: "Đun nóng một khối khí trong bình kín (quá trình đẳng tích), áp suất và nội năng của khối khí sẽ thay đổi như thế nào?", options: ["Áp suất tăng, nội năng giảm.", "Áp suất không đổi, nội năng tăng.", "Áp suất tăng, nội năng tăng.", "Áp suất giảm, nội năng giảm."], correctIndex: 2, explanation: "Đun nóng ($T$ tăng). Quá trình đẳng tích ($V=\\text{const}$), theo định luật Sac-lơ $P/T=\\text{const}$ nên $T$ tăng $\\implies P$ tăng. Nội năng khí lí tưởng phụ thuộc vào $T$, nên $T$ tăng $\\implies U$ tăng.", },
+            { id: 8, level: "Hiểu", question: "Trong quá trình đẳng nhiệt của khí lí tưởng, công ($A$) mà môi trường thực hiện lên khí và nhiệt lượng ($Q$) khí nhận vào có mối liên hệ như thế nào?", options: ["$A = 0$ và $Q = \\Delta U$.", "$A = -Q$.", "$Q = 0$ và $\\Delta U = A$.", "$Q = A$."], correctIndex: 1, explanation: "Quá trình đẳng nhiệt ($T=\\text{const}$) của khí lí tưởng $\\implies \\Delta U = 0$. Áp dụng Nguyên lí I: $\\Delta U = Q + A \\implies 0 = Q + A \\implies A = -Q$.", },
+            { id: 9, level: "Hiểu", question: "Khi ta khuấy một cốc nước lạnh, nội năng của nước thay đổi như thế nào và nguyên nhân chính là gì?", options: ["Nội năng giảm do nước truyền nhiệt ra không khí.", "Nội năng không đổi vì không có sự truyền nhiệt rõ rệt.", "Nội năng tăng do ta thực hiện công lên nước.", "Nội năng tăng do ta cung cấp nhiệt lượng cho nước."], correctIndex: 2, explanation: "Khuấy nước là ta thực hiện công ($A > 0$) lên hệ. Theo $\\Delta U = Q + A$, nếu bỏ qua sự truyền nhiệt ra môi trường ($Q \\approx 0$), thì $\\Delta U = A > 0$, nội năng tăng lên.", },
+            { id: 10, level: "Hiểu", question: "Nội năng của một lượng nước không thay đổi khi nào?", options: ["Nước được làm lạnh từ $50^{\\circ}$C xuống $20^{\\circ}$C.", "Nước được đun nóng từ $20^{\\circ}$C lên $50^{\\circ}$C.", "Nước được chuyển từ cốc này sang cốc khác mà không thay đổi nhiệt độ.", "Nước được nén từ áp suất $1\\text{ atm}$ lên $2\\text{ atm}$ ở nhiệt độ không đổi."], correctIndex: 2, explanation: "Nội năng của chất lỏng phụ thuộc chủ yếu vào nhiệt độ. Chỉ khi nhiệt độ không thay đổi thì nội năng mới không đổi. Việc chuyển từ cốc này sang cốc khác không làm thay đổi nhiệt độ.", },
+
+            // Cấp độ 3: Vận dụng thấp (5 câu)
+            { id: 11, level: "Vận dụng thấp", question: "Một khối khí nhận nhiệt lượng $Q = 150\\text{ J}$, đồng thời khí thực hiện công $A' = 40\\text{ J}$. Độ biến thiên nội năng $\\Delta U$ của khí là:", options: ["$190\\text{ J}$", "$110\\text{ J}$", "$-110\\text{ J}$", "$-190\\text{ J}$"], correctIndex: 1, explanation: "Khí nhận nhiệt: $Q = 150\\text{ J}$. Khí thực hiện công: $A' = 40\\text{ J} \\implies$ Công môi trường thực hiện lên khí: $A = -A' = -40\\text{ J}$. Áp dụng Nguyên lí I: $\\Delta U = Q + A = 150 + (-40) = 110\\text{ J}$.", },
+            { id: 12, level: "Vận dụng thấp", question: "Một khối khí giãn nở đẳng áp dưới áp suất $P = 1,5 \\times 10^5\\text{ Pa}$. Thể tích khí tăng từ $V_1 = 2,0\\text{ L}$ đến $V_2 = 5,0\\text{ L}$. Công $A'$ mà khối khí thực hiện là bao nhiêu?", options: ["$450\\text{ J}$", "$300\\text{ J}$", "$750\\text{ J}$", "$-450\\text{ J}$"], correctIndex: 0, explanation: "Công khí thực hiện trong quá trình đẳng áp: $A' = P \\cdot \\Delta V$. Ta có $\\Delta V = V_2 - V_1 = 5,0\\text{ L} - 2,0\\text{ L} = 3,0\\text{ L} = 3,0 \\times 10^{-3}\\text{ m}^3$. $A' = 1,5 \\times 10^5\\text{ Pa} \\times 3,0 \\times 10^{-3}\\text{ m}^3 = 450\\text{ J}$.", },
+            { id: 13, level: "Vận dụng thấp", question: "Trong quá trình đẳng tích, một khối khí nhận nhiệt lượng $Q = 75\\text{ J}$. Độ biến thiên nội năng $\\Delta U$ của khối khí là bao nhiêu?", options: ["$0\\text{ J}$", "$75\\text{ J}$", "$-75\\text{ J}$", "$150\\text{ J}$"], correctIndex: 1, explanation: "Quá trình đẳng tích ($\\Delta V = 0$) $\\implies$ Công $A=0$. Khí nhận nhiệt: $Q = 75\\text{ J}$. Áp dụng Nguyên lí I: $\\Delta U = Q + A = 75 + 0 = 75\\text{ J}$.", },
+            { id: 14, level: "Vận dụng thấp", question: "Một hệ có độ biến thiên nội năng $\\Delta U = -50\\text{ J}$, đồng thời hệ thực hiện công $A' = 20\\text{ J}$. Nhiệt lượng $Q$ mà hệ trao đổi là bao nhiêu?", options: ["$70\\text{ J}$", "$-70\\text{ J}$", "$-30\\text{ J}$", "$30\\text{ J}$"], correctIndex: 2, explanation: "Độ biến thiên nội năng: $\\Delta U = -50\\text{ J}$. Hệ thực hiện công: $A' = 20\\text{ J} \\implies$ Công môi trường thực hiện: $A = -20\\text{ J}$. Áp dụng Nguyên lí I: $\\Delta U = Q + A \\implies Q = \\Delta U - A = -50 - (-20) = -30\\text{ J}$. Dấu trừ cho thấy hệ nhả nhiệt.", },
+            { id: 15, level: "Vận dụng thấp", question: "Trong một quá trình biến đổi chu trình (trở về trạng thái ban đầu), một hệ thực hiện công $A' = 60\\text{ J}$. Nhiệt lượng $Q$ mà hệ trao đổi là bao nhiêu?", options: ["$0\\text{ J}$", "$60\\text{ J}$", "$-60\\text{ J}$", "Phải biết nhiệt độ ban đầu và cuối cùng."], correctIndex: 1, explanation: "Quá trình chu trình $\\implies$ trạng thái cuối trùng trạng thái đầu $\\implies$ Độ biến thiên nội năng $\\Delta U = 0$. Hệ thực hiện công: $A' = 60\\text{ J} \\implies A = -60\\text{ J}$. Áp dụng Nguyên lí I: $\\Delta U = Q + A \\implies 0 = Q + (-60) \\implies Q = 60\\text{ J}$.", },
+
+            // Cấp độ 4: Vận dụng cao (5 câu)
+            { 
+                id: 16, 
+                level: "Vận dụng cao", 
+                question: "Một khối khí lí tưởng thực hiện hai quá trình liên tiếp: \\n (1) Đẳng áp: Khí nhận nhiệt $Q_1 = 400\\text{ J}$ và thực hiện công $A'_1 = 150\\text{ J}$. \\n (2) Đẳng tích: Khí nhả nhiệt $Q_2 = 100\\text{ J}$. \\n Độ biến thiên nội năng tổng cộng $\\Delta U$ của khối khí là bao nhiêu?", 
+                // ĐÃ SỬA LỖI TRÙNG LẶP: Thay "$150\\text{ J}$" ở index 0 thành "$250\\text{ J}$"
+                options: ["$250\\text{ J}$", "$350\\text{ J}$", "$50\\text{ J}$", "$150\\text{ J}$"], 
+                correctIndex: 3, 
+                explanation: "Quá trình (1): $Q_1 = 400\\text{ J}$, $A_1 = -A'_1 = -150\\text{ J}$. $\\Delta U_1 = Q_1 + A_1 = 400 - 150 = 250\\text{ J}$. Quá trình (2): Đẳng tích $\\implies A_2 = 0$. Khí nhả nhiệt $\\implies Q_2 = -100\\text{ J}$. $\\Delta U_2 = Q_2 + A_2 = -100 + 0 = -100\\text{ J}$. Độ biến thiên tổng cộng: $\\Delta U = \\Delta U_1 + \\Delta U_2 = 250 + (-100) = 150\\text{ J}$.", 
+            },
+            { id: 17, level: "Vận dụng cao", question: "Một khối khí lí tưởng giãn nở đẳng nhiệt. Nó nhận nhiệt lượng $Q = 600\\text{ J}$. Công $A'$ do khí thực hiện là bao nhiêu?", options: ["$600\\text{ J}$", "$0\\text{ J}$", "$-600\\text{ J}$", "$300\\text{ J}$"], correctIndex: 0, explanation: "Giãn nở đẳng nhiệt $\\implies \\Delta U = 0$. Khí nhận nhiệt $Q = 600\\text{ J}$. Áp dụng Nguyên lí I: $\\Delta U = Q + A \\implies 0 = 600 + A \\implies A = -600\\text{ J}$. Công khí thực hiện $A'$ là $A' = -A = 600\\text{ J}$.", },
+            { id: 18, level: "Vận dụng cao", question: "Một khối khí giãn nở đẳng áp. Trong quá trình này, khí nhận nhiệt lượng $Q$ và thực hiện công $A'$. Biết rằng độ biến thiên nội năng $\\Delta U$ của khí gấp 2 lần công $A'$ mà khí thực hiện (tức là $\\Delta U = 2A'$). Tính tỉ số $Q/A'$:", options: ["$1$", "$2$", "$3$", "$4$"], correctIndex: 2, explanation: "Công khí thực hiện: $A' = -A$. Áp dụng Nguyên lí I: $\\Delta U = Q + A = Q - A'$. Theo đề bài: $\\Delta U = 2A'$. Thay vào: $2A' = Q - A' \\implies Q = 2A' + A' = 3A'$. Vậy tỉ số $Q/A' = 3$.", },
+            { id: 19, level: "Vận dụng cao", question: "Một khối khí được nén đoạn nhiệt. Công $A$ do môi trường thực hiện lên khối khí là $A = 250\\text{ J}$. Độ biến thiên nội năng $\\Delta U$ của khối khí là bao nhiêu và khí nóng lên hay nguội đi?", options: ["$\\Delta U = 0\\text{ J}$, khí nguội đi.", "$\\Delta U = -250\\text{ J}$, khí nguội đi.", "$\\Delta U = 250\\text{ J}$, khí nóng lên.", "$\\Delta U = 250\\text{ J}$, khí nguội đi."], correctIndex: 2, explanation: "Quá trình nén đoạn nhiệt $\\implies Q=0$. Công môi trường thực hiện: $A = 250\\text{ J}$ ($A>0$). Áp dụng Nguyên lí I: $\\Delta U = Q + A = 0 + 250 = 250\\text{ J}$. Vì $\\Delta U > 0$, nội năng tăng, nhiệt độ của khí tăng lên (khí nóng lên).", },
+            { id: 20, level: "Vận dụng cao", question: "Một khối khí biến đổi từ trạng thái 1 sang trạng thái 3 thông qua trạng thái 2 ($1 \\to 2$ là đẳng áp, $2 \\to 3$ là đẳng nhiệt). Trong quá trình $1 \\to 2$, khí thực hiện công $A'_{12} = 5\\text{ J}$ và nội năng tăng $\\Delta U_{12} = 30\\text{ J}$. Quá trình $2 \\to 3$ khí nhận nhiệt $Q_{23} = 15\\text{ J}$. Tính độ biến thiên nội năng $\\Delta U_{13}$ của cả quá trình.", options: ["$30\\text{ J}$", "$45\\text{ J}$", "$35\\text{ J}$", "$50\\text{ J}$"], correctIndex: 0, explanation: "Độ biến thiên nội năng toàn quá trình: $\\Delta U_{13} = \\Delta U_{12} + \\Delta U_{23}$. Quá trình $2 \\to 3$ là đẳng nhiệt $\\implies$ nhiệt độ không đổi $\\implies \\Delta U_{23} = 0$. Do đó, $\\Delta U_{13} = 30\\text{ J} + 0\\text{ J} = 30\\text{ J}$. (Lưu ý: $A'_{12}$ và $Q_{23}$ là thông tin thừa để tính $\\Delta U_{13}$).", },
+        ];
+        
+        // --- 2. GLOBAL STATE ---
+        let currentQuestionIndex = 0;
+        let userAnswers = Array(rawQuestions.length).fill(null);
+        let quizSubmitted = false;
+        
+        // --- 3. DOM ELEMENTS ---
+        const contentArea = document.getElementById('content-area');
+        const questionNav = document.getElementById('question-nav');
+        const toastContainer = document.getElementById('toast-container');
+        const submitButton = document.getElementById('submit-quiz-button');
+
+        // --- 4. UTILITIES ---
+        const optionLabels = ['A', 'B', 'C', 'D'];
+        
+        /** Hiển thị thông báo động viên/cổ vũ */
+        function showToast(message, type = 'success') {
+            const icon = type === 'success' ? '🎉' : '🤔';
+            const bgColor = type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700';
+            
+            const toast = document.createElement('div');
+            toast.className = `p-4 rounded-lg border-2 shadow-xl ${bgColor} flex items-center transform transition-all duration-500 ease-out translate-x-full opacity-0 font-normal`; // Thêm font-normal
+            toast.innerHTML = `<span class="text-xl mr-3">${icon}</span> <span>${message}</span>`;
+            
+            toastContainer.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full', 'opacity-0');
+                toast.classList.add('translate-x-0', 'opacity-100');
+            }, 10);
+            
+            // Animate out and remove
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        // --- 5. NAVIGATION AND RENDERING ---
+        
+        /** Cập nhật thanh điều hướng câu hỏi */
+        function renderQuestionNav() {
+            questionNav.innerHTML = '';
+            rawQuestions.forEach((q, index) => {
+                const navButton = document.createElement('button');
+                // Giữ font-semibold cho nút số
+                navButton.className = 'question-nav-button w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-gray-300 flex items-center justify-center font-semibold text-sm transition-all duration-200 focus:outline-none';
+                navButton.textContent = q.id;
+                navButton.onclick = () => jumpToQuestion(index);
+                
+                // Cập nhật trạng thái trả lời
+                if (userAnswers[index] !== null) {
+                    navButton.classList.add('answered');
+                    if (quizSubmitted) {
+                        const isCorrect = userAnswers[index] === rawQuestions[index].correctIndex;
+                        navButton.classList.remove('answered');
+                        navButton.classList.add(isCorrect ? 'correct' : 'incorrect');
+                    }
+                }
+                
+                // Đánh dấu câu hỏi hiện tại
+                if (index === currentQuestionIndex && !quizSubmitted) {
+                    navButton.classList.add('bg-blue-200', 'border-blue-500', 'text-blue-700');
+                }
+
+                questionNav.appendChild(navButton);
+            });
+        }
+
+        /** Render nội dung câu hỏi hiện tại */
+        function renderQuestion() {
+            if (quizSubmitted) return;
+
+            const q = rawQuestions[currentQuestionIndex];
+            const currentAnswer = userAnswers[currentQuestionIndex];
+            
+            contentArea.innerHTML = `
+                <div class="mb-6">
+                    <div class="text-sm font-medium text-gray-500 font-normal mb-1">Cấp độ: ${q.level}</div>
+                    <!-- Tiêu đề câu hỏi (H2) giữ font-semibold/bold -->
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 border-l-4 border-blue-500 pl-3">
+                        Câu ${q.id}: ${q.question}
+                    </h2>
+                </div>
+                <div id="options-list" class="space-y-4">
+                    ${q.options.map((optionText, index) => `
+                        <div class="option-item ${currentAnswer === index ? 'selected-option' : 'border-gray-200 hover:border-blue-400'}" 
+                             data-index="${index}"
+                             onclick="handleOptionClick(${index})"
+                             role="button"
+                             tabindex="0"
+                             class="p-4 rounded-lg border cursor-pointer transition duration-200 ease-in-out">
+                            <div class="flex items-start">
+                                <span class="answer-label bg-gray-200 text-gray-700 font-semibold rounded-full p-2 mr-4 transition duration-200">
+                                    ${optionLabels[index]}
+                                </span>
+                                <!-- Nội dung đáp án là font-normal/mảnh -->
+                                <span class="flex-1 pt-1 font-normal">${optionText}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="mt-8 flex justify-between">
+                    <button onclick="prevQuestion()" ${currentQuestionIndex === 0 ? 'disabled' : ''} class="px-6 py-2 bg-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-200">
+                        &larr; Câu trước
+                    </button>
+                    <button onclick="nextQuestion()" class="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-200">
+                        ${currentQuestionIndex === rawQuestions.length - 1 ? 'Quay lại' : 'Câu tiếp theo &rarr;'}
+                    </button>
+                </div>
+            `;
+            renderQuestionNav();
+            // Gọi MathJax để render công thức sau khi nội dung đã được thêm vào DOM
+            if (typeof MathJax !== 'undefined') {
+                MathJax.typesetPromise([contentArea]);
+            }
+        }
+
+        // --- 6. HANDLERS ---
+        
+        /** Xử lý sự kiện chọn đáp án */
+        function handleOptionClick(selectedIndex) {
+            if (quizSubmitted) return;
+            
+            const q = rawQuestions[currentQuestionIndex];
+
+            // Xóa style cũ và thêm style mới
+            const options = document.querySelectorAll('.option-item');
+            options.forEach(opt => opt.classList.remove('selected-option', 'border-gray-200', 'hover:border-blue-400'));
+            
+            // Cập nhật câu trả lời của người dùng
+            userAnswers[currentQuestionIndex] = selectedIndex;
+            
+            // Đánh dấu đáp án đã chọn
+            const selectedElement = document.querySelector(`.option-item[data-index="${selectedIndex}"]`);
+            selectedElement.classList.add('selected-option');
+            
+            // Hiển thị thông báo động viên/cổ vũ
+            showToast("Tuyệt vời, đã lưu đáp án! Tiếp tục thôi! 🎉", 'success');
+            
+            // Cập nhật thanh điều hướng
+            renderQuestionNav();
+            
+            // Tự động chuyển sang câu tiếp theo (nếu chưa phải câu cuối)
+            setTimeout(() => {
+                if (currentQuestionIndex < rawQuestions.length - 1) {
+                    nextQuestion();
+                } else {
+                    // Nếu là câu cuối, chỉ cần cập nhật trạng thái
+                    renderQuestion();
+                }
+            }, 500);
+        }
+
+        /** Chuyển sang câu hỏi tiếp theo */
+        function nextQuestion() {
+            if (currentQuestionIndex < rawQuestions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            }
+        }
+
+        /** Chuyển về câu hỏi trước */
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        }
+
+        /** Chuyển đến câu hỏi theo chỉ mục */
+        function jumpToQuestion(index) {
+            currentQuestionIndex = index;
+            if (quizSubmitted) {
+                renderReviewQuestion();
+            } else {
+                renderQuestion();
+            }
+        }
+        
+        // --- 7. RESULT SCREEN ---
+        
+        /** Tính toán và hiển thị kết quả */
+        function showResults() {
+            quizSubmitted = true;
+            submitButton.disabled = true;
+            
+            let score = 0;
+            const categoryScores = { "Ghi nhớ": { total: 0, correct: 0 }, "Hiểu": { total: 0, correct: 0 }, "Vận dụng thấp": { total: 0, correct: 0 }, "Vận dụng cao": { total: 0, correct: 0 } };
+            const motivationalMessages = [
+                { minScore: 0, message: "Bạn có thể làm tốt hơn! Cùng ôn tập lại các khái niệm cơ bản nhé!", color: "text-red-600" },
+                { minScore: 10, message: "Kết quả khá tốt! Cần chú ý thêm các bài tập vận dụng. Cố lên! 💪", color: "text-yellow-600" },
+                { minScore: 15, message: "Xuất sắc! Kiến thức vững vàng. Rất đáng khích lệ! ✨", color: "text-green-600" },
+                { minScore: 20, message: "Hoàn hảo! Bạn là chuyên gia về Nhiệt động lực học! Chúc mừng! 🏆", color: "text-blue-600" },
+            ];
+
+            rawQuestions.forEach((q, index) => {
+                categoryScores[q.level].total++;
+                if (userAnswers[index] === q.correctIndex) {
+                    score++;
+                    categoryScores[q.level].correct++;
+                }
+            });
+
+            // Chọn thông điệp động viên
+            let message = motivationalMessages[0];
+            for (const m of motivationalMessages) {
+                if (score >= m.minScore) {
+                    message = m;
+                }
+            }
+            
+            // Tạo bảng tóm tắt chi tiết
+            const summaryTable = Object.keys(categoryScores).map(level => {
+                const data = categoryScores[level];
+                const percentage = data.total > 0 ? ((data.correct / data.total) * 100).toFixed(0) : 0;
+                let colorClass = 'text-gray-700';
+                if (percentage >= 80) colorClass = 'text-green-600 font-bold';
+                else if (percentage >= 50) colorClass = 'text-yellow-600 font-bold';
+                else colorClass = 'text-red-600 font-bold';
+                
+                return `
+                    <tr class="border-b hover:bg-gray-50 font-normal">
+                        <td class="py-3 px-4 text-left">${level}</td>
+                        <td class="py-3 px-4 text-center">${data.correct} / ${data.total}</td>
+                        <td class="py-3 px-4 text-right ${colorClass}">${percentage}%</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Render kết quả
+            contentArea.innerHTML = `
+                <div class="text-center p-6 md:p-10">
+                    <div class="text-7xl mb-4">${message.minScore === 20 ? '🥇' : (score >= 15 ? '🌟' : (score >= 10 ? '💡' : '🌱'))}</div>
+                    <h2 class="text-4xl font-extrabold text-gray-800 mb-4">Kết Quả Bài Làm Của Bạn</h2>
+                    <p class="text-6xl font-black ${message.color}">${score} / ${rawQuestions.length}</p>
+                    <p class="text-2xl mt-4 ${message.color} font-semibold">${message.message}</p>
+                    
+                    <div class="mt-10 max-w-lg mx-auto bg-gray-100 p-6 rounded-xl shadow-inner font-normal">
+                        <h3 class="text-xl font-bold mb-4 border-b pb-2 text-gray-700">Tóm Tắt Chi Tiết Theo Trình Độ</h3>
+                        <table class="w-full text-left text-sm bg-white rounded-lg overflow-hidden">
+                            <thead class="bg-blue-500 text-white font-semibold">
+                                <tr>
+                                    <th class="py-3 px-4">Trình độ</th>
+                                    <th class="py-3 px-4 text-center">Đúng/Tổng</th>
+                                    <th class="py-3 px-4 text-right">Tỷ lệ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${summaryTable}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <button onclick="reviewAnswers()" class="mt-8 px-8 py-3 bg-indigo-500 text-white font-bold rounded-lg hover:bg-indigo-600 transition duration-300 shadow-lg focus:outline-none focus:ring-4 focus:ring-indigo-300">
+                        Xem lại đáp án
+                    </button>
+                </div>
+            `;
+            renderQuestionNav(); // Cập nhật màu sắc thanh điều hướng theo kết quả
+        }
+
+        /** Cho phép người dùng xem lại đáp án sau khi nộp bài */
+        function reviewAnswers() {
+            // Tắt nút nộp bài và chuyển về câu hỏi 1
+            submitButton.style.display = 'none';
+            currentQuestionIndex = 0;
+            renderReviewQuestion();
+        }
+
+        /** Render câu hỏi trong chế độ xem lại */
+        function renderReviewQuestion() {
+            const q = rawQuestions[currentQuestionIndex];
+            const userAnswerIndex = userAnswers[currentQuestionIndex];
+            const isCorrect = userAnswerIndex === q.correctIndex;
+            
+            // Hàm chuyển đổi Markdown/LaTeX đơn giản thành HTML
+            function formatExplanation(text) {
+                // Thay thế \\n thành <br>
+                text = text.replace(/\\n/g, '<br>');
+                // KHÔNG thay thế $...$ vì MathJax sẽ xử lý
+                return text;
+            }
+
+            contentArea.innerHTML = `
+                <div class="mb-6">
+                    <div class="text-sm font-medium text-gray-500 font-normal mb-1">Cấp độ: ${q.level}</div>
+                    <!-- Tiêu đề câu hỏi (H2) giữ font-semibold/bold -->
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 border-l-4 ${isCorrect ? 'border-green-500' : 'border-red-500'} pl-3">
+                        Câu ${q.id}: ${q.question}
+                    </h2>
+                    <p class="mt-2 text-lg font-semibold ${isCorrect ? 'text-green-600' : 'text-red-600'}">
+                        Trạng thái: ${isCorrect ? 'CHÍNH XÁC' : 'SAI'}
+                    </p>
+                </div>
+                
+                <!-- Hiển thị các lựa chọn -->
+                <div id="options-list" class="space-y-4">
+                    ${q.options.map((optionText, index) => {
+                        let optionClass = 'border-gray-200';
+                        if (index === q.correctIndex) {
+                            optionClass = 'correct-answer'; // Đáp án đúng
+                        } else if (index === userAnswerIndex) {
+                            optionClass = 'incorrect-answer'; // Đáp án người dùng chọn (và bị sai)
+                        }
+                        
+                        return `
+                            <div class="p-4 rounded-lg border-2 ${optionClass}">
+                                <div class="flex items-start">
+                                    <span class="answer-label bg-gray-200 text-gray-700 font-semibold rounded-full p-2 mr-4 transition duration-200">
+                                        ${optionLabels[index]}
+                                    </span>
+                                    <!-- Nội dung đáp án là font-normal/mảnh -->
+                                    <span class="flex-1 pt-1 font-normal">${optionText}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                
+                <!-- Giải thích chi tiết -->
+                <div class="mt-8 p-5 bg-blue-50 border-l-4 border-blue-500 rounded-lg shadow-md font-normal">
+                    <h3 class="text-xl font-bold text-blue-700 mb-3 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Giải thích chi tiết
+                    </h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        ${formatExplanation(q.explanation || 'Không có giải thích chi tiết cho câu hỏi này.')}
+                    </p>
+                    <p class="mt-3 text-sm font-semibold text-green-700">
+                        Đáp án đúng là: ${optionLabels[q.correctIndex]}
+                    </p>
+                </div>
+                
+                <div class="mt-8 flex justify-between">
+                    <button onclick="reviewPrev()" ${currentQuestionIndex === 0 ? 'disabled' : ''} class="px-6 py-2 bg-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-400 disabled:opacity-50 transition duration-200">
+                        &larr; Câu trước
+                    </button>
+                    <button onclick="reviewNext()" ${currentQuestionIndex === rawQuestions.length - 1 ? 'disabled' : ''} class="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 disabled:opacity-50 transition duration-200">
+                        Câu tiếp theo &rarr;
+                    </button>
+                </div>
+            `;
+            renderQuestionNav();
+            // Gọi MathJax để render công thức sau khi nội dung đã được thêm vào DOM
+            if (typeof MathJax !== 'undefined') {
+                MathJax.typesetPromise([contentArea]);
+            }
+        }
+
+        function reviewNext() {
+            if (currentQuestionIndex < rawQuestions.length - 1) {
+                currentQuestionIndex++;
+                renderReviewQuestion();
+            }
+        }
+
+        function reviewPrev() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderReviewQuestion();
+            }
+        }
+
+
+        // --- 8. INITIALIZATION ---
+        
+        /** Khởi tạo ứng dụng */
+        function init() {
+            renderQuestion();
+            submitButton.style.display = 'block';
+        }
+
+        // Bắt đầu ứng dụng khi tài liệu được tải
+        window.onload = init;
+
+    </script>
+</body>
+</html>

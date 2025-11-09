@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô phỏng Biến đổi Nội năng Khí Lý tưởng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+</script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .container-box {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+        /* Cố định chiều rộng xi lanh để tính toán va chạm hạt */
+        .cylinder-container {
+            width: 300px; 
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            position: relative;
+            background: linear-gradient(to bottom, #cfd8dc, #eceff1);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 3px solid #334155;
+            flex-shrink: 0;
+            margin: 0 auto; /* Căn giữa xi lanh */
+        }
+        .gas-body {
+            position: absolute;
+            bottom: 0;
+            width: 90%;
+            /* Nền trong suốt để chỉ hiển thị các hạt khí */
+            background: transparent !important; 
+            transition: height 0.3s ease-out;
+            border-top: 2px dashed #9ca3af;
+        }
+        .piston {
+            position: absolute;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(to right, #4b5563, #1f2937);
+            border-radius: 4px;
+            transition: bottom 0.3s ease-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            border: 2px solid #000;
+        }
+        .piston-rod {
+            position: absolute;
+            top: -50px; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 50px;
+            background-color: #1f2937;
+            border-radius: 2px;
+        }
+        .label-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e40af; 
+        }
+        .slider-custom::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            background: #10b981;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 4px solid #065f46;
+        }
+        .heat-arrow {
+            position: absolute;
+            right: 0px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            transition: transform 0.3s ease-out;
+        }
+        .heat-arrow.out {
+            border-bottom: 20px solid #ef4444; 
+        }
+        .heat-arrow.in {
+            border-top: 20px solid #3b82f6; 
+        }
+        /* CSS cho các hạt khí động */
+        .gas-particle {
+            position: absolute;
+            background-color: #333; /* Màu đen/xám cho hạt */
+            border-radius: 50%;
+            width: 6px;
+            height: 6px;
+            /* Tắt transition để chuyển động mượt mà */
+            transition: none !important; 
+            will-change: transform;
+        }
+        /* Định dạng hiển thị kết quả nhỏ gọn bên cạnh xi lanh */
+        .result-box-compact {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+            margin-bottom: 0.75rem;
+        }
+        .result-label {
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 600;
+            color: #475569; /* slate-600 */
+        }
+        .result-value {
+            font-size: 1rem; /* text-base */
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Mô phỏng Biến đổi Nội năng Khí Lý tưởng (Khí Đơn Nguyên tử)</h1>
+
+        <!-- PROCESS SELECTION -->
+        <div class="container-box p-4 flex flex-col items-center mb-8 bg-gray-100">
+            <p class="text-xl font-bold text-gray-800 mb-4">Chọn Quá trình Nhiệt động lực học</p>
+            <div class="flex flex-wrap justify-center space-x-4">
+                <label class="flex items-center space-x-2">
+                    <input type="radio" name="processType" value="polytropic" checked id="radioPolytropic" class="form-radio text-indigo-600 h-5 w-5">
+                    <span class="text-gray-700 font-medium">Đa biến ($k=1.2$)</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="radio" name="processType" value="adiabatic" id="radioAdiabatic" class="form-radio text-red-600 h-5 w-5">
+                    <span class="text-gray-700 font-medium">Đoạn nhiệt ($Q=0, k=\gamma$)</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="radio" name="processType" value="isothermal" id="radioIsothermal" class="form-radio text-green-600 h-5 w-5">
+                    <span class="text-gray-700 font-medium">Đẳng nhiệt ($\Delta T=0, k=1$)</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- BỎ KHUNG HIỂN THỊ TỔNG HỢP V, T, P NẰM NGANG PHÍA TRÊN -->
+        
+        <!-- VISUALIZATION & SLIDER -->
+        <div class="container-box p-4 flex flex-col items-center">
+            
+            <div class="flex items-start justify-center w-full max-w-lg mb-6">
+                
+                <!-- Real-time Labels V, P, T (Left side - Unified State Display) -->
+                <div class="space-y-6 mr-8 min-w-[100px] text-right pt-6">
+                    <!-- THỂ TÍCH V MỚI -->
+                    <div class="p-1 rounded-lg">
+                        <p class="text-sm font-semibold text-gray-700">Thể tích V (m³):</p>
+                        <span id="v_realtime" class="text-lg font-bold text-indigo-600">...</span>
+                    </div>
+                    <!-- ÁP SUẤT P CŨ -->
+                    <div class="p-1 rounded-lg">
+                        <p class="text-sm font-semibold text-gray-700">Áp suất P:</p>
+                        <span id="p_realtime" class="text-lg font-bold text-red-600">...</span>
+                    </div>
+                    <!-- NHIỆT ĐỘ T CŨ -->
+                    <div class="p-1 rounded-lg">
+                        <p class="text-sm font-semibold text-gray-700">Nhiệt độ T:</p>
+                        <span id="t_realtime" class="text-lg font-bold text-yellow-700">...</span>
+                    </div>
+                </div>
+
+                <!-- Cylinder Visualization (Center) -->
+                <div id="cylinder-visual" class="cylinder-container max-w-sm">
+                    <!-- gas-body now acts as the particle boundary -->
+                    <div id="gas-body" class="gas-body"></div> 
+                    <div id="piston" class="piston">
+                        <div class="piston-rod"></div>
+                    </div>
+                    <!-- Heat Arrow Placeholder (for visual feedback) -->
+                    <div id="heat-arrow" class="heat-arrow" style="bottom: 50%; right: -20px;"></div>
+                    <div class="absolute top-2 left-1/2 transform -translate-x-1/2 text-sm text-gray-700 font-bold">Piston</div>
+                    <div class="absolute bottom-2 right-4 text-sm text-gray-700 font-bold">Khí Lý tưởng</div>
+                </div>
+
+                <!-- Real-time Results W, Q, dU (Right side - Compact) -->
+                <div class="space-y-4 ml-8 min-w-[150px] text-left pt-6">
+                    <div id="work-display" class="result-box-compact bg-blue-50">
+                        <p class="result-label">Công W (kJ)</p>
+                        <div class="result-value text-blue-700" id="W_value">0.00</div>
+                    </div>
+                    <div id="heat-display" class="result-box-compact bg-red-50">
+                        <p class="result-label">Nhiệt lượng Q (kJ)</p>
+                        <div class="result-value text-red-700" id="Q_value">0.00</div>
+                    </div>
+                    <div id="dU-display" class="result-box-compact bg-green-50">
+                        <p class="result-label">Biến đổi Nội năng ΔU (kJ)</p>
+                        <div class="result-value text-green-700" id="dU_value">0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <label for="pistonSlider" class="text-lg font-semibold text-gray-700 mb-2">Điều chỉnh Piston (Thay đổi Thể tích)</label>
+            <input type="range" id="pistonSlider" min="1" max="5" step="0.01" value="4" class="slider-custom w-full">
+            <button onclick="resetSimulation()" class="mt-4 px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300">
+                Thiết lập lại Trạng thái Ban đầu
+            </button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+        // --- CÁC HẰNG SỐ VÀ THÔNG SỐ BAN ĐẦU ---
+        const R = 8.314; // Hằng số khí lý tưởng (J/mol.K)
+        const N_MOLES = 1; // Số mol khí (giả định)
+        const POLYTROPIC_K = 1.2; // Chỉ số đa biến ban đầu
+        const GAMMA = 5 / 3; // Chỉ số đoạn nhiệt (gamma) cho khí đơn nguyên tử ≈ 1.667
+
+        let K_INDEX = POLYTROPIC_K; // Chỉ số k hiện tại, mặc định là đa biến
+
+        // Trạng thái ban đầu (State 1) - Tương ứng với giá trị slider V=4
+        const V_INITIAL = 4.0; // Thể tích ban đầu (m³)
+        const T_INITIAL = 300.0; // Nhiệt độ ban đầu (K)
+        const P_INITIAL = (N_MOLES * R * T_INITIAL) / V_INITIAL; // Áp suất ban đầu (Pa)
+
+        // Giới hạn Thể tích
+        const V_MIN = 1.0; // Giá trị slider min
+        const V_MAX = 5.0; // Giá trị slider max
+
+        // Kích thước Visualization (đơn vị: px)
+        const CYLINDER_HEIGHT = 400; // Chiều cao tối đa của cylinder (px)
+        const CYLINDER_WIDTH_PX = 300 * 0.9; // Chiều rộng cho khu vực khí (90% của 300px)
+        const PISTON_HEIGHT_PX = 20; // Chiều cao Piston (px)
+
+        // Thông số hạt khí
+        const NUM_PARTICLES = 50;
+        const PARTICLE_RADIUS = 3; // px
+        const BASE_SPEED_FACTOR = 0.5; // Hệ số tốc độ cơ sở để dễ quan sát
+
+        // Biến lưu trữ trạng thái hiện tại
+        let currentV = V_INITIAL;
+        let H_gas_px = 0; // Chiều cao khí hiện tại (pixel)
+        let particles = [];
+        let animationFrameId = null;
+
+
+        // --- CÁC PHẦN TỬ UI ---
+        const slider = document.getElementById('pistonSlider');
+        
+        // W, Q, dU real-time next to the cylinder
+        const W_value_el = document.getElementById('W_value');
+        const Q_value_el = document.getElementById('Q_value');
+        const dU_value_el = document.getElementById('dU_value');
+        
+        const piston_el = document.getElementById('piston');
+        const gas_body_el = document.getElementById('gas-body');
+        const heat_arrow_el = document.getElementById('heat-arrow');
+        const processRadios = document.querySelectorAll('input[name="processType"]');
+        
+        // V, P, T real-time next to the cylinder (Unified Display)
+        const V_realtime_el = document.getElementById('v_realtime'); // Mới
+        const P_realtime_el = document.getElementById('p_realtime');
+        const T_realtime_el = document.getElementById('t_realtime');
+        
+        // Element containers for dynamic styling
+        const W_container = document.getElementById('work-display');
+        const Q_container = document.getElementById('heat-display');
+        const dU_container = document.getElementById('dU-display');
+        const W_label = W_container.querySelector('.result-label');
+        const Q_label = Q_container.querySelector('.result-label');
+        const dU_label = dU_container.querySelector('.result-label');
+
+
+        // --- CHỨC NĂNG TÍNH TOÁN CƠ BẢN ---
+        function calculateState(V2) {
+            
+            // Trường hợp đặc biệt: Đẳng nhiệt (Isothermal) k = 1
+            if (K_INDEX === 1) {
+                const T2 = T_INITIAL; 
+                const dU = 0; 
+                const P2 = P_INITIAL * (V_INITIAL / V2);
+                
+                // Công nhận vào (W_on) = nRT ln(V1/V2). Công thức này đã đúng dấu.
+                const W = N_MOLES * R * T_INITIAL * Math.log(V_INITIAL / V2); 
+                const Q = -W; // Q = Delta U - W = 0 - W
+
+                return { V: V2, P: P2, T: T2, W: W, Q: Q, dU: dU };
+            }
+
+            // Trường hợp chung: Đa biến (Polytropic), Đoạn nhiệt (Adiabatic) (k != 1)
+            const P2 = P_INITIAL * Math.pow(V_INITIAL / V2, K_INDEX);
+            const T2 = (P2 * V2) / (N_MOLES * R);
+            const dU = (3 / 2) * N_MOLES * R * (T2 - T_INITIAL);
+            
+            // Công thức vật lý cho Công nhận vào (W_on) là: W = (P2*V2 - P1*V1) / (k-1)
+            const W = (P2 * V2 - P_INITIAL * V_INITIAL) / (K_INDEX - 1); 
+
+            let Q = dU - W;
+            
+            if (K_INDEX === GAMMA) { Q = 0; } // Đảm bảo Q=0 cho đoạn nhiệt
+
+            return { V: V2, P: P2, T: T2, W: W, Q: Q, dU: dU };
+        }
+
+
+        // --- HỆ THỐNG HẠT KHÍ ---
+
+        function initParticles() {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            particles = [];
+            gas_body_el.innerHTML = ''; // Xóa các hạt cũ
+            
+            // Tính toán tốc độ ban đầu dựa trên T_INITIAL (Tốc độ tỷ lệ với căn bậc hai của T)
+            const initialSpeedMagnitude = Math.sqrt(T_INITIAL) * BASE_SPEED_FACTOR;
+            
+            // Chiều cao khí ban đầu (pixel)
+            const initial_gas_height = (V_INITIAL / V_MAX) * (CYLINDER_HEIGHT - PISTON_HEIGHT_PX); 
+
+            for (let i = 0; i < NUM_PARTICLES; i++) {
+                const angle = Math.random() * 2 * Math.PI;
+                // Tốc độ cá nhân hóa nhẹ
+                const speed = initialSpeedMagnitude * (0.8 + Math.random() * 0.4); 
+
+                const particle = {
+                    // x, y là tọa độ từ góc dưới bên trái của vùng khí
+                    x: PARTICLE_RADIUS + Math.random() * (CYLINDER_WIDTH_PX - PARTICLE_RADIUS * 2),
+                    y: PARTICLE_RADIUS + Math.random() * (initial_gas_height - PARTICLE_RADIUS * 2),
+                    vx: speed * Math.cos(angle),
+                    vy: speed * Math.sin(angle),
+                    element: document.createElement('div')
+                };
+
+                particle.element.className = 'gas-particle';
+                gas_body_el.appendChild(particle.element);
+                particles.push(particle);
+            }
+            // Khởi động vòng lặp animation
+            lastTime = performance.now();
+            animateParticles();
+        }
+
+        let lastTime = 0;
+        function animateParticles(time) {
+            if (!time) time = 0;
+            const deltaTime = (time - lastTime) / 16.67; // Chia 16.67 (miligiây/khung hình) để chuẩn hóa cho 60FPS
+            lastTime = time;
+
+            // Chiều cao tối đa mà hạt có thể đi đến (vị trí piston)
+            const collision_height = H_gas_px; 
+            
+            // Hệ số thay đổi tốc độ (Tỉ lệ với căn bậc hai của T hiện tại so với T ban đầu)
+            const state = calculateState(currentV); 
+            const speed_scale = Math.sqrt(state.T / T_INITIAL);
+
+            const halfWidth = gas_body_el.offsetWidth / 2;
+            const centerOffset = (300 - gas_body_el.offsetWidth) / 2;
+            
+            particles.forEach(p => {
+                // Tăng/Giảm tốc độ dựa trên hệ số nhiệt độ
+                let current_vx = p.vx * speed_scale;
+                let current_vy = p.vy * speed_scale;
+                
+                p.x += current_vx * deltaTime;
+                p.y += current_vy * deltaTime;
+
+                // --- VA CHẠM TƯỜNG (Bên trái/Bên phải) ---
+                if (p.x <= PARTICLE_RADIUS) {
+                    p.vx = Math.abs(p.vx); // Phản xạ: đảm bảo vận tốc dương
+                    p.x = PARTICLE_RADIUS;
+                } else if (p.x >= CYLINDER_WIDTH_PX - PARTICLE_RADIUS) {
+                    p.vx = -Math.abs(p.vx); // Phản xạ: đảm bảo vận tốc âm
+                    p.x = CYLINDER_WIDTH_PX - PARTICLE_RADIUS;
+                }
+
+                // --- VA CHẠM ĐÁY (Dưới cùng) ---
+                if (p.y <= PARTICLE_RADIUS) {
+                    p.vy = Math.abs(p.vy); // Phản xạ: đảm bảo vận tốc dương
+                    p.y = PARTICLE_RADIUS;
+                }
+
+                // --- VA CHẠM PISTON (Trên cùng) ---
+                if (p.y >= collision_height - PARTICLE_RADIUS) { 
+                    p.vy = -Math.abs(p.vy); // Phản xạ: đảm bảo vận tốc âm
+                    p.y = collision_height - PARTICLE_RADIUS;
+                }
+
+                // --- CẬP NHẬT VỊ TRÍ CSS ---
+                // p.x là vị trí từ trái, p.y là vị trí từ đáy (0)
+                // CSS 'bottom' = p.y - PARTICLE_RADIUS
+                // CSS 'left' = p.x - PARTICLE_RADIUS
+                p.element.style.bottom = `${p.y - PARTICLE_RADIUS}px`;
+                p.element.style.left = `${p.x - PARTICLE_RADIUS}px`;
+            });
+
+            animationFrameId = requestAnimationFrame(animateParticles);
+        }
+
+        // --- CHỨC NĂNG CẬP NHẬT MÔ PHỎNG VÀ UI ---
+
+        function updateSimulation(V_slider_value) {
+            const state = calculateState(V_slider_value);
+            currentV = state.V;
+            
+            // --- CẬP NHẬT GIAO DIỆN TEXT TRẠNG THÁI (Left side) ---
+            V_realtime_el.textContent = state.V.toFixed(2); // Mới
+            T_realtime_el.textContent = state.T.toFixed(1) + ' K';
+            P_realtime_el.textContent = (state.P / 1000).toFixed(2) + ' kPa';
+            
+            // --- CẬP NHẬT KẾT QUẢ W, Q, dU (Real-time Compact Display) ---
+            
+            W_value_el.textContent = (state.W / 1000).toFixed(2);
+            Q_value_el.textContent = (state.Q / 1000).toFixed(2);
+            dU_value_el.textContent = (state.dU / 1000).toFixed(2);
+            
+            // Logic cho màu sắc và label dựa trên dấu
+            
+            // Công W: Dương (+) là nhận vào (Màu Xanh), Âm (-) là sinh ra (Màu Đỏ)
+            W_value_el.classList.toggle('text-blue-700', state.W >= 0);
+            W_value_el.classList.toggle('text-red-700', state.W < 0);
+            W_container.classList.toggle('bg-blue-50', state.W >= 0);
+            W_container.classList.toggle('bg-red-50', state.W < 0);
+            W_label.textContent = state.W >= 0 ? "Công W (Nhận vào, kJ)" : "Công W (Sinh ra, kJ)";
+
+            // Nhiệt lượng Q: Dương (+) là nhận vào (Màu Xanh), Âm (-) là thải ra (Màu Đỏ)
+            Q_value_el.classList.toggle('text-blue-700', state.Q >= 0); 
+            Q_value_el.classList.toggle('text-red-700', state.Q < 0); 
+            Q_container.classList.toggle('bg-blue-50', state.Q >= 0);
+            Q_container.classList.toggle('bg-red-50', state.Q < 0);
+            Q_label.textContent = state.Q >= 0 ? "Nhiệt lượng Q (Nhận vào, kJ)" : "Nhiệt lượng Q (Thải ra, kJ)";
+            
+            // Nội năng dU: Dương (+) là tăng (Màu Xanh Lá), Âm (-) là giảm (Màu Đỏ)
+            dU_value_el.classList.toggle('text-green-700', state.dU >= 0);
+            dU_value_el.classList.toggle('text-red-700', state.dU < 0);
+            dU_container.classList.toggle('bg-green-50', state.dU >= 0);
+            dU_container.classList.toggle('bg-red-50', state.dU < 0);
+            dU_label.textContent = state.dU >= 0 ? "Biến đổi Nội năng ΔU (+kJ)" : "Biến đổi Nội năng ΔU (-kJ)";
+
+
+            // --- CẬP NHẬT VISUAL PISTON/KHÍ ---
+
+            // Tính toán Chiều cao khí (pixel) và lưu vào global
+            const H_gas = (state.V / V_MAX) * (CYLINDER_HEIGHT - PISTON_HEIGHT_PX);
+            H_gas_px = H_gas; 
+            const Piston_bottom_position = H_gas; 
+
+            piston_el.style.bottom = `${Piston_bottom_position}px`;
+            gas_body_el.style.height = `${H_gas}px`; // Cập nhật chiều cao khu vực chứa hạt
+
+            // Hiệu ứng mũi tên Nhiệt lượng (Q)
+            // Lấy độ lớn của Q (kJ) để scaling
+            const Q_kJ_abs = Math.abs(state.Q / 1000); 
+
+            heat_arrow_el.style.display = Q_kJ_abs > 0.1 ? 'block' : 'none'; 
+            if (state.Q < 0) {
+                // Thải nhiệt (Ra ngoài) - Màu Đỏ
+                heat_arrow_el.className = 'heat-arrow out';
+                // Scale dựa trên độ lớn của Q, giới hạn tối đa là 2
+                heat_arrow_el.style.transform = `scaleY(${Math.min(2, Q_kJ_abs / 20)})`; 
+            } else if (state.Q > 0) {
+                // Nhận nhiệt (Vào trong) - Màu Xanh dương - Mũi tên đảo ngược
+                heat_arrow_el.className = 'heat-arrow in';
+                heat_arrow_el.style.transform = `scaleY(${Math.min(2, Q_kJ_abs / 20)}) rotate(180deg)`;
+            }
+        }
+
+        window.resetSimulation = function() {
+            slider.value = V_INITIAL;
+            updateSimulation(V_INITIAL);
+            W_value_el.textContent = '0.00';
+            Q_value_el.textContent = '0.00';
+            dU_value_el.textContent = '0.00';
+            
+            // Đảm bảo các hạt được khởi tạo lại đúng trạng thái
+            if (particles.length === 0) {
+                 initParticles();
+            }
+        }
+
+        // --- GẮN SỰ KIỆN ---
+        processRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const type = e.target.value;
+                if (type === 'adiabatic') {
+                    K_INDEX = GAMMA;
+                } else if (type === 'isothermal') {
+                    K_INDEX = 1;
+                } else { 
+                    K_INDEX = POLYTROPIC_K;
+                }
+                updateSimulation(parseFloat(slider.value));
+            });
+        });
+
+        slider.addEventListener('input', (e) => {
+            updateSimulation(parseFloat(e.target.value));
+        });
+
+        // Khởi tạo trạng thái ban đầu và các hạt khi tải trang
+        window.onload = function() {
+            window.resetSimulation();
+            initParticles();
+        };
+
+        })();
+    </script>
+</body>
+</html>
