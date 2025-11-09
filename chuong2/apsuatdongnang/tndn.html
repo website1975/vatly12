@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Kiểm Tra Trực Tuyến - Động Học Phân Tử Chất Khí</title>
+    <!-- MathJax for LaTeX support -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        svg: {
+          fontCache: 'global'
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+        }
+      };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #f0f8ff;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --text-color: #333;
+            --border-color: #dee2e6;
+            --bg-color: #fff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9;
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .quiz-container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            background-color: var(--bg-color);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .left-panel {
+            flex: 1;
+            padding: 20px;
+            background-color: var(--secondary-color);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .panel-footer {
+            margin-top: auto;
+            width: 100%;
+        }
+
+        .timer-container {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #timer {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary-color);
+            background-color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid var(--primary-color);
+        }
+
+        .nav-container {
+            width: 100%;
+        }
+
+        #question-nav {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border-color);
+            background-color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background-color: #e9ecef;
+        }
+
+        .nav-btn.answered {
+            background-color: var(--info-color);
+            color: white;
+            border-color: var(--info-color);
+        }
+
+        .nav-btn.current {
+            border: 2px solid var(--primary-color);
+            background-color: var(--warning-color);
+            transform: scale(1.1);
+        }
+        
+        .nav-btn.correct {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .nav-btn.incorrect {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .action-button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #submit-btn {
+            background-color: var(--primary-color);
+        }
+        #submit-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        #redo-btn {
+            background-color: var(--success-color);
+            display: none; /* Hidden by default */
+        }
+        #redo-btn:hover {
+            background-color: #218838;
+        }
+
+        .right-panel {
+            flex: 3;
+            padding: 30px;
+            position: relative;
+        }
+
+        .question-block {
+            display: none;
+        }
+
+        .question-block.active {
+            display: block;
+        }
+
+        .question-header {
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .question-title {
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+        
+        .question-level {
+            font-size: 0.9em;
+            font-style: italic;
+            color: #6c757d;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            display: block;
+            background-color: #f8f9fa;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option:hover {
+            border-color: var(--primary-color);
+        }
+
+        .option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .quiz-navigation {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-button {
+            padding: 10px 25px;
+            font-size: 1em;
+            border: 1px solid var(--primary-color);
+            background-color: #fff;
+            color: var(--primary-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-button:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .nav-button:disabled {
+            background-color: #e9ecef;
+            color: #6c757d;
+            border-color: var(--border-color);
+            cursor: not-allowed;
+        }
+
+        /* Result styles */
+        .explanation {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #e9ecef;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .explanation h4 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .option.correct {
+            background-color: #d4edda;
+            border-color: var(--success-color);
+        }
+
+        .option.incorrect {
+            background-color: #f8d7da;
+            border-color: var(--danger-color);
+        }
+        
+        #result-display {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .quiz-finished .right-panel {
+            overflow-y: auto;
+            max-height: 80vh; /* Allow scrolling for review */
+        }
+
+        @media (max-width: 768px) {
+            .quiz-container {
+                flex-direction: column;
+            }
+            .left-panel {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="left-panel">
+            <div style="background-color: blue; color:white;font-weight:bold; margin: auto;">20 CÂU ĐỘNG NĂNG KHÍ</div>
+            <div class="timer-container">
+                <h4>Thời gian còn lại</h4>
+                <div id="timer">30:00</div>
+            </div>
+            <div class="nav-container">
+                <h3>Câu hỏi</h3>
+                <div id="question-nav">
+                    <!-- Navigation buttons will be generated here by JS -->
+                </div>
+            </div>
+            <div class="panel-footer">
+                <button id="submit-btn" class="action-button">Nộp Bài</button>
+                <button id="redo-btn" class="action-button">Làm Lại</button>
+            </div>
+        </div>
+        <div class="right-panel">
+            <div id="result-display"></div>
+            <form id="quiz-form">
+                <!-- Questions will be generated here by JS -->
+            </form>
+            <div class="quiz-navigation">
+                <button id="prev-btn" class="nav-button">Câu Trước</button>
+                <button id="next-btn" class="nav-button">Câu Tiếp</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+// Dữ liệu câu hỏi giữ nguyên
+const quizData = [
+    // --- CẤP ĐỘ BIẾT (5 câu) ---
+    {
+        level: "Nhận biết",
+        question: "Động năng trung bình của một phân tử khí lí tưởng đơn nguyên tử phụ thuộc vào đại lượng nào sau đây?",
+        options: ["Áp suất của khối khí", "Thể tích của khối khí", "Nhiệt độ tuyệt đối của khối khí", "Khối lượng của khối khí"],
+        answer: 2,
+        explanation: "Theo thuyết động học phân tử, động năng trung bình của một phân tử khí tỉ lệ thuận với nhiệt độ tuyệt đối T. Công thức: $ \\bar{W_đ} = \\frac{3}{2}kT $, trong đó k là hằng số Boltzmann."
+    },
+    {
+        level: "Nhận biết",
+        question: "Nội năng của một khối khí lí tưởng đơn nguyên tử được xác định bởi công thức nào?",
+        options: ["$ U = \\frac{3}{2}nRT $", "$ U = \\frac{5}{2}nRT $", "$ U = nRT $", "$ U = \\frac{1}{2}nRT $"],
+        answer: 0,
+        explanation: "Nội năng U của một khối khí lí tưởng bằng tổng động năng của các phân tử. Đối với khí đơn nguyên tử, $ U = N \\cdot \\bar{W_đ} = N \\cdot \\frac{3}{2}kT = nN_A \\cdot \\frac{3}{2}kT = n \\cdot \\frac{3}{2}(N_A k)T = \\frac{3}{2}nRT $."
+    },
+    {
+        level: "Nhận biết",
+        question: "Áp suất của chất khí lên thành bình là do:",
+        options: ["Lực hút giữa các phân tử khí.", "Va chạm của các phân tử khí lên thành bình.", "Trọng lượng của các phân tử khí.", "Chuyển động có hướng của các phân tử khí."],
+        answer: 1,
+        explanation: "Theo thuyết động học phân tử, các phân tử khí chuyển động hỗn loạn không ngừng và va chạm với thành bình, gây ra áp suất."
+    },
+    {
+        level: "Nhận biết",
+        question: "Trong phương trình trạng thái khí lí tưởng $ pV = nRT $, R được gọi là gì?",
+        options: ["Hằng số Boltzmann", "Hằng số khí lí tưởng", "Hằng số Avogadro", "Hằng số Plank"],
+        answer: 1,
+        explanation: "R là hằng số khí lí tưởng, có giá trị xấp xỉ 8.31 J/(mol.K)."
+    },
+    {
+        level: "Nhận biết",
+        question: "Vận tốc trung bình bình phương (vận tốc toàn phương) của các phân tử khí được định nghĩa bởi công thức nào?",
+        options: ["$ v = \\sqrt{\\frac{3kT}{m_0}} $", "$ v = \\sqrt{\\frac{kT}{m_0}} $", "$ v = \\frac{3}{2}kT $", "$ v = \\frac{3RT}{m_0} $"],
+        answer: 0,
+        explanation: "Vận tốc trung bình bình phương (root-mean-square velocity) được suy ra từ mối liên hệ giữa động năng trung bình và nhiệt độ: $ \\frac{1}{2}m_0 \\overline{v^2} = \\frac{3}{2}kT \\Rightarrow \\overline{v^2} = \\frac{3kT}{m_0} \\Rightarrow v_{rms} = \\sqrt{\\overline{v^2}} = \\sqrt{\\frac{3kT}{m_0}} $."
+    },
+    // --- CẤP ĐỘ HIỂU (5 câu) ---
+    {
+        level: "Thông hiểu",
+        question: "Khi nhiệt độ tuyệt đối của một khối khí lí tưởng tăng lên 4 lần thì động năng trung bình của các phân tử khí sẽ:",
+        options: ["Tăng 2 lần", "Tăng 4 lần", "Tăng 16 lần", "Không đổi"],
+        answer: 1,
+        explanation: "Động năng trung bình tỉ lệ thuận với nhiệt độ tuyệt đối T ($ \\bar{W_đ} \\propto T $). Do đó, khi T tăng 4 lần thì động năng trung bình cũng tăng 4 lần."
+    },
+    {
+        level: "Thông hiểu",
+        question: "So sánh vận tốc trung bình bình phương của phân tử khí Heli (M=4 g/mol) và phân tử khí Oxi (M=32 g/mol) ở cùng một nhiệt độ T.",
+        options: ["Vận tốc của Heli lớn hơn", "Vận tốc của Oxi lớn hơn", "Vận tốc bằng nhau", "Không đủ dữ kiện để so sánh"],
+        answer: 0,
+        explanation: "Vận tốc trung bình bình phương được tính bởi $ v = \\sqrt{\\frac{3RT}{M}} $. Ở cùng nhiệt độ T, v tỉ lệ nghịch với căn bậc hai của khối lượng mol M. Vì Heli có M nhỏ hơn Oxi, nên vận tốc của Heli sẽ lớn hơn."
+    },
+    {
+        level: "Thông hiểu",
+        question: "Một bình kín chứa khí lí tưởng. Khi nén đẳng nhiệt thể tích của bình giảm đi một nửa, áp suất của khí sẽ:",
+        options: ["Giảm một nửa", "Tăng gấp đôi", "Không đổi", "Tăng gấp bốn"],
+        answer: 1,
+        explanation: "Trong quá trình đẳng nhiệt (T=const), theo định luật Boyle-Mariotte, áp suất tỉ lệ nghịch với thể tích ($ pV = const $). Khi V giảm một nửa, p phải tăng gấp đôi."
+    },
+    {
+        level: "Thông hiểu",
+        question: "Tại sao nội năng của một lượng khí Heli (đơn nguyên tử) lại nhỏ hơn nội năng của một lượng khí Nitơ (lưỡng nguyên tử) có cùng số mol và ở cùng nhiệt độ?",
+        options: ["Vì phân tử Nitơ nặng hơn.", "Vì phân tử Nitơ ngoài chuyển động tịnh tiến còn có chuyển động quay.", "Vì phân tử Heli có kích thước nhỏ hơn.", "Vì áp suất của khí Nitơ lớn hơn."],
+        answer: 1,
+        explanation: "Nội năng của khí lí tưởng bao gồm động năng tịnh tiến và động năng quay (nếu có). Khí đơn nguyên tử (Heli) chỉ có 3 bậc tự do tịnh tiến ($ U = \\frac{3}{2}nRT $). Khí lưỡng nguyên tử (Nitơ) có thêm 2 bậc tự do quay nên có nội năng lớn hơn ($ U = \\frac{5}{2}nRT $)."
+    },
+    {
+        level: "Thông hiểu",
+        question: "Nếu mật độ phân tử trong một khối khí tăng lên trong khi vận tốc trung bình bình phương của chúng không đổi, điều gì sẽ xảy ra với áp suất?",
+        options: ["Áp suất tăng", "Áp suất giảm", "Áp suất không đổi", "Không thể xác định"],
+        answer: 0,
+        explanation: "Áp suất được xác định bởi $ p = \\frac{1}{3} n_0 m_0 \\overline{v^2} $, trong đó $ n_0 $ là mật độ phân tử. Nếu mật độ $ n_0 $ tăng và $ \\overline{v^2} $ không đổi, thì áp suất p sẽ tăng."
+    },
+    // --- CẤP ĐỘ VẬN DỤNG (5 câu) ---
+    {
+        level: "Vận dụng",
+        question: "Tính động năng trung bình của một phân tử khí ở nhiệt độ $ 27^\\circ C $. Cho hằng số Boltzmann $ k = 1.38 \\cdot 10^{-23} \\, J/K $.",
+        options: ["$ 6.21 \\cdot 10^{-21} \\, J $", "$ 4.14 \\cdot 10^{-21} \\, J $", "$ 5.65 \\cdot 10^{-22} \\, J $", "$ 2.07 \\cdot 10^{-21} \\, J $"],
+        answer: 0,
+        explanation: "Đầu tiên, đổi nhiệt độ sang Kelvin: $ T = 27 + 273 = 300 \\, K $. <br> Áp dụng công thức động năng trung bình: $ \\bar{W_đ} = \\frac{3}{2}kT = \\frac{3}{2} \\cdot (1.38 \\cdot 10^{-23}) \\cdot 300 = 6.21 \\cdot 10^{-21} \\, J $."
+    },
+    {
+        level: "Vận dụng",
+        question: "Một bình có dung tích 10 lít chứa 2 mol khí lí tưởng ở áp suất $ 1.2 \\cdot 10^5 \\, Pa $. Nội năng của khối khí này là bao nhiêu?",
+        options: ["1200 J", "1800 J", "2400 J", "3000 J"],
+        answer: 1,
+        explanation: "Sử dụng phương trình trạng thái: $ pV = nRT $. Nội năng của khí (giả sử đơn nguyên tử) là $ U = \\frac{3}{2}nRT $. Thay $ nRT $ bằng $ pV $, ta có $ U = \\frac{3}{2}pV $. <br> Đổi đơn vị: $ V = 10 \\, lít = 10 \\cdot 10^{-3} \\, m^3 $. <br> $ U = \\frac{3}{2} \\cdot (1.2 \\cdot 10^5) \\cdot (10 \\cdot 10^{-3}) = 1800 \\, J $. (Lưu ý: Nếu đề không nói rõ loại khí, ta thường giả định là đơn nguyên tử)."
+    },
+    {
+        level: "Vận dụng",
+        question: "Tính vận tốc trung bình bình phương của các phân tử Heli (M = 4 g/mol) ở nhiệt độ $ 0^\\circ C $. Cho R = 8.31 J/(mol.K).",
+        options: ["1305 m/s", "1845 m/s", "923 m/s", "1570 m/s"],
+        answer: 0,
+        explanation: "Đổi đơn vị: $ T = 0 + 273 = 273 \\, K $; $ M = 4 \\, g/mol = 0.004 \\, kg/mol $.<br> Áp dụng công thức: $ v = \\sqrt{\\frac{3RT}{M}} = \\sqrt{\\frac{3 \\cdot 8.31 \\cdot 273}{0.004}} \\approx 1305 \\, m/s $."
+    },
+    {
+        level: "Vận dụng",
+        question: "Một khối khí có $ 3 \\cdot 10^{23} $ phân tử, ở nhiệt độ 300 K. Tính tổng động năng của các phân tử trong khối khí. Cho $ k = 1.38 \\cdot 10^{-23} \\, J/K $.",
+        options: ["1863 J", "1242 J", "2484 J", "621 J"],
+        answer: 0,
+        explanation: "Tổng động năng (nội năng) bằng số phân tử N nhân với động năng trung bình của một phân tử. <br> $ U = N \\cdot \\bar{W_đ} = N \\cdot \\frac{3}{2}kT = (3 \\cdot 10^{23}) \\cdot \\frac{3}{2} \\cdot (1.38 \\cdot 10^{-23}) \\cdot 300 = 1863 \\, J $."
+    },
+    {
+        level: "Vận dụng",
+        question: "Có 14g khí Nitơ ($ N_2 $, M=28 g/mol) ở nhiệt độ $ 27^\\circ C $. Tính nội năng của khối khí này (coi Nitơ là khí lí tưởng lưỡng nguyên tử).",
+        options: ["3116.25 J", "2077.5 J", "4155 J", "1246.5 J"],
+        answer: 0,
+        explanation: "Số mol khí Nitơ: $ n = \\frac{m}{M} = \\frac{14}{28} = 0.5 \\, mol $.<br> Nhiệt độ: $ T = 27 + 273 = 300 \\, K $.<br> Vì Nitơ là khí lưỡng nguyên tử, nội năng được tính bằng công thức $ U = \\frac{5}{2}nRT $.<br> $ U = \\frac{5}{2} \\cdot 0.5 \\cdot 8.31 \\cdot 300 = 3116.25 \\, J $."
+    },
+    // --- CẤP ĐỘ VẬN DỤNG CAO (5 câu) ---
+    {
+        level: "Vận dụng cao",
+        question: "Một bình chứa một hỗn hợp khí gồm 2 mol khí Heli và 3 mol khí Argon (cả hai đều là khí trơ đơn nguyên tử) ở nhiệt độ T. Tỉ số giữa tổng động năng của các phân tử Argon và tổng động năng của các phân tử Heli là:",
+        options: ["1", "3/2", "2/3", "9/4"],
+        answer: 1,
+        explanation: "Trong một hỗn hợp khí ở trạng thái cân bằng nhiệt, động năng trung bình của mỗi loại phân tử khí là như nhau và chỉ phụ thuộc vào nhiệt độ T. <br> $ \\bar{W}_{đ,Ar} = \\bar{W}_{đ,He} = \\frac{3}{2}kT $. <br> Tổng động năng của Argon: $ U_{Ar} = n_{Ar} N_A \\cdot \\bar{W}_{đ,Ar} $. <br> Tổng động năng của Heli: $ U_{He} = n_{He} N_A \\cdot \\bar{W}_{đ,He} $. <br> Tỉ số: $ \\frac{U_{Ar}}{U_{He}} = \\frac{n_{Ar}}{n_{He}} = \\frac{3}{2} $."
+    },
+    {
+        level: "Vận dụng cao",
+        question: "Áp suất của một khối khí tăng 20% và thể tích giảm 10% so với ban đầu. Vận tốc trung bình bình phương của các phân tử khí thay đổi như thế nào?",
+        options: ["Tăng khoảng 4%", "Tăng khoảng 8%", "Giảm khoảng 4%", "Giảm khoảng 8%"],
+        answer: 0,
+        explanation: "Từ $ pV = nRT $, ta có $ T = \\frac{pV}{nR} $. Vận tốc trung bình bình phương $ v \\propto \\sqrt{T} $. Do đó $ v \\propto \\sqrt{pV} $. <br> Trạng thái sau: $ p' = 1.2p $, $ V' = 0.9V $. <br> $ \\frac{v'}{v} = \\sqrt{\\frac{p'V'}{pV}} = \\sqrt{\\frac{(1.2p)(0.9V)}{pV}} = \\sqrt{1.08} \\approx 1.039 $. <br> Vậy vận tốc tăng $1.039 - 1 = 0.039$, tức là tăng khoảng 4%."
+    },
+    {
+        level: "Vận dụng cao",
+        question: "Một lượng khí bị nén đoạn nhiệt (không trao đổi nhiệt với môi trường) làm cho thể tích giảm đi một nửa. Nội năng của khối khí sẽ:",
+        options: ["Giảm", "Không đổi", "Tăng", "Có thể tăng hoặc giảm"],
+        answer: 2,
+        explanation: "Khi nén đoạn nhiệt, hệ khí nhận công từ bên ngoài (A > 0 theo quy ước công hệ nhận). Theo nguyên lý I nhiệt động lực học: $ \\Delta U = Q + A $. Vì quá trình là đoạn nhiệt nên Q = 0. Do đó $ \\Delta U = A $. <br> Vì khí bị nén nên ngoại lực thực hiện công lên hệ, hệ nhận công nên A > 0. Vậy $ \\Delta U > 0 $, nội năng tăng."
+    },
+    {
+        level: "Vận dụng cao",
+        question: "Tính mật độ của khí Oxi ($ O_2 $, M=32 g/mol) ở điều kiện tiêu chuẩn ($ p_0 = 1.013 \\cdot 10^5 \\, Pa $, $ T_0 = 273 \\, K $).",
+        options: ["1.43 kg/m³", "1.25 kg/m³", "0.09 kg/m³", "1.98 kg/m³"],
+        answer: 0,
+        explanation: "Mật độ $ D = \\frac{m}{V} $. Từ phương trình trạng thái $ pV = \\frac{m}{M}RT $, ta có $ \\frac{m}{V} = \\frac{pM}{RT} $.<br> $ D = \\frac{(1.013 \\cdot 10^5 Pa) \\cdot (0.032 kg/mol)}{(8.31 J/(mol \\cdot K)) \\cdot (273 K)} \\approx 1.429 \\, kg/m^3 $."
+    },
+    {
+        level: "Vận dụng cao",
+        question: "Nếu tất cả các phân tử trong một bình khí đột nhiên ngừng chuyển động tịnh tiến nhưng vẫn giữ nguyên chuyển động quay (đối với khí lưỡng nguyên tử), nhiệt độ của khối khí sẽ:",
+        options: ["Giảm xuống 0 K", "Giảm nhưng không về 0 K", "Không đổi", "Tăng lên"],
+        answer: 0,
+        explanation: "Nhiệt độ tuyệt đối là thước đo trực tiếp của động năng tịnh tiến trung bình của các phân tử ($ \\bar{W}_{đ, tịnh tiến} = \\frac{3}{2}kT $). Nếu chuyển động tịnh tiến ngừng hoàn toàn, động năng tịnh tiến trung bình bằng 0. Do đó, nhiệt độ tuyệt đối T cũng sẽ bằng 0 K, bất kể các chuyển động khác (quay, dao động) có còn hay không."
+    }
+];
+
+// --- SCRIPT LOGIC ---
+document.addEventListener('DOMContentLoaded', () => {
+    const quizContainer = document.querySelector('.quiz-container');
+    const quizForm = document.getElementById('quiz-form');
+    const questionNav = document.getElementById('question-nav');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const submitBtn = document.getElementById('submit-btn');
+    const redoBtn = document.getElementById('redo-btn');
+    const timerEl = document.getElementById('timer');
+    const resultDisplay = document.getElementById('result-display');
+    const quizNavButtons = document.querySelector('.quiz-navigation');
+
+    let currentQuestionIndex = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+    let timer;
+    const timeLimit = 30 * 60; // 30 minutes in seconds
+
+    function initQuiz() {
+        // Render questions and navigation
+        quizForm.innerHTML = quizData.map((q, index) => {
+            const optionsHtml = q.options.map((option, i) => `
+                <label class="option" for="q${index}_option${i}">
+                    <input type="radio" name="question${index}" id="q${index}_option${i}" value="${i}">
+                    ${String.fromCharCode(65 + i)}. ${option}
+                </label>
+            `).join('');
+            return `
+                <div class="question-block" id="question${index}">
+                    <div class="question-header">
+                        <p class="question-title">Câu ${index + 1}: ${q.question}</p>
+                        <p class="question-level">Cấp độ: ${q.level}</p>
+                    </div>
+                    <div class="options-container">
+                        ${optionsHtml}
+                    </div>
+                    <div class="explanation">
+                        <h4>Hướng dẫn giải chi tiết:</h4>
+                        <p>${q.explanation}</p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        questionNav.innerHTML = quizData.map((_, index) => 
+            `<button type="button" class="nav-btn" data-index="${index}">${index + 1}</button>`
+        ).join('');
+
+        addEventListeners();
+        
+        resetQuizState();
+    }
+
+    function addEventListeners() {
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                showQuestion(parseInt(btn.dataset.index));
+            });
+        });
+
+        quizForm.addEventListener('change', (e) => {
+            if (e.target.type === 'radio') {
+                const qIndex = parseInt(e.target.name.replace('question', ''));
+                userAnswers[qIndex] = parseInt(e.target.value);
+                document.querySelector(`.nav-btn[data-index="${qIndex}"]`).classList.add('answered');
+            }
+        });
+
+        prevBtn.addEventListener('click', showPreviousQuestion);
+        nextBtn.addEventListener('click', showNextQuestion);
+        submitBtn.addEventListener('click', handleSubmit);
+        redoBtn.addEventListener('click', resetQuizState);
+    }
+    
+    function showQuestion(index) {
+        document.querySelectorAll('.question-block').forEach(q => q.classList.remove('active'));
+        const currentQuestionBlock = document.getElementById(`question${index}`);
+        currentQuestionBlock.classList.add('active');
+        
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('current'));
+        document.querySelector(`.nav-btn[data-index="${index}"]`).classList.add('current');
+
+        currentQuestionIndex = index;
+        updateNavButtons();
+        
+        // **PERFORMANCE OPTIMIZATION**
+        // Only render LaTeX for the current question if MathJax is ready
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            MathJax.typesetPromise([currentQuestionBlock]);
+        }
+    }
+
+    function updateNavButtons() {
+        prevBtn.disabled = currentQuestionIndex === 0;
+        nextBtn.disabled = currentQuestionIndex === quizData.length - 1;
+    }
+
+    function showNextQuestion() {
+        if (currentQuestionIndex < quizData.length - 1) {
+            showQuestion(currentQuestionIndex + 1);
+        }
+    }
+
+    function showPreviousQuestion() {
+        if (currentQuestionIndex > 0) {
+            showQuestion(currentQuestionIndex - 1);
+        }
+    }
+
+    function startTimer(duration) {
+        let remaining = duration;
+        timer = setInterval(() => {
+            const minutes = Math.floor(remaining / 60);
+            let seconds = remaining % 60;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            timerEl.textContent = `${minutes}:${seconds}`;
+            remaining--;
+            if (remaining < 0) {
+                clearInterval(timer);
+                alert("Hết giờ làm bài! Bài của bạn sẽ được nộp tự động.");
+                showResults();
+            }
+        }, 1000);
+    }
+    
+    function handleSubmit() {
+        const unanswered = userAnswers.filter(a => a === null).length;
+        const confirmation = confirm(
+            `Bạn có chắc chắn muốn nộp bài không?` +
+            (unanswered > 0 ? `\nBạn còn ${unanswered} câu chưa trả lời.` : '')
+        );
+        if (confirmation) {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        clearInterval(timer);
+        let score = 0;
+
+        quizData.forEach((q, index) => {
+            const userAnswer = userAnswers[index];
+            const questionBlock = document.getElementById(`question${index}`);
+            const options = questionBlock.querySelectorAll('.option');
+            const navBtn = document.querySelector(`.nav-btn[data-index="${index}"]`);
+
+            questionBlock.querySelectorAll('input[type="radio"]').forEach(radio => radio.disabled = true);
+            questionBlock.querySelector('.explanation').style.display = 'block';
+
+            if (userAnswer !== null) {
+                if (userAnswer === q.answer) {
+                    score++;
+                    options[userAnswer].classList.add('correct');
+                    navBtn.classList.add('correct');
+                } else {
+                    options[userAnswer].classList.add('incorrect');
+                    options[q.answer].classList.add('correct');
+                    navBtn.classList.add('incorrect');
+                }
+            } else {
+                 options[q.answer].classList.add('correct');
+                 navBtn.classList.add('incorrect');
+            }
+        });
+        
+        resultDisplay.innerHTML = `<h3>Kết quả: Bạn đã trả lời đúng ${score}/${quizData.length} câu</h3>`;
+        resultDisplay.style.display = 'block';
+
+        submitBtn.style.display = 'none';
+        redoBtn.style.display = 'block';
+        quizNavButtons.style.display = 'none';
+        
+        quizContainer.classList.add('quiz-finished');
+        document.querySelectorAll('.question-block').forEach(q => q.classList.add('active'));
+        quizForm.style.display = 'flex';
+        quizForm.style.flexDirection = 'column';
+        quizForm.style.gap = '30px';
+
+        // Render all math formulas for review
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            MathJax.typesetPromise();
+        }
+    }
+    
+    function resetQuizState() {
+        clearInterval(timer);
+        
+        // Reset data
+        userAnswers.fill(null);
+        currentQuestionIndex = 0;
+        
+        // Reset UI
+        resultDisplay.style.display = 'none';
+        submitBtn.style.display = 'block';
+        redoBtn.style.display = 'none';
+        quizNavButtons.style.display = 'flex';
+        quizContainer.classList.remove('quiz-finished');
+        quizForm.style.display = '';
+        quizForm.style.flexDirection = '';
+        quizForm.style.gap = '';
+        
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.className = 'nav-btn'; // Reset all classes
+        });
+        
+        document.querySelectorAll('.question-block').forEach((q, index) => {
+            q.classList.remove('active');
+            q.querySelector('.explanation').style.display = 'none';
+            q.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.disabled = false;
+                radio.checked = false;
+            });
+            q.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+        });
+        
+        // Start quiz
+        showQuestion(0);
+        startTimer(timeLimit);
+    }
+
+    initQuiz();
+});
+</script>
+
+</body>
+</html>

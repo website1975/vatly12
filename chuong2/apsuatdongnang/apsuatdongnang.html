@@ -1,1 +1,669 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Học Vật Lý: Áp Suất Khí và Động Năng Phân Tử</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải Three.js cho mô phỏng 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+     <!-- Tải MathJax cho công thức toán học -->
+     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+    </script>
+    <style>
+        /* Thiết lập font Inter cho toàn bộ trang */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7; /* Màu nền nhẹ nhàng */
+        }
+        /* Style cho các công thức, đảm bảo dễ đọc */
+        .math-formula {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #333;
+            background-color: #e5e7eb;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            text-align: center;
+            overflow-x: auto; /* Đảm bảo công thức dài không làm tràn */
+        }
+        .math-formula span {
+            font-family: 'Times New Roman', serif; /* Dùng font cổ điển hơn cho ký hiệu */
+        }
+        .col-card {
+            min-height: 100%;
+        }
+        /* CSS cho cột 1 (Mô tả) */
+        .col-1-bg {
+            background-color: #eff6ff; /* Blue 50 */
+            border: 2px solid #93c5fd; /* Blue 300 */
+        }
+        /* CSS cho cột 2 (Kiến thức) */
+        .col-2-bg {
+            background-color: #f0fdf4; /* Green 50 */
+            border: 2px solid #4ade80; /* Green 400 */
+        }
+        #gas-simulation-container {
+            width: 100%;
+            height: 400px;
+            background-color: #f0f4f8;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+        .mcq-option {
+            transition: all 0.2s;
+        }
+        .mcq-option:not(.disabled-option):hover {
+            background-color: #e0f7fa;
+            cursor: pointer;
+        }
+        .correct-answer {
+            background-color: #dcfce7 !important; /* green-100 */
+            border-color: #10b981 !important; /* green-500 */
+        }
+        .incorrect-answer {
+            background-color: #fee2e2 !important; /* red-100 */
+            border-color: #ef4444 !important; /* red-500 */
+        }
+        .selected-answer {
+            background-color: #bfdbfe; /* blue-200 */
+            border-color: #3b82f6; /* blue-500 */
+        }
+        .disabled-input, .disabled-option {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
 
+    <div class="max-w-7xl mx-auto">
+        <!-- Tiêu đề Bài học -->
+        <header class="text-center mb-10">
+            <h1 class="text-2xl md:text-1xl font-bold text-indigo-800 tracking-tight">
+                ÁP SUẤT KHÍ VÀ ĐỘNG NĂNG PHÂN TỬ
+            </h1>
+            <p class="text-xl text-gray-600 mt-2 italic">(Áp dụng cho Mô hình Khí lý tưởng)</p>
+        </header>
+
+        <!-- Khối Bài học - Responsive Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <!-- Cột 1: Mô tả Chuyển động Hỗn loạn của Phân tử Khí -->
+            <div class="col-card col-1-bg p-6 rounded-2xl shadow-xl">
+                <h2 class="text-3xl font-bold text-indigo-700 mb-6 border-b-4 border-indigo-400 pb-2">
+                    Mô tả Chuyển động Hỗn loạn
+                </h2>
+
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-2">Mô phỏng 3D: Chuyển động Hỗn loạn</h3>
+                    <p class="text-sm text-indigo-700 mb-3 italic">
+                        Sử dụng chuột (kéo) để thay đổi góc nhìn mô phỏng.
+                    </p>
+                    <!-- Khung chứa mô phỏng 3D -->
+                    <div id="gas-simulation-container"></div>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-2">1. Chuyển động Hỗn loạn Phân tử Khí</h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        <strong>Mô hình Cơ sở (Hình hộp kín):</strong> Các phân tử khí trong bình kín chuyển động 
+                        <span class="font-bold text-indigo-700">hỗn loạn (Brownian)</span> không ngừng theo mọi phương, mọi chiều với tốc độ rất lớn (hàng trăm m/s) và hoàn toàn ngẫu nhiên.
+                    </p>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-2">Va chạm:</h3>
+                    <ul class="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                        <li>Va chạm đàn hồi với nhau và với thành bình.</li>
+                        <li>Sau va chạm, các phân tử đổi hướng và thay đổi độ lớn vận tốc theo quy luật ngẫu nhiên.</li>
+                    </ul>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-2">Quãng đường & Thời gian va chạm:</h3>
+                    <ul class="list-disc list-inside text-gray-700 ml-4 space-y-2">
+                        <li>
+                            <span class="font-medium">Quãng đường tự do trung bình ($\lambda$):</span> Là quãng đường trung bình mà một phân tử đi được giữa hai lần va chạm liên tiếp.
+                        </li>
+                        <li>
+                            <span class="font-medium">Thời gian va chạm ($\tau$):</span> Là thời gian trung bình giữa hai lần va chạm liên tiếp.
+                        </li>
+                        <li>
+                            <span class="font-medium">Mối liên hệ:</span> $\lambda = \overline{v} \times \tau$ (với $\overline{v}$ là vận tốc trung bình).
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-2">Thời gian giữa các va chạm trên thành bình:</h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        Khi xét va chạm với một thành bình cụ thể (giả sử có chiều dài $L$ theo phương chuyển động), phân tử sẽ đi quãng đường $d=2L$ giữa hai lần va chạm liên tiếp với thành đó.
+                        Thời gian tương ứng là $\Delta t = \frac{2L}{v_{va chạm}}$.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- Cột 2: Kiến thức liên quan đến Áp suất và Động năng -->
+            <div class="col-card col-2-bg p-6 rounded-2xl shadow-xl">
+                <h2 class="text-2xl font-bold text-green-700 mb-6 border-b-4 border-green-400 pb-2">
+                    Kiến thức Áp suất và Động năng
+                </h2>
+
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-green-600 mb-2">2. Nguồn gốc của Áp suất Khí</h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        <strong>1/ Ảnh hưởng Va chạm lên thành bình dẫn đến Áp suất</strong>
+                        <br> Áp suất khí lên thành bình được tạo ra do:
+                    </p>
+                    <ul class="list-disc list-inside text-gray-700 ml-4 space-y-2 mt-2">
+                        <li>Sự va chạm liên tục và cực kỳ nhiều của các phân tử khí lên thành bình.</li>
+                        <li>Mỗi va chạm làm thay đổi động lượng ($\Delta \vec{p}$) của phân tử, tạo ra một lực đẩy (xung lực).</li>
+                        <li>Tổng hợp lực đẩy trung bình lên một đơn vị diện tích chính là <strong>Áp suất (P)</strong>.</li>
+                    </ul>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-green-600 mb-2">2/ Biểu thức Cơ bản của Áp suất Khí</h3>
+                    <p class="font-medium text-gray-700 mb-2">Trình bày cách chứng minh (CM):</p>
+
+                    <!-- CM A -->
+                    <p class="text-sm font-medium text-gray-600 mt-3">A. Xét một phân tử:</p>
+                    <ul class="text-gray-700 text-sm ml-4 list-disc">
+                        <li>Độ biến thiên động lượng: $\Delta p = 2 m v_x$.</li>
+                        <li>Thời gian giữa 2 va chạm: $\Delta t = 2L/v_x$.</li>
+                        <li>Lực trung bình: $F_1 = \frac{\Delta p}{\Delta t} = \frac{m v_x^2}{L}$.</li>
+                    </ul>
+
+                    <!-- CM B -->
+                    <p class="text-sm font-medium text-gray-600 mt-3">B. Xét N phân tử trong thể tích V:</p>
+                    <ul class="text-gray-700 text-sm ml-4 list-disc">
+                        <li>Trung bình phương vận tốc: $\overline{v_x^2} = \frac{1}{3} \overline{v^2}$.</li>
+                        <li>Tổng lực: $F = N \frac{m \overline{v_x^2}}{L} = \frac{1}{3} \frac{N m \overline{v^2}}{L}$.</li>
+                    </ul>
+
+                    <!-- Công thức P -->
+                    <p class="text-sm font-medium text-gray-600 mt-3">C. Biểu thức Áp suất (P) (Vì $V = L^3$):</p>
+                    <div class="math-formula bg-green-200">
+                        <span class="text-2xl">P = $\frac{1}{3}.\frac{N}{V}. m.\overline{v^2}$</span>
+                    </div>
+
+                    <p class="font-medium text-gray-700 mt-4">Liệt kê các Đại lượng liên quan:</p>
+                    <ul class="text-gray-700 ml-4 list-disc">
+                        <li>$P$: Áp suất (Pa)</li>
+                        <li>$N$: Tổng số phân tử</li>
+                        <li>$V$: Thể tích bình ($m^3$)</li>
+                        <li>$m$: Khối lượng 1 phân tử (kg)</li>
+                        <li>$\overline{v^2}$: <span class="font-semibold">Bình phương trung bình vận tốc</span> ($m^2/s^2$)</li>
+                    </ul>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-green-600 mb-2">3/ Động năng Phân tử (Trung bình)</h3>
+                    <p class="text-gray-700">Động năng tịnh tiến trung bình ($\overline{W_d}$) của một phân tử:</p>
+                    <div class="math-formula bg-green-200">
+                        <span class="text-2xl">$\overline{W_d} = \frac{1}{2}.m.\overline{v^2}$</span>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-green-600 mb-2">4/ Liên hệ giữa Áp suất và Động năng</h3>
+                    <p class="text-gray-700">Thay biểu thức động năng vào công thức Áp suất:</p>
+                    <div class="math-formula bg-green-200">
+                        <span class="text-2xl">$P = \frac{2}{3}.\frac{N}{V}.\overline{W_d}$</span>
+                    </div>
+                    <p class="font-medium text-green-700 mt-4">
+                        <span class="font-bold">Kết luận:</span> Áp suất của khí lý tưởng tỉ lệ thuận với mật độ phân tử ($\frac{N}{V}$) và động năng tịnh tiến trung bình ($\overline{W_d}$) của các phân tử.
+                    </p>
+                </div>
+                
+                <!-- Phần Mở rộng -->
+                <div class="mt-8 pt-4 border-t border-green-400">
+                    <h3 class="text-2xl font-bold text-green-800 mb-4">Mở rộng (Nâng cao)</h3>
+                    <p class="text-gray-700 mb-2">
+                        <span class="font-medium">Nhiệt độ (T):</span> Động năng tịnh tiến trung bình liên hệ trực tiếp với Nhiệt độ Tuyệt đối ($T$):
+                    </p>
+                    <div class="math-formula bg-yellow-100 border-yellow-500">
+                        <span class="text-2xl">$\overline{W_d} = \frac{3}{2}.k.T$</span>
+                    </div>
+                    <p class="text-gray-700 mt-4">
+                        <span class="font-medium">Phương trình Trạng thái Khí Lý tưởng:</span>
+                    </p>
+                    <div class="math-formula bg-yellow-100 border-yellow-500">
+                        <span class="text-2xl">$PV = N. k.T$</span>
+                    </div>
+                    <p class="text-gray-600 italic text-sm">
+                        (k là hằng số Boltzmann)
+                    </p>
+                </div>
+                
+                <!-- PHẦN CỦNG CỐ KIẾN THỨC (QUIZ) -->
+                <div class="mt-10 pt-6 border-t-4 border-green-600">
+                    <h3 class="text-2xl font-bold text-green-800 mb-6">Củng Cố Kiến Thức</h3>
+                    
+                    <div id="quiz-questions" class="space-y-6">
+                        <!-- Câu hỏi 1 (MCQ) -->
+                        <div class="quiz-item p-4 bg-white rounded-lg shadow" data-type="mcq" data-correct="C">
+                            <p class="font-semibold mb-3 text-gray-800">1. Áp suất khí lên thành bình được tạo ra trực tiếp do yếu tố nào?</p>
+                            <div class="mcq-option p-2 border border-gray-200 rounded-md mb-2" data-answer="A">A. Trọng lượng của phân tử khí.</div>
+                            <div class="mcq-option p-2 border border-gray-200 rounded-md mb-2" data-answer="B">B. Lực hút giữa các phân tử khí.</div>
+                            <div class="mcq-option p-2 border border-gray-200 rounded-md mb-2" data-answer="C">C. Sự va chạm liên tục của các phân tử lên thành bình.</div>
+                            <div class="mcq-option p-2 border border-gray-200 rounded-md" data-answer="D">D. Sự chuyển động có trật tự của phân tử.</div>
+                            <p class="feedback mt-2 text-sm italic"></p>
+                        </div>
+
+                        <!-- Câu hỏi 2 (MCQ) -->
+                        <div class="quiz-item p-4 bg-white rounded-lg shadow" data-type="mcq" data-correct="D">
+                            <p class="font-semibold mb-3 text-gray-800">2. Trong biểu thức $P = \frac{1}{3} \frac{N}{V} m \overline{v^2}$, đại lượng $\overline{v^2}$ là gì?</p>
+                            <div class="mcq-option p-2 border border-gray-200 rounded-md mb-2" data-answer="A">A. Vận tốc trung bình của phân tử.</div>
+                            <div class="mcq-option p-2 border border-gray-200 rounded-md mb-2" data-answer="B">B. Vận tốc cực đại của phân tử.</div>
+                            <div class="mcq-option p-2 border border-gray-200 rounded-md mb-2" data-answer="C">C. Bình phương vận tốc của một phân tử.</div>
+                            <div class="mcq-option p-2 border border-gray-200 rounded-md" data-answer="D">D. Bình phương trung bình vận tốc của phân tử.</div>
+                            <p class="feedback mt-2 text-sm italic"></p>
+                        </div>
+
+                        <!-- Câu hỏi 3 (MCQ) -->
+                        <div class="quiz-item p-4 bg-white rounded-lg shadow" data-type="mcq" data-correct="B">
+                            <p class="font-semibold mb-3 text-gray-800">3. Áp suất $P$ của khí lý tưởng tỉ lệ thuận với đại lượng nào sau đây?</p>
+                            <div class="mcq-option p-2 border border-gray-200 rounded-md mb-2" data-answer="A">A. Thể tích $V$.</div>
+                            <div class="mcq-option p-2 border border-gray-200 rounded-md mb-2" data-answer="B">B. Mật độ phân tử $\frac{N}{V}$ và Động năng trung bình $\overline{W_d}$.</div>
+                            <div class="mcq-option p-2 border border-gray-200 rounded-md mb-2" data-answer="C">C. Khối lượng phân tử $m$.</div>
+                            <div class="mcq-option p-2 border border-gray-200 rounded-md" data-answer="D">D. Thời gian giữa các va chạm $\tau$.</div>
+                            <p class="feedback mt-2 text-sm italic"></p>
+                        </div>
+
+                        <!-- Câu hỏi 4 (Điền số) -->
+                        <div class="quiz-item p-4 bg-white rounded-lg shadow" data-type="numerical" data-correct="40000" data-tolerance="0">
+                            <p class="font-semibold mb-3 text-gray-800">4. Nếu $\overline{W_d} = 6 \times 10^{-21}$ J và mật độ phân tử $\frac{N}{V} = 10^{25}$ phân tử/$\text{m}^3$. Sử dụng công thức $P = \frac{2}{3} \frac{N}{V} \overline{W_d}$, hãy tính Áp suất $P$ (đơn vị Pa).</p>
+                            <input type="number" step="any" id="q4-input" class="q-input w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" placeholder="Nhập kết quả (Pa)">
+                            <p class="feedback mt-2 text-sm italic"></p>
+                        </div>
+
+                        <!-- Câu hỏi 5 (Điền số) -->
+                        <div class="quiz-item p-4 bg-white rounded-lg shadow" data-type="numerical" data-correct="9e-21" data-tolerance="1e-22">
+                            <p class="font-semibold mb-3 text-gray-800">5. Nếu Động năng tịnh tiến trung bình $\overline{W_d}$ của một phân tử là $4.5 \times 10^{-21}$ J, hãy tính giá trị của $m \overline{v^2}$ (đơn vị J). (Sử dụng $\overline{W_d} = \frac{1}{2} m \overline{v^2}$)</p>
+                            <input type="text" id="q5-input" class="q-input w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" placeholder="Nhập kết quả (ví dụ: 9e-21)">
+                            <p class="feedback mt-2 text-sm italic"></p>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4 mt-6">
+                        <button id="check-quiz-btn" class="w-1/2 py-3 px-4 bg-green-600 text-white font-bold rounded-xl shadow-lg hover:bg-green-700 transition duration-200">
+                            Kiểm Tra Đáp Án
+                        </button>
+                        <button id="reset-quiz-btn" class="w-1/2 py-3 px-4 bg-gray-400 text-white font-bold rounded-xl shadow-lg hover:bg-gray-500 transition duration-200">
+                            Làm Lại Quiz
+                        </button>
+                    </div>
+                    
+                    <div id="quiz-result" class="mt-4 text-center text-xl font-bold p-3 rounded-xl hidden"></div>
+                </div>
+
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        // --- LOGIC MÔ PHỎNG 3D (THREE.JS) ---
+        window.onload = function() {
+            // --- CÀI ĐẶT CƠ BẢN ---
+            const container = document.getElementById('gas-simulation-container');
+            if (!container) {
+                // Nếu không tìm thấy container (ví dụ: trong môi trường không phải trình duyệt), thoát
+                return; 
+            }
+            
+            let WIDTH = container.clientWidth;
+            let HEIGHT = container.clientHeight;
+            const BOX_SIZE = 100; // Kích thước của hộp chứa
+            const PARTICLE_COUNT = 50; // Số lượng phân tử
+            const PARTICLE_RADIUS = 3;
+            const MAX_VELOCITY = 1.0;
+            
+            let renderer, scene, camera;
+            let particles = [];
+            let isDragging = false;
+            let previousMouseX = 0, previousMouseY = 0;
+
+            // --- KHỞI TẠO CẢNH ---
+            function init() {
+                // Renderer
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(WIDTH, HEIGHT);
+                container.appendChild(renderer.domElement);
+
+                // Scene
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0xf0f4f8);
+
+                // Camera
+                camera = new THREE.PerspectiveCamera(75, WIDTH / HEIGHT, 1, 1000);
+                camera.position.set(0, 0, 150);
+                camera.lookAt(0, 0, 0);
+
+                // Ánh sáng
+                const ambientLight = new THREE.AmbientLight(0x404040);
+                scene.add(ambientLight);
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+                directionalLight.position.set(1, 1, 1);
+                scene.add(directionalLight);
+
+                // Tạo Hộp chứa (Box) - Chỉ hiển thị dạng khung lưới
+                const boxGeometry = new THREE.BoxGeometry(BOX_SIZE * 2, BOX_SIZE * 2, BOX_SIZE * 2);
+                const boxEdges = new THREE.EdgesGeometry(boxGeometry);
+                const boxLine = new THREE.LineSegments(boxEdges, new THREE.LineBasicMaterial({ color: 0x4a5568 }));
+                scene.add(boxLine);
+
+                // Tạo các Phân tử
+                const particleGeometry = new THREE.SphereGeometry(PARTICLE_RADIUS, 12, 12);
+                for (let i = 0; i < PARTICLE_COUNT; i++) {
+                    const material = new THREE.MeshPhongMaterial({ color: Math.random() * 0xffffff });
+                    const particle = new THREE.Mesh(particleGeometry, material);
+
+                    // Thiết lập vị trí và vận tốc ngẫu nhiên
+                    particle.position.x = (Math.random() * 2 - 1) * (BOX_SIZE - PARTICLE_RADIUS);
+                    particle.position.y = (Math.random() * 2 - 1) * (BOX_SIZE - PARTICLE_RADIUS);
+                    particle.position.z = (Math.random() * 2 - 1) * (BOX_SIZE - PARTICLE_RADIUS);
+
+                    particle.velocity = new THREE.Vector3(
+                        (Math.random() * 2 - 1) * MAX_VELOCITY,
+                        (Math.random() * 2 - 1) * MAX_VELOCITY,
+                        (Math.random() * 2 - 1) * MAX_VELOCITY
+                    );
+                    
+                    particles.push(particle);
+                    scene.add(particle);
+                }
+
+                // Thiết lập sự kiện điều khiển camera bằng chuột
+                container.addEventListener('mousedown', onMouseDown, false);
+                window.addEventListener('mouseup', onMouseUp, false);
+                container.addEventListener('mousemove', onMouseMove, false);
+                window.addEventListener('resize', onWindowResize, false);
+            }
+
+            // --- VÒNG LẶP ANIMATION (Mô phỏng) ---
+            function animate() {
+                requestAnimationFrame(animate);
+
+                // Xoay hộp để tạo hiệu ứng 3D
+                if (!isDragging) {
+                    scene.rotation.y += 0.001;
+                    scene.rotation.x += 0.0005;
+                }
+
+                // Cập nhật vị trí và kiểm tra va chạm
+                particles.forEach(particle => {
+                    // Cập nhật vị trí
+                    particle.position.add(particle.velocity);
+
+                    // Kiểm tra va chạm với thành bình (va chạm đàn hồi)
+                    if (particle.position.x > BOX_SIZE - PARTICLE_RADIUS || particle.position.x < -BOX_SIZE + PARTICLE_RADIUS) {
+                        particle.velocity.x *= -1; // Đổi chiều vận tốc
+                        // Đặt lại vị trí để tránh kẹt
+                        particle.position.x = THREE.MathUtils.clamp(particle.position.x, -BOX_SIZE + PARTICLE_RADIUS, BOX_SIZE - PARTICLE_RADIUS);
+                    }
+                    if (particle.position.y > BOX_SIZE - PARTICLE_RADIUS || particle.position.y < -BOX_SIZE + PARTICLE_RADIUS) {
+                        particle.velocity.y *= -1;
+                        particle.position.y = THREE.MathUtils.clamp(particle.position.y, -BOX_SIZE + PARTICLE_RADIUS, BOX_SIZE - PARTICLE_RADIUS);
+                    }
+                    if (particle.position.z > BOX_SIZE - PARTICLE_RADIUS || particle.position.z < -BOX_SIZE + PARTICLE_RADIUS) {
+                        particle.velocity.z *= -1;
+                        particle.position.z = THREE.MathUtils.clamp(particle.position.z, -BOX_SIZE + PARTICLE_RADIUS, BOX_SIZE - PARTICLE_RADIUS);
+                    }
+                });
+
+                renderer.render(scene, camera);
+            }
+
+            // --- ĐIỀU KHIỂN CHUỘT (XOAY CAMERA) ---
+
+            function onMouseDown(event) {
+                isDragging = true;
+                previousMouseX = event.clientX;
+                previousMouseY = event.clientY;
+            }
+
+            function onMouseUp(event) {
+                isDragging = false;
+            }
+
+            function onMouseMove(event) {
+                if (!isDragging) return;
+
+                const deltaX = event.clientX - previousMouseX;
+                const deltaY = event.clientY - previousMouseY;
+
+                // Xoay toàn bộ Scene dựa trên chuyển động của chuột
+                scene.rotation.y += deltaX * 0.01;
+                scene.rotation.x += deltaY * 0.01;
+
+                previousMouseX = event.clientX;
+                previousMouseY = event.clientY;
+            }
+
+            // Xử lý thay đổi kích thước cửa sổ
+            function onWindowResize() {
+                WIDTH = container.clientWidth;
+                HEIGHT = container.clientHeight;
+                if (camera) {
+                    camera.aspect = WIDTH / HEIGHT;
+                    camera.updateProjectionMatrix();
+                }
+
+                if (renderer) {
+                    renderer.setSize(WIDTH, HEIGHT);
+                }
+            }
+            
+            init();
+            animate();
+        };
+
+        // --- LOGIC QUIZ ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const quizItems = document.querySelectorAll('.quiz-item');
+            const checkBtn = document.getElementById('check-quiz-btn');
+            const resetBtn = document.getElementById('reset-quiz-btn');
+            const quizResult = document.getElementById('quiz-result');
+            let totalQuestions = quizItems.length;
+
+            // Xử lý chọn đáp án trắc nghiệm
+            quizItems.forEach(item => {
+                if (item.getAttribute('data-type') === 'mcq') {
+                    item.querySelectorAll('.mcq-option').forEach(option => {
+                        option.addEventListener('click', function() {
+                            // Chỉ cho phép chọn nếu chưa kiểm tra
+                            if (!checkBtn.disabled) {
+                                // Xóa lớp 'selected' cũ
+                                item.querySelectorAll('.mcq-option').forEach(opt => {
+                                    opt.classList.remove('selected-answer');
+                                });
+                                // Thêm lớp 'selected' mới
+                                this.classList.add('selected-answer');
+                            }
+                        });
+                    });
+                }
+            });
+
+            checkBtn.addEventListener('click', checkAnswers);
+            resetBtn.addEventListener('click', resetQuiz);
+
+            /**
+             * Kiểm tra và chấm điểm các câu trả lời.
+             */
+            function checkAnswers() {
+                let score = 0;
+                let allAnswered = true;
+
+                quizItems.forEach(item => {
+                    const type = item.getAttribute('data-type');
+                    const correctValue = item.getAttribute('data-correct');
+                    const feedbackElement = item.querySelector('.feedback');
+                    let isCorrect = false;
+
+                    // FIX 1: Khai báo rawInput trong phạm vi của mỗi item để tránh ReferenceError
+                    let rawInput = null; 
+
+                    // Reset feedback
+                    feedbackElement.textContent = '';
+                    feedbackElement.classList.remove('text-green-600', 'text-red-600');
+
+                    // Reset styling cho lần chấm điểm này
+                    item.querySelectorAll('.mcq-option').forEach(opt => {
+                        opt.classList.remove('correct-answer', 'incorrect-answer'); 
+                    });
+                    item.querySelector('input')?.classList.remove('correct-answer', 'incorrect-answer');
+
+
+                    if (type === 'mcq') {
+                        const selectedOption = item.querySelector('.mcq-option.selected-answer');
+                        
+                        // Vô hiệu hóa tất cả các option MCQ sau khi kiểm tra
+                        item.querySelectorAll('.mcq-option').forEach(opt => opt.classList.add('disabled-option'));
+                        
+                        if (selectedOption) {
+                            const userAnswer = selectedOption.getAttribute('data-answer');
+                            
+                            // Highlight đáp án đúng/sai
+                            if (userAnswer === correctValue) {
+                                isCorrect = true;
+                                selectedOption.classList.add('correct-answer');
+                            } else {
+                                selectedOption.classList.add('incorrect-answer');
+                                // Highlight đáp án đúng
+                                item.querySelector(`[data-answer="${correctValue}"]`).classList.add('correct-answer');
+                            }
+                        } else {
+                            allAnswered = false;
+                            // Highlight đáp án đúng mặc dù chưa trả lời
+                            item.querySelector(`[data-answer="${correctValue}"]`)?.classList.add('correct-answer');
+                        }
+                    } else if (type === 'numerical') {
+                        const inputElement = item.querySelector('.q-input');
+                        // FIX 2: Gán giá trị cho rawInput (đã khai báo ở trên)
+                        rawInput = inputElement.value.trim();
+                        
+                        // Vô hiệu hóa input sau khi kiểm tra
+                        inputElement.classList.add('disabled-input');
+                        inputElement.setAttribute('disabled', 'true');
+                        
+                        if (rawInput === '') {
+                            allAnswered = false;
+                        } else {
+                            // Xử lý giá trị số (cho phép ký hiệu khoa học)
+                            const userAnswer = parseFloat(rawInput);
+                            const correctAnswer = parseFloat(correctValue);
+                            // Dùng giá trị tuyệt đối để so sánh sai số
+                            const tolerance = parseFloat(item.getAttribute('data-tolerance')) || 0;
+
+                            if (!isNaN(userAnswer) && Math.abs(userAnswer - correctAnswer) <= tolerance) {
+                                isCorrect = true;
+                                inputElement.classList.add('correct-answer');
+                            } else {
+                                inputElement.classList.add('incorrect-answer');
+                            }
+                        }
+                    }
+
+                    // --- LOGIC PHẢN HỒI (FEEDBACK) ---
+                    if (isCorrect) {
+                        score++;
+                        feedbackElement.textContent = 'Chính xác! 🎉';
+                        feedbackElement.classList.add('text-green-600');
+                    } else if (allAnswered) { // Nếu đã trả lời (allAnswered vẫn là true) nhưng đáp án sai
+                        feedbackElement.textContent = 'Chưa chính xác. Xem lại phần kiến thức liên quan.';
+                        feedbackElement.classList.add('text-red-600');
+                        
+                        // Đối với câu điền số, hiển thị đáp án nếu sai
+                        if (type === 'numerical') {
+                             feedbackElement.textContent += ` (Đáp án đúng: ${correctValue})`;
+                        }
+                    }
+                    // Trường hợp chưa trả lời (allAnswered = false) sẽ được xử lý sau vòng lặp
+                });
+
+                // Hiển thị cảnh báo nếu chưa trả lời hết
+                if (!allAnswered) {
+                    // Kích hoạt lại nút kiểm tra
+                    checkBtn.disabled = false;
+                    checkBtn.classList.remove('disabled-input', 'opacity-50');
+
+                    quizResult.classList.remove('hidden');
+                    quizResult.textContent = `Vui lòng trả lời tất cả các câu hỏi trước khi kiểm tra!`;
+                    quizResult.className = `mt-4 text-center text-xl font-bold p-3 rounded-xl bg-red-100 text-red-800`;
+                    
+                    // Reset Quiz (chỉ xóa kết quả, giữ lại input để người dùng nhập tiếp)
+                    resetQuiz(true); 
+                    return;
+                }
+                
+                // Vô hiệu hóa nút kiểm tra sau khi chấm điểm thành công
+                checkBtn.disabled = true;
+                checkBtn.classList.add('disabled-input', 'opacity-50');
+
+                // Hiển thị kết quả tổng hợp
+                quizResult.classList.remove('hidden');
+                quizResult.textContent = `Bạn đã trả lời đúng ${score} / ${totalQuestions} câu.`;
+                quizResult.className = `mt-4 text-center text-xl font-bold p-3 rounded-xl`;
+                if (score === totalQuestions) {
+                    quizResult.classList.add('bg-green-100', 'text-green-800');
+                } else if (score > totalQuestions / 2) {
+                    quizResult.classList.add('bg-yellow-100', 'text-yellow-800');
+                } else {
+                    quizResult.classList.add('bg-red-100', 'text-red-800');
+                }
+            }
+
+            /**
+             * Đặt lại Quiz, cho phép giữ lại input nếu được gọi từ checkAnswers (keepInput = true)
+             */
+            function resetQuiz(keepInput = false) {
+                // Kích hoạt lại nút kiểm tra
+                checkBtn.disabled = false;
+                checkBtn.classList.remove('disabled-input', 'opacity-50');
+                
+                quizResult.classList.add('hidden');
+                quizResult.textContent = '';
+
+                quizItems.forEach(item => {
+                    const feedbackElement = item.querySelector('.feedback');
+                    
+                    // Reset styling và feedback
+                    feedbackElement.textContent = '';
+                    feedbackElement.classList.remove('text-green-600', 'text-red-600');
+                    
+                    if (item.getAttribute('data-type') === 'mcq') {
+                        item.querySelectorAll('.mcq-option').forEach(opt => {
+                            opt.classList.remove('selected-answer', 'correct-answer', 'incorrect-answer', 'disabled-option');
+                        });
+                    } else if (item.getAttribute('data-type') === 'numerical') {
+                        const inputElement = item.querySelector('.q-input');
+                        if (!keepInput) {
+                           // Xóa input nếu không phải trường hợp cảnh báo bỏ trống
+                           inputElement.value = '';
+                        }
+                        inputElement.classList.remove('correct-answer', 'incorrect-answer', 'disabled-input');
+                        inputElement.removeAttribute('disabled');
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
