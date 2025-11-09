@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Demo</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* Panel trên */
+  #top-panel {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    text-align: center;
+  }
+
+  #top-panel a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+  }
+
+  #top-panel a:hover {
+    text-decoration: underline;
+  }
+
+  /* Panel dưới (hiển thị nội dung) */
+  #bottom-panel {
+    flex-grow: 1;
+    border-top: 2px solid #ccc;
+  }
+
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+</style>
+</head>
+
+<body>
+	
+  <div id="top-panel">Phân Dạng : 
+    <a href="dinhluatboyle/ttdt.pdf" target="content-frame">[ĐL Boyle]</a>
+    <a href="dinhluatcharles/charles.pdf" target="content-frame">[ĐL Charles]</a>
+    <a href="khilituong/ttdt.pdf" target="content-frame">[Khí lý tưởng]</a>
+  </div>
+
+  <div id="bottom-panel">
+    <iframe name="content-frame" src="https://www.wikipedia.org"></ifra
