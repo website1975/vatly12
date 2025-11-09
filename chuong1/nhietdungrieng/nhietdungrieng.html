@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tóm Tắt Ôn Tập Vật Lý Nhiệt</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+</script>
+    <!-- Tải MathJax để hiển thị công thức LaTeX -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                // Ensure MathJax is ready before trying to typeset
+                renderActions: {
+                    add: [
+                        10, 
+                        (doc) => { 
+                            if (!doc.typesetRoot) return;
+                            doc.typeset();
+                        },
+                        100,
+                    ]
+                },
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* Tùy chỉnh font cho tiêu đề và nội dung */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* Custom styling cho công thức LaTeX */
+        .latex-formula {
+            display: block;
+            margin: 1rem 0;
+            padding: 0.75rem;
+            background-color: #e5e7eb;
+            color: #1f2937;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            overflow-x: auto;
+        }
+        /* Custom styling cho bảng */
+        .review-table th, .review-table td {
+            padding: 0.75rem;
+            text-align: left;
+        }
+        /* Style cho công thức trong bảng */
+        .math-cell {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #dc2626; /* Màu đỏ cho công thức */
+        }
+        /* Để hình ảnh đồ thị không bị quá lớn */
+        .graph-container {
+            max-width: 450px; /* Tăng kích thước tối đa cho đồ thị */
+            margin: 0 auto 1.5rem auto;
+            border: 1px solid #ccc;
+            padding: 5px;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .graph-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+    <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl overflow-hidden">
+        
+        <!-- SLIDE 1: Trang Chủ & Mục Tiêu -->
+        <header id="slide-1" class="p-6 sm:p-10 bg-indigo-600 text-white rounded-t-xl">
+            <h1 class="text-3xl sm:text-4xl font-extrabold mb-2">TÓM TẮT NHANH VỀ NHIỆT</h1>
+            <p class="text-indigo-200 text-xl font-medium">CÁC ĐẠI LƯỢNG NHIỆT & CÔNG THỨC CỐT LÕI</p>
+            
+            <div class="mt-6">
+                <h3 class="text-xl font-bold mb-3 border-b border-indigo-400 pb-1">MỤC TIÊU GHI NHỚ</h3>
+                <ul class="space-y-2 list-disc list-inside text-lg">
+                    <li>Công thức tính Nhiệt lượng ($Q$) cho 3 quá trình cơ bản.</li>
+                    <li>Nguyên lý Cân bằng nhiệt ($Q_{toả} = Q_{thu}$).</li>
+                    <li>Phân tích các giai đoạn trên Đồ thị Chuyển thể.</li>
+                </ul>
+            </div>
+        </header>
+
+        <!-- SLIDE 2: 3 Đại lượng Nhiệt cơ bản -->
+        <section id="slide-2" class="p-6 sm:p-10">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2">1. 3 ĐẠI LƯỢNG NHIỆT CƠ BẢN</h2>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full review-table min-w-[700px] border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 rounded-tl-lg">Đại lượng</th>
+                            <th class="py-3 px-6">Công thức Q</th>
+                            <th class="py-3 px-6">Đơn vị</th>
+                            <th class="py-3 px-6 rounded-tr-lg">Lưu ý quan trọng</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-600 text-sm font-light">
+                        <tr class="border-b border-gray-200 hover:bg-yellow-50/50">
+                            <td class="py-3 px-6 font-medium">**Nhiệt dung riêng** ($c$)</td>
+                            <td class="py-3 px-6 math-cell">$$Q = m \cdot c \cdot \Delta t$$</td>
+                            <td class="py-3 px-6 italic">$J/kg \cdot K$</td>
+                            <td class="py-3 px-6">Gây **thay đổi nhiệt độ**.</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 hover:bg-yellow-50/50">
+                            <td class="py-3 px-6 font-medium">**Nhiệt nóng chảy riêng** ($\lambda$)</td>
+                            <td class="py-3 px-6 math-cell">$$Q = m \cdot \lambda$$</td>
+                            <td class="py-3 px-6 italic">$J/kg$</td>
+                            <td class="py-3 px-6">Xảy ra ở $t^\circ$ **không đổi** ($t_{nc}$).</td>
+                        </tr>
+                        <tr class="hover:bg-yellow-50/50">
+                            <td class="py-3 px-6 font-medium">**Nhiệt hóa hơi riêng** ($L$)</td>
+                            <td class="py-3 px-6 math-cell">$$Q = m \cdot L$$</td>
+                            <td class="py-3 px-6 italic">$J/kg$</td>
+                            <td class="py-3 px-6">Xảy ra ở $t^\circ$ **không đổi** ($t_{sôi}$).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="mt-6 text-sm italic text-gray-500">
+                **CÔNG THỨC THÍ NGHIỆM:** Nếu dùng điện trở (Công suất P, thời gian t): $$P \cdot t = Q_{\text{thu}}$$
+            </p>
+        </section>
+
+        <!-- SLIDE 3: Cân Bằng Nhiệt & Tổng Hợp Q -->
+        <section id="slide-3" class="p-6 sm:p-10 bg-white">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 border-b-2 border-green-500 pb-2">2. CÂN BẰNG NHIỆT & TỔNG HỢP Q</h2>
+
+            <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-600 mb-6">
+                <h3 class="text-xl font-bold text-green-700 mb-2">A. NGUYÊN LÝ CÂN BẰNG NHIỆT</h3>
+                <div class="latex-formula bg-green-200 text-green-800">
+                    $$\mathbf{Q_{\text{toả}} = Q_{\text{thu}}}$$
+                </div>
+                <ul class="list-disc list-inside text-gray-700 ml-4">
+                    <li>$Q_{\text{toả}}$: Nhiệt lượng vật có $t^\circ$ **cao** truyền đi.</li>
+                    <li>$Q_{\text{thu}}$: Nhiệt lượng vật có $t^\circ$ **thấp** nhận vào.</li>
+                </ul>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-800 mb-3">B. CÔNG THỨC CÂN BẰNG (Chỉ đổi nhiệt độ)</h3>
+            <div class="latex-formula bg-gray-100 text-indigo-700">
+                $$\mathbf{m_1 \cdot c_1 \cdot (t_1 - t_{\text{cb}}) = m_2 \cdot c_2 \cdot (t_{\text{cb}} - t_2)}$$
+            </div>
+            
+            <h3 class="text-xl font-bold text-gray-800 mt-6 mb-3">C. LƯU Ý QUAN TRỌNG (Tính tổng $Q$)</h3>
+            <p class="text-gray-700 mb-2">
+                Trong các bài toán **Nước đá** hoặc **Hơi nước**, $Q$ phải tính tổng các giai đoạn:
+            </p>
+            <div class="latex-formula bg-red-100 text-red-700">
+                $$\mathbf{Q_{\text{tổng}} = Q_{\text{tăng } t^\circ} + Q_{\text{chuyển thể}}}$$
+            </div>
+        </section>
+        
+        <!-- SLIDE 4: Đồ Thị Chuyển Thể -->
+        <section id="slide-4" class="p-6 sm:p-10 bg-gray-50 rounded-b-xl">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 border-b-2 border-orange-500 pb-2">3. ĐỒ THỊ CHUYỂN THỂ (T vs Q)</h2>
+
+            <p class="text-base text-gray-700 italic mb-4">
+                **QUY TẮC VÀNG:** Đoạn nằm ngang $\rightarrow$ **Chuyển thể** ($t^\circ$ không đổi)
+            </p>
+
+            <!-- Bổ sung hình ảnh Đồ thị Chuyển thể bằng thẻ gọi hình ảnh -->
+		<center><img src="gianhiet.jpg" alt="mô tả ảnh" width="chiều_rộng" height="chiều_cao"></center>
+
+            <div class="graph-container">
+                
+                <p class="text-center text-sm text-gray-600 mt-2">Đồ thị $t^\circ$ theo $Q$ (Rắn $\rightarrow$ Nóng chảy $\rightarrow$ Lỏng $\rightarrow$ Sôi $\rightarrow$ Khí)</p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full review-table min-w-[600px] border-collapse">
+                    <thead>
+                        <tr class="bg-orange-100 text-orange-700 uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 rounded-tl-lg">Giai đoạn</th>
+                            <th class="py-3 px-6">Trạng thái (Pha)</th>
+                            <th class="py-3 px-6">Nhiệt độ ($t^\circ$)</th>
+                            <th class="py-3 px-6 rounded-tr-lg">Công thức $Q$</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-600 text-sm font-light">
+                        <tr class="border-b border-gray-200">
+                            <td class="py-3 px-6 font-medium">**1**</td>
+                            <td class="py-3 px-6">Rắn</td>
+                            <td class="py-3 px-6 text-green-600">**Tăng**</td>
+                            <td class="py-3 px-6 math-cell">$Q = m \cdot c_{\text{rắn}} \cdot \Delta t$</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 bg-yellow-50">
+                            <td class="py-3 px-6 font-medium">**Nóng chảy**</td>
+                            <td class="py-3 px-6">Rắn + Lỏng</td>
+                            <td class="py-3 px-6 text-red-600">**Không đổi** ($t_{nc}$)</td>
+                            <td class="py-3 px-6 math-cell">$Q = m \cdot \lambda$</td>
+                        </tr>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-3 px-6 font-medium">**2**</td>
+                            <td class="py-3 px-6">Lỏng</td>
+                            <td class="py-3 px-6 text-green-600">**Tăng**</td>
+                            <td class="py-3 px-6 math-cell">$Q = m \cdot c_{\text{lỏng}} \cdot \Delta t$</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 bg-yellow-50">
+                            <td class="py-3 px-6 font-medium">**Hóa hơi/Sôi**</td>
+                            <td class="py-3 px-6">Lỏng + Khí</td>
+                            <td class="py-3 px-6 text-red-600">**Không đổi** ($t_{sôi}$)</td>
+                            <td class="py-3 px-6 math-cell">$Q = m \cdot L$</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-6 font-medium">**3**</td>
+                            <td class="py-3 px-6">Khí</td>
+                            <td class="py-3 px-6 text-green-600">**Tăng**</td>
+                            <td class="py-3 px-6 math-cell">$Q = m \cdot c_{\text{khí}} \cdot \Delta t$</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+        </section>
+
+        <footer class="p-4 text-center text-gray-500 text-xs bg-gray-200/50">
+            Tài liệu ôn tập tóm tắt - Vật Lý
+        </footer>
+    </div>
+</body>
+</html>

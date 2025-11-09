@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đồ Thị T vs t Truyền Nhiệt Có Chuyển Pha</title>
+    <!-- Tải Tailwind CSS và Font Inter -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+</script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f0f4f8; }
+        .container-box { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); }
+        #chart-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        /* Style cho đường biểu diễn */
+        .line-ice, .line-water { fill: none; stroke-width: 3px; }
+        .line-ice { stroke: #3b82f6; } /* Blue for ice (Cốc 1) */
+        .line-water { stroke: #ef4444; } /* Red for water (Cốc 2) */
+    </style>
+</head>
+<body class="p-4 md:p-8 flex justify-center min-h-screen">
+
+    <div class="container-box bg-white rounded-xl p-6 md:p-10 w-full max-w-4xl">
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-6 border-b pb-2">
+            Mô Phỏng Đồ Thị T vs t Truyền Nhiệt & Chuyển Pha (Có Hoạt Ảnh)
+        </h1>
+
+        <p class="text-gray-600 mb-6">
+            Đồ thị biểu diễn Nhiệt độ ($T$) theo **Thời Gian Mô Phỏng ($t$)**. Độ dài các đoạn thẳng trên trục $t$ có thể không tỷ lệ chính xác với Nhiệt lượng ($Q$) thực tế.
+            <strong class="text-indigo-600">Hoạt ảnh đã được làm chậm để bạn dễ hình dung quá trình tương tác giữa hai vật thể.</strong>
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Cốc 1: Nước Đá -->
+            <div class="p-4 bg-blue-50/50 border border-blue-200 rounded-lg">
+                <h2 class="text-xl font-semibold text-blue-700 mb-3">Cốc 1: Nước Đá</h2>
+                <label class="block mb-2">
+                    <span class="text-sm text-gray-700">Khối lượng Đá ($m_{đá}$, kg)</span>
+                    <input type="number" id="m_ice" value="0.5" step="0.1" class="w-full mt-1 p-2 border rounded-md">
+                </label>
+                <label class="block mb-2">
+                    <span class="text-sm text-gray-700">Nhiệt độ Đá ban đầu ($T_{đá}$, °C)</span>
+                    <input type="number" id="t_ice" value="-10" step="1" max="0" class="w-full mt-1 p-2 border rounded-md">
+                </label>
+                <p class="text-xs text-gray-500 mt-1">Sử dụng: $c_{đá} = 2100 \text{ J/kg}\cdot^\circ C$, $\lambda = 334000 \text{ J/kg}$.</p>
+            </div>
+
+            <!-- Cốc 2: Nước Lỏng -->
+            <div class="p-4 bg-red-50/50 border border-red-200 rounded-lg">
+                <h2 class="text-xl font-semibold text-red-700 mb-3">Cốc 2: Nước Lỏng</h2>
+                <label class="block mb-2">
+                    <span class="text-sm text-gray-700">Khối lượng Nước ($m_{nước}$, kg)</span>
+                    <input type="number" id="m_water" value="1.0" step="0.1" class="w-full mt-1 p-2 border rounded-md">
+                </label>
+                <label class="block mb-2">
+                    <span class="text-sm text-gray-700">Nhiệt độ Nước ban đầu ($T_{nước}$, °C)</span>
+                    <input oninput="if(this.value > 100) this.value = 100;" type="number" id="t_water" value="5" step="1" max="100" min="0" class="w-full mt-1 p-2 border rounded-md">
+                </label>
+                <p class="text-xs text-gray-500 mt-1">Sử dụng: $c_{nước} = 4186 \text{ J/kg}\cdot^\circ C$.</p>
+            </div>
+        </div>
+
+        <button onclick="startSimulation()" class="w-full px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition duration-150 transform hover:scale-[1.01]">
+            Khởi Động Mô Phỏng (Vẽ lại)
+        </button>
+
+        <!-- Phần Chú Giải/Legend Đã Thêm -->
+        <div class="mt-4 flex flex-wrap space-x-6 justify-center text-sm font-medium text-gray-700">
+            <div class="flex items-center my-1">
+                <div class="w-4 h-1 rounded-full bg-blue-500 mr-2"></div>
+                <span>T° Cốc 1 (Đá/Hỗn hợp)</span>
+            </div>
+            <div class="flex items-center my-1">
+                <div class="w-4 h-1 rounded-full bg-red-500 mr-2"></div>
+                <span>T° Cốc 2 (Nước Lỏng)</span>
+            </div>
+            <div class="flex items-center my-1">
+                <div class="w-4 h-1 border-b border-dashed border-green-500 mr-2"></div>
+                <span>T° Cân Bằng ($\text{T}_{\text{CB}}$)</span>
+            </div>
+        </div>
+        <!-- End Chú Giải -->
+
+        <!-- Phần Kết quả -->
+        <div class="mt-8 p-4 bg-green-50 border border-green-300 rounded-lg">
+            <h2 class="text-xl font-bold text-green-800 mb-2">T° Cân Bằng Thực Tế</h2>
+            <p id="result-text" class="2xl font-extrabold text-green-600">-- °C</p>
+            <p id="analysis-text" class="text-sm text-gray-600 mt-2">Phân tích: Vui lòng chạy mô phỏng.</p>
+        </div>
+
+        <div class="mt-8" id="chart-container">
+            <svg id="heat-chart" width="100%" height="100%" viewBox="0 0 760 400"></svg>
+        </div>
+    </div>
+
+    <script>
+        // Hằng số vật lý
+        const PHASE_TEMP = 0; 
+        const C_ICE = 2100;
+        const C_WATER = 4186;
+        const LF_WATER = 334000;
+        
+        // Độ trễ giữa mỗi bước hoạt ảnh (milliseconds)
+        const ANIMATION_INTERVAL_MS = 50; 
+        const MIN_TOTAL_STEPS = 500; // Tăng lên 500 để đồ thị dài hơn và hoạt ảnh chi tiết hơn
+
+        // --- GLOBAL STATES ---
+        let historyIce = [];
+        let historyWater = [];
+        let T_eq_final = 0;
+        let animationFrameId = null; 
+        let currentStep = 0;
+        let MAX_STEPS = 0;
+
+        // Hàm chính tính toán T_eq và xây dựng lịch sử nhiệt độ
+        function calculateAndBuildHistory() {
+            // Lấy input
+            const m_ice = parseFloat(document.getElementById('m_ice').value);
+            const T_ice = parseFloat(document.getElementById('t_ice').value);
+            const m_water = parseFloat(document.getElementById('m_water').value);
+            const T_water = parseFloat(document.getElementById('t_water').value);
+
+            // Kiểm tra điều kiện đầu vào
+            if (isNaN(m_ice) || isNaN(T_ice) || isNaN(m_water) || isNaN(T_water) ||
+                m_ice <= 0 || m_water <= 0 || T_ice >= PHASE_TEMP || T_water <= PHASE_TEMP) {
+                
+                document.getElementById('analysis-text').textContent = "LỖI: Vui lòng nhập các giá trị hợp lệ. Đá phải có T° < 0°C, Nước phải có T° > 0°C.";
+                clearChart();
+                return null;
+            }
+            
+            // Nhiệt dung hiệu dụng
+            const C_eff_ice = m_ice * C_ICE;
+            const C_eff_water = m_water * C_WATER;
+
+            // --- BƯỚC 1: TÍNH TOÁN CÂN BẰNG THỰC TẾ (T_eq) ---
+            const Q_ice_to_0 = C_eff_ice * (PHASE_TEMP - T_ice); // Q thu để đá lên 0°C
+            const Q_water_to_0 = C_eff_water * (T_water - PHASE_TEMP); // Q tỏa để nước xuống 0°C
+            const Q_melt_needed = m_ice * LF_WATER; // Q thu để đá tan hết
+            
+            // Tổng nhiệt cần thiết để đá tan hết (để có T_eq > 0)
+            const Q_needed_to_melt_all = Q_ice_to_0 + Q_melt_needed; 
+
+            let analysis_msg = "";
+            let segments = []; 
+            
+            // Reset lịch sử
+            historyIce = []; 
+            historyWater = [];
+            currentStep = 0;
+            MAX_STEPS = 0;
+            T_eq_final = 0;
+
+            // --- Xác định T_eq và các điểm chuyển tiếp ---
+            
+            // --- Case 3: Melting (T_eq > 0°C) - Nóng chảy Toàn Bộ ---
+            if (Q_water_to_0 > Q_needed_to_melt_all) { 
+                // T_eq > 0°C
+                const Q_surplus = Q_water_to_0 - Q_needed_to_melt_all; 
+                T_eq_final = PHASE_TEMP + Q_surplus / ((m_ice + m_water) * C_WATER);
+
+                analysis_msg = `T° CB = ${T_eq_final.toFixed(2)} °C > 0°C: Nước đá tan chảy hết. Hệ cuối cùng là Nước lỏng.`;
+
+                // Phase 1: Đá tăng T° lên 0°C (Q_ice_to_0). Nước giảm T° (Q_ice_to_0).
+                const T2_B = T_water - Q_ice_to_0 / C_eff_water;
+                segments.push({
+                    T1_start: T_ice, T1_end: PHASE_TEMP, 
+                    T2_start: T_water, T2_end: T2_B, 
+                });
+
+                // Phase 2: Đá nóng chảy hoàn toàn tại 0°C (Q_melt_needed). Nước tiếp tục giảm T° (Q_melt_needed).
+                const T2_C = T2_B - Q_melt_needed / C_eff_water; 
+                segments.push({
+                    T1_start: PHASE_TEMP, T1_end: PHASE_TEMP, // Đá giữ 0°C (Chuyển pha)
+                    T2_start: T2_B, T2_end: T2_C, 
+                });
+
+                // Phase 3: Toàn bộ là nước lỏng cùng tăng nhiệt từ 0°C/T2_C lên T_eq
+                segments.push({
+                    T1_start: PHASE_TEMP, T1_end: T_eq_final, 
+                    T2_start: T2_C, T2_end: T_eq_final, 
+                });
+
+            } 
+            // --- Case 1: Freezing (T_eq < 0°C) - Đông đặc Toàn Bộ ---
+            else if (Q_ice_to_0 > Q_water_to_0 + m_water * LF_WATER) { 
+                // Nhiệt lượng tỏa tối đa của nước: xuống 0°C (Q_water_to_0) + đông đặc hết (m_water * LF_WATER)
+                const Q_max_release = Q_water_to_0 + m_water * LF_WATER;
+
+                // Nhiệt lượng còn thiếu (Net Q) để đưa toàn bộ khối lượng lên 0°C
+                const Q_net_at_0 = Q_ice_to_0 - Q_max_release; 
+                
+                const C_eff_final_ice = (m_ice + m_water) * C_ICE; 
+                
+                // *** Sửa lỗi tính T_eq tại đây: T_eq phải là 0 trừ đi phần nhiệt độ chênh lệch ***
+                T_eq_final = PHASE_TEMP - Q_net_at_0 / C_eff_final_ice; // Đảm bảo T_eq >= T_ice
+
+                analysis_msg = `T° CB = ${T_eq_final.toFixed(2)} °C < 0°C: Nước Đông Đặc Hoàn Toàn. Hệ cuối cùng là Đá.`;
+                
+                // Phase 1: Nước giảm T° xuống 0°C (Q_water_to_0). Đá tăng T° (Q_water_to_0).
+                const T1_B = T_ice + Q_water_to_0 / C_eff_ice;
+                segments.push({
+                    T1_start: T_ice, T1_end: T1_B, 
+                    T2_start: T_water, T2_end: PHASE_TEMP, 
+                });
+
+                // Phase 2: Nước đông đặc hoàn toàn tại 0°C (m_water * LF_WATER). Đá tiếp tục tăng T°.
+                const Q_freeze_water = m_water * LF_WATER;
+                const T1_C = T1_B + Q_freeze_water / C_eff_ice;
+                segments.push({
+                    T1_start: T1_B, T1_end: T1_C, 
+                    T2_start: PHASE_TEMP, T2_end: PHASE_TEMP, // Nước giữ 0°C (Chuyển pha)
+                });
+
+                // Phase 3: Cả hai cùng là Đá, cùng giảm T° xuống T_eq_final
+                segments.push({
+                    T1_start: T1_C, T1_end: T_eq_final, 
+                    T2_start: PHASE_TEMP, T2_end: T_eq_final, 
+                });
+            }
+
+
+            // --- Case 2: EQUILIBRIUM AT 0°C (T_eq = 0°C) - Chuyển Pha Một Phần ---
+            else { 
+                T_eq_final = PHASE_TEMP;
+                
+                if (Q_water_to_0 >= Q_ice_to_0) {
+                    // 2a: Partial Melting (Nóng chảy một phần)
+                    
+                    // Phase 1: Đá tăng T° lên 0°C (Q_ice_to_0). Nước giảm T° (Q_ice_to_0).
+                    const Q_transfer_to_0 = Q_ice_to_0;
+                    const T2_B = T_water - Q_transfer_to_0 / C_eff_water;
+                    segments.push({
+                        T1_start: T_ice, T1_end: PHASE_TEMP, 
+                        T2_start: T_water, T2_end: T2_B, 
+                    });
+
+                    // Phase 2: Chuyển pha một phần
+                    const Q_net_at_0 = Q_water_to_0 - Q_ice_to_0;
+                    const melted_mass = Q_net_at_0 / LF_WATER;
+                    analysis_msg = `T° CB = 0°C: Nước đá tan chảy một phần. Khối lượng đá tan chảy: ${melted_mass.toFixed(3)} kg.`;
+
+                    // Cốc 1 (Đá): T° giữ 0°C (Chuyển pha). Cốc 2 (Nước): T° giảm nốt từ T2_B xuống 0°C (để cung cấp Q_net_at_0).
+                    segments.push({
+                        T1_start: PHASE_TEMP, T1_end: PHASE_TEMP, 
+                        T2_start: T2_B, T2_end: PHASE_TEMP, 
+                    });
+
+                } else {
+                    // 2b: Partial Freezing (Đông đặc một phần)
+                    
+                    // Phase 1: Nước giảm T° xuống 0°C (Q_water_to_0). Đá tăng T° (Q_water_to_0).
+                    const Q_transfer_to_0 = Q_water_to_0;
+                    const T1_B = T_ice + Q_transfer_to_0 / C_eff_ice;
+                    segments.push({
+                        T1_start: T_ice, T1_end: T1_B, 
+                        T2_start: T_water, T2_end: PHASE_TEMP, 
+                    });
+
+                    // Phase 2: Chuyển pha một phần
+                    const Q_rem_needed = Q_ice_to_0 - Q_water_to_0; // Nhiệt đá còn cần
+                    const frozen_mass = Q_rem_needed / LF_WATER;
+                    analysis_msg = `T° CB = 0°C: Nước đông đặc một phần (lượng ${frozen_mass.toFixed(3)} kg nước lỏng hóa thành đá).`;
+
+                    // Cốc 1 (Đá): T° tăng nốt từ T1_B lên 0°C (để thu Q_rem_needed). Cốc 2 (Nước): T° giữ 0°C (đông đặc).
+                    segments.push({
+                        T1_start: T1_B, T1_end: PHASE_TEMP, 
+                        T2_start: PHASE_TEMP, T2_end: PHASE_TEMP, 
+                    });
+                }
+            }
+
+
+            // --- BƯỚC 1.5: Chuẩn hóa số bước để tổng số bước là MIN_TOTAL_STEPS ---
+            if (segments.length > 0) {
+                // Tính số bước cần thiết cho mỗi segment để tổng số bước xấp xỉ MIN_TOTAL_STEPS
+                const steps_per_segment_base = Math.floor(MIN_TOTAL_STEPS / segments.length);
+                
+                // Áp dụng số bước này cho tất cả các segments
+                segments.forEach(seg => {
+                    // Tăng gấp đôi thời gian cho đoạn chuyển pha (đường ngang tại 0°C)
+                    const isPhaseChange = (seg.T1_start === seg.T1_end && seg.T1_end === PHASE_TEMP) || 
+                                           (seg.T2_start === seg.T2_end && seg.T2_end === PHASE_TEMP);
+
+                    if (isPhaseChange) {
+                         seg.steps = steps_per_segment_base * 2; 
+                    } else {
+                        seg.steps = steps_per_segment_base;
+                    }
+                });
+                // Tính lại tổng số bước
+                MAX_STEPS = segments.reduce((sum, seg) => sum + seg.steps, 0);
+            }
+
+
+            // Cập nhật kết quả
+            document.getElementById('result-text').textContent = `${T_eq_final.toFixed(2)} °C`;
+            document.getElementById('analysis-text').textContent = analysis_msg;
+
+
+            // --- BƯỚC 2: Xây dựng toàn bộ lịch sử nhiệt độ cho hoạt ảnh ---
+            historyIce = [];
+            historyWater = [];
+            let totalSteps = 0;
+
+            // Điểm bắt đầu (t=0)
+            historyIce.push({ t: 0, temp: T_ice });
+            historyWater.push({ t: 0, temp: T_water });
+
+            for (let i = 0; i < segments.length; i++) {
+                const seg = segments[i];
+                const startStep = totalSteps;
+                totalSteps += seg.steps;
+
+                for (let j = 1; j <= seg.steps; j++) {
+                    const t_current = startStep + j;
+                    const ratio = j / seg.steps;
+
+                    // Tuyến tính hóa nhiệt độ trong đoạn
+                    const T1_current = seg.T1_start + (seg.T1_end - seg.T1_start) * ratio;
+                    const T2_current = seg.T2_start + (seg.T2_end - seg.T2_start) * ratio;
+                    
+                    historyIce.push({ t: t_current, temp: T1_current });
+                    historyWater.push({ t: t_current, temp: T2_current });
+                }
+            }
+            
+            MAX_STEPS = totalSteps;
+            return MAX_STEPS > 0;
+        }
+
+        // --- Hàm quản lý hoạt ảnh (Sử dụng setTimeout để kiểm soát tốc độ) ---
+        function startSimulation() {
+            // Clear any existing animation if running
+            if (animationFrameId) {
+                clearTimeout(animationFrameId);
+            }
+            if (calculateAndBuildHistory()) {
+                currentStep = 0;
+                // Bắt đầu chuỗi hoạt ảnh
+                animateChart();
+            }
+        }
+
+        function animateChart() {
+            if (currentStep <= MAX_STEPS) {
+                // Vẽ đồ thị đến bước hiện tại
+                drawChart(historyIce.slice(0, currentStep + 1), historyWater.slice(0, currentStep + 1), T_eq_final, MAX_STEPS);
+                currentStep++;
+
+                // Lập lịch cho bước tiếp theo với độ trễ cố định
+                animationFrameId = setTimeout(animateChart, ANIMATION_INTERVAL_MS);
+
+            } else {
+                // Đảm bảo vẽ điểm cuối cùng và dừng
+                drawChart(historyIce, historyWater, T_eq_final, MAX_STEPS);
+                console.log("Mô phỏng hoàn tất.");
+            }
+        }
+
+        // --- Hàm vẽ đồ thị SVG ---
+        function clearChart() {
+            document.getElementById('heat-chart').innerHTML = '';
+        }
+
+        function drawChart(currentHistory1, currentHistory2, T_eq_ideal, total_time_steps) {
+            clearChart(); 
+            
+            const svgChart = document.getElementById('heat-chart'); 
+            const CHART_WIDTH = 760;
+            const CHART_HEIGHT = 400;
+            const PADDING = 40;
+            const innerWidth = CHART_WIDTH - 2 * PADDING;
+            const innerHeight = CHART_HEIGHT - 2 * PADDING;
+
+            if (currentHistory1.length === 0) return;
+
+            // Lấy nhiệt độ hiện tại (điểm cuối cùng đã vẽ)
+            const currentTempIce = currentHistory1[currentHistory1.length - 1].temp;
+            const currentTempWater = currentHistory2[currentHistory2.length - 1].temp;
+
+            // Tính toán phạm vi dữ liệu
+            const allTemps = historyIce.flatMap(d => [d.temp]).concat(historyWater.flatMap(d => [d.temp]));
+            
+            let minTemp = Math.floor(Math.min(...allTemps, T_eq_ideal, PHASE_TEMP) / 5) * 5;
+            let maxTemp = Math.ceil(Math.max(...allTemps, T_eq_ideal, PHASE_TEMP) / 5) * 5;
+            const tempRange = maxTemp - minTemp;
+            
+            if (tempRange === 0) { minTemp -= 5; maxTemp += 5; }
+
+            // Hàm ánh xạ: Dữ liệu -> Tọa độ màn hình
+            // Trục X ánh xạ từ t (0-total_time_steps)
+            const scaleX = (t) => PADDING + (t / total_time_steps) * innerWidth;
+            const scaleY = (temp) => PADDING + innerHeight - ((temp - minTemp) / tempRange) * innerHeight;
+
+            // --- Vẽ các đường (Path) ---
+            const line1 = currentHistory1.map(d => `${scaleX(d.t)},${scaleY(d.temp)}`).join(" "); // Đá -> Nước
+            const line2 = currentHistory2.map(d => `${scaleX(d.t)},${scaleY(d.temp)}`).join(" "); // Nước
+
+            // Đường T° Cốc 1 (Đá/Nước)
+            const path1 = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+            path1.setAttribute('points', line1);
+            path1.setAttribute('class', 'line-ice');
+            path1.setAttribute('stroke-linecap', 'round');
+            path1.setAttribute('stroke-linejoin', 'round');
+            svgChart.appendChild(path1);
+
+            // Đường T° Cốc 2 (Nước)
+            const path2 = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+            path2.setAttribute('points', line2);
+            path2.setAttribute('class', 'line-water');
+            path2.setAttribute('stroke-linecap', 'round');
+            path2.setAttribute('stroke-linejoin', 'round');
+            svgChart.appendChild(path2);
+            
+            // --- Vẽ Đường 0°C (Quan trọng) ---
+            const yZero = scaleY(PHASE_TEMP);
+            if (PHASE_TEMP >= minTemp && PHASE_TEMP <= maxTemp) {
+                const zeroLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                
+                zeroLine.setAttribute('x1', PADDING);
+                zeroLine.setAttribute('y1', yZero);
+                zeroLine.setAttribute('x2', CHART_WIDTH - PADDING);
+                zeroLine.setAttribute('y2', yZero);
+                zeroLine.setAttribute('stroke', '#9ca3af'); /* Gray */
+                zeroLine.setAttribute('stroke-dasharray', '2,4');
+                zeroLine.setAttribute('stroke-width', '1');
+                svgChart.appendChild(zeroLine);
+
+                 const textZero = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                textZero.setAttribute('x', PADDING - 10);
+                textZero.setAttribute('y', yZero + 4);
+                textZero.setAttribute('text-anchor', 'end');
+                textZero.setAttribute('font-size', '12');
+                textZero.setAttribute('fill', '#9ca3af');
+                textZero.textContent = `0°C`;
+                svgChart.appendChild(textZero);
+            }
+
+            // --- Vẽ Đường Cân Bằng Lý Thuyết (T_eq) ---
+            const yEq = scaleY(T_eq_ideal);
+            const eqLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            eqLine.setAttribute('x1', PADDING);
+            eqLine.setAttribute('y1', yEq);
+            eqLine.setAttribute('x2', CHART_WIDTH - PADDING);
+            eqLine.setAttribute('y2', yEq);
+            eqLine.setAttribute('stroke', '#10b981'); /* Green */
+            eqLine.setAttribute('stroke-dasharray', '5,5');
+            eqLine.setAttribute('stroke-width', '1');
+            svgChart.appendChild(eqLine);
+            
+            // Nhãn T° Cân Bằng
+            const textEq = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            textEq.setAttribute('x', CHART_WIDTH - PADDING - 5);
+            textEq.setAttribute('y', yEq - 5);
+            textEq.setAttribute('text-anchor', 'end');
+            textEq.setAttribute('font-size', '12');
+            textEq.setAttribute('fill', '#10b981');
+            textEq.textContent = `T° CB: ${T_eq_ideal.toFixed(1)}°C`;
+            svgChart.appendChild(textEq);
+
+            // --- Vẽ Nhãn Nhiệt Độ Hiện Tại (Điểm cuối cùng) ---
+            if (currentHistory1.length > 0) {
+                const lastPointIce = currentHistory1[currentHistory1.length - 1];
+                const xIce = scaleX(lastPointIce.t);
+                const yIce = scaleY(lastPointIce.temp);
+                
+                // Nhãn T° hiện tại Cốc 1 (Đá/Nước) - Màu xanh
+                const textIce = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                textIce.setAttribute('x', xIce + 5);
+                textIce.setAttribute('y', yIce - 5);
+                textIce.setAttribute('font-size', '14');
+                textIce.setAttribute('fill', '#3b82f6');
+                textIce.setAttribute('font-weight', 'bold');
+                textIce.textContent = `${currentTempIce.toFixed(1)} °C`;
+                svgChart.appendChild(textIce);
+
+                const lastPointWater = currentHistory2[currentHistory2.length - 1];
+                const xWater = scaleX(lastPointWater.t);
+                const yWater = scaleY(lastPointWater.temp);
+
+                // Nhãn T° hiện tại Cốc 2 (Nước Lỏng) - Màu đỏ
+                const textWater = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                // Đặt nhãn nước thấp hơn một chút để tránh chồng lấn
+                textWater.setAttribute('x', xWater + 5); 
+                textWater.setAttribute('y', yWater + 15);
+                textWater.setAttribute('font-size', '14');
+                textWater.setAttribute('fill', '#ef4444');
+                textWater.setAttribute('font-weight', 'bold');
+                textWater.textContent = `${currentTempWater.toFixed(1)} °C`;
+                svgChart.appendChild(textWater);
+            }
+            // --- Kết thúc Vẽ Nhãn Nhiệt Độ Hiện Tại ---
+
+
+            // --- Trục tọa độ và Nhãn ---
+
+            // Trục Y (Nhiệt độ)
+            let tickStepY = Math.ceil(tempRange / 5 / 5) * 5; 
+            if (tickStepY === 0) tickStepY = 5;
+
+            for (let temp = minTemp; temp <= maxTemp; temp += tickStepY) {
+                const y = scaleY(temp);
+
+                // Đường lưới ngang
+                const gridLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                gridLine.setAttribute('x1', PADDING);
+                gridLine.setAttribute('y1', y);
+                gridLine.setAttribute('x2', CHART_WIDTH - PADDING);
+                gridLine.setAttribute('y2', y);
+                gridLine.setAttribute('stroke', '#e2e8f0');
+                gridLine.setAttribute('stroke-width', '1');
+                svgChart.appendChild(gridLine);
+
+                // Nhãn nhiệt độ
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute('x', PADDING - 10);
+                text.setAttribute('y', y + 4);
+                text.setAttribute('text-anchor', 'end');
+                text.setAttribute('font-size', '12');
+                text.setAttribute('fill', '#4b5563');
+                text.textContent = `${temp.toFixed(0)}°C`;
+                svgChart.appendChild(text);
+            }
+
+            // Trục X (Thời gian Mô Phỏng)
+            // Tính toán bước nhảy cho trục X dựa trên MAX_STEPS
+            const total_steps_display = MAX_STEPS > 0 ? MAX_STEPS : 1; 
+            // Điều chỉnh bước nhảy thành bội số của 100 hoặc 50 tùy theo độ dài
+            let tickStepT;
+            if (total_steps_display > 500) {
+                tickStepT = 200; // Bước nhảy lớn hơn cho đồ thị rất dài
+            } else if (total_steps_display > 300) {
+                tickStepT = 100;
+            } else {
+                tickStepT = 50;
+            }
+            
+
+            for (let t = 0; t <= total_steps_display; t += tickStepT) {
+                const x = scaleX(t);
+                
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute('x', x);
+                text.setAttribute('y', CHART_HEIGHT - PADDING + 20);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('font-size', '12');
+                text.setAttribute('fill', '#4b5563');
+                text.textContent = `${t}`;
+                svgChart.appendChild(text);
+                
+                if (t === 0) {
+                     // Vẽ thêm nhãn "0" nếu t=0 bị bỏ qua
+                     const zeroLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                     zeroLabel.setAttribute('x', scaleX(0));
+                     zeroLabel.setAttribute('y', CHART_HEIGHT - PADDING + 20);
+                     zeroLabel.setAttribute('text-anchor', 'middle');
+                     zeroLabel.setAttribute('font-size', '12');
+                     zeroLabel.setAttribute('fill', '#4b5563');
+                     zeroLabel.textContent = `0`;
+                     svgChart.appendChild(zeroLabel);
+                }
+            }
+
+            // Nhãn trục X và Y
+            const labelX = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            labelX.setAttribute('x', CHART_WIDTH / 2);
+            labelX.setAttribute('y', CHART_HEIGHT);
+            labelX.setAttribute('text-anchor', 'middle');
+            labelX.setAttribute('font-size', '14');
+            labelX.setAttribute('fill', '#1f2937');
+            labelX.textContent = "Thời Gian Mô Phỏng (t)";
+            svgChart.appendChild(labelX);
+
+            const labelY = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            labelY.setAttribute('x', 15);
+            labelY.setAttribute('y', CHART_HEIGHT / 2);
+            labelY.setAttribute('transform', `rotate(-90, 15, ${CHART_HEIGHT / 2})`);
+            labelY.setAttribute('text-anchor', 'middle');
+            labelY.setAttribute('font-size', '14');
+            labelY.setAttribute('fill', '#1f2937');
+            labelY.textContent = "Nhiệt Độ (°C)";
+            svgChart.appendChild(labelY);
+        }
+
+        // Tự động chạy khi tải trang
+        window.onload = function() {
+            // Đặt sự kiện lắng nghe để cập nhật khi người dùng thay đổi input
+            document.querySelectorAll('input[type="number"]').forEach(input => {
+                input.addEventListener('input', startSimulation);
+            });
+            // Chạy lần đầu
+            startSimulation();
+        };
+    </script>
+</body>
+</html>

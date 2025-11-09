@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiểm Tra Kiến Thức Nhiệt Học</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load MathJax -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* Custom scrollbar for question numbers */
+        #question-numbers {
+            /* Ensure horizontal scrolling for small screens if needed, but keeping grid */
+            overflow-x: auto;
+        }
+        #question-numbers::-webkit-scrollbar {
+            height: 4px; /* Changed from width to height for horizontal scroll */
+        }
+        #question-numbers::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 2px;
+        }
+        
+        /* CẬP NHẬT: Style cho đáp án được chọn (rõ ràng hơn) */
+        .option-item.selected-option { 
+            background-color: #dbeafe; /* Tailwind blue-100 (Màu xanh dương nhạt) */
+            border-color: #3b82f6;    /* Tailwind blue-500 (Viền xanh dương đậm) */
+            border-width: 2px;
+        }
+
+        /* Styles sau khi nộp bài */
+        .option-item.correct-answer {
+            background-color: #d1fae5 !important; /* light green */
+            border-color: #10b981 !important;   /* primary green */
+            border-width: 2px !important;
+        }
+        .option-item.incorrect-answer {
+            background-color: #fee2e2 !important; /* light red */
+            border-color: #ef4444 !important;   /* red */
+            border-width: 2px !important;
+        }
+        .option-item.correct-selected {
+             background-color: #a7f3d0 !important; /* darker light green */
+             border-color: #059669 !important; /* secondary green */
+             border-width: 2px !important;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': '#10b981',
+                        'secondary': '#059669',
+                    }
+                }
+            }
+        }
+
+        // Configuration for MathJax
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+
+        const questionsData = [
+            // Mức độ 1: Biết (Nhớ kiến thức SGK)
+            { id: 1, level: "Biết", question: "Nhiệt dung riêng ($c$) của một chất cho biết điều gì?", options: ["Nhiệt lượng cần cung cấp để làm nóng toàn bộ khối chất lên $100^\\circ \\text{C}$.", "Nhiệt lượng cần cung cấp để $1\\text{ kg}$ chất đó tăng $1^\\circ \\text{C}$ (hoặc $1\\text{ K}$).", "Nhiệt độ tối đa mà chất đó có thể đạt được khi được cung cấp nhiệt.", "Khả năng của vật chất dẫn nhiệt tốt hay kém."], answer: 1, rationale: "Đây là định nghĩa chính xác của nhiệt dung riêng, liên quan đến lượng nhiệt trên mỗi đơn vị khối lượng và mỗi đơn vị độ tăng nhiệt độ." },
+            { id: 2, level: "Biết", question: "Đơn vị chuẩn trong hệ $\\text{SI}$ của Nhiệt hóa hơi riêng ($L$) là gì?", options: ["$\\text{J/K}$", "$\\text{J/kg}$", "$\\text{J/kg}\\cdot\\text{K}$", "$\\text{J}\\cdot\\text{kg}$"], answer: 1, rationale: "Nhiệt hóa hơi riêng là nhiệt lượng ($J$) cần thiết để làm $1\\text{ kg}$ chất lỏng hóa hơi (tức là $\\text{J/kg}$)."},
+            { id: 3, level: "Biết", question: "Trong quá trình nóng chảy, để áp dụng công thức tính nhiệt nóng chảy riêng ($\\lambda$), vật chất phải ở điều kiện nào?", options: ["Nhiệt độ phòng $\\left(25^\\circ \\text{C}\\right)$.", "Nhiệt độ nóng chảy của nó.", "Áp suất rất cao.", "Phải có nhiệt dung riêng lớn."], answer: 1, rationale: "Nóng chảy là một quá trình chuyển pha đẳng nhiệt xảy ra chính xác tại nhiệt độ nóng chảy của chất đó."},
+            { id: 4, level: "Biết", question: "Cân bằng nhiệt trong một hệ kín được định nghĩa là trạng thái mà tại đó:", options: ["Tổng nhiệt lượng tỏa ra bằng $0$.", "Tất cả các vật trong hệ thống đạt được cùng một nhiệt độ.", "Chỉ có sự trao đổi nhiệt bằng bức xạ.", "Vật có khối lượng lớn hơn tỏa nhiệt cho vật có khối lượng nhỏ hơn."], answer: 1, rationale: "Cân bằng nhiệt xảy ra khi không còn sự trao đổi nhiệt giữa các vật, tức là chúng đã đạt cùng một nhiệt độ ổn định."},
+            { id: 5, level: "Biết", question: "Công thức cơ bản nào dùng để tính nhiệt lượng vật thu vào hay tỏa ra khi nhiệt độ vật thay đổi $\\left(\\Delta t\\right)$ mà không có sự chuyển pha?", options: ["$Q = P t$", "$Q = L m$", "$Q = m c \\Delta t$", "$Q = \\frac{1}{2} m v^2$"], answer: 2, rationale: "Đây là công thức cơ bản và chính xác, bao gồm khối lượng ($m$), nhiệt dung riêng ($c$) và độ thay đổi nhiệt độ ($\\Delta t$)." },
+            // Mức độ 2: Hiểu (Thí nghiệm, hiện tượng tự nhiên)
+            { id: 6, level: "Hiểu", question: "Vào mùa hè, nhiệt độ đất ở ven biển thay đổi nhanh hơn nhiệt độ nước biển. Giải thích nào sau đây là đúng nhất?", options: ["Nước biển có khối lượng lớn hơn đất.", "Nước có nhiệt dung riêng lớn hơn đất.", "Đất dẫn nhiệt tốt hơn nước.", "Nước biển liên tục được làm mát bởi gió."], answer: 1, rationale: "Nước có nhiệt dung riêng rất lớn, nên để làm thay đổi nhiệt độ nước một lượng nhỏ cần một lượng nhiệt lớn hơn nhiều so với đất (với cùng khối lượng), do đó nước ấm lên và nguội đi chậm hơn."},
+            { id: 7, level: "Hiểu", question: "Tại sao việc đổ mồ hôi lại giúp cơ thể người làm mát?", options: ["Quá trình thoát hơi nước không cần nhiệt lượng.", "Nhiệt lượng cần thiết cho mồ hôi hóa hơi được lấy từ cơ thể.", "Mồ hôi có nhiệt độ thấp hơn nhiệt độ cơ thể.", "Mồ hôi tăng khả năng dẫn nhiệt của da ra môi trường."], answer: 1, rationale: "Khi mồ hôi (nước) bay hơi, nó thu nhiệt từ bề mặt da (cơ thể), làm giảm nhiệt độ của cơ thể và tạo cảm giác mát mẻ."},
+            { id: 8, level: "Hiểu", question: "Trong thực tế, người ta thường dùng nước đá để ướp lạnh. Điều này liên quan trực tiếp đến tính chất vật lý nào của nước?", options: ["Nhiệt dung riêng lớn của nước đá.", "Nhiệt hóa hơi riêng của nước rất lớn.", "Nhiệt nóng chảy riêng của nước đá lớn.", "Nước đá có khả năng cách nhiệt tốt."], answer: 2, rationale: "Trong suốt quá trình nước đá tan chảy thành nước (tại $0^\\circ \\text{C}$), nó liên tục thu một lượng nhiệt lớn (nhiệt nóng chảy riêng), giữ cho môi trường xung quanh ở nhiệt độ thấp và ổn định."},
+            { id: 9, level: "Hiểu", question: "Xét quá trình trao đổi nhiệt giữa hai vật $\\text{A}$ và $\\text{B}$ trong một hệ kín, biết nhiệt độ ban đầu của $\\text{A}$ cao hơn $\\text{B}$. Điều gì xảy ra?", options: ["Cả hai vật đều tỏa nhiệt.", "Vật $\\text{A}$ thu nhiệt và vật $\\text{B}$ tỏa nhiệt.", "Vật $\\text{A}$ tỏa nhiệt và vật $\\text{B}$ thu nhiệt.", "Chỉ có vật $\\text{B}$ tỏa nhiệt, vật $\\text{A}$ không đổi."], answer: 2, rationale: "Trao đổi nhiệt luôn diễn ra từ vật có nhiệt độ cao (A) sang vật có nhiệt độ thấp (B) cho đến khi đạt cân bằng."},
+            { id: 10, level: "Hiểu", question: "Tại sao các dụng cụ nấu ăn (như nồi, chảo) thường được làm bằng kim loại như nhôm hoặc gang?", options: ["Kim loại có nhiệt dung riêng lớn, giúp giữ nhiệt lâu.", "Kim loại có nhiệt dung riêng nhỏ và độ dẫn nhiệt tốt.", "Kim loại có nhiệt nóng chảy riêng lớn.", "Kim loại không bao giờ đạt đến nhiệt độ cân bằng với lửa."], answer: 1, rationale: "Nhiệt dung riêng nhỏ giúp nồi nhanh chóng đạt nhiệt độ cao; độ dẫn nhiệt tốt giúp nhiệt truyền nhanh và đều vào thức ăn, tiết kiệm thời gian."},
+            // Mức độ 3: Vận dụng (Ráp số vào công thức)
+            { id: 11, level: "Vận dụng", question: "Cần cung cấp bao nhiêu nhiệt lượng để làm nóng $2\\text{ kg}$ nước từ $20^\\circ \\text{C}$ lên $50^\\circ \\text{C}$? $\\left(c_{\\text{nước}} = 4200\\text{ J/kg}\\cdot\\text{K}\\right)$", options: ["$84000\\text{ J}$", "$252000\\text{ J}$", "$126000\\text{ J}$", "$105000\\text{ J}$"], answer: 1, rationale: "Áp dụng $Q = mc\\Delta t = 2 \\times 4200 \\times (50-20) = 252000\\text{ J}$."},
+            { id: 12, level: "Vận dụng", question: "Nếu cung cấp $10500\\text{ J}$ nhiệt lượng cho $0.5\\text{ kg}$ đồng, nhiệt độ của khối đồng sẽ tăng thêm bao nhiêu độ $\\text{C}$? $\\left(c_{\\text{đồng}} = 380\\text{ J/kg}\\cdot\\text{K}\\right)$", options: ["$27.63^\\circ \\text{C}$", "$55.26^\\circ \\text{C}$", "$19.00^\\circ \\text{C}$", "$70.00^\\circ \\text{C}$"], answer: 1, rationale: "Biến đổi công thức $\\Delta t = Q/(mc) = 10500 / (0.5 \\times 380) \\approx 55.26\\text{ K}$, hay $55.26^\\circ \\text{C}$."},
+            { id: 13, level: "Vận dụng", question: "Cần bao nhiêu nhiệt lượng để làm hóa hơi hoàn toàn $0.1\\text{ kg}$ nước ở $100^\\circ \\text{C}$? $\\left(L_{\\text{nước}} = 2.3 \\times 10^6\\text{ J/kg}\\right)$", options: ["$23000\\text{ J}$", "$230000\\text{ J}$", "$2300000\\text{ J}$", "$42000\\text{ J}$"], answer: 1, rationale: "Áp dụng công thức $Q = Lm = 2.3 \\times 10^6 \\times 0.1 = 230000\\text{ J}$."},
+            { id: 14, level: "Vận dụng", question: "$50\\text{ g}$ chì nóng chảy hoàn toàn cần $1250\\text{ J}$ nhiệt lượng. Nhiệt nóng chảy riêng ($\\lambda$) của chì là bao nhiêu?", options: ["$62500\\text{ J/kg}$", "$2500\\text{ J/kg}$", "$25000\\text{ J/kg}$", "$125000\\text{ J/kg}$"], answer: 2, rationale: "Đổi $m = 50\\text{ g} = 0.05\\text{ kg}$. Áp dụng $\\lambda = Q/m = 1250 / 0.05 = 25000\\text{ J/kg}$."},
+            { id: 15, level: "Vận dụng", question: "Một vật có nhiệt dung riêng $c=900\\text{ J/kg}\\cdot\\text{K}$, khi nhiệt độ tăng $10^\\circ \\text{C}$ thì vật thu $18000\\text{ J}$ nhiệt lượng. Khối lượng của vật là bao nhiêu?", options: ["$1\\text{ kg}$", "$2\\text{ kg}$", "$4\\text{ kg}$", "$0.5\\text{ kg}$"], answer: 1, rationale: "Áp dụng công thức biến đổi $m = Q / (c\\Delta t) = 18000 / (900 \\times 10) = 2\\text{ kg}$."},
+            // Mức độ 4: Vận dụng kỹ thuật (Biến đổi phức tạp)
+            { id: 16, level: "Vận dụng Kỹ thuật", question: "Trộn $1\\text{ kg}$ nước ở $80^\\circ \\text{C}$ với $1\\text{ kg}$ nước ở $20^\\circ \\text{C}$ trong một nhiệt lượng kế. Bỏ qua mọi sự trao đổi nhiệt với môi trường. Nhiệt độ cân bằng của hỗn hợp là bao nhiêu?", options: ["$40^\\circ \\text{C}$", "$50^\\circ \\text{C}$", "$60^\\circ \\text{C}$", "$70^\\circ \\text{C}$"], answer: 1, rationale: "Áp dụng phương trình cân bằng nhiệt $m_1 c \\Delta t_1 = m_2 c \\Delta t_2$. Vì $m_1=m_2$ và cùng chất ($c_1=c_2$), nhiệt độ cân bằng là trung bình cộng: $t_c = (80+20)/2 = 50^\\circ \\text{C}$."},
+            { id: 17, level: "Vận dụng Kỹ thuật", question: "$2\\text{ kg}$ nước ($c_1=4200\\text{ J/kg}\\cdot\\text{K}$) ở $20^\\circ \\text{C}$ được trộn với $1\\text{ kg}$ kim loại ($c_2=900\\text{ J/kg}\\cdot\\text{K}$) ở $80^\\circ \\text{C}$. Nhiệt độ cân bằng $t_c$ của hỗn hợp là bao nhiêu?", options: ["$45.00^\\circ \\text{C}$", "$26.88^\\circ \\text{C}$", "$32.45^\\circ \\text{C}$", "$28.57^\\circ \\text{C}$"], answer: 1, rationale: "Phương trình cân bằng nhiệt: $m_2 c_2 (t_2 - t_c) = m_1 c_1 (t_c - t_1) \\implies 1 \\times 900 \\times (80 - t_c) = 2 \\times 4200 \\times (t_c - 20) \\implies 72000 - 900t_c = 8400t_c - 168000 \\implies 9300t_c = 240000 \\implies t_c \\approx 26.88^\\circ \\text{C}$."},
+            { id: 18, level: "Vận dụng Kỹ thuật", question: "Cần bao nhiêu nhiệt lượng để biến $0.5\\text{ kg}$ nước đá ở $0^\\circ \\text{C}$ thành nước lỏng ở $20^\\circ \\text{C}$? $\\left(\\lambda_{\\text{đá}} = 3.4 \\times 10^5\\text{ J/kg}, c_{\\text{nước}} = 4200\\text{ J/kg}\\cdot\\text{K}\\right)$", options: ["$170000\\text{ J}$", "$212000\\text{ J}$", "$254000\\text{ J}$", "$42000\\text{ J}$"], answer: 1, rationale: "Tổng nhiệt lượng $Q = Q_{\\text{nóng chảy}} + Q_{\\text{nước nóng}} = \\lambda m + m c \\Delta t = 3.4 \\times 10^5 \\times 0.5 + 0.5 \\times 4200 \\times 20 = 170000 + 42000 = 212000\\text{ J}$."},
+            { id: 19, level: "Vận dụng Kỹ thuật", question: "$0.2\\text{ kg}$ nước đá ở $-10^\\circ \\text{C}$ được làm nóng đến $10^\\circ \\text{C}$ và cần tổng nhiệt lượng $Q = 80400\\text{ J}$. Nếu $c_{\\text{nước đá}}=2100\\text{ J/kg}\\cdot\\text{K}$ và $c_{\\text{nước}}=4200\\text{ J/kg}\\cdot\\text{K}$, tính nhiệt nóng chảy riêng $\\lambda$ của nước đá.", options: ["$3.4 \\times 10^5\\text{ J/kg}$", "$2.3 \\times 10^6\\text{ J/kg}$", "$4.2 \\times 10^5\\text{ J/kg}$", "$1.5 \\times 10^5\\text{ J/kg}$"], answer: 0, rationale: "Tổng nhiệt lượng $Q = Q_{\\text{tăng đá}} + Q_{\\text{nóng chảy}} + Q_{\\text{nước nóng}}$. $Q_{\\text{thu}} = m c_{\\text{đá}} (10) + m \\lambda + m c_{\\text{nước}} (10) = 0.2 \\times 2100 \\times 10 + 0.2 \\lambda + 0.2 \\times 4200 \\times 10 = 4200 + 0.2 \\lambda + 8400$. $80400 = 12600 + 0.2 \\lambda \\implies 0.2 \\lambda = 67800 \\implies \\lambda = 339000\\text{ J/kg}$, gần bằng $3.4 \\times 10^5\\text{ J/kg}$."},
+            { id: 20, level: "Vận dụng Kỹ thuật", question: "$1\\text{ kg}$ nước ở $20^\\circ \\text{C}$ được đun nóng bằng bếp điện $1000\\text{ W}$ trong $5\\text{ phút}$ lên $60^\\circ \\text{C}$. Hiệu suất của bếp là bao nhiêu? $\\left(c_{\\text{nước}} = 4200\\text{ J/kg}\\cdot\\text{K}\\right)$", options: ["$42\\%$", "$56\\%$", "$84\\%$", "$100\\%$"], answer: 1, rationale: "Nhiệt lượng thu vào: $Q_{\\text{thu}} = 1 \\times 4200 \\times (60-20) = 168000\\text{ J}$. Nhiệt lượng toàn phần: $Q_{\\text{toàn phần}} = P t = 1000\\text{ W} \\times (5 \\times 60)\\text{ s} = 300000\\text{ J}$. Hiệu suất $H = Q_{\\text{thu}} / Q_{\\text{toàn phần}} = 168000 / 300000 = 0.56 = 56\\%$."}
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = {}; // { 0: 2, 1: 0, ... } index: selectedOptionIndex
+        let isSubmitted = false;
+        let startTime;
+        let timerInterval;
+
+        window.onload = () => {
+            initializeQuiz();
+        };
+
+        function initializeQuiz() {
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+            renderQuestionNumbers();
+            renderQuestion();
+        }
+
+        function updateTimer() {
+            const timeElapsed = Date.now() - startTime;
+            const totalSeconds = Math.floor(timeElapsed / 1000);
+            const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+            const seconds = String(totalSeconds % 60).padStart(2, '0');
+            document.getElementById('timer').textContent = `${minutes}:${seconds}`;
+        }
+
+        function renderQuestionNumbers() {
+            const container = document.getElementById('question-numbers');
+            container.innerHTML = '';
+            questionsData.forEach((q, index) => {
+                const button = document.createElement('button');
+                button.textContent = q.id;
+                button.className = 'w-10 h-10 flex items-center justify-center rounded-full text-sm font-medium border-2 transition-all duration-200 flex-shrink-0'; /* Added flex-shrink-0 for horizontal scrolling */
+                button.addEventListener('click', () => goToQuestion(index));
+
+                // Apply styles based on state
+                if (index === currentQuestionIndex) {
+                    button.classList.add('bg-primary', 'text-white', 'border-primary', 'scale-110');
+                } else if (userAnswers[index] !== undefined) {
+                    button.classList.add('bg-primary/20', 'text-primary', 'border-primary');
+                } else {
+                    button.classList.add('bg-gray-100', 'text-gray-700', 'border-gray-300', 'hover:bg-primary/10');
+                }
+
+                if (isSubmitted) {
+                    const isCorrect = userAnswers[index] === q.answer;
+                    if (isCorrect) {
+                        button.classList.remove('bg-primary/20', 'text-primary', 'border-primary');
+                        button.classList.add('bg-green-600', 'text-white', 'border-green-700');
+                    } else if (userAnswers[index] !== undefined) {
+                        button.classList.remove('bg-primary/20', 'text-primary', 'border-primary');
+                        button.classList.add('bg-red-600', 'text-white', 'border-red-700');
+                    } else {
+                        button.classList.add('bg-gray-400', 'text-white', 'border-gray-500');
+                    }
+                }
+
+                container.appendChild(button);
+            });
+        }
+
+        function renderQuestion() {
+            const questionData = questionsData[currentQuestionIndex];
+            const qContainer = document.getElementById('question-container');
+
+            // --- RENDER QUESTION DETAILS ---
+            qContainer.innerHTML = `
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-2xl font-bold text-gray-800">Câu ${questionData.id}</h2>
+                        <span class="text-sm font-semibold px-3 py-1 bg-primary text-white rounded-full shadow-md">${questionData.level}</span>
+                    </div>
+                    <div id="question-text" class="text-lg text-gray-700 p-4 bg-gray-50 rounded-lg shadow-inner">
+                        ${questionData.question}
+                    </div>
+                </div>
+
+                <div id="options-container" class="space-y-4">
+                    <!-- Options will be rendered here -->
+                </div>
+
+                <div id="rationale-box" class="mt-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded-lg hidden">
+                    <h3 class="font-bold mb-2">Giải thích chi tiết:</h3>
+                    <div id="rationale-text">${questionData.rationale}</div>
+                </div>
+            `;
+
+            // --- RENDER OPTIONS ---
+            const optionsContainer = document.getElementById('options-container');
+            questionData.options.forEach((optionText, index) => {
+                const isSelected = userAnswers[currentQuestionIndex] === index;
+
+                const optionDiv = document.createElement('div');
+                optionDiv.id = `option-${index}`;
+                // Đảm bảo class 'selected-option' được áp dụng với độ ưu tiên cao hơn
+                optionDiv.className = `option-item p-4 border border-gray-300 rounded-xl cursor-pointer transition duration-150 ease-in-out hover:shadow-md bg-white ${isSelected ? 'selected-option' : ''}`;
+                optionDiv.innerHTML = `<span class="font-medium mr-3">${String.fromCharCode(65 + index)}.</span> <span class="option-content">${optionText}</span>`;
+
+                if (!isSubmitted) {
+                    optionDiv.addEventListener('click', () => selectOption(index));
+                }
+
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            // --- RENDER FOOTER BUTTONS ---
+            document.getElementById('prev-btn').disabled = currentQuestionIndex === 0;
+            document.getElementById('next-btn').disabled = currentQuestionIndex === questionsData.length - 1;
+
+            const submitBtn = document.getElementById('submit-btn');
+            if (isSubmitted) {
+                submitBtn.textContent = 'Đã Nộp Bài';
+                submitBtn.disabled = true;
+            } else {
+                submitBtn.textContent = 'Nộp Bài';
+                submitBtn.disabled = false;
+            }
+
+            // --- APPLY STYLES AFTER SUBMISSION ---
+            if (isSubmitted) {
+                applySubmissionStyles(questionData);
+            }
+
+            // Important: Typeset MathJax after inserting content
+            MathJax.typesetPromise([qContainer]).catch((err) => console.error("MathJax typesetting error:", err));
+            renderQuestionNumbers();
+        }
+
+        function applySubmissionStyles(questionData) {
+            document.getElementById('rationale-box').classList.remove('hidden');
+
+            questionData.options.forEach((_, index) => {
+                const optionDiv = document.getElementById(`option-${index}`);
+                optionDiv.classList.remove('selected-option', 'hover:shadow-md', 'cursor-pointer');
+
+                // Mark correct answer
+                if (index === questionData.answer) {
+                    optionDiv.classList.add('correct-answer', 'shadow-lg');
+                }
+
+                // Mark user's choice
+                if (userAnswers[currentQuestionIndex] === index) {
+                    if (index === questionData.answer) {
+                        // Correctly answered
+                        optionDiv.classList.add('correct-selected', 'shadow-lg');
+                    } else {
+                        // Incorrectly answered
+                        optionDiv.classList.add('incorrect-answer', 'shadow-lg');
+                    }
+                }
+            });
+        }
+
+        function selectOption(index) {
+            if (isSubmitted) return;
+
+            // Update user answer
+            userAnswers[currentQuestionIndex] = index;
+
+            // CẬP NHẬT: Loại bỏ và thêm class 'selected-option'
+            const optionsContainer = document.getElementById('options-container');
+            Array.from(optionsContainer.children).forEach((optionDiv, optIndex) => {
+                // Đảm bảo class 'selected-option' bị loại bỏ khỏi tất cả các tùy chọn khác
+                optionDiv.classList.remove('selected-option');
+                if (optIndex === index) {
+                    optionDiv.classList.add('selected-option');
+                }
+            });
+
+            // Rerender question numbers for feedback
+            renderQuestionNumbers();
+        }
+
+        function goToQuestion(index) {
+            if (index >= 0 && index < questionsData.length) {
+                currentQuestionIndex = index;
+                renderQuestion();
+                // Ensure correct scrolling behavior
+                const qNumContainer = document.getElementById('question-numbers');
+                const btn = qNumContainer.children[index];
+                if (btn) {
+                    // Scroll the button into view (important for horizontal scroll on mobile)
+                    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                goToQuestion(currentQuestionIndex - 1);
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questionsData.length - 1) {
+                goToQuestion(currentQuestionIndex + 1);
+            }
+        }
+
+        function submitQuiz() {
+            if (isSubmitted) return;
+
+            // Simple check to ensure all questions are answered (optional)
+            const answeredCount = Object.keys(userAnswers).length;
+            if (answeredCount < questionsData.length) {
+                // IMPORTANT: Replacing window.confirm() with console.error and custom message logic
+                // For this environment, we must avoid native confirmation dialogs.
+                console.warn(`Tự động nộp bài với ${questionsData.length - answeredCount} câu chưa trả lời.`);
+            }
+            
+            // Stop timer
+            clearInterval(timerInterval);
+            isSubmitted = true;
+
+            // Calculate score
+            let score = 0;
+            questionsData.forEach((q, index) => {
+                if (userAnswers[index] === q.answer) {
+                    score++;
+                }
+            });
+
+            // Display result modal
+            const totalSeconds = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+            const seconds = String(totalSeconds % 60).padStart(2, '0');
+
+            const resultModal = document.getElementById('result-modal');
+            document.getElementById('final-score').textContent = `${score}/${questionsData.length}`;
+            document.getElementById('final-time').textContent = `${minutes}:${seconds}`;
+            resultModal.classList.remove('hidden');
+
+            // Update UI
+            renderQuestion();
+        }
+
+        // --- NEW FUNCTION TO RESET QUIZ ---
+        function resetQuiz() {
+            // 1. Stop the current timer
+            clearInterval(timerInterval);
+
+            // 2. Reset state variables
+            currentQuestionIndex = 0;
+            userAnswers = {};
+            isSubmitted = false;
+            
+            // 3. Close modal if open
+            document.getElementById('result-modal').classList.add('hidden');
+
+            // 4. Re-initialize the quiz (this restarts the timer and renders the first question)
+            initializeQuiz(); 
+            
+            // 5. Provide feedback (optional, but good practice)
+            console.log("Bài kiểm tra đã được làm lại.");
+        }
+        // --- END NEW FUNCTION ---
+
+        function closeModal() {
+            document.getElementById('result-modal').classList.add('hidden');
+        }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans antialiased">
+
+    <!-- Result Modal (No changes here) -->
+    <div id="result-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-xl p-8 max-w-lg w-full shadow-2xl transform transition-all scale-100 opacity-100">
+            <h2 class="text-3xl font-extrabold text-primary mb-4 text-center">HOÀN THÀNH BÀI KIỂM TRA</h2>
+            <div class="space-y-3 text-lg">
+                <p class="flex justify-between items-center border-b pb-2">
+                    <span class="font-medium text-gray-600">Số câu đúng:</span>
+                    <span id="final-score" class="font-bold text-2xl text-green-600"></span>
+                </p>
+                <p class="flex justify-between items-center border-b pb-2">
+                    <span class="font-medium text-gray-600">Tổng thời gian:</span>
+                    <span id="final-time" class="font-bold text-xl text-gray-800"></span>
+                </p>
+                <p class="text-center text-sm pt-4 text-gray-500">
+                    Bây giờ bạn có thể xem lại chi tiết từng câu hỏi để thấy đáp án và giải thích.
+                </p>
+            </div>
+            <button onclick="closeModal()" class="mt-6 w-full py-3 bg-primary hover:bg-secondary text-white font-semibold rounded-lg shadow-md transition duration-200">
+                Xem Bài Giải Chi Tiết
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="min-h-screen lg:flex">
+
+        <!-- Column 1: Navigation and Timer (Sidebar on Desktop, Full-width header on Mobile) -->
+        <div class="w-full lg:w-72 bg-white p-6 lg:shadow-xl flex flex-col z-10 
+                    lg:static lg:h-screen lg:border-r border-gray-200 
+                    shadow-md"> 
+            
+		<h1 class="text-1xl font-bold text-blue-600 tracking-wide">
+			  <center>20 CÂU ÔN TẬP NHIỆT LƯỢNG</center>
+		</h1>
+
+
+            <!-- Timer -->
+            <div class="bg-blue-50 p-3 rounded-xl text-center mb-4 lg:mb-6 shadow-inner flex-shrink-0">
+                <p class="text-sm font-medium text-blue-600 mb-1">Thời gian làm bài</p>
+                <div id="timer" class="text-3xl font-mono font-bold text-blue-800">00:00</div>
+            </div>
+
+            <!-- Question Numbers - Now horizontal scroll on mobile, vertical on desktop -->
+            <div class="lg:flex-grow lg:overflow-y-auto">
+                <div id="question-numbers" class="flex flex-row space-x-2 pb-4 overflow-x-auto lg:grid lg:grid-cols-5 lg:gap-3 lg:space-x-0">
+                    <!-- Question buttons will be rendered here -->
+                </div>
+            </div>
+            
+            <!-- REPLAY BUTTON -->
+            <button onclick="resetQuiz()" 
+                    class="w-full py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg shadow-md transition duration-200 mt-4 lg:mt-6 text-sm sm:text-base flex-shrink-0">
+                Làm Lại Bài Kiểm Tra
+            </button>
+        </div>
+
+        <!-- Column 2: Quiz Content -->
+        <main class="flex-grow p-4 lg:p-10">
+            <div class="max-w-4xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-2xl min-h-[85vh]">
+                <!-- Question Container -->
+                <div id="question-container" class="mb-8">
+                    <!-- Question content will be rendered here -->
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="flex justify-between items-center pt-6 border-t border-gray-200">
+                    <button id="prev-btn" onclick="prevQuestion()"
+                            class="px-4 py-2 sm:px-6 sm:py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg shadow-sm hover:bg-gray-300 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        Câu Trước
+                    </button>
+
+                    <button id="submit-btn" onclick="submitQuiz()"
+                            class="px-6 py-2 sm:px-8 sm:py-3 bg-red-600 text-white font-bold rounded-lg shadow-lg hover:bg-red-700 transition duration-150 focus:outline-none focus:ring-4 focus:ring-red-300 text-sm sm:text-base">
+                        Nộp Bài
+                    </button>
+
+                    <button id="next-btn" onclick="nextQuestion()"
+                            class="px-4 py-2 sm:px-6 sm:py-3 bg-primary text-white font-semibold rounded-lg shadow-sm hover:bg-secondary transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base">
+                        Câu Sau
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 inline-block ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- IMPORTANT: Must remove window.confirm to comply with sandbox rules -->
+    <script>
+        // Find the submitQuiz function and remove window.confirm
+        const originalSubmitQuiz = submitQuiz;
+        submitQuiz = function() {
+            if (isSubmitted) return;
+
+            const answeredCount = Object.keys(userAnswers).length;
+            if (answeredCount < questionsData.length) {
+                // Modified: Instead of window.confirm, just proceed or use a console warning/log
+                console.warn(`Tự động nộp bài với ${questionsData.length - answeredCount} câu chưa trả lời.`);
+            }
+            
+            // Proceed with submission logic
+            clearInterval(timerInterval);
+            isSubmitted = true;
+
+            let score = 0;
+            questionsData.forEach((q, index) => {
+                if (userAnswers[index] === q.answer) {
+                    score++;
+                }
+            });
+
+            const totalSeconds = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+            const seconds = String(totalSeconds % 60).padStart(2, '0');
+
+            const resultModal = document.getElementById('result-modal');
+            document.getElementById('final-score').textContent = `${score}/${questionsData.length}`;
+            document.getElementById('final-time').textContent = `${minutes}:${seconds}`;
+            resultModal.classList.remove('hidden');
+
+            renderQuestion();
+        }
+
+        // Re-implement goToQuestion to use the correct scrolling behavior for the new mobile layout
+        const originalGoToQuestion = goToQuestion;
+        goToQuestion = function(index) {
+            if (index >= 0 && index < questionsData.length) {
+                currentQuestionIndex = index;
+                renderQuestion();
+                const qNumContainer = document.getElementById('question-numbers');
+                const btn = qNumContainer.children[index];
+                if (btn) {
+                    // Scroll the button into view (important for horizontal scroll on mobile)
+                    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
