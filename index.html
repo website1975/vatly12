@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vật Lý 12</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: #ecf0f1;
+  }
+
+  /* Panel trái */
+  #left-panel {
+    width: 120px;
+    background: linear-gradient(180deg, #1e3c72, #2a5298);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 10px;
+    box-shadow: 3px 0 8px rgba(0, 0, 0, 0.2);
+  }
+
+  #left-panel h2 {
+    font-weight: 600;
+    font-size: 22px;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+
+  /* Nút menu */
+  .menu-btn {
+    width: 90%;
+    background: #3498db;
+    color: white;
+    border: none;
+    outline: none;
+    padding: 12px 0;
+    margin: 8px 0;
+    font-size: 17px;
+    font-weight: 500;
+    text-align: center;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
+  }
+
+  .menu-btn:hover {
+    transform: translateY(2px);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+    background: #2980b9;
+  }
+
+  /* Panel phải */
+  #right-panel {
+    flex: 1;
+    background-color: #f4f6f8;
+  }
+
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+</style>
+</head>
+<body>
+
+  <div id="left-panel">
+    <center><h2 >VẬT LÝ 12 (CTST) </h2></center>
+    <button class="menu-btn" onclick="openLink('chuong1/index.html')">VẬT LÝ NHIỆT</button>
+    <button class="menu-btn" onclick="openLink('chuong2/index.html')">KHÍ LÝ TƯỞNG</button>
+    <button class="menu-btn" onclick="openLink('chuong3/index.html')">TỪ TRƯỜNG</button>
+    <button class="menu-btn" onclick="openLink('chuong4/index.html')">VẬT LÝ HẠT NHÂN</button>
+  </div>
+
+  <div id="right-panel">
+    <iframe id="content-frame" src="chuong1/index.html"></iframe>
+  </div>
+
+<script>
+  function openLink(url) {
+    document.getElementById('content-frame').src = url;
+  }
+</script>
+
+</body>
+</html>
