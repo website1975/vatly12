@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô phỏng Áp suất Lốp và Diện tích Tiếp xúc</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải MathJax cho việc hiển thị công thức LaTeX -->
+        <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+</script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <style>
+        /* Tùy chỉnh font Inter cho giao diện */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* Nền tối */
+            color: #c9d1d9;
+        }
+        /* Style cho thanh trượt */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #2e89ff;
+            cursor: pointer;
+            box-shadow: 0 0 5px #2e89ff;
+        }
+        input[type=range]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #2e89ff;
+            cursor: pointer;
+            box-shadow: 0 0 5px #2e89ff;
+        }
+        /* Style cho nút reset */
+        .reset-button {
+            transition: all 0.3s ease;
+        }
+        .reset-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(46, 137, 255, 0.4);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <h1 class="text-3xl font-bold mb-6 text-center text-blue-400">
+        Mô Phỏng Áp suất và Diện tích Tiếp xúc Lốp Xe
+    </h1>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Cột 1: Hình ảnh Lốp xe và Điều khiển -->
+        <div class="lg:col-span-1 p-5 bg-[#161b22] border border-[#30363d] rounded-xl shadow-lg">
+            <h2 class="text-xl font-semibold mb-4 text-white">1. Hình ảnh Mô phỏng Lốp xe</h2>
+            
+            <!-- Khu vực Điều khiển -->
+            <div class="mb-6">
+                <label for="pressureSlider" class="block text-sm font-medium mb-2 text-gray-400">
+                    Điều chỉnh Áp suất Dư (Gauge Pressure)
+                </label>
+                <input type="range" id="pressureSlider" min="0" max="400" value="200" step="5"
+                       class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                       oninput="updateSimulation(this.value)">
+                <div class="flex justify-between text-sm mt-1 text-gray-500">
+                    <span>$0 \text{ kPa}$ (Xẹp)</span>
+                    <span>$400 \text{ kPa}$ (Max)</span>
+                </div>
+            </div>
+
+            <!-- Khu vực Hình ảnh Lốp xe (Sử dụng SVG để dễ dàng thay đổi) -->
+            <div class="flex justify-center items-center h-64 bg-[#0d1117] rounded-lg border border-gray-700">
+                <svg id="tireSvg" width="250" height="250" viewBox="0 0 250 250">
+                    <!-- Đường đất/mặt đường -->
+                    <line x1="0" y1="200" x2="250" y2="200" stroke="#4c4f52" stroke-width="2"/>
+                    
+                    <!-- Lốp xe (Vỏ) - Dạng hình xuyến (Toroid-like) -->
+                    <!-- Vòng ngoài của lốp -->
+                    <circle cx="125" cy="125" r="100" fill="none" stroke="#282a2e" stroke-width="20" id="tireCasing" />
+                    <!-- Vành xe (Rim) - Khung tròn -->
+                    <circle cx="125" cy="125" r="50" fill="#a0a0a0" stroke="#ffffff" stroke-width="3" />
+                    
+                    <!-- Ruột Lốp (Tưởng tượng) - màu xanh nhạt hơn, áp suất -->
+                    <circle cx="125" cy="125" r="80" fill="lightblue" opacity="0.1" />
+
+                    <!-- Vòng ngoài của lốp (Dùng lại để che ruột, tạo cảm giác dày) -->
+                    <circle cx="125" cy="125" r="100" fill="none" stroke="#282a2e" stroke-width="20" />
+                    
+                    <!-- Vị trí tiếp xúc mặt đường (Contact Patch) -->
+                    <!-- Màu đậm hơn, đại diện cho phần lốp bị biến dạng tiếp xúc với mặt đất -->
+                    <rect id="contactPatch" x="100" y="195" width="50" height="10" rx="2" fill="#585c60" />
+                    
+                    <!-- Ánh sáng/phản chiếu -->
+                    <circle cx="100" cy="80" r="10" fill="white" opacity="0.1" />
+                </svg>
+            </div>
+            
+            <div class="mt-4 text-sm text-center">
+                <p class="text-yellow-400 font-medium">Quan sát: Diện tích tiếp xúc (hình chữ nhật) sẽ thay đổi khi Áp suất Dư thay đổi.</p>
+            </div>
+            
+        </div>
+
+        <!-- Cột 2: Hiển thị Áp suất -->
+        <div class="lg:col-span-1 p-5 bg-[#161b22] border border-[#30363d] rounded-xl shadow-lg">
+            <h2 class="text-xl font-semibold mb-4 text-white">2. Hiển thị Giá trị Áp suất</h2>
+
+            <!-- Hằng số và Giải thích -->
+            <div class="bg-blue-900/30 p-4 rounded-lg mb-4">
+                <p class="text-blue-300 font-semibold mb-2">Giá trị Tham chiếu (Khí quyển)</p>
+                <div class="flex justify-between items-center text-lg">
+                    <span class="font-light">Áp suất Khí quyển $P_{\text{kq}}$:</span>
+                    <span id="pAtmDisplay" class="font-bold text-blue-300">$101.3 \text{ kPa}$</span>
+                </div>
+                <p class="text-sm italic text-gray-400 mt-1">
+                    $\approx 1 \text{ atm}$ $\approx 1.013 \text{ bar}$
+                </p>
+            </div>
+
+            <!-- Công thức Cân bằng Áp suất Lốp -->
+            <div class="bg-gray-700/50 p-4 rounded-lg mb-6 border-l-4 border-purple-500">
+                <p class="text-sm font-light text-purple-300 mb-2">Công thức Cân bằng Lực (Tải trọng $F$, Diện tích $A$):</p>
+                <!-- Công thức yêu cầu $P_{\text{tuyệt đối}} = P_0 + F/A$ -->
+                $$P_{\text{tuyệt đối}} = P_{\text{kq}} + \frac{F}{A}$$
+            </div>
+
+            <!-- Hiển thị Áp suất Dư -->
+            <div class="bg-gray-800 p-4 rounded-lg mb-4 border-l-4 border-yellow-500">
+                <p class="text-sm font-light text-yellow-400">Áp suất Dư (Gauge Pressure) $P_{\text{dư}}$</p>
+                <span id="pGaugeDisplay" class="text-3xl font-extrabold text-yellow-300">200 kPa</span>
+            </div>
+
+            <!-- Hiển thị Áp suất Tuyệt đối -->
+            <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-green-500">
+                <p class="text-sm font-light text-green-400">Áp suất Tuyệt đối (Absolute Pressure) $P_{\text{tuyệt đối}}$</p>
+                <span id="pAbsoluteDisplay" class="text-3xl font-extrabold text-green-300">301.3 kPa</span>
+            </div>
+            
+            <div class="mt-6 text-sm text-center">
+                <button onclick="resetSimulation()" class="reset-button bg-red-600 text-white px-4 py-2 rounded-lg font-medium shadow-md">
+                    Đặt lại Áp suất
+                </button>
+            </div>
+        </div>
+
+        <!-- Cột 3: Tóm tắt Kiến thức Lý thuyết -->
+        <div class="lg:col-span-1 p-5 bg-[#161b22] border border-[#30363d] rounded-xl shadow-lg">
+            <h2 class="text-xl font-semibold mb-4 text-white">3. Tóm tắt Lý thuyết về Áp suất</h2>
+            
+            <div class="space-y-4 text-gray-300">
+                
+                <h3 class="text-lg font-semibold text-yellow-500">① Áp suất Khí quyển $P_{\text{kq}}$</h3>
+                <ul class="list-disc list-inside ml-4 space-y-2">
+                    <li><strong class="text-white">Định nghĩa:</strong> Là áp suất do trọng lượng của cột không khí (khí quyển) tác động lên bề mặt Trái đất.</li>
+                    <li><strong class="text-white">Giá trị chuẩn:</strong> Thường được coi là hằng số cho các mục đích tính toán đơn giản, khoảng $101.325 \text{ kPa}$ ($1 \text{ atm}$ hoặc $1.013 \text{ bar}$) ở mực nước biển.</li>
+                    <li><strong class="text-white">Tính chất:</strong> Nó là điểm tham chiếu (mức 0) cho áp suất dư.</li>
+                </ul>
+
+                <hr class="border-gray-700">
+
+                <h3 class="text-lg font-semibold text-yellow-300">② Áp suất Dư (Gauge Pressure) $P_{\text{dư}}$</h3>
+                <ul class="list-disc list-inside ml-4 space-y-2">
+                    <li><strong class="text-white">Định nghĩa:</strong> Là chênh lệch áp suất giữa áp suất bên trong hệ thống (lốp xe) và áp suất khí quyển xung quanh.</li>
+                    <li><strong class="text-white">Thiết bị đo:</strong> Đây là giá trị mà hầu hết các đồng hồ đo áp suất lốp thông thường (gauge) hiển thị.</li>
+                    <li><strong class="text-white">Công thức:</strong> $P_{\text{dư}} = P_{\text{tuyệt đối}} - P_{\text{khí quyển}}$.</li>
+                </ul>
+
+                <hr class="border-gray-700">
+                
+                <h3 class="text-lg font-semibold text-green-500">③ Áp suất Tuyệt đối (Absolute Pressure) $P_{\text{tuyệt đối}}$</h3>
+                <ul class="list-disc list-inside ml-4 space-y-2">
+                    <li><strong class="text-white">Định nghĩa:</strong> Là tổng áp suất của hệ thống được đo so với chân không hoàn toàn (áp suất 0 tuyệt đối).</li>
+                    <li><strong class="text-white">Công thức:</strong> $P_{\text{tuyệt đối}} = P_{\text{dư}} + P_{\text{khí quyển}}$.</li>
+                    <li><strong class="text-white">Sử dụng:</strong> Quan trọng trong các tính toán khoa học, vật lý khí lý tưởng (PV=nRT), và các ứng dụng chân không.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hằng số
+        const P_ATM = 101.3; // Áp suất khí quyển chuẩn, đơn vị: kPa
+        const P_MAX_GAUGE = 400; // Áp suất dư tối đa trong mô phỏng
+        const CONTACT_PATCH_MAX_HEIGHT = 20; // Chiều cao tối đa của vùng tiếp xúc (ở 0 kPa)
+        const CONTACT_PATCH_MIN_HEIGHT = 5;  // Chiều cao tối thiểu của vùng tiếp xúc (ở P_MAX)
+
+        // Lấy các phần tử DOM
+        const slider = document.getElementById('pressureSlider');
+        const pGaugeDisplay = document.getElementById('pGaugeDisplay');
+        const pAbsoluteDisplay = document.getElementById('pAbsoluteDisplay');
+        const contactPatch = document.getElementById('contactPatch');
+        const tireCasing = document.getElementById('tireCasing');
+
+        // Hàm cập nhật mô phỏng
+        function updateSimulation(gaugePressureValue) {
+            // 1. Chuyển đổi giá trị sang dạng số
+            const P_gauge = parseFloat(gaugePressureValue);
+
+            // 2. Tính toán Áp suất Tuyệt đối
+            const P_absolute = P_gauge + P_ATM;
+
+            // 3. Cập nhật hiển thị (Cột 2)
+            // Thay đổi cách hiển thị: sử dụng MathJax cho đơn vị kPa
+            // Tuy nhiên, do đây là nội dung động (dynamic content) được cập nhật bằng JS,
+            // ta phải sử dụng một wrapper để MathJax xử lý lại. Ta sẽ giữ nguyên JS, 
+            // và sửa định dạng tĩnh HTML để nó hiển thị đúng.
+            pGaugeDisplay.innerHTML = `${P_gauge.toFixed(1)} <span class="math-unit">kPa</span>`;
+            pAbsoluteDisplay.innerHTML = `${P_absolute.toFixed(1)} <span class="math-unit">kPa</span>`;
+
+            // 4. Cập nhật Visualization (Cột 1)
+            
+            // Tính toán sự biến dạng/chiều cao vùng tiếp xúc (tỉ lệ nghịch với áp suất dư)
+            let normalizedPressure = P_gauge / P_MAX_GAUGE;
+            if (normalizedPressure > 1) normalizedPressure = 1;
+
+            // Chiều cao vùng tiếp xúc (Contact Patch Height)
+            // Khi P_gauge = 0, height = MAX (20)
+            // Khi P_gauge = 400, height = MIN (5)
+            const patchHeight = CONTACT_PATCH_MAX_HEIGHT - 
+                                (CONTACT_PATCH_MAX_HEIGHT - CONTACT_PATCH_MIN_HEIGHT) * normalizedPressure;
+            
+            // Chiều rộng vùng tiếp xúc (Width) - Giảm nhẹ khi áp suất tăng
+            const currentWidth = 50 - (10 * normalizedPressure);
+            const patchX = 125 - (currentWidth / 2); // Căn giữa
+
+            // Vị trí Y: Chiều cao + 200 (mặt đất) - 250 (viewbox height) = 200 - patchHeight
+            // Đặt Y sao cho đáy của hình chữ nhật chạm vào Y=200
+            const patchY = 200 - patchHeight; 
+
+            // Cập nhật thuộc tính SVG của vùng tiếp xúc
+            contactPatch.setAttribute('width', currentWidth.toFixed(1));
+            contactPatch.setAttribute('height', patchHeight.toFixed(1));
+            contactPatch.setAttribute('x', patchX.toFixed(1));
+            contactPatch.setAttribute('y', patchY.toFixed(1));
+
+            // Cập nhật đường viền lốp (tạo hiệu ứng lún nhẹ khi áp suất thấp)
+            // Giảm opacity và tăng blur nhẹ khi P thấp
+            const tireBlur = (1 - normalizedPressure) * 1.5; // Tối đa 1.5px blur
+            
+            if (P_gauge < 50) {
+                 // Dưới 50 kPa, lốp bị xẹp nhiều, contact patch gần như lấn ra ngoài
+                 // Để lốp có vẻ bị bẹt, ta có thể thay đổi bán kính Y của hình tròn
+                 // Tuy nhiên, việc này phức tạp trong SVG, ta dùng cách tạo hiệu ứng biến dạng (blur/color)
+                 tireCasing.setAttribute('stroke', '#a05c5c'); // Màu đỏ cảnh báo
+                 tireCasing.setAttribute('stroke-width', 22);
+            } else {
+                 tireCasing.setAttribute('stroke', '#282a2e');
+                 tireCasing.setAttribute('stroke-width', 20);
+            }
+            
+            // Quan trọng: Gọi MathJax để render lại nội dung động
+            if (window.MathJax) {
+                window.MathJax.typesetPromise([pGaugeDisplay, pAbsoluteDisplay]).catch((err) => console.error('MathJax Error:', err));
+            }
+        }
+        
+        // Hàm đặt lại mô phỏng
+        function resetSimulation() {
+            slider.value = 200; // Đặt về giá trị chuẩn (ví dụ 200 kPa)
+            updateSimulation(200);
+        }
+
+        // Khởi tạo mô phỏng khi tải trang
+        window.onload = function() {
+            // Thay đổi cách hiển thị: sử dụng MathJax cho đơn vị kPa
+            const pAtmDisplay = document.getElementById('pAtmDisplay');
+            pAtmDisplay.innerHTML = `$${P_ATM.toFixed(1)} \text{ kPa}$`;
+
+            // Khởi tạo với giá trị slider mặc định
+            updateSimulation(slider.value);
+            
+            // Quan trọng: Gọi MathJax để render lần đầu cho các phần tử tĩnh
+            if (window.MathJax) {
+                window.MathJax.typesetPromise().catch((err) => console.error('MathJax Initial Load Error:', err));
+            }
+        }
+
+    </script>
+</body>
+</html>

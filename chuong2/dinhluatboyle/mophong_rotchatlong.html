@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng Rót Chai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                // Ensure MathJax is ready before trying to typeset
+                renderActions: {
+                    add: [
+                        10, 
+                        (doc) => { 
+                            if (!doc.typesetRoot) return;
+                            doc.typeset();
+                        },
+                        100,
+                    ]
+                },
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        .flow-status-box {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        /* Tailwind switch component styling */
+        .toggle-switch input:checked + .slider {
+            background-color: #4f46e5;
+        }
+        .toggle-switch input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-center text-indigo-700 mb-8">
+            Mô Phỏng Quá Trình Rót Chất Lỏng
+        </h1>
+
+        <!-- HÀNG TRÊN: Mô Phỏng (Cột 1) và Dữ liệu (Cột 2) được nhóm lại -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+            <!-- Cột 1: Mô Phỏng Trực Quan (Chiếm 1/2 hàng trên) -->
+            <div class="bg-white p-6 rounded-xl shadow-2xl flex flex-col items-center">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2 w-full text-center">1. Mô Phỏng Trực Quan (Nhấn để Rót)</h2>
+                
+                <!-- HỘP THÔNG BÁO -->
+                <div id="messageBox" class="text-center mb-4 p-3 bg-blue-100 text-blue-800 rounded-lg font-medium hidden w-full"></div>
+
+                <div class="flex justify-center items-center flex-grow w-full">
+                    <canvas id="fillCanvas" width="300" height="500" class="cursor-pointer border-4 border-gray-200"></canvas>
+                </div>
+
+                <!-- Thanh điều khiển Thoát khí và Đặt lại -->
+                <div class="w-full mt-4 space-y-3">
+                    <!-- Toggle Switch for Venting -->
+                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg border">
+                        <span class="text-sm font-semibold text-gray-700">Kích hoạt Thoát Khí (Venting)</span>
+                        <label id="ventingToggleLabel" class="toggle-switch relative inline-block w-12 h-6 cursor-pointer">
+                            <input type="checkbox" id="ventingToggle" class="opacity-0 w-0 h-0">
+                            <span class="slider absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 rounded-full transition duration-400 before:absolute before:content-[''] before:h-5 before:w-5 before:left-[2px] before:bottom-[2px] before:bg-white before:rounded-full before:transition before:duration-400"></span>
+                        </label>
+                    </div>
+
+                    <!-- Reset Button -->
+                    <button id="resetButton" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md">
+                        Đặt lại Mô Phỏng
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cột 2: Ghi Nhận Tốc Độ Chảy & Áp Suất (Chiếm 1/2 hàng trên) -->
+            <div class="space-y-6">
+                <div class="flow-status-box">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">2. Thông Số Dòng Chảy</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-600">Tốc Độ Chảy Hiện Tại (ml/s):</p>
+                            <p id="flowRateDisplay" class="text-4xl font-extrabold text-indigo-600">0.00</p>
+                            <p class="text-xs text-gray-500 italic">Lưu lượng nước đi vào chai.</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-600">Áp Suất Khí Bên Trong (P_in):</p>
+                            <p id="internalPressureDisplay" class="text-2xl font-bold text-teal-600">1.00 atm</p>
+                            <p class="text-xs text-gray-500 italic">Áp suất không khí bị nén.</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-600">Thể Tích Khí (V_air):</p>
+                            <p id="airVolumeDisplay" class="text-2xl font-bold text-orange-600">1000 ml</p>
+                            <p class="text-xs text-gray-500 italic">Thể tích không khí còn lại trong chai.</p>
+                        </div>
+                        <div class="pt-3 border-t">
+                            <p class="text-sm font-semibold text-gray-600">Trạng Thái Mô Phỏng:</p>
+                            <p id="statusDisplay" class="text-lg font-semibold text-gray-500">Đã dừng</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- Kết thúc HÀNG TRÊN -->
+
+        <!-- Cột 3: Giải Thích Hiện Tượng (Định Luật Boyle) - Chiếm toàn bộ hàng dưới -->
+        <div class="bg-white p-6 rounded-xl shadow-2xl">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">3. Giải Thích Hiện Tượng (Định luật Boyle và Thoát Khí)</h2>
+            <div class="text-gray-700 space-y-4">
+                <p>Hiện tượng tốc độ rót chất lỏng giảm dần khi chai gần đầy là minh họa trực quan cho <strong>Định luật Boyle-Mariotte</strong> ($P \cdot V = \text{Hằng số}$).</p>
+
+                <h3 class="font-bold text-lg text-indigo-600">Phân Tích Thoát Khí (Venting):</h3>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li><strong>Mô Phỏng Lý Tưởng (Tắt Thoát Khí):</strong> Giả định chai được **niêm phong hoàn toàn**, không khí không thể thoát ra. Áp suất ($P_{in}$) tăng mạnh khiến dòng chảy dừng lại sớm. Mô hình này gần với chất lỏng có độ nhớt cao (dòng chảy tầng) trong hệ thống kín.</li>
+                    <li><strong>Thực Tế (Nước, Bật Thoát Khí):</strong> Nước có độ nhớt thấp. Khi $P_{in}$ tăng, khí nén dễ dàng thoát ra ngoài dưới dạng **bong bóng khí ("Glugging")**. Bong bóng thoát ra giúp $P_{in}$ **giảm đột ngột** về $P_{atm}$, cho phép nước tiếp tục chảy vào. Đây là lý do tại sao trong đời thực, nước luôn đổ đầy chai. </li>
+                </ul>
+
+                <h3 class="font-bold text-lg text-indigo-600">Nguyên lý Cơ bản:</h3>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li><strong>Áp suất Khí nén:</strong> Khi chất lỏng chảy vào, thể tích không khí ($V_{air}$) giảm, khiến áp suất khí bên trong ($P_{in}$) **tăng lên**.</li>
+                    <li><strong>Giảm tốc độ:</strong> Tốc độ chảy tỉ lệ thuận với chênh lệch áp suất ($\Delta P = P_{atm} - P_{in}$). Khi $P_{in}$ tăng, $\Delta P$ giảm, làm **tốc độ dòng chảy giảm dần**.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Khai báo các biến toàn cục cho Firebase (MANDATORY variables)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+
+        const canvas = document.getElementById('fillCanvas');
+        const ctx = canvas.getContext('2d');
+        const flowRateDisplay = document.getElementById('flowRateDisplay');
+        const internalPressureDisplay = document.getElementById('internalPressureDisplay');
+        const airVolumeDisplay = document.getElementById('airVolumeDisplay');
+        const statusDisplay = document.getElementById('statusDisplay');
+        const messageBox = document.getElementById('messageBox');
+        const resetButton = document.getElementById('resetButton');
+        const ventingToggle = document.getElementById('ventingToggle');
+
+        // --- HẰNG SỐ MÔ PHỎNG (Simulation Constants) ---
+        const CANVAS_WIDTH = canvas.width;
+        const CANVAS_HEIGHT = canvas.height;
+
+        // Bottle Dimensions
+        const BOTTLE_BOTTOM_Y = CANVAS_HEIGHT - 30;
+        const BOTTLE_WIDTH_MAX = CANVAS_WIDTH * 0.7;
+        const BOTTLE_NECK_WIDTH = CANVAS_WIDTH * 0.2;
+        const BOTTLE_HEIGHT = CANVAS_HEIGHT - 60;
+        const BOTTLE_BODY_HEIGHT = BOTTLE_HEIGHT * 0.8;
+
+        // Physics Constants
+        const V_BOTTLE_TOTAL_ML = 1000; // Total bottle volume (ml)
+        const P_ATM = 101.3; // Atmospheric pressure (kPa)
+        // K_PRESSURE_DRAG (Hằng số cản áp suất)
+        const K_PRESSURE_DRAG = 0.25; 
+        // FLOW_MAX_Q (Lưu lượng tối đa ban đầu)
+        const FLOW_MAX_Q = 50; 
+        // Venting threshold: P_in must exceed P_ATM * 1.05 (5% increase) to trigger release
+        const VENTING_THRESHOLD_MULTIPLIER = 1.05; 
+
+        // Particle System Constants
+        let particles = []; 
+        const PARTICLE_GRAVITY = 500; 
+        let lastParticleCreationTime = 0;
+        const PARTICLE_CREATION_INTERVAL = 0.05; 
+
+        // Simulation State
+        let V_liquid_ml;      // Thể tích chất lỏng hiện tại (ml)
+        let V_initial_air_ml; // Thể tích không khí ban đầu (ml) - Dùng cho Định luật Boyle
+        let P_in_kPa;         // Áp suất khí bên trong (kPa)
+        let flowRate_Q;       // Tốc độ dòng chảy (ml/s)
+        let isFilling;        // Trạng thái rót
+        let animationFrameId; // ID của requestAnimationFrame
+        let ventingEnabled;   // Trạng thái thoát khí
+
+        // Khởi tạo trạng thái ban đầu (Initialize simulation state)
+        function initializeSimulation() {
+            V_liquid_ml = 0;
+            V_initial_air_ml = V_BOTTLE_TOTAL_ML; // Chai rỗng -> Thể tích khí ban đầu = Tổng thể tích chai
+            P_in_kPa = P_ATM;
+            flowRate_Q = 0;
+            isFilling = false;
+            particles = []; 
+            lastParticleCreationTime = 0;
+            ventingEnabled = ventingToggle.checked; // Lấy trạng thái từ UI
+
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            messageBox.textContent = `Nhấn vào Phễu để bắt đầu rót. Thoát Khí: ${ventingEnabled ? 'BẬT' : 'TẮT'}`;
+            messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800');
+            messageBox.classList.add('bg-blue-100', 'text-blue-800');
+            statusDisplay.textContent = 'Đã dừng';
+            statusDisplay.classList.remove('text-green-500', 'text-red-500');
+            statusDisplay.classList.add('text-gray-500');
+            drawCanvas();
+            updateDisplay();
+        }
+
+        // --- LOGIC VẼ CANVAS (Canvas Drawing Logic) ---
+
+        // Hàm vẽ Chai (Đáy phẳng - Flat Bottom Bottle)
+        function drawBottle() {
+            ctx.beginPath();
+            ctx.strokeStyle = '#374151'; // Dark gray
+            ctx.lineWidth = 3;
+            ctx.fillStyle = '#f3f4f6'; // Light gray (glass effect)
+
+            const neckTopY = BOTTLE_BOTTOM_Y - BOTTLE_HEIGHT;
+            const bodyTopY = neckTopY + BOTTLE_HEIGHT * 0.2;
+            const center = CANVAS_WIDTH / 2;
+            const bodyWidth = BOTTLE_WIDTH_MAX / 2;
+            const neckWidth = BOTTLE_NECK_WIDTH / 2;
+            const baseBottomY = BOTTLE_BOTTOM_Y; 
+
+            // Bottle path (Cổ -> Vai -> Thân -> Đáy phẳng)
+            ctx.moveTo(center - neckWidth, neckTopY);
+            ctx.lineTo(center + neckWidth, neckTopY); // Top right mouth
+            ctx.lineTo(center + neckWidth, bodyTopY); // Right neck
+            ctx.lineTo(center + bodyWidth, baseBottomY); // Right body down to flat bottom
+            ctx.lineTo(center - bodyWidth, baseBottomY); // Flat bottom
+            ctx.lineTo(center - bodyWidth, bodyTopY); // Left body up to shoulder
+            ctx.lineTo(center - neckWidth, bodyTopY); // Left neck
+            ctx.lineTo(center - neckWidth, neckTopY); 
+
+            ctx.stroke();
+            ctx.fill();
+            ctx.closePath();
+            
+            // Draw top mouth border
+            ctx.beginPath();
+            ctx.moveTo(center - neckWidth, neckTopY);
+            ctx.lineTo(center + neckWidth, neckTopY);
+            ctx.strokeStyle = '#2563eb';
+            ctx.lineWidth = 5;
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        // Hàm vẽ Phễu (Funnel)
+        function drawFunnel() {
+            ctx.beginPath();
+            ctx.strokeStyle = '#4b5563';
+            ctx.fillStyle = '#9ca3af';
+            ctx.lineWidth = 2;
+            const center = CANVAS_WIDTH / 2;
+            const funnelWidth = BOTTLE_WIDTH_MAX * 0.5;
+            const funnelHeight = 50;
+            const neckTopY = BOTTLE_BOTTOM_Y - BOTTLE_HEIGHT;
+
+            // Funnel shape (trapezoid)
+            ctx.moveTo(center - funnelWidth / 2, neckTopY);
+            ctx.lineTo(center + funnelWidth / 2, neckTopY);
+            ctx.lineTo(center + BOTTLE_NECK_WIDTH / 2, neckTopY + funnelHeight);
+            ctx.lineTo(center - BOTTLE_NECK_WIDTH / 2, neckTopY + funnelHeight);
+            ctx.lineTo(center - funnelWidth / 2, neckTopY);
+
+            ctx.stroke();
+            ctx.fill();
+            ctx.closePath();
+
+            // Click target visual
+            ctx.beginPath();
+            ctx.arc(center, neckTopY + funnelHeight / 2, 5, 0, Math.PI * 2);
+            ctx.fillStyle = isFilling ? '#dc2626' : '#10b981'; // Red if filling, Green if ready to start
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        // Hàm vẽ Chất lỏng (Liquid level)
+        function drawLiquid() {
+            const V_available_ml = V_BOTTLE_TOTAL_ML;
+            const liquidRatio = V_liquid_ml / V_available_ml;
+            
+            // Calculate height based on ratio (simplified)
+            const liquidHeight = liquidRatio * BOTTLE_BODY_HEIGHT; 
+
+            // Y position of the liquid surface
+            const center = CANVAS_WIDTH / 2;
+            const bodyWidth = BOTTLE_WIDTH_MAX / 2;
+            const liquidSurfaceY = BOTTLE_BOTTOM_Y - liquidHeight;
+
+            ctx.beginPath();
+            ctx.fillStyle = '#3b82f6'; // Blue water color
+            ctx.strokeStyle = '#1e40af';
+            ctx.lineWidth = 1;
+            
+            // Draw a rectangle representing the liquid body
+            ctx.rect(center - bodyWidth, liquidSurfaceY, BOTTLE_WIDTH_MAX, BOTTLE_BOTTOM_Y - liquidSurfaceY);
+
+            ctx.fillRect(center - bodyWidth, liquidSurfaceY, BOTTLE_WIDTH_MAX, BOTTLE_BOTTOM_Y - liquidSurfaceY);
+            ctx.closePath();
+        }
+
+        // Hàm cập nhật và vẽ các hạt (Particle System Update)
+        function updateAndDrawParticles(deltaTime) {
+            const neckTopY = BOTTLE_BOTTOM_Y - BOTTLE_HEIGHT;
+            
+            // Calculate the current liquid surface Y position (for collision)
+            const V_available_ml = V_BOTTLE_TOTAL_ML;
+            const liquidRatio = V_liquid_ml / V_available_ml;
+            const liquidHeight = liquidRatio * BOTTLE_BODY_HEIGHT; 
+            const liquidSurfaceY = BOTTLE_BOTTOM_Y - liquidHeight;
+
+            // Update particle positions and age (Gravity simulation)
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.age += deltaTime;
+                
+                // Check if particle hits the liquid surface or is too old
+                if (p.y >= liquidSurfaceY - p.radius || p.age > 1.5) {
+                    particles.splice(i, 1); // Remove landed/expired particle
+                    continue;
+                }
+                
+                // Apply gravity
+                p.velocityY += PARTICLE_GRAVITY * deltaTime;
+                p.y += p.velocityY * deltaTime;
+                
+                // Draw the particle
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                const alpha = Math.max(0.2, 1 - p.age / 0.8); // Fade out quickly
+                ctx.fillStyle = `rgba(59, 130, 246, ${alpha})`;
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            // CREATE new particles based on flow rate
+            if (isFilling && flowRate_Q > 0) {
+                if (lastParticleCreationTime >= PARTICLE_CREATION_INTERVAL) {
+                    
+                    // Adjust particle generation rate based on flow rate (Q)
+                    const generationMultiplier = flowRate_Q / FLOW_MAX_Q;
+                    // Max 3 particles created per interval
+                    const numToCreate = Math.ceil(3 * generationMultiplier); 
+
+                    const center = CANVAS_WIDTH / 2;
+                    const neckWidth = BOTTLE_NECK_WIDTH / 2;
+                    const funnelBottomY = neckTopY + 50;
+                    
+                    for (let i = 0; i < numToCreate; i++) {
+                        // Spawn position at the bottom of the funnel
+                        const spawnY = funnelBottomY + 5; 
+                        // Randomize X position slightly within the neck
+                        const spawnX = center + (Math.random() * neckWidth * 0.9 - neckWidth * 0.45); 
+
+                        particles.push({
+                            x: spawnX,
+                            y: spawnY,
+                            radius: 2 + Math.random() * 2,
+                            velocityY: 0,
+                            age: 0,
+                        });
+                    }
+                    lastParticleCreationTime = 0;
+                } else {
+                    lastParticleCreationTime += deltaTime;
+                }
+            }
+        }
+
+        // Hàm vẽ toàn bộ Canvas (Draw entire canvas)
+        function drawCanvas() {
+            ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+            drawBottle();
+            // Setup clipping path for the liquid body
+            ctx.save();
+            ctx.beginPath();
+            const center = CANVAS_WIDTH / 2;
+            const neckTopY = BOTTLE_BOTTOM_Y - BOTTLE_HEIGHT;
+            const bodyTopY = neckTopY + BOTTLE_HEIGHT * 0.2;
+            const bodyWidth = BOTTLE_WIDTH_MAX / 2;
+            const baseBottomY = BOTTLE_BOTTOM_Y; 
+            const neckWidth = BOTTLE_NECK_WIDTH / 2;
+
+            ctx.moveTo(center - neckWidth, neckTopY);
+            ctx.lineTo(center + neckWidth, neckTopY);
+            ctx.lineTo(center + neckWidth, bodyTopY);
+            ctx.lineTo(center + bodyWidth, baseBottomY); 
+            ctx.lineTo(center - bodyWidth, baseBottomY); 
+            ctx.lineTo(center - bodyWidth, bodyTopY);
+            ctx.lineTo(center - neckWidth, neckTopY);
+            
+            ctx.clip(); 
+
+            drawLiquid();
+            ctx.restore(); 
+
+            drawFunnel();
+        }
+
+        // --- LOGIC VẬT LÝ (Physics Logic) ---
+
+        let lastTime = 0;
+        function updateSimulation(timestamp) {
+            if (!isFilling) {
+                statusDisplay.textContent = 'Đã dừng';
+                return;
+            }
+
+            const deltaTime = (timestamp - lastTime) / 1000; // Time elapsed (seconds)
+            lastTime = timestamp;
+
+            // 1. Tính toán Thể tích Khí hiện tại (V_air)
+            const V_air_ml_current = Math.max(0.1, V_initial_air_ml - V_liquid_ml); 
+
+            // 2. Tính toán Áp suất bên trong (P_in) theo Định luật Boyle
+            P_in_kPa = P_ATM * (V_initial_air_ml / V_air_ml_current);
+
+            // 3. Xử lý Thoát Khí (Venting/Glugging) - Mô phỏng nước thực tế
+            if (ventingEnabled && P_in_kPa > P_ATM * VENTING_THRESHOLD_MULTIPLIER) {
+                // Áp suất vượt ngưỡng -> Mô phỏng bong bóng khí thoát ra (giải phóng áp suất)
+                
+                // Đặt lại V_initial_air_ml để tính toán lại Boyle:
+                // Thể tích khí hiện tại (V_air_ml_current) bây giờ được coi là thể tích ở P_ATM
+                V_initial_air_ml = V_air_ml_current; 
+                P_in_kPa = P_ATM; // Áp suất giảm tức thời về khí quyển
+
+                // Hiển thị thông báo thoát khí tạm thời
+                messageBox.textContent = 'BONG BÓNG KHÍ! Áp suất đã được giải phóng (P_in reset về 1 atm).';
+                messageBox.classList.remove('hidden', 'bg-blue-100', 'text-blue-800', 'bg-red-100', 'text-red-800');
+                messageBox.classList.add('bg-yellow-100', 'text-yellow-800');
+                
+                setTimeout(() => {
+                    if (isFilling) {
+                        messageBox.classList.add('hidden');
+                    }
+                }, 1000); 
+            }
+
+            // 4. Tính toán Tốc độ dòng chảy (Q)
+            const pressureDifference = P_in_kPa - P_ATM; 
+            flowRate_Q = Math.max(0, FLOW_MAX_Q - K_PRESSURE_DRAG * pressureDifference); 
+
+            // 5. Cập nhật Thể tích chất lỏng
+            V_liquid_ml += flowRate_Q * deltaTime;
+
+            // 6. Kiểm tra kết thúc mô phỏng (chai đầy hoặc dòng chảy dừng)
+            // Lưu ý: Nếu ventingEnabled=true, flowRate_Q sẽ KHÔNG bao giờ giảm về 0 trừ khi chai đầy.
+            if (V_liquid_ml >= V_BOTTLE_TOTAL_ML || (flowRate_Q <= 0.5 && !ventingEnabled)) { 
+                isFilling = false;
+                flowRate_Q = 0;
+                V_liquid_ml = Math.min(V_liquid_ml, V_BOTTLE_TOTAL_ML);
+                drawCanvas();
+                updateDisplay();
+                
+                // Cập nhật thông báo hướng dẫn người dùng nhấn nút Đặt lại
+                const finishMessage = V_liquid_ml >= V_BOTTLE_TOTAL_ML 
+                    ? 'CHAI ĐẦY! Dòng chảy đã dừng. Vui lòng nhấn "Đặt lại Mô Phỏng" để chơi lại.' 
+                    : 'Dòng chảy đã dừng do áp suất khí quá lớn (áp suất trong chai đã đạt giới hạn). Vui lòng nhấn "Đặt lại Mô Phỏng" để chơi lại.';
+
+                messageBox.textContent = finishMessage;
+                messageBox.classList.remove('hidden', 'bg-blue-100', 'text-blue-800', 'bg-yellow-100', 'text-yellow-800');
+                messageBox.classList.add('bg-red-100', 'text-red-800');
+                statusDisplay.textContent = 'Hoàn thành';
+                statusDisplay.classList.remove('text-green-500', 'text-gray-500');
+                statusDisplay.classList.add('text-red-500');
+                return;
+            }
+
+            // Cập nhật hiển thị và vẽ lại (Update display and redraw)
+            drawCanvas(); 
+            updateAndDrawParticles(deltaTime); 
+            updateDisplay();
+
+            // Lặp lại vòng lặp (Loop the animation)
+            animationFrameId = requestAnimationFrame(updateSimulation);
+            statusDisplay.textContent = 'Đang rót...';
+            statusDisplay.classList.remove('text-gray-500', 'text-red-500');
+            statusDisplay.classList.add('text-green-500');
+        }
+
+        // Cập nhật thông số hiển thị (Update Cột 2 display)
+        function updateDisplay() {
+            const V_air_ml = Math.max(0.0, V_BOTTLE_TOTAL_ML - V_liquid_ml);
+            
+            flowRateDisplay.textContent = flowRate_Q.toFixed(2);
+            // Display pressure as multiple of atmospheric pressure (atm)
+            internalPressureDisplay.textContent = (P_in_kPa / P_ATM).toFixed(3) + ' atm'; 
+            airVolumeDisplay.textContent = V_air_ml.toFixed(0) + ' ml';
+        }
+
+        // --- XỬ LÝ SỰ KIỆN (Event Handlers) ---
+
+        function handleStartStop() {
+            ventingEnabled = ventingToggle.checked; // Cập nhật trạng thái thoát khí ngay khi bắt đầu
+
+            if (V_liquid_ml >= V_BOTTLE_TOTAL_ML) {
+                 messageBox.textContent = 'CHAI ĐÃ ĐẦY! Không thể rót thêm. Vui lòng nhấn "Đặt lại Mô Phỏng" bên dưới.';
+                 messageBox.classList.remove('hidden', 'bg-blue-100', 'text-blue-800', 'bg-yellow-100', 'text-yellow-800');
+                 messageBox.classList.add('bg-red-100', 'text-red-800');
+                 return;
+            }
+            
+            if (!isFilling) {
+                // Bắt đầu rót
+                isFilling = true;
+                lastTime = performance.now();
+                messageBox.classList.add('hidden');
+                animationFrameId = requestAnimationFrame(updateSimulation);
+            } else {
+                // Tạm dừng rót
+                isFilling = false;
+                cancelAnimationFrame(animationFrameId);
+                messageBox.textContent = `Đã tạm dừng. Thoát Khí: ${ventingEnabled ? 'BẬT' : 'TẮT'}. Nhấn lại để tiếp tục.`;
+                messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800');
+                messageBox.classList.add('bg-blue-100', 'text-blue-800');
+                statusDisplay.textContent = 'Tạm dừng';
+                statusDisplay.classList.remove('text-green-500', 'text-red-500');
+                statusDisplay.classList.add('text-gray-500');
+            }
+        }
+        
+        // Event listener for the toggle switch
+        ventingToggle.addEventListener('change', () => {
+            if (!isFilling) {
+                ventingEnabled = ventingToggle.checked;
+                messageBox.textContent = `Thoát Khí đã được ${ventingEnabled ? 'BẬT' : 'TẮT'}. Nhấn vào Phễu để bắt đầu.`;
+                messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800');
+                messageBox.classList.add('bg-blue-100', 'text-blue-800');
+            }
+        });
+
+
+        // Add click event to canvas (funnel area)
+        canvas.addEventListener('click', handleStartStop);
+
+        // Add click event for reset button
+        resetButton.addEventListener('click', initializeSimulation);
+
+        // Run on load
+        window.onload = initializeSimulation;
+
+    </script>
+</body>
+</html>
