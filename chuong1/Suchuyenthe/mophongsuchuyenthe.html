@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng Chuyển Thể Của Nước</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Tải OrbitControls để xoay và phóng to 3D -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden; /* Ngăn cuộn màn hình chính */
+            font-family: 'Inter', sans-serif; 
+            min-height: 100vh;
+        }
+        /* Đảm bảo canvas lấp đầy container cha */
+        #container { 
+            width: 100%; 
+            height: 100%; 
+            background-color: #1f2937; 
+            position: relative; 
+        }
+        canvas { display: block; }
+        
+        /* Style cho thanh trượt, điều chỉnh để làm nổi bật các giai đoạn chuyển thể */
+        #tempSlider {
+            width: 80%;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            /* Cập nhật dải màu để làm nổi bật giai đoạn chuyển pha (nhiệt độ không đổi) */
+            background: linear-gradient(to right, 
+                #3b82f6 0%,      /* Blue for ICE */
+                #3b82f6 20%,
+                #fbbf24 20%,     /* Yellow for MELTING */
+                #fbbf24 35%,
+                #22c55e 35%,     /* Green for LIQUID */
+                #22c55e 75%,
+                #ef4444 75%,     /* Red for BOILING */
+                #ef4444 90%,
+                #a855f7 90%,     /* Purple for VAPOR */
+                #a855f7 100%
+            );
+            border-radius: 4px;
+            cursor: pointer;
+            outline: none;
+        }
+        #tempSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 3px solid #1f2937;
+            cursor: grab;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        /* Đảm bảo chiều cao đầy đủ cho khu vực điều khiển trên màn hình lớn */
+        #controls-column {
+            min-height: 300px; /* Chiều cao tối thiểu cho điện thoại */
+        }
+        @media (min-width: 768px) {
+            #controls-column {
+                height: calc(100vh - 2rem); /* 100vh trừ padding 4 đơn vị (1rem=4px, 4px*4=16px*2=32px=2rem) */
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- CONTAINER CHÍNH: Flexbox cho bố cục 2 cột trên màn hình lớn (md:) -->
+    <div class="md:flex md:h-screen p-4 space-y-4 md:space-y-0 md:space-x-4">
+        
+        <!-- Cột TRÁI: Thanh Điều Khiển (chiếm khoảng 1/3) -->
+        <div id="controls-column" class="bg-white p-4 shadow-xl rounded-xl md:w-1/3 flex flex-col">
+            <h1 class="text-2xl font-bold text-center text-gray-800 mb-4">Mô Phỏng Chuyển Thể Của Nước (H₂O)</h1>
+            
+            <!-- Thanh chọn chế độ 3D/2D -->
+            <div class="flex justify-center mb-6 space-x-4">
+                <button id="mode3D" class="px-4 py-2 rounded-lg font-semibold transition bg-indigo-500 text-white shadow-md hover:bg-indigo-600">
+                    Mô hình 3D
+                </button>
+                <button id="mode2D" class="px-4 py-2 rounded-lg font-semibold transition bg-gray-200 text-gray-700 shadow-md hover:bg-gray-300">
+                    Mô hình 2D
+                </button>
+            </div>
+
+            <!-- Thanh trượt nhiệt độ -->
+            <div class="flex flex-col items-center mb-6">
+                <label for="tempSlider" class="text-lg font-medium text-gray-600 mb-2">
+                    Nhiệt độ: <span id="tempValue" class="text-indigo-600 font-extrabold">0°C</span>
+                </label>
+                <input type="range" id="tempSlider" min="-50" max="150" value="0" step="1">
+                <p id="phaseDisplay" class="mt-4 text-xl font-semibold text-center h-8">Đang nóng chảy (0°C)</p>
+            </div>
+            
+            <p class="text-sm text-gray-500 mt-auto pt-4 border-t border-gray-200">
+                Lưu ý: Kéo thanh trượt để quan sát sự thay đổi nhiệt độ và động lực học của phân tử. Phân tử nước được tượng trưng bằng một hình cầu duy nhất, màu sắc thay đổi theo pha.
+            </p>
+        </div>
+
+        <!-- Cột PHẢI: Container cho mô phỏng 3D (chiếm khoảng 2/3) -->
+        <div id="simulation-column" class="md:w-2/3 flex-grow">
+            <div id="container" class="rounded-xl shadow-xl"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- Cài đặt chung ---
+        const container = document.getElementById('container');
+        let scene, camera, renderer, controls; // Thêm controls
+        const molecules = [];
+        const NUM_MOLECULES = 80;
+        const BOUNDARY = 15; // Giới hạn không gian mô phỏng (X và Z)
+        let is3DMode = true; // Biến trạng thái chế độ
+        
+        // Cấu hình Three.js
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1f2937); // Màu nền tối
+
+            // Camera (Khởi tạo ban đầu cho 3D)
+            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            
+            // Lấy kích thước ban đầu của container sau khi bố cục 2 cột đã được áp dụng
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            // Ánh sáng
+            const ambientLight = new THREE.AmbientLight(0x404040, 2); // Ánh sáng môi trường
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            directionalLight.position.set(5, 10, 7.5);
+            scene.add(directionalLight);
+
+            // Tạo các phân tử nước (hình cầu đơn)
+            createMolecules();
+
+            // *** KHỞI TẠO ORBIT CONTROLS ***
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; // Cho chuyển động mượt mà hơn
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false; // Ngăn không cho kéo pan (chỉ cho xoay/zoom)
+            controls.minDistance = 5; // Khoảng cách phóng to tối thiểu
+            controls.maxDistance = 100; // Khoảng cách lùi tối đa
+            // *** END ORBIT CONTROLS ***
+
+            // Thiết lập sự kiện thanh trượt
+            document.getElementById('tempSlider').addEventListener('input', handleSliderChange);
+            
+            // Thiết lập sự kiện chuyển đổi chế độ
+            document.getElementById('mode3D').addEventListener('click', () => setMode(true));
+            document.getElementById('mode2D').addEventListener('click', () => setMode(false));
+            
+            // Thiết lập sự kiện thay đổi kích thước
+            window.addEventListener('resize', onWindowResize, false);
+
+            // Thiết lập chế độ 3D ban đầu
+            setMode(true, true);
+
+            // Khởi chạy vòng lặp hoạt hình
+            animate();
+        }
+
+        // Xử lý thay đổi kích thước cửa sổ
+        function onWindowResize() {
+            // Đảm bảo renderer được cập nhật với kích thước container mới
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            
+            // Cập nhật tỷ lệ khung hình của camera
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            
+            // Cập nhật lại chế độ hiển thị khi resize để đảm bảo camera đúng
+            setMode(is3DMode, true);
+        }
+
+        // --- Logic Chuyển đổi Chế độ (3D/2D) ---
+        function setMode(is3D, isInitial = false) {
+            // Nếu không chuyển mode và không phải là lần khởi tạo, không cần làm gì
+            if (is3DMode === is3D && !isInitial) return; 
+
+            is3DMode = is3D;
+            
+            // Cập nhật button style
+            const btn3D = document.getElementById('mode3D');
+            const btn2D = document.getElementById('mode2D');
+
+            if (is3D) {
+                btn3D.className = 'px-4 py-2 rounded-lg font-semibold transition bg-indigo-500 text-white shadow-md hover:bg-indigo-600';
+                btn2D.className = 'px-4 py-2 rounded-lg font-semibold transition bg-gray-200 text-gray-700 shadow-md hover:bg-gray-300';
+                
+                // Chuyển sang PerspectiveCamera cho 3D
+                camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+                // Thiết lập vị trí mặc định ban đầu cho 3D (sẽ bị OrbitControls thay đổi)
+                camera.position.z = 35; 
+                camera.position.y = 5;
+                
+                // Bật điều khiển xoay
+                if (controls) {
+                    controls.enabled = true;
+                    // Reset camera targets khi chuyển về 3D
+                    controls.target.set(0, 0, 0); 
+                    controls.update(); 
+                }
+
+            } else {
+                btn3D.className = 'px-4 py-2 rounded-lg font-semibold transition bg-gray-200 text-gray-700 shadow-md hover:bg-gray-300';
+                btn2D.className = 'px-4 py-2 rounded-lg font-semibold transition bg-indigo-500 text-white shadow-md hover:bg-indigo-600';
+
+                // Chuyển sang OrthographicCamera cho 2D (Nhìn từ trên trục Z xuống)
+                const aspect = container.clientWidth / container.clientHeight;
+                const frustumSize = BOUNDARY * 3; 
+
+                camera = new THREE.OrthographicCamera(
+                    frustumSize * aspect / -2, frustumSize * aspect / 2,
+                    frustumSize / 2, frustumSize / -2,
+                    0.1, 1000
+                );
+                // Đặt camera nhìn thẳng mặt phẳng X-Y
+                camera.position.set(0, 0, 100); 
+                camera.lookAt(0, 0, 0); 
+                
+                // Tắt điều khiển xoay trong 2D
+                if (controls) {
+                    controls.enabled = false;
+                }
+            }
+
+            // Gán lại camera cho renderer
+            renderer.render(scene, camera); 
+            
+            // Đảm bảo cập nhật lại pha để xử lý camera hơi nếu cần
+            updatePhase(parseFloat(document.getElementById('tempSlider').value));
+        }
+
+
+        // --- Mô hình Phân tử Nước Đơn Giản (1 hình cầu) ---
+        function createMolecules() {
+            // Định nghĩa kích thước và màu sắc cơ bản
+            const MOLECULE_RADIUS = 0.5; 
+            const BASE_COLOR = 0xef4444; // Màu cơ bản (sẽ được cập nhật theo pha)
+
+            const mol_geometry = new THREE.SphereGeometry(MOLECULE_RADIUS, 16, 16);
+            const mol_material = new THREE.MeshPhongMaterial({ color: BASE_COLOR }); 
+            
+            // Tạo lưới tinh thể ban đầu
+            let index = 0;
+            const size = Math.ceil(Math.cbrt(NUM_MOLECULES));
+            const spacing = 2.5;
+            const startPos = -((size - 1) * spacing) / 2;
+
+            for (let x = 0; x < size; x++) {
+                for (let y = 0; y < size; y++) {
+                    for (let z = 0; z < size; z++) {
+                        if (index < NUM_MOLECULES) {
+                            // Tạo nhóm (Group) cho phân tử nước (chỉ có 1 hình cầu)
+                            const moleculeGroup = new THREE.Group();
+
+                            // 1. Phân tử nước (tượng trưng bằng 1 hình cầu)
+                            const waterMolecule = new THREE.Mesh(mol_geometry, mol_material.clone());
+                            moleculeGroup.add(waterMolecule); // Phần tử 0 trong group
+                            
+                            // Đặt vị trí ban đầu cho cả Group
+                            moleculeGroup.position.set(
+                                startPos + x * spacing + (y % 2) * 0.5,
+                                startPos + y * spacing,
+                                startPos + z * spacing
+                            );
+
+                            // Dữ liệu động lực học (gắn vào Group)
+                            moleculeGroup.velocity = new THREE.Vector3(0, 0, 0);
+                            moleculeGroup.originalPosition = moleculeGroup.position.clone();
+                            moleculeGroup.phaseData = { vibration: 0, speed: 0 }; 
+                            
+                            molecules.push(moleculeGroup);
+                            scene.add(moleculeGroup);
+                            index++;
+                        }
+                    }
+                }
+            }
+        }
+
+        // --- Logic Chuyển thể ---
+
+        // Hàm trả về màu sắc dựa trên pha
+        function getPhaseColor(phase) {
+            switch (phase) {
+                case 'ICE': return 0x3b82f6; // Blue
+                case 'MELTING': return 0xfbbf24; // Yellow
+                case 'LIQUID': return 0x22c55e; // Green
+                case 'BOILING': return 0xef4444; // Red
+                case 'VAPOR': return 0xa855f7; // Purple
+                default: return 0x93c5fd;
+            }
+        }
+        
+        function handleSliderChange(event) {
+            const sliderValue = parseFloat(event.target.value);
+            updatePhase(sliderValue);
+        }
+
+        function updatePhase(sliderValue) {
+            let displayTemp, phase, vibrationFactor, movementSpeed, cohesionFactor, title;
+            let containerHeight = BOUNDARY * 2; 
+            const display = document.getElementById('phaseDisplay');
+
+            // --- 1. Xác định Pha và Nhiệt độ hiển thị dựa trên giá trị thanh trượt (sliderValue) ---
+            
+            if (sliderValue <= -10) {
+                // Giai đoạn 1: NƯỚC ĐÁ (ICE)
+                displayTemp = Math.round(sliderValue + 10);
+                phase = 'ICE';
+                const tempRangeFactor = (sliderValue + 50) / 40; 
+                
+                title = `Nước đá (${displayTemp}°C): Cấu trúc tinh thể, rung động nhẹ`;
+                vibrationFactor = 0.05 + tempRangeFactor * 0.05; 
+                movementSpeed = 0;
+                cohesionFactor = 1.0; 
+            } else if (sliderValue <= 20) {
+                // Giai đoạn 2: CHUYỂN PHA NÓNG CHẢY (MELTING PLATEAU)
+                displayTemp = 0;
+                phase = 'MELTING';
+                const tempRangeFactor = (sliderValue + 10) / 30; 
+                
+                title = `Đang nóng chảy (0°C): Cấu trúc tan rã (${Math.round(tempRangeFactor * 100)}% chuyển thành lỏng)`;
+                vibrationFactor = 0.1 + tempRangeFactor * 0.1; 
+                movementSpeed = 0.01 + tempRangeFactor * 0.03; 
+                cohesionFactor = 0.9 - tempRangeFactor * 0.9; 
+            } else if (sliderValue <= 100) {
+                // Giai đoạn 3: CHẤT LỎNG (LIQUID)
+                displayTemp = Math.round(sliderValue - 20);
+                phase = 'LIQUID';
+                const tempRangeFactor = (sliderValue - 20) / 80; 
+                
+                title = `Chất lỏng (${displayTemp}°C): Phân tử di chuyển tự do`;
+                vibrationFactor = 0.2 + tempRangeFactor * 0.1; 
+                movementSpeed = 0.08 + tempRangeFactor * 0.05; 
+                cohesionFactor = 0.0; 
+            } else if (sliderValue <= 130) {
+                // Giai đoạn 4: CHUYỂN PHA SÔI (BOILING PLATEAU)
+                displayTemp = 100;
+                phase = 'BOILING';
+                const tempRangeFactor = (sliderValue - 100) / 30; 
+                
+                title = `Đang sôi (100°C): Hóa hơi (${Math.round(tempRangeFactor * 100)}% chuyển thành hơi)`;
+                vibrationFactor = 0.3;
+                movementSpeed = 0.15 + tempRangeFactor * 0.1; 
+                cohesionFactor = 0.0;
+                containerHeight = BOUNDARY * 2.5; 
+            } else {
+                // Giai đoạn 5: HƠI (VAPOR)
+                displayTemp = Math.round(sliderValue - 30);
+                phase = 'VAPOR';
+                const tempRangeFactor = (sliderValue - 130) / 20; 
+                
+                title = `Hơi (${displayTemp}°C): Phân tử di chuyển nhanh, cách xa nhau`;
+                vibrationFactor = 0.0; 
+                movementSpeed = 0.3 + tempRangeFactor * 0.2;
+                cohesionFactor = 0.0;
+                containerHeight = BOUNDARY * 3; 
+            }
+
+            // Cập nhật hiển thị nhiệt độ và pha
+            document.getElementById('tempValue').textContent = `${displayTemp}°C`;
+            display.textContent = title;
+            // Lấy màu tương ứng với pha
+            const mol_color = getPhaseColor(phase);
+            display.className = `mt-4 text-xl font-semibold text-[${mol_color.toString(16)}]`; 
+
+            // 2. Xử lý camera cho chế độ 3D/Hơi
+            if (is3DMode) {
+                // Bỏ đoạn code đặt lại camera.position cứng để duy trì góc nhìn của người dùng
+                // khi thanh trượt thay đổi. 
+                
+                /* ĐOẠN CODE CŨ ĐÃ BỊ XÓA BỎ:
+                if (phase === 'VAPOR') {
+                    camera.position.z = 60; 
+                    camera.position.y = 0;
+                } else {
+                    camera.position.z = 35; 
+                    camera.position.y = 5;
+                }
+                */
+
+                camera.updateProjectionMatrix();
+                
+                // Nếu controls đã được khởi tạo, cập nhật camera của controls
+                if (controls) {
+                    controls.object = camera;
+                    // Không gọi controls.update() ở đây vì nó được gọi trong animate
+                }
+            }
+
+            // 3. Áp dụng các tham số và màu sắc mới cho các phân tử
+            molecules.forEach(mol => {
+                // Cập nhật màu của phân tử (Phần tử thứ 0 trong Group)
+                mol.children[0].material.color.setHex(mol_color); 
+
+                // Cập nhật dữ liệu pha
+                mol.phaseData.vibration = vibrationFactor;
+                mol.phaseData.speed = movementSpeed;
+                mol.phaseData.cohesion = cohesionFactor;
+                mol.phaseData.containerHeight = containerHeight;
+            });
+        }
+
+        // --- Vòng lặp hoạt hình ---
+
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta(); // Thời gian trôi qua giữa các frame
+            const time = clock.getElapsedTime();
+
+            // *** Cập nhật điều khiển OrbitControls ***
+            if (is3DMode && controls.enabled) {
+                controls.update();
+            }
+
+            molecules.forEach(mol => {
+                const { vibration, speed, cohesion, containerHeight } = mol.phaseData;
+                
+                // 1. Rung động (Chủ yếu cho Ice)
+                if (vibration > 0) {
+                    const originalPos = mol.originalPosition;
+                    // Quay về vị trí ban đầu (Lực liên kết/Cohesion)
+                    mol.position.lerp(originalPos, cohesion * 0.1); 
+                    
+                    // Thêm rung động
+                    mol.position.x += Math.sin(time * 10 + mol.id * 1) * vibration * delta;
+                    mol.position.y += Math.cos(time * 15 + mol.id * 2) * vibration * delta;
+                    
+                    if (is3DMode) {
+                        mol.position.z += Math.sin(time * 12 + mol.id * 3) * vibration * delta;
+                    }
+                    
+                    // Xoay nhẹ phân tử
+                    mol.rotation.x += vibration * 0.01 * delta;
+                    mol.rotation.y += vibration * 0.005 * delta;
+                }
+
+                // 2. Di chuyển (Chủ yếu cho Liquid/Vapor)
+                if (speed > 0) {
+                    // Cập nhật vận tốc (nhiệt động học ngẫu nhiên)
+                    mol.velocity.x += (Math.random() - 0.5) * speed * 0.5;
+                    mol.velocity.y += (Math.random() - 0.5) * speed * 0.5;
+                    
+                    if (is3DMode) {
+                        mol.velocity.z += (Math.random() - 0.5) * speed * 0.5;
+                    }
+                    
+                    // Giảm ma sát 
+                    mol.velocity.multiplyScalar(0.99);
+
+                    // Di chuyển phân tử
+                    mol.position.add(mol.velocity.clone().multiplyScalar(speed * 10 * delta));
+                    
+                    // Xoay tự do 
+                    mol.rotation.x += speed * 0.1 * delta;
+                    mol.rotation.y += speed * 0.05 * delta;
+                    mol.rotation.z += speed * 0.03 * delta;
+                }
+
+                // 3. Giới hạn va chạm/Biên
+                const boundaryX = BOUNDARY;
+                const boundaryY = containerHeight / 2;
+                const boundaryZ = BOUNDARY;
+
+                // Xử lý va chạm biên X-Y
+                if (mol.position.x > boundaryX) { mol.position.x = boundaryX; mol.velocity.x *= -1; }
+                if (mol.position.x < -boundaryX) { mol.position.x = -boundaryX; mol.velocity.x *= -1; }
+                if (mol.position.y > boundaryY) { mol.position.y = boundaryY; mol.velocity.y *= -1; }
+                if (mol.position.y < -boundaryY) { mol.position.y = -boundaryY; mol.velocity.y *= -1; }
+                
+                // Xử lý va chạm biên Z (Chỉ trong chế độ 3D)
+                if (is3DMode) {
+                    if (mol.position.z > boundaryZ) { mol.position.z = boundaryZ; mol.velocity.z *= -1; }
+                    if (mol.position.z < -boundaryZ) { mol.position.z = -boundaryZ; mol.velocity.z *= -1; }
+                } else {
+                    // Trong 2D, cố định Z gần 0 
+                    mol.position.z = mol.originalPosition.z * 0.1; 
+                    mol.velocity.z = 0;
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        // Khởi tạo mô phỏng khi cửa sổ tải xong
+        window.onload = function() {
+            init();
+            // Cập nhật trạng thái ban đầu (-30°C trong dải Nước đá)
+            const initialSliderValue = -30; 
+            document.getElementById('tempSlider').value = initialSliderValue;
+            updatePhase(initialSliderValue); // Gọi updatePhase với giá trị slider ban đầu
+            animate();
+        };
+
+    </script>
+
+</body>
+</html>

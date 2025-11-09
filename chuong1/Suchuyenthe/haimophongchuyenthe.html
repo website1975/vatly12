@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng Vật Chất Tích Hợp</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải Three.js cho mô phỏng 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Tải OrbitControls để xoay và phóng to 3D -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <style>
+        /* Thiết lập chung */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0F172A; /* Màu nền tối (slate-900) */
+            color: #E2E8F0;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        /* Bố cục chính */
+        #dual-container {
+            min-height: calc(100vh - 100px); /* Dành chỗ cho header/footer */
+        }
+        
+        /* Khung hiển thị Canvas/3D */
+        .simulation-box {
+            background-color: #1E293B; /* slate-800 */
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Vùng Canvas 2D */
+        #canvasContainer1 {
+            width: 100%;
+            flex-grow: 1;
+            margin-bottom: 1rem;
+            background-color: #334155; /* slate-700 */
+            border-radius: 0.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #simulationCanvas {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            border-radius: 0.5rem;
+        }
+        
+        /* Vùng 3D */
+        #threeDContainer {
+            width: 100%;
+            flex-grow: 1;
+            /* Đã bỏ margin-bottom 1rem để kiểm soát bằng div controls-2 */
+            background-color: #334155;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Responsive height for mobile screens */
+        @media (max-width: 768px) {
+            .simulation-box {
+                min-height: 80vh; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="text-center mb-1">
+        <h3 class="text-3xl font-bold text-white mb-1">Trình Xem Song Song Mô Phỏng Tích Hợp</h3>
+        <p class="text-lg text-gray-400">Xem Mô phỏng Trạng thái (2D) và Chuyển thể (3D) đồng thời.</p>
+    </header>
+
+    <!-- Bố cục lưới responsive 2 cột -->
+    <main id="dual-container" class="grid md:grid-cols-2 grid-cols-1 gap-6">
+
+        <!-- CỘT 1: Mô Phỏng Các Trạng Thái (2D Canvas) -->
+        <div class="simulation-box">
+            <h2 class="text-xl font-semibold text-sky-400 mb-4 text-center">
+                1. Mô Phỏng Trạng thái Rắn - Lỏng - Khí (2D)
+            </h2>
+            <div id="canvasContainer1">
+                <canvas id="simulationCanvas"></canvas>
+            </div>
+            
+            <!-- Điều khiển Cột 1 (Đã có sẵn ở vị trí dưới) -->
+            <div class="controls-1 flex flex-wrap justify-center gap-4 mt-auto p-2 bg-gray-900 bg-opacity-70 rounded-lg">
+                <div class="flex flex-col items-center">
+                    <label for="tempRange1" class="text-sm font-medium mb-1">Nhiệt độ ($T$):</label>
+                    <input type="range" id="tempRange1" min="0" max="100" value="20" class="w-40 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                    <span id="tempValue1" class="text-md font-mono mt-1 text-yellow-300">20</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <label for="particleCount1" class="text-sm font-medium mb-1">Số Lượng Phân Tử:</label>
+                    <input type="range" id="particleCount1" min="30" max="180" value="90" class="w-40 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                    <span id="countValue1" class="text-md font-mono mt-1 text-cyan-300">90</span>
+                </div>
+                <button id="resetButton1" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white font-medium self-end transition duration-300">
+                    Đặt Lại
+                </button>
+            </div>
+        </div>
+
+        <!-- CỘT 2: Mô Phỏng Chuyển Thể Của Nước (3D Three.js) -->
+        <div class="simulation-box">
+            <h2 class="text-xl font-semibold text-emerald-400 mb-4 text-center">
+                2. Mô Phỏng Chuyển Thể Của Nước (3D)
+            </h2>
+            <div id="threeDContainer">
+                <!-- Three.js Canvas sẽ được đặt ở đây -->
+            </div>
+            
+            <!-- Điều khiển Cột 2: Đặt ngang hàng với controls-1 -->
+            <div class="controls-2 mt-auto p-2 bg-gray-900 bg-opacity-70 rounded-lg shadow-lg">
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                    <!-- Thanh trượt Nhiệt độ -->
+                    <div class="flex flex-col items-center">
+                        <label for="tempRange2" class="text-sm font-medium text-gray-200 mb-1 whitespace-nowrap">Nhiệt độ ($T$) ($^{\circ}C$):</label>
+                        <input type="range" id="tempRange2" min="-100" max="150" value="25" class="w-40 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                        <span id="tempValue2" class="text-md font-mono text-yellow-300 mt-1 whitespace-nowrap">25°C (Lỏng)</span>
+                    </div>
+
+                    <!-- Checkbox Chế độ 3D -->
+                    <div class="flex items-center gap-2 mt-2 md:mt-0 pt-2 border-t md:border-t-0 border-gray-700 md:pt-0">
+                        <label for="modeToggle2" class="text-sm font-medium text-gray-200 whitespace-nowrap">Kích hoạt chuyển động 3D (Z-axis):</label>
+                        <input type="checkbox" id="modeToggle2" class="w-4 h-4 text-emerald-500 bg-gray-100 rounded border-gray-300 focus:ring-emerald-500">
+                    </div>
+                </div>
+                <div class="text-xs text-gray-400 mt-2 text-center">Dùng chuột kéo để xoay mô hình 3D.</div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // ==========================================================
+        // KHỞI TẠO CHUNG
+        // ==========================================================
+        window.onload = function() {
+            initSimulation1();
+            initSimulation2();
+            
+            // Kích hoạt resize ban đầu để Canvas 2D và 3D nhận kích thước đúng
+            window.dispatchEvent(new Event('resize'));
+        };
+
+        // Thêm event listener cho resize để đảm bảo cả 2 mô phỏng đều responsive
+        window.addEventListener('resize', function() {
+            resizeCanvas1();
+            handleResize2();
+        });
+
+        
+        // ==========================================================
+        // LOGIC MÔ PHỎNG 1 (2D States of Matter - Rắn/Lỏng/Khí)
+        // ==========================================================
+        let canvas1, ctx1, particles1 = [], tempRange1, tempValue1, countRange1, countValue1, animationFrame1;
+        const PARTICLE_RADIUS_1 = 5;
+        let temperature1 = 20;
+
+        class Particle1 {
+            constructor(x, y, vx, vy, color, isSolid) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.color = color;
+                this.originalPositionX = x;
+                this.originalPositionY = y;
+                this.isSolid = isSolid;
+            }
+
+            checkState(sectionWidth) {
+                if (this.x < sectionWidth) return 'solid';
+                else if (this.x < sectionWidth * 2) return 'liquid';
+                else return 'gas';
+            }
+
+            update(deltaTime) {
+                const sectionWidth = canvas1.width / 3;
+                const state = this.checkState(sectionWidth);
+
+                const factor = deltaTime / 16.67; // Chuẩn hóa deltaTime (giả định 60fps)
+
+                let fx = 0;
+                let fy = 0;
+
+                // Mức độ chuyển động ngẫu nhiên (năng lượng nhiệt)
+                const thermalMagnitude = (0.005 + temperature1 / 100 * 0.15) * factor;
+
+                // Áp dụng lực Ngẫu nhiên (Nhiệt)
+                fx += (Math.random() - 0.5) * thermalMagnitude;
+                fy += (Math.random() - 0.5) * thermalMagnitude;
+
+                let damping = 0.99;
+
+                // 1. ÁP DỤNG LỰC TRẠNG THÁI
+                if (state === 'solid' && this.isSolid) {
+                    // Lực kéo về vị trí mạng tinh thể
+                    const returnStrength = 0.5;
+                    fx += (this.originalPositionX - this.x) * returnStrength * factor * 0.5;
+                    fy += (this.originalPositionY - this.y) * returnStrength * factor * 0.5;
+
+                    damping = 0.95;
+                    fx *= 0.1;
+                    fy *= 0.1;
+
+                } else if (state === 'liquid') {
+                    damping = 0.98;
+
+                } else if (state === 'gas') {
+                    damping = 0.999;
+                    fx += (Math.random() - 0.5) * 0.5 * factor;
+                    fy += (Math.random() - 0.5) * 0.5 * factor;
+                }
+
+                // 2. Xử lý va chạm giữa các phân tử
+                const PUSH_STRENGTH = 0.05 * factor;
+                const min_dist = 2 * PARTICLE_RADIUS_1;
+
+                for (let other of particles1) {
+                    if (other === this) continue;
+                    const dx = other.x - this.x;
+                    const dy = other.y - this.y;
+                    const distSq = dx * dx + dy * dy;
+
+                    if (distSq < min_dist * min_dist && distSq > 0) {
+                        const dist = Math.sqrt(distSq);
+                        const nx = dx / dist;
+                        const ny = dy / dist;
+
+                        const overlap = min_dist - dist;
+                        const pushForce = overlap * PUSH_STRENGTH;
+
+                        fx -= nx * pushForce;
+                        fy -= ny * pushForce;
+
+                        // Hiệu chỉnh vị trí để tránh dính nhau
+                        const correction = overlap * 0.5;
+                        this.x -= nx * correction;
+                        this.y -= ny * correction;
+                    }
+                }
+
+                // 3. Cập nhật Vận tốc và Vị trí
+                const mass = 1;
+                this.vx += fx / mass;
+                this.vy += fy / mass;
+
+                // Áp dụng Ma sát
+                this.vx *= damping;
+                this.vy *= damping;
+
+                // Cập nhật vị trí
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // 4. XỬ LÝ VA CHẠM BIÊN VẬT LÝ
+                let sectionStartX = (state === 'solid' ? 0 : state === 'liquid' ? sectionWidth : sectionWidth * 2);
+                let sectionEndX = (state === 'solid' ? sectionWidth : state === 'liquid' ? sectionWidth * 2 : canvas1.width);
+                const BOUNCE_FACTOR = 0.8;
+
+                // Va chạm biên X
+                if (this.x < sectionStartX + PARTICLE_RADIUS_1) {
+                    this.x = sectionStartX + PARTICLE_RADIUS_1;
+                    this.vx = Math.abs(this.vx) * BOUNCE_FACTOR;
+                } else if (this.x > sectionEndX - PARTICLE_RADIUS_1) {
+                    this.x = sectionEndX - PARTICLE_RADIUS_1;
+                    this.vx = -Math.abs(this.vx) * BOUNCE_FACTOR;
+                }
+
+                // Va chạm biên Y (toàn bộ canvas)
+                if (this.y < PARTICLE_RADIUS_1) {
+                    this.y = PARTICLE_RADIUS_1;
+                    this.vy = Math.abs(this.vy) * BOUNCE_FACTOR;
+                } else if (this.y > canvas1.height - PARTICLE_RADIUS_1) {
+                    this.y = canvas1.height - PARTICLE_RADIUS_1;
+                    this.vy = -Math.abs(this.vy) * BOUNCE_FACTOR;
+                }
+            }
+
+            draw() {
+                ctx1.shadowBlur = 8;
+                ctx1.shadowColor = this.color;
+                ctx1.shadowOffsetX = 0;
+                ctx1.shadowOffsetY = 0;
+
+                ctx1.beginPath();
+                ctx1.arc(this.x, this.y, PARTICLE_RADIUS_1, 0, Math.PI * 2);
+                ctx1.fillStyle = this.color;
+                ctx1.fill();
+
+                ctx1.shadowBlur = 0;
+            }
+        }
+
+        function createParticles1(count) {
+            particles1 = [];
+            const sectionWidth = canvas1.width / 3;
+            const PADDING = PARTICLE_RADIUS_1 * 2;
+            const particlesPerSection = Math.floor(count / 3);
+            let createdCount = 0;
+
+            // 1. SOLID Section (Lattice Structure)
+            const solidParticles = particlesPerSection;
+            // Tính toán lưới phù hợp với tỷ lệ khung hình hiện tại
+            const area = sectionWidth * canvas1.height;
+            const approxAreaPerParticle = area / solidParticles;
+            const particleSpacing = Math.sqrt(approxAreaPerParticle);
+            
+            let numCols = Math.floor(sectionWidth / particleSpacing);
+            let numRows = Math.floor(canvas1.height / particleSpacing);
+            if (numCols < 1) numCols = 1;
+            if (numRows < 1) numRows = 1;
+
+            const finalSpacingX = sectionWidth / (numCols + 1);
+            const finalSpacingY = canvas1.height / (numRows + 1);
+
+            let i = 0;
+            for (let row = 1; row <= numRows; row++) {
+                for (let col = 1; col <= numCols; col++) {
+                    if (i >= solidParticles) break;
+                    
+                    let x = col * finalSpacingX;
+                    let y = row * finalSpacingY;
+                    
+                    const vx = (Math.random() - 0.5) * 0.05;
+                    const vy = (Math.random() - 0.5) * 0.05;
+
+                    const p = new Particle1(x, y, vx, vy, '#10B981', true); // Xanh ngọc lục bảo (Emerald)
+                    particles1.push(p);
+                    createdCount++;
+                    i++;
+                }
+                if (i >= solidParticles) break;
+            }
+
+
+            // 2. LIQUID Section
+            const liquidStart = sectionWidth;
+            const liquidParticles = particlesPerSection;
+            for (let i = 0; i < liquidParticles; i++) {
+                 if (createdCount >= count) break;
+
+                let x = liquidStart + PADDING + Math.random() * (sectionWidth - PADDING * 2);
+                let y = canvas1.height - (PADDING + Math.random() * (canvas1.height * 0.7)); // Tập trung ở dưới
+
+                const vx = (Math.random() - 0.5) * 0.5;
+                const vy = (Math.random() - 0.5) * 0.5;
+
+                const p = new Particle1(x, y, vx, vy, '#3B82F6', false); // Xanh dương (Blue)
+                particles1.push(p);
+                createdCount++;
+            }
+
+            // 3. GAS Section (and remaining particles)
+            const gasStart = sectionWidth * 2;
+            while (createdCount < count) {
+                let x = gasStart + PADDING + Math.random() * (sectionWidth - PADDING * 2);
+                let y = PADDING + Math.random() * (canvas1.height - PADDING * 2);
+
+                const vx = (Math.random() - 0.5) * 3;
+                const vy = (Math.random() - 0.5) * 3;
+
+                const p = new Particle1(x, y, vx, vy, '#F59E0B', false); // Vàng cam (Amber)
+                particles1.push(p);
+                createdCount++;
+            }
+        }
+
+        let lastTime1 = 0;
+
+        function animate1(currentTime) {
+            const deltaTime = currentTime - (lastTime1 || currentTime - 16.67);
+            lastTime1 = currentTime;
+
+            ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+
+            // --- VẼ NỀN KHU VỰC ---
+            const sectionWidth = canvas1.width / 3;
+            
+            // Solid
+            ctx1.fillStyle = 'rgba(16, 185, 129, 0.15)'; // Emerald
+            ctx1.fillRect(0, 0, sectionWidth, canvas1.height);
+            // Liquid
+            ctx1.fillStyle = 'rgba(59, 130, 246, 0.15)'; // Blue
+            ctx1.fillRect(sectionWidth, 0, sectionWidth, canvas1.height);
+            // Gas
+            ctx1.fillStyle = 'rgba(245, 158, 11, 0.15)'; // Amber
+            ctx1.fillRect(sectionWidth * 2, 0, sectionWidth, canvas1.height);
+
+            // Vẽ đường phân chia
+            ctx1.strokeStyle = '#6B7280';
+            ctx1.lineWidth = 2;
+            ctx1.setLineDash([5, 5]);
+            ctx1.beginPath();
+            ctx1.moveTo(sectionWidth, 0); ctx1.lineTo(sectionWidth, canvas1.height);
+            ctx1.moveTo(sectionWidth * 2, 0); ctx1.lineTo(sectionWidth * 2, canvas1.height);
+            ctx1.stroke();
+            ctx1.setLineDash([]);
+
+            // Ghi nhãn trạng thái
+            ctx1.fillStyle = '#d1d5db';
+            const fontSize = Math.max(12, canvas1.height / 30);
+            ctx1.font = `${fontSize}px Inter`;
+            ctx1.textAlign = 'center';
+            ctx1.fillText('RẮN', sectionWidth / 2, fontSize * 1.5);
+            ctx1.fillText('LỎNG', sectionWidth * 1.5, fontSize * 1.5);
+            ctx1.fillText('KHÍ', sectionWidth * 2.5, fontSize * 1.5);
+
+            // Cập nhật và vẽ các phân tử
+            particles1.forEach(p => {
+                p.update(deltaTime);
+                p.draw();
+            });
+
+            animationFrame1 = requestAnimationFrame(animate1);
+        }
+
+        function resizeCanvas1() {
+            if (!canvas1 || !canvas1.parentElement) return;
+            const container = canvas1.parentElement;
+            
+            // Lấy kích thước hiện tại của container
+            const displayedWidth = container.clientWidth;
+            const displayedHeight = container.clientHeight;
+
+            // Chỉ thay đổi kích thước canvas khi cần
+            if (canvas1.width !== displayedWidth || canvas1.height !== displayedHeight) {
+                // Đặt kích thước Canvas bằng kích thước container
+                canvas1.width = displayedWidth;
+                canvas1.height = displayedHeight;
+                
+                // Cần khởi tạo lại vị trí hạt để phù hợp với kích thước mới
+                createParticles1(parseInt(countRange1.value));
+            }
+        }
+
+        function initSimulation1() {
+            canvas1 = document.getElementById('simulationCanvas');
+            ctx1 = canvas1.getContext('2d');
+            tempRange1 = document.getElementById('tempRange1');
+            tempValue1 = document.getElementById('tempValue1');
+            countRange1 = document.getElementById('particleCount1');
+            countValue1 = document.getElementById('countValue1');
+            const resetButton1 = document.getElementById('resetButton1');
+
+            // Cập nhật giá trị ban đầu
+            temperature1 = parseInt(tempRange1.value);
+
+            // Sự kiện điều khiển
+            tempRange1.addEventListener('input', (e) => {
+                temperature1 = parseInt(e.target.value);
+                tempValue1.textContent = temperature1;
+            });
+            countRange1.addEventListener('input', (e) => {
+                const count = parseInt(e.target.value);
+                countValue1.textContent = count;
+                createParticles1(count);
+            });
+            resetButton1.addEventListener('click', () => {
+                createParticles1(parseInt(countRange1.value));
+            });
+
+            // Khởi tạo kích thước và hạt ban đầu
+            resizeCanvas1();
+            createParticles1(parseInt(countRange1.value));
+            
+            // Bắt đầu vòng lặp hoạt ảnh
+            lastTime1 = performance.now();
+            animate1(lastTime1);
+        }
+
+        
+        // ==========================================================
+        // LOGIC MÔ PHỎNG 2 (3D Phase Transition - Nước)
+        // ==========================================================
+        let scene2, camera2, renderer2, controls2, molecules2 = [], temperature2 = 25;
+        let is3DMode2 = false;
+        let animationFrame2;
+        const CONTAINER_SIZE = 40;
+        const MOLECULE_RADIUS = 1;
+        const NUM_MOLECULES = 100;
+
+        function updateTempDisplay2(temp) {
+            let state;
+            if (temp < 0) state = 'Rắn (Nước đá)';
+            else if (temp >= 0 && temp < 100) state = 'Lỏng (Nước)';
+            else state = 'Khí (Hơi nước)';
+            document.getElementById('tempValue2').textContent = `${temp}°C (${state})`;
+        }
+
+        function updateSimulation2(temp) {
+            // Tốc độ tối đa tăng theo nhiệt độ
+            let maxSpeed = 0.05 + Math.min(1, Math.max(0, temp + 100) / 250) * 0.3;
+            const bondFactor = 0.00005;
+
+            molecules2.forEach(molA => {
+
+                // Tác động nhiệt (lực ngẫu nhiên)
+                molA.velocity.add(new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.005 * maxSpeed * 10,
+                    (Math.random() - 0.5) * 0.005 * maxSpeed * 10,
+                    (Math.random() - 0.5) * 0.005 * maxSpeed * 10
+                ));
+
+                // Xử lý trạng thái (Rắn, Lỏng, Khí)
+                if (temp < 0) { // Rắn (Nước đá)
+                    // Lực kéo về vị trí tinh thể
+                    const returnStrength = 0.005 + (0 - temp) * 0.0001;
+                    molA.velocity.sub(molA.position.clone().sub(molA.originalPosition).multiplyScalar(returnStrength));
+                    molA.velocity.multiplyScalar(0.98); // Damping cao (ít chuyển động)
+                } else if (temp >= 0 && temp < 100) { // Lỏng
+                    molA.velocity.multiplyScalar(0.99); // Damping vừa phải
+                } else { // Khí (Hơi nước)
+                    molA.velocity.multiplyScalar(0.999); // Damping thấp (chuyển động tự do)
+                }
+
+                // Xử lý va chạm và lực liên kết (Lennard-Jones like)
+                molecules2.forEach(molB => {
+                    if (molA === molB) return;
+
+                    const distance = molA.position.distanceTo(molB.position);
+                    const direction = molB.position.clone().sub(molA.position);
+
+                    if (distance < 2 * MOLECULE_RADIUS + 0.5 && distance > 0.1) {
+                        // Lực đẩy khi quá gần (Va chạm vật lý)
+                        if (distance < 2 * MOLECULE_RADIUS) {
+                            const overlap = 2 * MOLECULE_RADIUS - distance;
+                            molA.velocity.add(direction.normalize().multiplyScalar(-overlap * 0.015));
+                        }
+
+                        // Lực hút/liên kết (Chỉ mạnh ở Lỏng)
+                        if (temp >= 0 && temp < 100) {
+                             const strength = bondFactor * (1/distance);
+                             molA.velocity.add(direction.normalize().multiplyScalar(strength));
+                        }
+                    }
+                });
+
+                // Giới hạn tốc độ
+                if (molA.velocity.length() > maxSpeed) {
+                    molA.velocity.setLength(maxSpeed);
+                }
+
+                molA.position.add(molA.velocity);
+
+                // Xử lý va chạm biên
+                const boundaryX2 = CONTAINER_SIZE / 2 - MOLECULE_RADIUS;
+                const boundaryY2 = CONTAINER_SIZE / 2 - MOLECULE_RADIUS;
+                const boundaryZ2 = CONTAINER_SIZE / 2 - MOLECULE_RADIUS;
+
+                if (molA.position.x > boundaryX2) { molA.position.x = boundaryX2; molA.velocity.x *= -0.9; }
+                if (molA.position.x < -boundaryX2) { molA.position.x = -boundaryX2; molA.velocity.x *= -0.9; }
+                if (molA.position.y > boundaryY2) { molA.position.y = boundaryY2; molA.velocity.y *= -0.9; }
+                if (molA.position.y < -boundaryY2) { molA.position.y = -boundaryY2; molA.velocity.y *= -0.9; }
+
+                // Xử lý va chạm biên Z
+                if (is3DMode2) {
+                    if (molA.position.z > boundaryZ2) { molA.position.z = boundaryZ2; molA.velocity.z *= -0.9; }
+                    if (molA.position.z < -boundaryZ2) { molA.position.z = -boundaryZ2; molA.velocity.z *= -0.9; }
+                } else {
+                    // Trong 2D, giới hạn chuyển động Z rất nhỏ
+                    molA.position.z *= 0.8;
+                    molA.velocity.z *= 0.5;
+                }
+
+                // Cập nhật màu sắc dựa trên tốc độ (năng lượng)
+                const speedNormalized = molA.velocity.length() / (maxSpeed + 0.05);
+                molA.material.color.setHSL(0.6 - speedNormalized * 0.6, 1, 0.7);
+            });
+        }
+
+
+        function animate2() {
+            if (controls2) controls2.update();
+            updateSimulation2(temperature2);
+
+            renderer2.render(scene2, camera2);
+            animationFrame2 = requestAnimationFrame(animate2);
+        }
+
+        function createScene2() {
+            const threeDContainer = document.getElementById('threeDContainer');
+            
+            // Chỉ khởi tạo Renderer/Scene nếu chưa có
+            if (!scene2) {
+                scene2 = new THREE.Scene();
+                scene2.background = new THREE.Color(0x1f2937);
+
+                // Thiết lập Renderer
+                renderer2 = new THREE.WebGLRenderer({ antialias: true });
+                threeDContainer.appendChild(renderer2.domElement);
+            }
+            
+            // Thiết lập Camera
+            const aspect = threeDContainer.clientWidth / threeDContainer.clientHeight;
+            if (!camera2) {
+                camera2 = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+            }
+            camera2.aspect = aspect;
+            camera2.updateProjectionMatrix();
+            camera2.position.z = CONTAINER_SIZE * 1.2;
+            
+            renderer2.setSize(threeDContainer.clientWidth, threeDContainer.clientHeight);
+
+
+            // Ánh sáng
+            scene2.add(new THREE.AmbientLight(0xcccccc, 0.8));
+            scene2.add(new THREE.DirectionalLight(0xffffff, 0.5));
+
+            // Controls (Chỉ khởi tạo 1 lần)
+            if (!controls2) {
+                controls2 = new THREE.OrbitControls(camera2, renderer2.domElement);
+                controls2.enableDamping = true;
+                controls2.dampingFactor = 0.05;
+            } else {
+                 controls2.domElement = renderer2.domElement;
+            }
+
+            // Xóa mô hình cũ (nếu có)
+            molecules2.forEach(mol => scene2.remove(mol));
+            molecules2 = [];
+            const oldBox = scene2.getObjectByName('ContainerBox');
+            if (oldBox) scene2.remove(oldBox);
+
+
+            // Tạo Box container (viền)
+            const boxGeometry = new THREE.BoxGeometry(CONTAINER_SIZE, CONTAINER_SIZE, CONTAINER_SIZE);
+            const edges = new THREE.EdgesGeometry(boxGeometry);
+            const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x4B5563 }));
+            line.position.set(0, 0, 0);
+            line.name = 'ContainerBox';
+            scene2.add(line);
+
+
+            // Khởi tạo các phân tử
+            const moleculeGeometry = new THREE.SphereGeometry(MOLECULE_RADIUS, 16, 16);
+            for (let i = 0; i < NUM_MOLECULES; i++) {
+                const material = new THREE.MeshPhongMaterial({ color: 0x00ffff });
+                const molecule = new THREE.Mesh(moleculeGeometry, material);
+
+                // Vị trí ban đầu
+                const pos = new THREE.Vector3(
+                    (Math.random() - 0.5) * CONTAINER_SIZE * 0.5,
+                    (Math.random() - 0.5) * CONTAINER_SIZE * 0.5,
+                    (Math.random() - 0.5) * CONTAINER_SIZE * 0.5
+                );
+
+                molecule.position.copy(pos);
+                molecule.originalPosition = pos.clone();
+
+                molecule.velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.01,
+                    (Math.random() - 0.5) * 0.01,
+                    (Math.random() - 0.5) * 0.01
+                );
+
+                molecules2.push(molecule);
+                scene2.add(molecule);
+            }
+        }
+
+        function handleResize2() {
+            const threeDContainer = document.getElementById('threeDContainer');
+            if (!threeDContainer || !camera2 || !renderer2) return;
+            
+            const width = threeDContainer.clientWidth;
+            const height = threeDContainer.clientHeight;
+
+            camera2.aspect = width / height;
+            camera2.updateProjectionMatrix();
+            renderer2.setSize(width, height);
+        }
+
+        function initSimulation2() {
+            const tempRange2 = document.getElementById('tempRange2');
+            const modeToggle2 = document.getElementById('modeToggle2');
+
+            // Khởi tạo scene, camera, renderer
+            createScene2();
+
+            // Lắng nghe sự kiện
+            tempRange2.addEventListener('input', (e) => {
+                temperature2 = parseInt(e.target.value);
+                updateTempDisplay2(temperature2);
+            });
+            modeToggle2.addEventListener('change', (e) => {
+                is3DMode2 = e.target.checked;
+            });
+
+            // Cập nhật trạng thái hiển thị ban đầu
+            updateTempDisplay2(temperature2);
+            handleResize2();
+            
+            // Bắt đầu vòng lặp hoạt ảnh
+            animate2();
+        }
+    </script>
+</body>
+</html>

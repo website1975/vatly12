@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cấu Trúc Và Sự Chuyển Thể</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .slide {
+            min-height: 80vh;
+            border-radius: 1rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: opacity 0.5s ease-in-out, transform 0.3s ease;
+        }
+        .quiz-container {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .quiz-option {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .quiz-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px -2px rgba(0, 0, 0, 0.15);
+        }
+        .correct-answer {
+            background-color: #4CAF50 !important; /* Green */
+            color: white !important;
+            border: 3px solid #388E3C;
+        }
+        .incorrect-answer {
+            background-color: #F44336 !important; /* Red */
+            color: white !important;
+            border: 3px solid #D32F2F;
+        }
+        .progress-bar {
+            height: 10px;
+            background-color: #4f46e5;
+            transition: width 1s linear;
+        }
+        .celebration-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.1);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            padding: 2rem;
+            border-radius: 1rem;
+            z-index: 1000;
+        }
+        .celebration-popup.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* CSS cho Mô phỏng Phân tử */
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #38bdf8; /* Màu xanh da trời */
+            border-radius: 50%;
+            box-shadow: 0 0 5px 2px rgba(56, 189, 248, 0.7);
+            /* animation properties added dynamically via JS */
+            animation-iteration-count: infinite;
+            animation-direction: alternate;
+            animation-timing-function: linear;
+        }
+
+        /* Styling cho sơ đồ chuyển thể TAM GIÁC */
+        .phase-diagram {
+            position: relative;
+            width: 100%;
+            height: 300px; /* Chiều cao cố định cho sơ đồ tam giác */
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            margin-bottom: 3rem;
+        }
+        .state-node {
+            position: absolute;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px; /* Pill shape */
+            font-weight: 700;
+            color: #ffffff;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border: 3px solid white;
+            transition: transform 0.3s ease;
+        }
+        .state-node:hover {
+             transform: scale(1.05);
+        }
+        .solid-node { top: 0; left: 50%; transform: translateX(-50%); background-color: #ef4444; }
+        .liquid-node { bottom: 0; left: 0%; background-color: #3b82f6; }
+        .gas-node { bottom: 0; right: 0%; background-color: #10b981; }
+
+        /* Đường nét và chú thích */
+        .line-segment {
+            position: absolute;
+            z-index: 10;
+        }
+        .line-label {
+            position: absolute;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.1rem 0.5rem;
+            border-radius: 0.25rem;
+            line-height: 1;
+            z-index: 20;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .heat-in { background-color: #fef2f2; color: #dc2626; border: 1px solid #f87171;} /* Thu nhiệt */
+        .heat-out { background-color: #eff6ff; color: #2563eb; border: 1px solid #60a5fa;} /* Toả nhiệt */
+
+        /* Sử dụng SVG cho các đường kẻ và mũi tên */
+        .diagram-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div id="app" class="max-w-4xl mx-auto">
+        
+        <!-- Header -->
+        <header class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-indigo-700">CHỦ ĐỀ: CẤU TRÚC VÀ SỰ CHUYỂN THỂ</h1>
+            <p class="text-gray-500">Bài học tương tác và Trắc nghiệm củng cố</p>
+        </header>
+
+        <!-- Main Content Area -->
+        <div id="content-area" class="bg-white p-6 md:p-10 transition-all duration-500">
+            <!-- Slides will be injected here -->
+        </div>
+
+        <!-- Navigation and Status -->
+        <div id="controls" class="mt-6 flex justify-between items-center">
+            <button id="prev-btn" onclick="prevSlide()" class="px-4 py-2 bg-gray-300 text-gray-700 font-semibold rounded-lg shadow-md hover:bg-gray-400 transition duration-150 disabled:opacity-50" disabled>
+                &larr; Quay lại
+            </button>
+            <div id="status" class="text-lg font-medium text-indigo-600">
+                Slide 1/5
+            </div>
+            <button id="next-btn" onclick="nextSlide()" class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150">
+                Tiếp theo &rarr;
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Celebration/Encouragement Popup -->
+    <div id="popup" class="celebration-popup hidden"></div>
+
+    <script>
+        // Dữ liệu Bài giảng (Slides)
+        const slides = [
+            {
+                title: "I. MÔ HÌNH ĐỘNG HỌC PHÂN TỬ",
+                content: `
+                    <div class="md:flex md:space-x-8">
+                        <div class="md:w-1/2">
+                            <ul class="space-y-4 text-gray-700 text-lg">
+                                <li><span class="font-semibold text-indigo-600">1. Cấu tạo:</span> Các chất được cấu tạo từ các hạt riêng biệt (phân tử, nguyên tử, ion).</li>
+                                <li><span class="font-semibold text-indigo-600">2. Chuyển động:</span> Các phân tử chuyển động không ngừng (chuyển động nhiệt). <br/> &rarr; Nhiệt độ càng cao, tốc độ chuyển động càng lớn.</li>
+                                <li><span class="font-semibold text-indigo-600">3. Lực tương tác:</span> Giữa các phân tử có lực hút và lực đẩy (lực liên kết phân tử).</li>
+                            </ul>
+                        </div>
+                        <!-- KHUNG MÔ HÌNH ĐỘNG HỌC CÓ ANIMATION -->
+                        <div class="md:w-1/2 mt-6 md:mt-0 flex items-center justify-center bg-gray-900 p-4 rounded-xl h-64 relative overflow-hidden border-4 border-indigo-400">
+                            <div id="molecular-model" class="w-full h-full relative">
+                                <!-- Particles will be generated here -->
+                                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white/50 text-sm select-none">Mô phỏng Chuyển động Nhiệt</div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "II. CẤU TRÚC CỦA VẬT CHẤT (3 Thể)",
+                content: `
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200 rounded-lg text-center">
+                            <thead>
+                                <tr class="bg-indigo-500 text-white">
+                                    <th class="py-2 px-4 border-b">Đặc điểm</th>
+                                    <th class="py-2 px-4 border-b">Thể Rắn</th>
+                                    <th class="py-2 px-4 border-b">Thể Lỏng</th>
+                                    <th class="py-2 px-4 border-b">Thể Khí</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm text-gray-700">
+                                <tr>
+                                    <td class="py-2 px-4 border-b font-semibold">Khoảng cách p.tử</td>
+                                    <td class="py-2 px-4 border-b">Rất gần nhau (cỡ kích thước p.tử)</td>
+                                    <td class="py-2 px-4 border-b">Xa nhau</td>
+                                    <td class="py-2 px-4 border-b">Rất xa nhau (gấp hàng chục lần)</td>
+                                </tr>
+                                <tr class="bg-indigo-50">
+                                    <td class="py-2 px-4 border-b font-semibold">Sự sắp xếp</td>
+                                    <td class="py-2 px-4 border-b">
+                                        <div class="flex flex-col items-center justify-center h-20">
+                                            <span class="text-2xl mb-1">🧊</span>
+                                            <span class="font-bold text-green-700">Trật tự (Mạng tinh thể)</span>
+                                            <span class="text-xs text-gray-600">Phân tử nằm tại các nút cố định.</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-2 px-4 border-b">
+                                        <div class="flex flex-col items-center justify-center h-20">
+                                            <span class="text-2xl mb-1">💧</span>
+                                            <span class="font-bold text-yellow-700">Kém trật tự (Trật tự gần)</span>
+                                            <span class="text-xs text-gray-600">Phân tử trượt và di chuyển qua lại.</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-2 px-4 border-b">
+                                        <div class="flex flex-col items-center justify-center h-20">
+                                            <span class="text-2xl mb-1">💨</span>
+                                            <span class="font-bold text-red-700">Hoàn toàn hỗn loạn</span>
+                                            <span class="text-xs text-gray-600">Phân tử chuyển động không ngừng.</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 px-4 border-b font-semibold">Chuyển động p.tử</td>
+                                    <td class="py-2 px-4 border-b">Chỉ dao động quanh VTCB cố định</td>
+                                    <td class="py-2 px-4 border-b">Dao động quanh VTCB luôn thay đổi</td>
+                                    <td class="py-2 px-4 border-b">Chuyển động hỗn loạn không ngừng</td>
+                                </tr>
+                                <tr class="bg-indigo-50">
+                                    <td class="py-2 px-4 border-b font-semibold">Hình dạng/Thể tích</td>
+                                    <td class="py-2 px-4 border-b">Xác định/Xác định, khó nén</td>
+                                    <td class="py-2 px-4 border-b">Không xác định/Xác định, khó nén</td>
+                                    <td class="py-2 px-4 border-b">Không xác định/Không xác định, dễ nén</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 px-4 font-semibold">Lực tương tác</td>
+                                    <td class="py-2 px-4">Lớn</td>
+                                    <td class="py-2 px-4">Trung bình</td>
+                                    <td class="py-2 px-4">Nhỏ</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            },
+            {
+                title: "III. SỰ CHUYỂN THỂ & PHÂN LOẠI CHẤT RẮN",
+                content: `
+                    <div class="md:flex md:space-x-8">
+                        <div class="md:w-1/2">
+                            <h3 class="text-xl font-bold text-red-600 mb-6">1. Sơ đồ Chuyển Thể (Tam giác Trạng thái)</h3>
+                            <!-- Sơ đồ Tam giác Chuyển thể trực quan -->
+                            <div class="phase-diagram relative">
+                                <!-- Nodes -->
+                                <div class="state-node solid-node" style="left: 50%; top: 0; transform: translateX(-50%);">RẮN 🧊</div>
+                                <div class="state-node liquid-node" style="left: 0; bottom: 0;">LỎNG 💧</div>
+                                <div class="state-node gas-node" style="right: 0; bottom: 0;">KHÍ 💨</div>
+                                
+                                <!-- SVG for Lines and Arrows -->
+                                <svg class="diagram-svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
+                                    <!-- Tính toán vị trí các đỉnh để đặt đường kẻ chính xác (giả định 3 đỉnh R(200, 30), L(50, 270), K(350, 270)) -->
+                                    <defs>
+                                        <marker id="arrowhead-in" markerWidth="6" markerHeight="6" refX="2" refY="3" orient="auto">
+                                            <polygon points="0 0, 6 3, 0 6" fill="#dc2626" />
+                                        </marker>
+                                        <marker id="arrowhead-out" markerWidth="6" markerHeight="6" refX="2" refY="3" orient="auto">
+                                            <polygon points="0 0, 6 3, 0 6" fill="#2563eb" />
+                                        </marker>
+                                    </defs>
+
+                                    <!-- RẮN (200, 30) <-> LỎNG (50, 270) -->
+                                    <!-- Nóng chảy (Thu nhiệt): Lỏng -> Rắn -->
+                                    <path d="M 60 260 L 190 40" stroke="#dc2626" stroke-width="2" marker-end="url(#arrowhead-in)" fill="none"/>
+                                    <!-- Đông đặc (Toả nhiệt): Rắn -> Lỏng -->
+                                    <path d="M 190 40 L 60 260" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowhead-out)" fill="none"/>
+                                    
+                                    <!-- LỎNG (50, 270) <-> KHÍ (350, 270) -->
+                                    <!-- Hóa hơi (Thu nhiệt): Lỏng -> Khí -->
+                                    <path d="M 60 270 L 340 270" stroke="#dc2626" stroke-width="2" marker-end="url(#arrowhead-in)" fill="none"/>
+                                    <!-- Ngưng tụ (Toả nhiệt): Khí -> Lỏng -->
+                                    <path d="M 340 280 L 60 280" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowhead-out)" fill="none"/>
+
+                                    <!-- RẮN (200, 30) <-> KHÍ (350, 270) -->
+                                    <!-- Thăng hoa (Thu nhiệt): Rắn -> Khí -->
+                                    <path d="M 210 40 L 340 260" stroke="#dc2626" stroke-width="2" marker-end="url(#arrowhead-in)" fill="none"/>
+                                    <!-- Ngưng đọng (Toả nhiệt): Khí -> Rắn -->
+                                    <path d="M 340 260 L 210 40" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowhead-out)" fill="none"/>
+
+                                    <!-- Chú thích Quá trình và Nhiệt -->
+                                    
+                                    <!-- RẮN <-> LỎNG (Trục bên trái) -->
+                                    <foreignObject x="100" y="100" width="100" height="50">
+                                        <div xmlns="http://www.w3.org/1999/xhtml" class="line-label heat-in" style="transform: rotate(-50deg) translate(-75%, 0);">Nóng chảy (Thu Nhiệt)</div>
+                                    </foreignObject>
+                                    <foreignObject x="100" y="150" width="100" height="50">
+                                        <div xmlns="http://www.w3.org/1999/xhtml" class="line-label heat-out" style="transform: rotate(-50deg) translate(-10%, 0);">Đông đặc (Toả Nhiệt)</div>
+                                    </foreignObject>
+                                    
+                                    <!-- LỎNG <-> KHÍ (Trục dưới) -->
+                                    <foreignObject x="100" y="235" width="200" height="30">
+                                        <div xmlns="http://www.w3.org/1999/xhtml" class="line-label heat-in" style="margin-left: 20px;">Hóa hơi (Thu Nhiệt)</div>
+                                    </foreignObject>
+                                    <foreignObject x="100" y="285" width="200" height="30">
+                                        <div xmlns="http://www.w3.org/1999/xhtml" class="line-label heat-out" style="margin-left: 20px;">Ngưng tụ (Toả Nhiệt)</div>
+                                    </foreignObject>
+
+                                    <!-- RẮN <-> KHÍ (Trục bên phải) -->
+                                    <foreignObject x="200" y="100" width="100" height="50">
+                                        <div xmlns="http://www.w3.org/1999/xhtml" class="line-label heat-in" style="transform: rotate(50deg) translate(-25%, 0);">Thăng hoa (Thu Nhiệt)</div>
+                                    </foreignObject>
+                                    <foreignObject x="200" y="150" width="100" height="50">
+                                        <div xmlns="http://www.w3.org/1999/xhtml" class="line-label heat-out" style="transform: rotate(50deg) translate(25%, 0);">Ngưng đọng (Toả Nhiệt)</div>
+                                    </foreignObject>
+                                </svg>
+                            </div>
+
+                            <h3 class="text-xl font-bold text-indigo-600 mb-3 border-t pt-4">2. Phân Loại Chất Rắn</h3>
+                            <ul class="list-disc ml-6 text-gray-700 space-y-2">
+                                <li><span class="font-bold text-indigo-700">Kết tinh:</span> Có cấu trúc tinh thể, có nhiệt độ nóng chảy <span class="text-green-600 font-extrabold">XÁC ĐỊNH</span> (Muối, Kim cương).</li>
+                                <li><span class="font-bold text-indigo-700">Vô định hình:</span> Không có cấu trúc tinh thể, nóng chảy <span class="text-red-600 font-extrabold">KHÔNG XÁC ĐỊNH</span> (mềm dần) (Thủy tinh, nhựa).</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="md:w-1/2 mt-6 md:mt-0 flex flex-col items-center justify-center bg-gray-50 p-4 rounded-xl shadow-inner">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Đồ Thị Nóng Chảy (Nhiệt độ $T$ vs Nhiệt lượng $Q$)</h3>
+                            <!-- SVG cho Đồ thị Nóng chảy (Kết tinh vs Vô định hình) -->
+                            <svg width="100%" height="250" viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg" class="max-w-xs">
+                                <!-- Axes -->
+                                <line x1="50" y1="220" x2="380" y2="220" stroke="#374151" stroke-width="2"/>
+                                <line x1="50" y1="220" x2="50" y2="20" stroke="#374151" stroke-width="2"/>
+                                
+                                <!-- Labels -->
+                                <text x="385" y="225" font-size="12" fill="#374151" font-weight="bold">Q (Nhiệt lượng)</text>
+                                <text x="35" y="25" font-size="12" fill="#374151" font-weight="bold">T (Nhiệt độ)</text>
+
+                                <!-- Chất Rắn Kết Tinh (Đường B - Green/Blue) -->
+                                <path id="curveB" d="M 50 180 L 150 180 L 220 110 L 350 110" fill="none" stroke="#22c55e" stroke-width="3" stroke-dasharray="0"/>
+                                <text x="360" y="115" font-size="12" fill="#22c55e" font-weight="bold">B (Kết Tinh)</text>
+                                <text x="180" y="200" font-size="12" fill="#22c55e" font-weight="bold">T=const (Nóng chảy)</text>
+                                <circle cx="150" cy="180" r="4" fill="#22c55e"/>
+
+                                <!-- Chất Rắn Vô Định Hình (Đường A - Red/Orange) -->
+                                <path id="curveA" d="M 50 200 L 120 160 L 250 100 L 350 80" fill="none" stroke="#ef4444" stroke-width="3" stroke-dasharray="4 2"/>
+                                <text x="360" y="85" font-size="12" fill="#ef4444" font-weight="bold">A (Vô Định Hình)</text>
+                                
+                                <!-- Ghi chú Nóng chảy xác định -->
+                                <line x1="45" y1="180" x2="55" y2="180" stroke="#22c55e" stroke-width="1"/>
+                                <text x="15" y="185" font-size="10" fill="#22c55e">T<sub>nc</sub></text>
+
+                            </svg>
+                            <p class="text-xs text-gray-500 mt-2">Đường B: Nóng chảy ở nhiệt độ xác định. Đường A: Nhiệt độ tăng liên tục.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "IV. SỰ SÔI VÀ SỰ BAY HƠI",
+                content: `
+                    <div class="md:flex md:space-x-8">
+                        <div class="md:w-1/2 p-4 bg-yellow-50 rounded-lg">
+                            <h3 class="text-xl font-semibold text-yellow-800 mb-3 border-b border-yellow-300 pb-2">SỰ BAY HƠI</h3>
+                            <ul class="list-disc ml-6 text-gray-700 space-y-2">
+                                <li>Xảy ra <span class="font-bold">ở mặt thoáng</span> của chất lỏng.</li>
+                                <li>Xảy ra ở <span class="font-bold">mọi nhiệt độ</span>.</li>
+                                <li><span class="font-semibold">Tốc độ phụ thuộc:</span> Diện tích mặt thoáng, tốc độ gió, nhiệt độ, độ ẩm không khí.</li>
+                            </ul>
+                        </div>
+                        <div class="md:w-1/2 mt-6 md:mt-0 p-4 bg-green-50 rounded-lg">
+                            <h3 class="text-xl font-semibold text-green-800 mb-3 border-b border-green-300 pb-2">SỰ SÔI</h3>
+                            <ul class="list-disc ml-6 text-gray-700 space-y-2">
+                                <li>Xảy ra <span class="font-bold">cả trong lòng và trên bề mặt</span> chất lỏng.</li>
+                                <li>Xảy ra ở <span class="font-bold">nhiệt độ sôi xác định</span>.</li>
+                                <li><span class="font-semibold">Nhiệt độ sôi phụ thuộc:</span> Áp suất trên mặt thoáng, bản chất chất lỏng.</li>
+                                <li><span class="font-bold text-red-500">LƯU Ý:</span> Trong quá trình hoá hơi (sôi), nhiệt độ chất không thay đổi.</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "CỦNG CỐ BÀI HỌC: TRÒ CHƠI TRẮC NGHIỆM",
+                content: `
+                    <div class="text-center py-10">
+                        <h2 class="text-3xl font-bold text-indigo-700 mb-4">SẴN SÀNG CHƯA?</h2>
+                        <p class="text-xl text-gray-600 mb-8">Hãy làm bài trắc nghiệm nhanh để củng cố kiến thức. Mỗi câu 15 giây!</p>
+                        <button id="start-quiz-btn" onclick="startQuiz()" class="px-8 py-4 bg-green-500 text-white text-xl font-bold rounded-full shadow-lg hover:bg-green-600 transition duration-150 transform hover:scale-105">
+                            BẮT ĐẦU TRẮC NGHIỆM
+                        </button>
+                    </div>
+                `,
+                isQuizIntro: true
+            }
+        ];
+
+        // Dữ liệu Trắc nghiệm (Quiz)
+        const quizQuestions = [
+            {
+                questionNumber: 1,
+                question: "Theo Mô hình động học phân tử, tốc độ chuyển động của các phân tử thay đổi như thế nào khi nhiệt độ vật chất tăng?",
+                answerOptions: [
+                    { text: "Giảm dần", isCorrect: false, rationale: "Tốc độ chuyển động nhiệt của phân tử tỉ lệ thuận với nhiệt độ tuyệt đối." },
+                    { text: "Tăng dần", isCorrect: true, rationale: "Khi nhiệt độ tăng, động năng trung bình của các phân tử tăng, làm chúng chuyển động nhanh hơn." },
+                    { text: "Không thay đổi", isCorrect: false, rationale: "Chuyển động nhiệt luôn thay đổi theo nhiệt độ môi trường xung quanh." },
+                    { text: "Ban đầu tăng, sau đó giảm", isCorrect: false, rationale: "Tốc độ chỉ tăng lên liên tục khi nhiệt độ tăng liên tục." }
+                ],
+                hint: "Hãy nhớ lại mối quan hệ giữa nhiệt độ và động năng của các phân tử trong vật chất."
+            },
+            {
+                questionNumber: 2,
+                question: "Đặc điểm nào về sự sắp xếp phân tử là ĐÚNG với Thể Khí?",
+                answerOptions: [
+                    { text: "Trật tự, tạo thành mạng tinh thể", isCorrect: false, rationale: "Đây là đặc điểm của chất ở thể rắn (kết tinh)." },
+                    { text: "Kém trật tự, chỉ có trật tự gần", isCorrect: false, rationale: "Đây là đặc điểm của chất ở thể lỏng." },
+                    { text: "Hoàn toàn không có trật tự (hỗn loạn)", isCorrect: true, rationale: "Trong thể khí, khoảng cách giữa các phân tử rất lớn và chúng chuyển động hỗn loạn không ngừng." },
+                    { text: "Dao động quanh vị trí cân bằng cố định", isCorrect: false, rationale: "Đây là đặc điểm của chuyển động phân tử trong chất rắn." }
+                ],
+                hint: "Hãy hình dung khoảng cách giữa các phân tử trong thể khí rất xa nhau so với kích thước của chúng."
+            },
+            {
+                questionNumber: 3,
+                question: "Chất rắn vô định hình khác chất rắn kết tinh ở đặc điểm nóng chảy nào?",
+                answerOptions: [
+                    { text: "Nóng chảy ở nhiệt độ không đổi", isCorrect: false, rationale: "Đây là đặc điểm của chất rắn kết tinh." },
+                    { text: "Nóng chảy liên tục, nhiệt độ tăng dần", isCorrect: true, rationale: "Chất rắn vô định hình mềm dần và chuyển sang lỏng trong một khoảng nhiệt độ, không có nhiệt độ nóng chảy xác định." },
+                    { text: "Không bao giờ nóng chảy, chỉ phân hủy", isCorrect: false, rationale: "Các chất vô định hình như thủy tinh, nhựa vẫn có thể chuyển sang trạng thái lỏng (mềm) khi nhiệt độ tăng." },
+                    { text: "Có tính dị hướng về nhiệt", isCorrect: false, rationale: "Chất rắn vô định hình có tính đẳng hướng." }
+                ],
+                hint: "Quan sát lại đồ thị A và B để xem đường cong nào biểu thị sự nóng chảy của chất rắn vô định hình."
+            },
+            {
+                questionNumber: 4,
+                question: "Quá trình chuyển thể nào sau đây là quá trình THU nhiệt lượng?",
+                answerOptions: [
+                    { text: "Ngưng tụ", isCorrect: false, rationale: "Ngưng tụ (Khí $\\to$ Lỏng) là quá trình tỏa nhiệt." },
+                    { text: "Đông đặc", isCorrect: false, rationale: "Đông đặc (Lỏng $\\to$ Rắn) là quá trình tỏa nhiệt." },
+                    { text: "Nóng chảy", isCorrect: true, rationale: "Nóng chảy (Rắn $\\to$ Lỏng) là quá trình thu nhiệt lượng từ môi trường." },
+                    { text: "Ngưng kết", isCorrect: false, rationale: "Ngưng kết (Khí $\\to$ Rắn) là quá trình tỏa nhiệt." }
+                ],
+                hint: "Hãy nhớ: để vật chất chuyển từ trạng thái có lực liên kết mạnh hơn (rắn) sang yếu hơn (lỏng, khí), nó cần năng lượng."
+            },
+            {
+                questionNumber: 5,
+                question: "Sự sôi khác sự bay hơi ở điểm cơ bản nào?",
+                answerOptions: [
+                    { text: "Sự sôi chỉ xảy ra ở mặt thoáng, sự bay hơi xảy ra cả trong lòng", isCorrect: false, rationale: "Ngược lại, sự bay hơi xảy ra ở mặt thoáng, sự sôi xảy ra cả trong lòng và trên bề mặt." },
+                    { text: "Sự sôi xảy ra ở nhiệt độ bất kì, sự bay hơi ở nhiệt độ sôi xác định", isCorrect: false, rationale: "Ngược lại, sự bay hơi ở nhiệt độ bất kì, sự sôi ở nhiệt độ sôi xác định." },
+                    { text: "Sự sôi xảy ra ở nhiệt độ sôi xác định và cả trong lòng chất lỏng", isCorrect: true, rationale: "Sự sôi là quá trình hóa hơi mãnh liệt xảy ra ở nhiệt độ sôi, đồng thời xảy ra cả bên trong và trên bề mặt chất lỏng." },
+                    { text: "Sự sôi không phụ thuộc áp suất, sự bay hơi có phụ thuộc", isCorrect: false, rationale: "Nhiệt độ sôi phụ thuộc chặt chẽ vào áp suất trên mặt thoáng." }
+                ],
+                hint: "Tập trung vào hai yếu tố chính phân biệt hai quá trình: vị trí xảy ra và điều kiện nhiệt độ."
+            }
+        ];
+
+        let currentSlideIndex = 0;
+        let isQuizMode = false;
+        let currentQuizIndex = 0;
+        let timer;
+        let score = 0;
+        const TIME_LIMIT = 15; // 15 seconds
+
+        const contentArea = document.getElementById('content-area');
+        const statusEl = document.getElementById('status');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const popup = document.getElementById('popup');
+        
+        // --- CHỨC NĂNG TẠO VÀ CHẠY MÔ PHỎNG PHÂN TỬ ---
+        function generateParticles() {
+            const container = document.getElementById('molecular-model');
+            if (!container) return;
+            
+            // 1. Dọn dẹp keyframes cũ và particles
+            container.innerHTML = '';
+            
+            // Loại bỏ stylesheet động cũ nếu có (Fix SecurityError)
+            const oldStyle = document.getElementById('particle-keyframes');
+            if (oldStyle) {
+                oldStyle.remove();
+            }
+
+            const numParticles = 20;
+
+            // 2. Tạo stylesheet mới để chèn keyframe (tránh SecurityError)
+            const newStyleSheet = document.createElement('style');
+            newStyleSheet.id = 'particle-keyframes'; // Dùng ID để dễ dàng tìm và xóa
+            document.head.appendChild(newStyleSheet);
+            // Lấy sheet từ element mới tạo, đảm bảo nó là same-origin
+            const styleSheet = newStyleSheet.sheet;
+
+
+            // Dùng setTimeout để đảm bảo container đã được render và có kích thước
+            setTimeout(() => {
+                const containerWidth = container.clientWidth;
+                const containerHeight = container.clientHeight;
+
+                for (let i = 0; i < numParticles; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+
+                    // Vị trí ngẫu nhiên
+                    const x = Math.random() * (containerWidth - 20) + 10; // Đảm bảo không sát lề
+                    const y = Math.random() * (containerHeight - 20) + 10;
+                    
+                    // Thuộc tính animation ngẫu nhiên
+                    const duration = 8 + Math.random() * 4; // 8s đến 12s
+                    const delay = Math.random() * duration;
+
+                    particle.style.left = `${x}px`;
+                    particle.style.top = `${y}px`;
+                    particle.style.animationDuration = `${duration}s`;
+                    particle.style.animationDelay = `-${delay}s`;
+
+                    // Tạo keyframe độc nhất để có chuyển động hỗn loạn
+                    // Giới hạn dịch chuyển ngẫu nhiên so với vị trí ban đầu (tăng tính ổn định)
+                    const maxOffset = 50; 
+                    const randomX1 = Math.random() * maxOffset - (maxOffset / 2);
+                    const randomY1 = Math.random() * maxOffset - (maxOffset / 2);
+                    const randomX2 = Math.random() * maxOffset - (maxOffset / 2);
+                    const randomY2 = Math.random() * maxOffset - (maxOffset / 2);
+                    const randomX3 = Math.random() * maxOffset - (maxOffset / 2);
+                    const randomY3 = Math.random() * maxOffset - (maxOffset / 2);
+
+
+                    const keyframeName = `move-p-${i}`;
+
+                    // Chèn keyframe vào stylesheet mới (SAFE)
+                    try {
+                        const rule = `
+                            @keyframes ${keyframeName} {
+                                0% { transform: translate(0, 0); }
+                                25% { transform: translate(${randomX1}px, ${randomY1}px); }
+                                50% { transform: translate(${randomX2}px, ${randomY2}px); }
+                                75% { transform: translate(${randomX3}px, ${randomY3}px); }
+                                100% { transform: translate(0, 0); }
+                            }
+                        `;
+                        styleSheet.insertRule(rule, styleSheet.cssRules.length);
+                        
+                        particle.style.animationName = keyframeName;
+                        container.appendChild(particle);
+                    } catch (e) {
+                        console.error("Lỗi khi chèn keyframe:", e);
+                    }
+                }
+            }, 100); // Chờ 100ms để DOM ổn định
+        }
+        // --- KẾT THÚC CHỨC NĂNG MÔ PHỎNG ---
+
+
+        function renderSlide(index) {
+            currentSlideIndex = index;
+            const slide = slides[index];
+
+            if (slide.isQuizIntro) {
+                prevBtn.disabled = false;
+                nextBtn.disabled = true; // Block next until quiz is done or started
+            } else {
+                nextBtn.disabled = index === slides.length - 1;
+                prevBtn.disabled = index === 0;
+            }
+
+            contentArea.innerHTML = `
+                <div class="slide bg-white p-6 md:p-8">
+                    <h2 class="text-2xl font-bold text-indigo-700 mb-6 border-b-2 border-indigo-200 pb-2">${slide.title}</h2>
+                    ${slide.content}
+                </div>
+            `;
+            statusEl.textContent = `Slide ${index + 1}/${slides.length}`;
+
+            // Chạy mô phỏng nếu là slide 0
+            if (index === 0) {
+                generateParticles();
+            }
+        }
+
+        function prevSlide() {
+            if (isQuizMode) return;
+            if (currentSlideIndex > 0) {
+                renderSlide(currentSlideIndex - 1);
+            }
+        }
+
+        function nextSlide() {
+            if (isQuizMode) return;
+            if (currentSlideIndex < slides.length - 1) {
+                renderSlide(currentSlideIndex + 1);
+            }
+        }
+
+        function startQuiz() {
+            isQuizMode = true;
+            currentQuizIndex = 0;
+            score = 0;
+            // Hide navigation buttons
+            const startQuizBtn = document.getElementById('start-quiz-btn');
+            if(startQuizBtn) startQuizBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+            renderQuizQuestion();
+        }
+
+        function showPopup(message, bgColor, emoji) {
+            popup.textContent = `${emoji} ${message}`;
+            popup.className = `celebration-popup show ${bgColor} text-white font-bold text-xl text-center`;
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 2000);
+        }
+
+        function startTimer() {
+            let timeLeft = TIME_LIMIT;
+            const progressBar = document.getElementById('time-progress');
+            const timeDisplay = document.getElementById('time-left');
+
+            progressBar.style.width = '100%';
+            progressBar.classList.remove('bg-red-600', 'bg-indigo-600');
+            progressBar.classList.add('bg-indigo-600');
+            timeDisplay.textContent = `${timeLeft}s`;
+
+
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                const percentage = (timeLeft / TIME_LIMIT) * 100;
+                progressBar.style.width = `${percentage}%`;
+                timeDisplay.textContent = `${timeLeft}s`;
+                
+                if (timeLeft < 5) {
+                    progressBar.classList.remove('bg-indigo-600');
+                    progressBar.classList.add('bg-red-600');
+                }
+
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    // Handle time's up - treat as incorrect answer
+                    document.getElementById('question-title').textContent = "HẾT GIỜ!";
+                    
+                    showPopup("Hết giờ! Xem giải thích nhé.", 'bg-red-500', '😥');
+                    
+                    // Show correct answer after delay
+                    const options = document.querySelectorAll('.quiz-option');
+                    options.forEach(option => {
+                        option.onclick = null; // Disable further clicks
+                        const correctIndex = quizQuestions[currentQuizIndex].answerOptions.findIndex(opt => opt.isCorrect).toString();
+                        if (option.dataset.index === correctIndex) {
+                            option.classList.add('correct-answer');
+                        }
+                    });
+                    
+                    const rationaleEl = document.getElementById('feedback-rationale');
+                    const correctRationale = quizQuestions[currentQuizIndex].answerOptions.find(opt => opt.isCorrect).rationale;
+                    rationaleEl.innerHTML = `**Giải thích:** ${correctRationale}`;
+                    rationaleEl.classList.remove('hidden');
+                    rationaleEl.classList.add('bg-green-100', 'text-green-800');
+
+                    setTimeout(nextQuizQuestion, 2500);
+                }
+            }, 1000);
+        }
+
+        function handleAnswer(selectedIndex) {
+            clearInterval(timer); // Stop timer immediately
+            const questionData = quizQuestions[currentQuizIndex];
+            const selectedOption = questionData.answerOptions[selectedIndex];
+            const options = document.querySelectorAll('.quiz-option');
+
+            // Disable all options
+            options.forEach(option => {
+                option.onclick = null;
+            });
+            
+            const rationaleEl = document.getElementById('feedback-rationale');
+            const correctRationale = questionData.answerOptions.find(opt => opt.isCorrect).rationale;
+
+
+            if (selectedOption.isCorrect) {
+                options[selectedIndex].classList.add('correct-answer');
+                score++;
+                showPopup("Chính xác! Xuất sắc!", 'bg-green-500', '🎉');
+                rationaleEl.innerHTML = `**Giải thích:** ${selectedOption.rationale}`;
+                rationaleEl.classList.remove('hidden');
+                rationaleEl.classList.add('bg-green-100', 'text-green-800');
+            } else {
+                options[selectedIndex].classList.add('incorrect-answer');
+                
+                // Highlight the correct answer
+                const correctIndex = questionData.answerOptions.findIndex(opt => opt.isCorrect);
+                options[correctIndex].classList.add('correct-answer');
+
+                showPopup("Chưa đúng. Đừng nản lòng!", 'bg-red-500', '❌');
+                rationaleEl.innerHTML = `**Giải thích:** ${correctRationale}`;
+                rationaleEl.classList.remove('hidden');
+                rationaleEl.classList.add('bg-green-100', 'text-green-800');
+            }
+
+            // Move to the next question after a delay
+            setTimeout(nextQuizQuestion, 2500);
+        }
+
+
+        function renderQuizQuestion() {
+            if (currentQuizIndex >= quizQuestions.length) {
+                renderQuizResult();
+                return;
+            }
+
+            const q = quizQuestions[currentQuizIndex];
+            
+            // Generate options HTML
+            const optionsHtml = q.answerOptions.map((option, index) => `
+                <div 
+                    class="quiz-option p-4 my-3 bg-white border border-gray-300 rounded-lg hover:bg-indigo-100" 
+                    onclick="handleAnswer(${index})"
+                    data-index="${index}"
+                >
+                    <span class="font-medium">${String.fromCharCode(65 + index)}.</span> ${option.text}
+                </div>
+            `).join('');
+
+            contentArea.innerHTML = `
+                <div class="quiz-container bg-indigo-50 p-6 md:p-8">
+                    <div>
+                        <!-- Question and Timer Header -->
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 id="question-title" class="text-xl md:text-2xl font-bold text-indigo-700">Câu Hỏi ${q.questionNumber}/${quizQuestions.length}</h2>
+                            <div class="flex items-center space-x-2 bg-white px-3 py-1 rounded-full shadow">
+                                <span class="text-sm font-semibold text-gray-700">Thời gian:</span>
+                                <span id="time-left" class="text-lg font-bold text-red-600">15s</span>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="w-full bg-gray-200 rounded-full h-2 mb-6 overflow-hidden">
+                            <div id="time-progress" class="progress-bar" style="width: 100%;"></div>
+                        </div>
+
+                        <!-- Question Text -->
+                        <p class="text-lg md:text-xl font-semibold text-gray-800 mb-6 p-4 bg-white rounded-lg shadow-inner border-l-4 border-indigo-500">
+                            ${q.question}
+                        </p>
+
+                        <!-- Answer Options -->
+                        <div id="options-container" class="space-y-3">
+                            ${optionsHtml}
+                        </div>
+                        
+                        <!-- Feedback and Rationale -->
+                        <div id="feedback-rationale" class="hidden mt-6 p-4 rounded-lg text-sm transition-all duration-300">
+                        </div>
+                    </div>
+
+                    <!-- Hint -->
+                    <div class="mt-8 text-sm text-gray-500 border-t pt-4">
+                        <span class="font-semibold text-indigo-500">Gợi ý:</span> ${q.hint}
+                    </div>
+                </div>
+            `;
+            startTimer();
+        }
+
+        function nextQuizQuestion() {
+            currentQuizIndex++;
+            if (currentQuizIndex < quizQuestions.length) {
+                renderQuizQuestion();
+            } else {
+                renderQuizResult();
+            }
+        }
+
+        function renderQuizResult() {
+            isQuizMode = false;
+            clearInterval(timer);
+            
+            const total = quizQuestions.length;
+            const percentage = (score / total) * 100;
+            let feedbackText = "";
+            let feedbackColor = "";
+
+            if (percentage === 100) {
+                feedbackText = "Xuất sắc! Bạn đã nắm vững toàn bộ kiến thức bài học. 🎉";
+                feedbackColor = "bg-green-600";
+            } else if (percentage >= 70) {
+                feedbackText = "Rất tốt! Bạn hiểu bài khá rõ, chỉ cần ôn lại một chút thôi. 👍";
+                feedbackColor = "bg-yellow-600";
+            } else {
+                feedbackText = "Cố gắng lên! Hãy xem lại phần lý thuyết và thử lại nhé. 💪";
+                feedbackColor = "bg-red-600";
+            }
+
+            contentArea.innerHTML = `
+                <div class="quiz-container text-center p-8 md:p-12 bg-white">
+                    <h2 class="text-4xl font-extrabold text-indigo-700 mb-6">KẾT QUẢ CỦNG CỐ</h2>
+                    
+                    <div class="p-6 rounded-xl shadow-2xl mx-auto max-w-sm ${feedbackColor} text-white">
+                        <p class="text-xl font-medium">Điểm của bạn:</p>
+                        <p class="text-6xl font-black mt-2 mb-4">${score}/${total}</p>
+                    </div>
+
+                    <p class="text-2xl mt-8 font-semibold text-gray-700">${feedbackText}</p>
+                    
+                    <div class="mt-10 flex justify-center space-x-4">
+                        <button onclick="renderSlide(0)" class="px-6 py-3 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 transition duration-150">
+                            Ôn lại Bài học (Slide 1)
+                        </button>
+                        <button onclick="startQuiz()" class="px-6 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition duration-150">
+                            Làm lại Trắc nghiệm
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Restore navigation buttons
+            prevBtn.style.display = 'inline-block';
+            nextBtn.style.display = 'inline-block';
+            nextBtn.disabled = true;
+        }
+
+        // Initialize the app
+        window.onload = () => {
+            renderSlide(0);
+        };
+    </script>
+</body>
+</html>

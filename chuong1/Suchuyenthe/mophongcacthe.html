@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng Trạng Thái Vật Chất</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Tùy chỉnh để đảm bảo Canvas hiển thị tốt và căn giữa */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1f2937; /* Màu nền tối */
+            color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        #simulationCanvas {
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            background-color: #374151; /* Nền canvas xám đậm */
+        }
+        .container-box {
+            width: 100%;
+            max-width: 1000px;
+        }
+        .state-label {
+            font-weight: bold;
+            font-size: 1.125rem;
+            color: #d1d5db;
+        }
+    </style>
+    <!-- Cấu hình Font Inter cho Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+
+<div class="container-box flex flex-col items-center space-y-6">
+    <h1 class="text-3xl font-extrabold text-blue-400">Mô Phỏng Trạng Thái Vật Chất (Rắn - Lỏng - Khí)</h1>
+
+    <!-- Khung nhãn trạng thái -->
+    <div class="w-full flex justify-around text-center mt-4">
+        <div class="state-label w-1/3 text-green-400">THỂ RẮN (Solid)</div>
+        <div class="state-label w-1/3 text-blue-400">THỂ LỎNG (Liquid)</div>
+        <div class="state-label w-1/3 text-red-400">THỂ KHÍ (Gas)</div>
+    </div>
+
+    <!-- Canvas mô phỏng -->
+    <canvas id="simulationCanvas" class="w-full aspect-[3/1]" height="350"></canvas>
+
+    <!-- Thanh trượt nhiệt độ -->
+    <div class="w-full max-w-lg flex flex-col items-center space-y-2 p-4 bg-gray-700 rounded-xl shadow-inner">
+        <label for="temperatureSlider" class="text-lg font-medium">Nhiệt Độ (Temperature): <span id="tempValue" class="font-bold text-orange-300">50</span> °C</label>
+        <input type="range" id="temperatureSlider" min="10" max="100" value="50" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg dark:bg-gray-600">
+    </div>
+
+</div>
+
+<!-- Firebase Boilerplate (Theo yêu cầu của môi trường) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Khai báo biến toàn cục bắt buộc
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+    if (Object.keys(firebaseConfig).length > 0) {
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Đăng nhập
+        (async () => {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                // console.log("Firebase initialized and signed in. App ID:", appId);
+            } catch (error) {
+                console.error("Firebase Auth Error:", error);
+            }
+        })();
+    }
+</script>
+
+<script>
+    // --- Logic Mô Phỏng Vật Chất ---
+
+    const canvas = document.getElementById('simulationCanvas');
+    const ctx = canvas.getContext('2d');
+    const tempSlider = document.getElementById('temperatureSlider');
+    const tempValueDisplay = document.getElementById('tempValue');
+
+    let particles = [];
+    let temperature = parseInt(tempSlider.value);
+    let lastTime = 0;
+    const STATE = { SOLID: 0, LIQUID: 1, GAS: 2 };
+
+    // Cập nhật kích thước Canvas và lắng nghe sự kiện resize
+    function resizeCanvas() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = 350; // Giữ chiều cao cố định hoặc tỷ lệ
+    }
+
+    // Lắng nghe sự kiện resize để đảm bảo responsive
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas(); // Thiết lập kích thước ban đầu
+
+    // Lớp Phân Tử (Particle)
+    class Particle {
+        constructor(x, y, state) {
+            this.x = x;
+            this.y = y;
+            this.radius = 6;
+            this.state = state;
+            this.targetX = x; // Chỉ dùng cho rắn
+            this.targetY = y; // Chỉ dùng cho rắn
+            this.vx = (Math.random() - 0.5) * 0.1; // Vận tốc ban đầu nhỏ
+            this.vy = (Math.random() - 0.5) * 0.1;
+            this.color = this.getColor();
+            this.phase = Math.random() * Math.PI * 2; // Pha cho chuyển động hình sin (Rắn)
+        }
+
+        getColor() {
+            switch (this.state) {
+                case STATE.SOLID: return '#6EE7B7'; // Xanh lá nhạt
+                case STATE.LIQUID: return '#DC2626'; // Đỏ đậm (Theo yêu cầu)
+                case STATE.GAS: return '#F87171'; // Đỏ nhạt
+                default: return '#D1D5DB';
+            }
+        }
+
+        // Cập nhật chuyển động dựa trên trạng thái và nhiệt độ
+        update(deltaTime, temperature) {
+            const tempFactor = temperature / 100; // 0.1 đến 1.0
+
+            if (this.state === STATE.SOLID) {
+                // Rắn: Rung động quanh vị trí cố định
+                const amplitude = 1 + 6 * tempFactor; // Biên độ rung tăng theo nhiệt độ
+                this.phase += tempFactor * 0.1; // Tốc độ rung tăng theo nhiệt độ
+
+                // Áp dụng rung động (hình sin)
+                this.x = this.targetX + Math.cos(this.phase) * amplitude * 0.5;
+                this.y = this.targetY + Math.sin(this.phase * 1.5) * amplitude * 0.5;
+
+            } else if (this.state === STATE.LIQUID) {
+                // Lỏng: Trượt và di chuyển ngẫu nhiên chậm, duy trì mật độ
+                const speed = 1.0 + 3 * tempFactor;
+
+                this.x += this.vx * speed * deltaTime;
+                this.y += this.vy * speed * deltaTime;
+
+                // Tăng giới hạn vận tốc
+                const maxSpeed = 4 * tempFactor + 1.5;
+                this.vx = Math.min(Math.max(this.vx, -maxSpeed), maxSpeed);
+                this.vy = Math.min(Math.max(this.vy, -maxSpeed), maxSpeed);
+
+                // Tăng ngẫu nhiên nhẹ để mô phỏng chuyển động nhiệt mạnh mẽ hơn
+                this.vx += (Math.random() - 0.5) * 0.1;
+                this.vy += (Math.random() - 0.5) * 0.1;
+
+                this.handleBoundary(canvas.width / 3, canvas.width * 2 / 3);
+
+            } else if (this.state === STATE.GAS) {
+                // Khí: Di chuyển nhanh, ngẫu nhiên, mật độ thấp
+                const speedFactor = 4 + 10 * tempFactor * tempFactor; 
+                
+                // Inject random impulse (Brownian Motion) to simulate constant thermal energy
+                this.vx += (Math.random() - 0.5) * 0.05 * tempFactor;
+                this.vy += (Math.random() - 0.5) * 0.05 * tempFactor;
+                
+                // *** BẢN SỬA LỖI: Thêm Giới Hạn Vận Tốc để ngăn Tunneling ***
+                const maxGasVelocity = 3 + 6 * tempFactor;
+                const currentVelocitySq = this.vx * this.vx + this.vy * this.vy;
+                if (currentVelocitySq > maxGasVelocity * maxGasVelocity) {
+                    const ratio = maxGasVelocity / Math.sqrt(currentVelocitySq);
+                    this.vx *= ratio;
+                    this.vy *= ratio;
+                }
+                // *** KẾT THÚC BẢN SỬA LỖI ***
+
+                this.x += this.vx * speedFactor * deltaTime;
+                this.y += this.vy * speedFactor * deltaTime;
+
+                this.handleBoundary(canvas.width * 2 / 3, canvas.width);
+            }
+        }
+
+        // Xử lý va chạm biên (chủ yếu cho Lỏng và Khí)
+        handleBoundary(startX, endX) {
+            const padding = 5;
+            const radius = this.radius;
+
+            // Va chạm ngang
+            if (this.x - radius < startX + padding) {
+                this.x = startX + radius + padding;
+                this.vx *= -1;
+            } else if (this.x + radius > endX - padding) {
+                this.x = endX - radius - padding;
+                this.vx *= -1;
+            }
+
+            // Va chạm dọc
+            if (this.y - radius < padding) {
+                this.y = radius + padding;
+                this.vy *= -1;
+            } else if (this.y + radius > canvas.height - padding) {
+                this.y = canvas.height - radius - padding;
+                this.vy *= -1;
+            }
+        }
+
+        // Vẽ phân tử
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.shadowBlur = 5;
+            ctx.shadowColor = this.color;
+            ctx.fill();
+            ctx.closePath();
+            // Vẽ vòng tròn ngoài để tạo cảm giác 3D nhẹ
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.closePath();
+        }
+    }
+
+    // Khởi tạo các phân tử
+    function initParticles() {
+        particles = [];
+        const numParticles = 80;
+        const radius = 6;
+        const sectionWidth = canvas.width / 3;
+        const padding = 20;
+
+        // 1. Thể Rắn (Solid) - Vị trí cố định (grid)
+        const solidStartX = padding;
+        const cols = 8;
+        const cellSpacing = (sectionWidth - 2 * padding) / cols;
+
+        for (let i = 0; i < numParticles / 3; i++) {
+            const row = Math.floor(i / cols);
+            const col = i % cols;
+            // Tính toán vị trí cố định
+            const x = solidStartX + padding + col * cellSpacing + cellSpacing / 2;
+            const y = padding + row * cellSpacing + cellSpacing / 2;
+            particles.push(new Particle(x, y, STATE.SOLID));
+        }
+
+        // 2. Thể Lỏng (Liquid) - Mật độ cao, vị trí ngẫu nhiên trong vùng
+        const liquidStartX = sectionWidth;
+        for (let i = 0; i < numParticles / 2; i++) { // Mật độ cao hơn Khí
+            const x = liquidStartX + padding + Math.random() * (sectionWidth - 2 * padding);
+            const y = padding + Math.random() * (canvas.height - 2 * padding);
+            particles.push(new Particle(x, y, STATE.LIQUID));
+        }
+
+        // 3. Thể Khí (Gas) - Mật độ thấp, vị trí ngẫu nhiên trong vùng
+        const gasStartX = sectionWidth * 2;
+        for (let i = 0; i < numParticles / 4; i++) { // Mật độ thấp
+            const x = gasStartX + padding + Math.random() * (sectionWidth - 2 * padding);
+            const y = padding + Math.random() * (canvas.height - 2 * padding);
+            // Gán vận tốc ngẫu nhiên lớn hơn
+            const p = new Particle(x, y, STATE.GAS);
+            p.vx = (Math.random() - 0.5) * 2;
+            p.vy = (Math.random() - 0.5) * 2;
+            particles.push(p);
+        }
+    }
+
+    // Xử lý tương tác giữa các phân tử (đơn giản: lực đẩy)
+    function handleInteractions(deltaTime, temperature) {
+        const tempFactor = temperature / 100;
+        // Bán kính tương tác cho chất lỏng (duy trì mật độ)
+        const liquidRadiusSquared = (2 * 15) ** 2; 
+
+        for (let i = 0; i < particles.length; i++) {
+            const p1 = particles[i];
+
+            if (p1.state === STATE.SOLID) continue; // Phân tử rắn không cần tương tác
+
+            for (let j = i + 1; j < particles.length; j++) {
+                const p2 = particles[j];
+
+                // Chỉ tương tác giữa các phân tử cùng trạng thái
+                if (p1.state !== p2.state) continue;
+
+                const dx = p1.x - p2.x;
+                const dy = p1.y - p2.y;
+                const distSq = dx * dx + dy * dy;
+                const dist = Math.sqrt(distSq);
+
+                // Lực đẩy chỉ xảy ra khi quá gần (va chạm cơ bản)
+                if (dist < p1.radius * 2) {
+                    const angle = Math.atan2(dy, dx);
+                    // Lực đẩy càng mạnh khi càng gần
+                    const force = (p1.radius * 2 - dist) / dist * 0.5;
+
+                    p1.vx += Math.cos(angle) * force;
+                    p1.vy += Math.sin(angle) * force;
+
+                    p2.vx -= Math.cos(angle) * force;
+                    p2.vy -= Math.sin(angle) * force;
+
+                } else if (p1.state === STATE.LIQUID && distSq < liquidRadiusSquared) {
+                    // Đối với chất lỏng, thêm một chút lực đẩy nhẹ để duy trì mật độ
+                    const angle = Math.atan2(dy, dx);
+                    // Lực yếu hơn, tăng nhẹ theo nhiệt độ
+                    const force = (liquidRadiusSquared - distSq) / liquidRadiusSquared * 0.05 * tempFactor; 
+
+                    p1.vx += Math.cos(angle) * force;
+                    p1.vy += Math.sin(angle) * force;
+
+                    p2.vx -= Math.cos(angle) * force;
+                    p2.vy -= Math.sin(angle) * force;
+                }
+            }
+        }
+
+        // Giảm vận tốc để mô phỏng ma sát (chỉ sau khi đã tính toán tương tác)
+        for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            
+            if (p.state === STATE.LIQUID) {
+                p.vx *= 0.99; // Ma sát nhẹ cho chất lỏng
+                p.vy *= 0.99;
+            } 
+        }
+    }
+
+
+    // Vòng lặp animation
+    function animate(currentTime) {
+        const deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+
+        // Xóa canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Tính toán chiều rộng khu vực
+        const sectionWidth = canvas.width / 3;
+
+        // --- BẮT ĐẦU VẼ NỀN KHU VỰC ---
+        // Vẽ nền cho vùng Lỏng (màu xanh theo yêu cầu)
+        const liquidStartX = sectionWidth;
+        const liquidWidth = sectionWidth;
+        
+        // Sử dụng màu xanh dương bán trong suốt (rgba(59, 130, 246, 0.2) tương đương Tailwind blue-500)
+        ctx.fillStyle = 'rgba(59, 130, 246, 0.2)'; 
+        ctx.fillRect(liquidStartX, 0, liquidWidth, canvas.height);
+        // --- KẾT THÚC VẼ NỀN KHU VỰC ---
+        
+        // Vẽ đường phân chia
+        ctx.strokeStyle = '#4B5563'; // Màu xám nhạt
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]); // Đường nét đứt
+
+        // Đường chia 1 (Rắn - Lỏng)
+        ctx.beginPath();
+        ctx.moveTo(sectionWidth, 0);
+        ctx.lineTo(sectionWidth, canvas.height);
+        ctx.stroke();
+
+        // Đường chia 2 (Lỏng - Khí)
+        ctx.beginPath();
+        ctx.moveTo(sectionWidth * 2, 0);
+        ctx.lineTo(sectionWidth * 2, canvas.height);
+        ctx.stroke();
+
+        ctx.setLineDash([]); // Tắt nét đứt
+
+        // Cập nhật và vẽ các phân tử
+        handleInteractions(deltaTime / 16, temperature); // Chia 16 để chuẩn hóa deltaTime
+        particles.forEach(p => {
+            p.update(deltaTime / 16, temperature);
+            p.draw();
+        });
+
+
+        requestAnimationFrame(animate);
+    }
+
+    // Xử lý sự kiện thanh trượt
+    tempSlider.addEventListener('input', () => {
+        temperature = parseInt(tempSlider.value);
+        tempValueDisplay.textContent = temperature;
+    });
+
+    // Bắt đầu mô phỏng sau khi canvas đã được resize và vẽ
+    window.onload = function() {
+        resizeCanvas();
+        initParticles();
+        animate(0);
+    }
+
+</script>
+</body>
+</html>

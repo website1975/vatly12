@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn Tập: Nhiệt và Sự Chuyển Thể</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+</script>
+    <!-- Cấu hình Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#4f46e5',
+                        'secondary': '#10b981',
+                        'error-color': '#ef4444',
+                        'correct-color': '#10b981',
+                        'background-main': '#f9fafb',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', 'sans-serif';
+            background-color: #f3f4f6;
+        }
+        /* Custom scrollbar for question list on desktop */
+        .question-list-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .question-list-container::-webkit-scrollbar-thumb {
+            background-color: #d1d5db;
+            border-radius: 4px;
+        }
+        .question-list-container {
+            max-height: calc(100vh - 8rem);
+            overflow-y: auto;
+        }
+        /* Hide rationale by default */
+        .rationale {
+            display: none;
+        }
+        /* Style for the graph container */
+        .graph-container {
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 8px;
+            margin-top: 10px;
+            background-color: #ffffff;
+        }
+        /* Responsive SVG drawing - using viewBox to scale */
+        .melting-graph-svg {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+<div id="app" class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-4 md:p-8">
+    
+    <!-- Header -->
+    <header class="text-center mb-6">
+        <h1 class="text-3xl font-bold text-primary">20 CÂU HỎI ÔN TẬP</h1>
+        <p class="text-lg text-gray-600">CHỦ ĐỀ: NHIỆT VÀ SỰ CHUYỂN THỂ</p>
+    </header>
+
+    <!-- Quiz Data -->
+    <script>
+        const quizData = [
+            // I. Mô hình động học phân tử
+            {
+                questionNumber: 1,
+                question: "Nội dung nào sau đây KHÔNG thuộc mô hình động học phân tử của vật chất?",
+                answerOptions: [
+                    { text: "Các chất được cấu tạo từ các hạt riêng biệt gọi là phân tử.", rationale: "Đây là một nội dung cơ bản của mô hình động học phân tử.", isCorrect: false },
+                    { text: "Phân tử luôn chuyển động không ngừng, nhiệt độ càng cao tốc độ càng lớn.", rationale: "Đây là nội dung về chuyển động nhiệt, một phần của mô hình.", isCorrect: false },
+                    { text: "Giữa các phân tử có lực hút và lực đẩy, gọi chung là lực liên kết phân tử.", rationale: "Đây là nội dung về tương tác phân tử, một phần của mô hình.", isCorrect: false },
+                    { text: "Các chất được cấu tạo từ các điện tích dương và điện tích âm chuyển động hỗn loạn.", rationale: "Mô hình động học phân tử tập trung vào phân tử, nguyên tử, ion chứ không chỉ điện tích, và đây không phải là nội dung cơ bản được đề cập.", isCorrect: true }
+                ],
+                hint: "Hãy nhớ lại ba nội dung cơ bản cấu thành mô hình động học phân tử."
+            },
+            {
+                questionNumber: 2,
+                question: "Theo mô hình động học phân tử, khi nhiệt độ của một vật tăng lên, điều gì xảy ra với chuyển động nhiệt của các phân tử cấu tạo nên vật đó?",
+                answerOptions: [
+                    { text: "Tốc độ chuyển động của phân tử giảm đi.", rationale: "Tốc độ chuyển động nhiệt tỉ lệ thuận với nhiệt độ tuyệt đối của vật.", isCorrect: false },
+                    { text: "Tốc độ chuyển động của phân tử không thay đổi.", rationale: "Nhiệt độ là thước đo của động năng trung bình của các phân tử, nên khi nhiệt độ thay đổi, tốc độ cũng thay đổi.", isCorrect: false },
+                    { text: "Tốc độ chuyển động của phân tử tăng lên.", rationale: "Nhiệt độ càng cao thì tốc độ chuyển động nhiệt của các phân tử càng lớn.", isCorrect: true },
+                    { text: "Lực liên kết phân tử tăng lên.", rationale: "Nhiệt độ chủ yếu ảnh hưởng đến tốc độ chuyển động, không phải trực tiếp là lực liên kết.", isCorrect: false }
+                ],
+                hint: "Nhiệt độ là đại lượng đặc trưng cho điều gì của chuyển động phân tử?"
+            },
+            {
+                questionNumber: 3,
+                question: "Lực liên kết giữa các phân tử có đặc điểm chung là gì?",
+                answerOptions: [
+                    { text: "Chỉ có lực hút.", rationale: "Lực liên kết bao gồm cả lực hút và lực đẩy.", isCorrect: false },
+                    { text: "Chỉ có lực đẩy.", rationale: "Lực liên kết bao gồm cả lực hút và lực đẩy.", isCorrect: false },
+                    { text: "Chỉ là lực đẩy khi phân tử ở gần và lực hút khi phân tử ở xa.", rationale: "Lực liên kết bao gồm cả lực hút và lực đẩy và chúng cùng tồn tại, sự chiếm ưu thế phụ thuộc vào khoảng cách.", isCorrect: false },
+                    { text: "Bao gồm cả lực hút và lực đẩy.", rationale: "Lực liên kết phân tử là tên gọi chung cho cả lực hút và lực đẩy giữa các phân tử.", isCorrect: true }
+                ],
+                hint: "Lực liên kết phân tử là tên gọi chung cho cả hai loại lực tương tác cơ bản giữa các hạt."
+            },
+            // II. Cấu trúc của vật chất (3 Thể)
+            {
+                questionNumber: 4,
+                question: "Trong thể rắn, các phân tử có chuyển động như thế nào?",
+                answerOptions: [
+                    { text: "Chuyển động hỗn loạn không ngừng.", rationale: "Đây là đặc điểm chuyển động của các phân tử trong thể khí.", isCorrect: false },
+                    { text: "Dao động quanh vị trí cân bằng (VTCB) luôn luôn thay đổi.", rationale: "Đây là đặc điểm chuyển động của các phân tử trong thể lỏng.", isCorrect: false },
+                    { text: "Chỉ dao động quanh VTCB cố định.", rationale: "Trong thể rắn, các phân tử liên kết chặt chẽ và chỉ dao động xung quanh các nút mạng tinh thể cố định.", isCorrect: true },
+                    { text: "Không chuyển động.", rationale: "Các phân tử trong mọi thể đều chuyển động không ngừng (chuyển động nhiệt).", isCorrect: false }
+                ],
+                hint: "Hãy hình dung sự sắp xếp có trật tự và khoảng cách rất gần nhau của các phân tử trong thể rắn."
+            },
+            {
+                questionNumber: 5,
+                question: "Sự sắp xếp của các phân tử trong thể lỏng được mô tả là:",
+                answerOptions: [
+                    { text: "Rất trật tự.", rationale: "Sự sắp xếp rất trật tự là đặc điểm của thể rắn.", isCorrect: false },
+                    { text: "Kém trật tự hơn so với thể rắn.", rationale: "Các phân tử trong thể lỏng có sự sắp xếp cục bộ nhưng không có trật tự xa như thể rắn, cho phép chúng trượt lên nhau.", isCorrect: true },
+                    { text: "Hoàn toàn không có trật tự.", rationale: "Hoàn toàn không có trật tự là đặc điểm của thể khí.", isCorrect: false },
+                    { text: "Luôn tạo thành mạng tinh thể.", rationale: "Chỉ có thể rắn kết tinh mới tạo thành mạng tinh thể.", isCorrect: false }
+                ],
+                hint: "Thể lỏng nằm ở giữa thể rắn và thể khí về mặt trật tự sắp xếp."
+            },
+            {
+                questionNumber: 6,
+                question: "Trong các thể, thể nào có lực tương tác giữa các phân tử là nhỏ nhất?",
+                answerOptions: [
+                    { text: "Thể rắn.", rationale: "Lực tương tác trong thể rắn là lớn nhất do khoảng cách phân tử rất gần nhau.", isCorrect: false },
+                    { text: "Thể lỏng.", rationale: "Lực tương tác trong thể lỏng là trung bình.", isCorrect: false },
+                    { text: "Thể khí.", rationale: "Trong thể khí, khoảng cách phân tử rất xa nhau nên lực tương tác (lực liên kết) là rất nhỏ.", isCorrect: true },
+                    { text: "Cả ba thể đều có lực tương tác bằng nhau.", rationale: "Lực tương tác phụ thuộc vào khoảng cách giữa các phân tử, do đó khác nhau ở mỗi thể.", isCorrect: false }
+                ],
+                hint: "Lực liên kết phân tử tỉ lệ nghịch với khoảng cách giữa chúng."
+            },
+            {
+                questionNumber: 7,
+                question: "Đặc điểm nào sau đây là của thể khí?",
+                answerOptions: [
+                    { text: "Có hình dạng và thể tích xác định, khó nén.", rationale: "Đây là đặc điểm của thể rắn.", isCorrect: false },
+                    { text: "Có hình dạng không xác định nhưng có thể tích xác định, khó nén.", rationale: "Đây là đặc điểm của thể lỏng.", isCorrect: false },
+                    { text: "Có hình dạng và thể tích không xác định, dễ nén.", rationale: "Thể khí chiếm toàn bộ thể tích bình chứa và dễ dàng bị nén lại.", isCorrect: true },
+                    { text: "Các phân tử chỉ dao động quanh VTCB cố định.", rationale: "Đây là đặc điểm của thể rắn.", isCorrect: false }
+                ],
+                hint: "Hãy nhớ đặc trưng quan trọng nhất của chất khí là nó phụ thuộc hoàn toàn vào vật chứa."
+            },
+            {
+                questionNumber: 8,
+                question: "Vì sao thể rắn và thể lỏng khó bị nén lại?",
+                answerOptions: [
+                    { text: "Vì các phân tử chỉ dao động tại chỗ.", rationale: "Chỉ đúng với thể rắn, nhưng không phải là lý do chính gây khó nén.", isCorrect: false },
+                    { text: "Vì lực tương tác phân tử giữa chúng rất nhỏ.", rationale: "Lực tương tác trong thể rắn và lỏng là lớn, chứ không phải nhỏ.", isCorrect: false },
+                    { text: "Vì khoảng cách giữa các phân tử rất gần (cỡ kích thước phân tử), không còn chỗ trống để giảm thể tích.", rationale: "Do phân tử đã ở rất gần nhau nên lực đẩy đã mạnh lên, ngăn cản sự giảm khoảng cách.", isCorrect: true },
+                    { text: "Vì chúng có hình dạng xác định.", rationale: "Thể lỏng không có hình dạng xác định nhưng vẫn khó nén.", isCorrect: false }
+                ],
+                hint: "Chú ý đến khoảng cách giữa các phân tử trong hai thể này so với thể khí."
+            },
+            // III. Sự chuyển thể
+            {
+                questionNumber: 9,
+                question: "Quá trình nào sau đây là quá trình thu nhiệt lượng?",
+                answerOptions: [
+                    { text: "Ngưng tụ.", rationale: "Ngưng tụ (Khí → Lỏng) là quá trình tỏa nhiệt.", isCorrect: false },
+                    { text: "Đông đặc.", rationale: "Đông đặc (Lỏng → Rắn) là quá trình tỏa nhiệt.", isCorrect: false },
+                    { text: "Nóng chảy.", rationale: "Nóng chảy (Rắn → Lỏng) cần thu nhiệt lượng để phá vỡ cấu trúc tinh thể.", isCorrect: true },
+                    { text: "Ngưng kết.", rationale: "Ngưng kết (Khí → Rắn) là quá trình tỏa nhiệt.", isCorrect: false }
+                ],
+                hint: "Các quá trình chuyển từ thể có trật tự sang thể kém trật tự (hoặc ngược lại) có xu hướng thu/tỏa nhiệt."
+            },
+            {
+                questionNumber: 10,
+                question: "Sự chuyển thể từ thể khí sang thể lỏng được gọi là gì?",
+                answerOptions: [
+                    { text: "Hóa hơi.", rationale: "Hóa hơi là Lỏng → Khí.", isCorrect: false },
+                    { text: "Nóng chảy.", rationale: "Nóng chảy là Rắn → Lỏng.", isCorrect: false },
+                    { text: "Ngưng tụ.", rationale: "Ngưng tụ là quá trình chất chuyển từ thể khí sang thể lỏng.", isCorrect: true },
+                    { text: "Thăng hoa.", rationale: "Thăng hoa là Rắn → Khí.", isCorrect: false }
+                ],
+                hint: "Đây là quá trình thường thấy khi hơi nước trong không khí tạo thành giọt sương."
+            },
+            {
+                questionNumber: 11,
+                question: "Hãy sắp xếp các quá trình sau theo thứ tự thu nhiệt lượng giảm dần (từ thu nhiệt đến tỏa nhiệt):",
+                answerOptions: [
+                    { text: "Nóng chảy, Đông đặc, Ngưng tụ.", rationale: "Nóng chảy (thu nhiệt), Đông đặc (tỏa nhiệt), Ngưng tụ (tỏa nhiệt). Không theo thứ tự yêu cầu.", isCorrect: false },
+                    { text: "Đông đặc, Ngưng tụ, Nóng chảy.", rationale: "Đông đặc và Ngưng tụ là tỏa nhiệt, Nóng chảy là thu nhiệt. Không theo thứ tự yêu cầu.", isCorrect: false },
+                    { text: "Hóa hơi, Nóng chảy, Đông đặc.", rationale: "Hóa hơi (thu nhiệt) > Nóng chảy (thu nhiệt) > Đông đặc (tỏa nhiệt). Đây là thứ tự chính xác từ thu nhiệt đến tỏa nhiệt.", isCorrect: true },
+                    { text: "Ngưng kết, Hóa hơi, Nóng chảy.", rationale: "Ngưng kết là tỏa nhiệt, Hóa hơi và Nóng chảy là thu nhiệt. Không theo thứ tự yêu cầu.", isCorrect: false }
+                ],
+                hint: "Các quá trình Rắn → Lỏng → Khí là thu nhiệt, các quá trình ngược lại là tỏa nhiệt. Hóa hơi thu nhiệt nhiều hơn nóng chảy."
+            },
+            {
+                questionNumber: 12,
+                question: "Sự thăng hoa là quá trình chuyển thể trực tiếp từ:",
+                answerOptions: [
+                    { text: "Thể khí sang thể rắn.", rationale: "Đây là sự ngưng kết.", isCorrect: false },
+                    { text: "Thể lỏng sang thể khí.", rationale: "Đây là sự hóa hơi.", isCorrect: false },
+                    { text: "Thể rắn sang thể khí.", rationale: "Thăng hoa là sự chuyển từ thể rắn sang thể khí mà không qua thể lỏng.", isCorrect: true },
+                    { text: "Thể rắn sang thể lỏng.", rationale: "Đây là sự nóng chảy.", isCorrect: false }
+                ],
+                hint: "Ví dụ điển hình của sự thăng hoa là băng phiến (long não)."
+            },
+            // IV. Sự sôi và sự bay hơi
+            {
+                questionNumber: 13,
+                question: "Sự bay hơi khác sự sôi ở điểm cơ bản nào sau đây?",
+                answerOptions: [
+                    { text: "Bay hơi là thu nhiệt, Sôi là tỏa nhiệt.", rationale: "Cả hai quá trình đều là hóa hơi và đều thu nhiệt.", isCorrect: false },
+                    { text: "Bay hơi xảy ra ở nhiệt độ bất kì, Sôi xảy ra ở nhiệt độ sôi xác định.", rationale: "Bay hơi xảy ra ở mọi nhiệt độ tại mặt thoáng, còn sự sôi chỉ xảy ra tại nhiệt độ sôi và diễn ra ở cả bên trong và bề mặt.", isCorrect: true },
+                    { text: "Bay hơi xảy ra ở mặt thoáng, Sôi xảy ra ở cả mặt thoáng và bên trong lòng chất lỏng.", rationale: "Đây là đặc điểm về vị trí xảy ra của hai quá trình.", isCorrect: false },
+                    { text: "Tốc độ bay hơi phụ thuộc vào gió, tốc độ sôi không phụ thuộc vào gió.", rationale: "Cả hai quá trình đều bị ảnh hưởng bởi các yếu tố khác nhau, nhưng sự khác biệt cơ bản nằm ở nhiệt độ và vị trí xảy ra.", isCorrect: false }
+                ],
+                hint: "Sự khác biệt rõ ràng nhất liên quan đến điều kiện nhiệt độ để quá trình diễn ra."
+            },
+            {
+                questionNumber: 14,
+                question: "Tốc độ bay hơi của chất lỏng sẽ tăng lên khi có sự tác động của yếu tố nào sau đây?",
+                answerOptions: [
+                    { text: "Tăng độ ẩm không khí phía trên mặt thoáng.", rationale: "Tăng độ ẩm làm giảm tốc độ bay hơi, vì không khí đã bão hòa hơi nước.", isCorrect: false },
+                    { text: "Tăng diện tích mặt thoáng của chất lỏng.", rationale: "Tăng diện tích mặt thoáng làm tăng số lượng phân tử có thể thoát ra khỏi chất lỏng trong cùng một đơn vị thời gian, do đó tốc độ bay hơi tăng.", isCorrect: true },
+                    { text: "Giảm nhiệt độ của chất lỏng.", rationale: "Giảm nhiệt độ làm giảm động năng của các phân tử, do đó tốc độ bay hơi giảm.", isCorrect: false },
+                    { text: "Giảm tốc độ gió trên mặt thoáng.", rationale: "Giảm tốc độ gió làm hơi nước tích tụ trên mặt thoáng, làm giảm tốc độ bay hơi.", isCorrect: false }
+                ],
+                hint: "Hãy nhớ 4 yếu tố ảnh hưởng đến tốc độ bay hơi: Nhiệt độ, Diện tích, Gió, và Độ ẩm."
+            },
+            {
+                questionNumber: 15,
+                question: "Trong quá trình chất lỏng sôi, nhiệt độ của chất lỏng sẽ như thế nào?",
+                answerOptions: [
+                    { text: "Tăng lên liên tục.", rationale: "Nhiệt độ chỉ tăng khi chưa đạt đến điểm sôi hoặc sau khi đã hóa hơi hoàn toàn.", isCorrect: false },
+                    { text: "Giảm xuống liên tục.", rationale: "Quá trình sôi là thu nhiệt, nhiệt độ không giảm.", isCorrect: false },
+                    { text: "Không thay đổi.", rationale: "Trong suốt quá trình sôi, nhiệt độ của chất lỏng duy trì ở nhiệt độ sôi xác định (nếu áp suất không đổi).", isCorrect: true },
+                    { text: "Có thể tăng hoặc giảm tùy thuộc vào áp suất.", rationale: "Áp suất thay đổi làm thay đổi nhiệt độ sôi, nhưng trong quá trình sôi, nhiệt độ vẫn không đổi.", isCorrect: false }
+                ],
+                hint: "Giống như sự nóng chảy của chất rắn kết tinh, sự sôi là một quá trình chuyển thể đẳng nhiệt."
+            },
+            {
+                questionNumber: 16,
+                question: "Việc phơi quần áo trong thời tiết hanh khô (độ ẩm không khí thấp) giúp quần áo mau khô hơn vì:",
+                answerOptions: [
+                    { text: "Lực liên kết phân tử trong nước tăng.", rationale: "Độ ẩm không khí không ảnh hưởng trực tiếp đến lực liên kết phân tử của nước.", isCorrect: false },
+                    { text: "Tốc độ gió giảm.", rationale: "Thời tiết hanh khô không đồng nghĩa với tốc độ gió giảm.", isCorrect: false },
+                    { text: "Nhiệt độ sôi của nước giảm.", rationale: "Nước bay hơi ở nhiệt độ bất kì, không nhất thiết là nhiệt độ sôi.", isCorrect: false },
+                    { text: "Độ ẩm không khí thấp làm tăng tốc độ bay hơi của nước.", rationale: "Độ ẩm thấp làm giảm nồng độ hơi nước trong không khí, thúc đẩy quá trình bay hơi.", isCorrect: true }
+                ],
+                hint: "Hãy nhớ các yếu tố ảnh hưởng đến tốc độ bay hơi, đặc biệt là độ ẩm."
+            },
+            // V. Chất rắn kết tinh và chất rắn vô định hình
+            {
+                questionNumber: 17,
+                question: "Chất rắn kết tinh có đặc điểm nào sau đây?",
+                answerOptions: [
+                    { text: "Không có cấu trúc tinh thể.", rationale: "Đây là đặc điểm của chất rắn vô định hình.", isCorrect: false },
+                    { text: "Có tính đẳng hướng duy nhất.", rationale: "Chất rắn kết tinh có thể có tính dị hướng (đơn tinh thể) hoặc đẳng hướng (đa tinh thể).", isCorrect: false },
+                    { text: "Mềm dần ra và nóng chảy ở một khoảng nhiệt độ.", rationale: "Đây là đặc điểm của chất rắn vô định hình.", isCorrect: false },
+                    { text: "Có cấu trúc tinh thể và nhiệt độ nóng chảy xác định.", rationale: "Đây là hai đặc điểm cơ bản và quan trọng nhất của chất rắn kết tinh.", isCorrect: true }
+                ],
+                hint: "Hãy nhớ sự khác biệt lớn nhất giữa hai loại chất rắn nằm ở cấu trúc bên trong và quá trình nóng chảy."
+            },
+            {
+                questionNumber: 18,
+                question: "Thuỷ tinh, nhựa, và cao su thuộc loại chất rắn nào?",
+                answerOptions: [
+                    { text: "Chất rắn đơn tinh thể.", rationale: "Thuỷ tinh, nhựa, cao su không có cấu trúc tinh thể.", isCorrect: false },
+                    { text: "Chất rắn đa tinh thể.", rationale: "Đây là các chất rắn vô định hình.", isCorrect: false },
+                    { text: "Chất rắn vô định hình.", rationale: "Đây là các ví dụ điển hình của chất rắn vô định hình, không có cấu trúc tinh thể.", isCorrect: true },
+                    { text: "Hỗn hợp của chất rắn kết tinh và vô định hình.", rationale: "Chúng được phân loại rõ ràng là chất rắn vô định hình.", isCorrect: false }
+                ],
+                hint: "Hãy nhớ rằng loại chất rắn này không có nhiệt độ nóng chảy rõ ràng."
+            },
+            {
+                questionNumber: 19,
+                question: `
+                    Dựa vào đồ thị sau, đường cong A và B lần lượt biểu diễn sự nóng chảy của loại chất rắn nào?
+                    <div class="graph-container">
+                        <svg class="melting-graph-svg" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Axis -->
+                            <line x1="20" y1="180" x2="280" y2="180" stroke="#333" stroke-width="2"/>
+                            <line x1="20" y1="180" x2="20" y2="20" stroke="#333" stroke-width="2"/>
+                            
+                            <!-- Labels -->
+                            <text x="285" y="185" font-size="12" fill="#333">Thời gian t</text>
+                            <text x="5" y="25" font-size="12" fill="#333">Nhiệt độ T</text>
+                            
+                            <!-- Curve A (Amorphous - Vô định hình) -->
+                            <polyline points="20,160 80,140 140,100 200,80 260,60" 
+                                      fill="none" stroke="#ef4444" stroke-width="3" stroke-dasharray="5,5" id="curve-A"/>
+                            <text x="265" y="65" font-size="14" fill="#ef4444" font-weight="bold">A</text>
+                            
+                            <!-- Curve B (Crystalline - Kết tinh) -->
+                            <polyline points="20,100 80,100" fill="none" stroke="#4f46e5" stroke-width="3"/>
+                            <polyline points="80,100 120,100 120,60 180,60 260,30" 
+                                      fill="none" stroke="#4f46e5" stroke-width="3" id="curve-B"/>
+                            <text x="265" y="35" font-size="14" fill="#4f46e5" font-weight="bold">B</text>
+                            
+                            <!-- Melting Point Line (for B) -->
+                            <line x1="20" y1="60" x2="180" y2="60" stroke="#4f46e5" stroke-width="1" stroke-dasharray="2,2"/>
+                            <text x="5" y="65" font-size="12" fill="#4f46e5">Tnc</text>
+
+                            <!-- Explanation points -->
+                            <circle cx="80" cy="100" r="3" fill="#4f46e5"/>
+                            <circle cx="120" cy="60" r="3" fill="#4f46e5"/>
+
+                            <!-- Arrows for flow -->
+                            <path d="M 120 70 L 120 170" fill="none" stroke="#333" stroke-dasharray="2,2" stroke-width="1"/>
+                            <path d="M 80 110 L 80 170" fill="none" stroke="#333" stroke-dasharray="2,2" stroke-width="1"/>
+                            <text x="90" y="195" font-size="10" fill="#333">Rắn</text>
+                            <text x="100" y="195" font-size="10" fill="#4f46e5">Rắn/Lỏng (B)</text>
+                            <text x="160" y="195" font-size="10" fill="#333">Lỏng</text>
+
+                        </svg>
+                    </div>
+                `,
+                answerOptions: [
+                    { text: "A: Chất rắn vô định hình; B: Chất rắn kết tinh.", rationale: "Đường B (nhiệt độ không đổi trong quá trình nóng chảy) là chất rắn kết tinh. Đường A (nhiệt độ tăng liên tục) là chất rắn vô định hình.", isCorrect: true },
+                    { text: "A: Chất rắn kết tinh; B: Chất rắn vô định hình.", rationale: "Đường B là chất rắn kết tinh (có nhiệt độ nóng chảy xác định). Đường A là chất rắn vô định hình (không có nhiệt độ nóng chảy xác định).", isCorrect: false },
+                    { text: "Cả A và B đều là chất rắn vô định hình.", rationale: "Hai đường cong thể hiện hai quá trình nóng chảy khác biệt.", isCorrect: false },
+                    { text: "Cả A và B đều là chất rắn kết tinh.", rationale: "Hai đường cong thể hiện hai quá trình nóng chảy khác biệt.", isCorrect: false }
+                ],
+                hint: "Chất rắn kết tinh có 'điểm' nóng chảy, còn chất rắn vô định hình có 'khoảng' nóng chảy."
+            },
+            {
+                questionNumber: 20,
+                question: "Tính chất đẳng hướng của chất rắn đa tinh thể có nghĩa là:",
+                answerOptions: [
+                    { text: "Chúng chỉ có thể nóng chảy ở một nhiệt độ duy nhất.", rationale: "Đây là đặc điểm của chất rắn kết tinh nói chung.", isCorrect: false },
+                    { text: "Các tính chất vật lí (cơ, nhiệt, điện,...) thay đổi theo các hướng khác nhau.", rationale: "Đây là định nghĩa của tính dị hướng.", isCorrect: false },
+                    { text: "Chúng không có cấu trúc tinh thể.", rationale: "Đa tinh thể vẫn có cấu trúc tinh thể (tinh thể nhỏ).", isCorrect: false },
+                    { text: "Các tính chất vật lí (cơ, nhiệt, điện,...) như nhau theo mọi hướng.", rationale: "Tính đẳng hướng có nghĩa là các tính chất không phụ thuộc vào phương đo.", isCorrect: true }
+                ],
+                hint: "Tính đẳng hướng (isotropic) và dị hướng (anisotropic) đề cập đến sự phụ thuộc của tính chất vật lí vào hướng đo."
+            }
+        ];
+
+        // Global variables
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timeLeft = 1200; // 20 questions * 60 seconds = 1200s (Default time)
+        let timerInterval;
+        let quizState = 'running'; // 'running', 'finished'
+        const totalQuestions = quizData.length;
+
+        // Utility functions
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // Timer functions
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (quizState === 'running') {
+                    timeLeft--;
+                    document.getElementById('timer').textContent = formatTime(timeLeft);
+
+                    if (timeLeft <= 0) {
+                        endQuiz(true); // End quiz due to timeout
+                    }
+                }
+            }, 1000);
+        }
+
+        // Rendering functions
+        function renderQuiz() {
+            const quizContainer = document.getElementById('quiz-container');
+            const navContainer = document.getElementById('question-nav');
+            
+            // Render question navigation
+            navContainer.innerHTML = quizData.map((q, index) => `
+                <button id="nav-q-${index}" 
+                        onclick="goToQuestion(${index})" 
+                        class="nav-btn bg-gray-200 text-gray-700 w-8 h-8 rounded-full font-semibold text-sm transition duration-150 hover:bg-primary hover:text-white"
+                        data-status="unanswered">
+                    ${index + 1}
+                </button>
+            `).join('');
+
+            // Start timer and display first question
+            displayQuestion(currentQuestionIndex);
+            startTimer();
+        }
+
+        function displayQuestion(index) {
+            currentQuestionIndex = index;
+            const q = quizData[index];
+            const quizContainer = document.getElementById('quiz-container');
+            document.getElementById('progress').textContent = `${index + 1}/${totalQuestions}`;
+
+            // Find current selection to highlight when navigating back
+            let storedAnswer = localStorage.getItem(`answer_${q.questionNumber}`);
+            let answered = storedAnswer !== null;
+
+            // Question content
+            quizContainer.innerHTML = `
+                <div class="mb-6 border-b pb-4">
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">Câu ${q.questionNumber}/${totalQuestions}</h2>
+                    <p class="text-gray-700 text-lg">${q.question}</p>
+                </div>
+                <div id="options-container" class="space-y-4">
+                    ${q.answerOptions.map((option, optIndex) => `
+                        <button 
+                            id="option-${optIndex}" 
+                            class="option-btn w-full text-left p-4 rounded-lg border-2 border-gray-300 transition duration-300 ${answered ? 'cursor-not-allowed' : 'hover:bg-indigo-50'}"
+                            data-index="${optIndex}"
+                            onclick="selectOption(${optIndex})"
+                            ${answered ? 'disabled' : ''}
+                        >
+                            <span class="font-medium mr-3">${String.fromCharCode(65 + optIndex)}.</span>
+                            <span class="text-gray-800">${option.text}</span>
+                        </button>
+                    `).join('')}
+                </div>
+
+                <div id="feedback-container" class="mt-6 p-4 rounded-lg hidden">
+                    <p id="feedback-message" class="font-semibold text-lg"></p>
+                    <div id="rationale-display" class="rationale mt-2 p-3 bg-gray-100 rounded-md border border-gray-300">
+                        <p class="font-bold text-sm text-primary mb-1">Giải thích:</p>
+                        <p class="text-sm text-gray-700"></p>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-between items-center">
+                    <button onclick="goToPreviousQuestion()" 
+                            id="prev-btn"
+                            class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg font-semibold transition duration-200 hover:bg-gray-400 disabled:opacity-50"
+                            ${index === 0 ? 'disabled' : ''}>
+                        &larr; Quay Lại
+                    </button>
+                    <button onclick="goToNextQuestion()" 
+                            id="next-btn"
+                            class="px-4 py-2 bg-primary text-white rounded-lg font-semibold transition duration-200 hover:bg-indigo-600 disabled:opacity-50"
+                            disabled>
+                        Tiếp Tục &rarr;
+                    </button>
+                </div>
+            `;
+
+            // Re-highlight selection and show feedback if already answered
+            if (answered) {
+                highlightSelection(parseInt(storedAnswer), true);
+                document.getElementById('next-btn').disabled = false;
+            } else {
+                // Disable next button until an option is selected for the current question
+                document.getElementById('next-btn').disabled = true;
+            }
+            
+            // Update navigation button styles
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('ring-4', 'ring-primary', 'ring-opacity-50'));
+            document.getElementById(`nav-q-${index}`).classList.add('ring-4', 'ring-primary', 'ring-opacity-50');
+
+            // Update next button text for the last question
+            if (index === totalQuestions - 1) {
+                document.getElementById('next-btn').textContent = 'Kết Thúc Bài Thi';
+            } else {
+                document.getElementById('next-btn').textContent = 'Tiếp Tục →';
+            }
+        }
+
+        function selectOption(selectedIndex) {
+            const q = quizData[currentQuestionIndex];
+            if (localStorage.getItem(`answer_${q.questionNumber}`) !== null) {
+                return; // Already answered
+            }
+
+            const isCorrect = q.answerOptions[selectedIndex].isCorrect;
+
+            // 1. Store answer
+            localStorage.setItem(`answer_${q.questionNumber}`, selectedIndex);
+            
+            // 2. Update navigation status
+            const navBtn = document.getElementById(`nav-q-${currentQuestionIndex}`);
+            navBtn.setAttribute('data-status', isCorrect ? 'correct' : 'incorrect');
+
+            // 3. Highlight options and provide feedback
+            highlightSelection(selectedIndex, isCorrect);
+            showFeedback(isCorrect, q.answerOptions[selectedIndex].rationale, q.hint);
+
+            // 4. Update score (only if correct)
+            if (isCorrect) {
+                // FIX: ClassList must use separate add() and remove() calls
+                navBtn.classList.remove('bg-gray-200', 'text-gray-700');
+                navBtn.classList.add('bg-correct-color', 'text-white');
+                score++;
+            } else {
+                // FIX: ClassList must use separate add() and remove() calls
+                navBtn.classList.remove('bg-gray-200', 'text-gray-700');
+                navBtn.classList.add('bg-error-color', 'text-white');
+            }
+
+            // 5. Disable all options and enable next button
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('cursor-not-allowed', 'opacity-70');
+                btn.classList.remove('hover:bg-indigo-50');
+            });
+            document.getElementById('next-btn').disabled = false;
+        }
+
+        function highlightSelection(selectedIndex, isAnswered) {
+            const q = quizData[currentQuestionIndex];
+            const options = document.querySelectorAll('.option-btn');
+
+            options.forEach((btn, index) => {
+                btn.classList.remove('border-gray-300', 'border-2', 'hover:bg-indigo-50');
+                
+                const isCorrect = q.answerOptions[index].isCorrect;
+                const isUserSelection = index === selectedIndex;
+                
+                if (isCorrect) {
+                    // Highlight the correct answer (green background)
+                    btn.classList.add('bg-green-100', 'border-correct-color', 'border-2');
+                }
+
+                if (isUserSelection && isAnswered) {
+                    // Highlight the user's selected answer
+                    if (isCorrect) {
+                        btn.classList.add('bg-correct-color', 'text-white', 'shadow-lg', 'border-correct-color');
+                    } else {
+                        btn.classList.add('bg-error-color', 'text-white', 'shadow-lg', 'border-error-color');
+                        // If wrong, ensure the correct answer is still visible in green-100
+                    }
+                } else {
+                    btn.classList.add('bg-white'); // Ensure non-selected are white
+                }
+            });
+        }
+
+        function showFeedback(isCorrect, rationale, hint) {
+            const feedbackContainer = document.getElementById('feedback-container');
+            const messageElement = document.getElementById('feedback-message');
+            const rationaleElement = document.querySelector('#rationale-display p.text-sm');
+            
+            feedbackContainer.classList.remove('hidden', 'bg-error-color/10', 'bg-correct-color/10', 'border-error-color', 'border-correct-color');
+
+            if (isCorrect) {
+                feedbackContainer.classList.add('bg-correct-color/10', 'border', 'border-correct-color');
+                messageElement.innerHTML = '🎉 Chúc Mừng! Bạn đã trả lời đúng. Hãy tiếp tục cố gắng nhé.';
+                messageElement.classList.add('text-correct-color');
+            } else {
+                feedbackContainer.classList.add('bg-error-color/10', 'border', 'border-error-color');
+                messageElement.innerHTML = '😔 Rất tiếc! Câu trả lời chưa chính xác. Đừng nản chí, bạn sẽ làm được. ';
+                messageElement.classList.add('text-error-color');
+            }
+
+            // Show Rationale
+            document.getElementById('rationale-display').classList.remove('hidden');
+            rationaleElement.textContent = rationale;
+        }
+
+        // Navigation functions
+        function goToQuestion(index) {
+            if (index >= 0 && index < totalQuestions) {
+                displayQuestion(index);
+            }
+        }
+
+        function goToNextQuestion() {
+            if (currentQuestionIndex < totalQuestions - 1) {
+                goToQuestion(currentQuestionIndex + 1);
+            } else {
+                endQuiz();
+            }
+        }
+
+        function goToPreviousQuestion() {
+            if (currentQuestionIndex > 0) {
+                goToQuestion(currentQuestionIndex - 1);
+            }
+        }
+
+        // End Quiz function
+        function endQuiz(isTimeout = false) {
+            quizState = 'finished';
+            clearInterval(timerInterval);
+            
+            // Calculate final score
+            const finalScore = quizData.filter((q, index) => {
+                const storedAnswer = localStorage.getItem(`answer_${q.questionNumber}`);
+                if (storedAnswer !== null) {
+                    return q.answerOptions[parseInt(storedAnswer)].isCorrect;
+                }
+                return false;
+            }).length;
+
+            const timeTaken = 1200 - timeLeft;
+            const timeMessage = isTimeout ? 
+                '<span class="text-error-color font-bold">HẾT GIỜ!</span>' : 
+                `Bạn đã hoàn thành trong <span class="text-primary font-bold">${formatTime(timeTaken)}</span>.`;
+            
+            const resultsContainer = document.getElementById('app');
+            resultsContainer.innerHTML = `
+                <div class="text-center py-12 px-4">
+                    <h1 class="text-5xl font-extrabold text-primary mb-4">${isTimeout ? 'THỜI GIAN KẾT THÚC' : 'KẾT THÚC BÀI ÔN TẬP'}</h1>
+                    <p class="text-xl text-gray-700 mb-6">${timeMessage}</p>
+                    
+                    <div class="bg-indigo-50 p-6 rounded-xl shadow-lg inline-block">
+                        <p class="text-3xl font-semibold text-gray-800">Điểm số cuối cùng của bạn:</p>
+                        <p class="text-6xl font-extrabold text-correct-color mt-2">${finalScore}/${totalQuestions}</p>
+                    </div>
+
+                    <p class="text-lg text-gray-600 mt-6">Bạn có thể xem lại các câu hỏi và câu trả lời chi tiết ở phía dưới.</p>
+                    
+                    <button onclick="reviewAnswers()" 
+                            class="mt-6 px-8 py-3 bg-secondary text-white rounded-lg font-bold text-lg transition duration-200 hover:bg-green-600 shadow-md">
+                        Xem lại Đáp án
+                    </button>
+                    <button onclick="resetQuiz()" 
+                            class="mt-6 ml-4 px-8 py-3 bg-error-color text-white rounded-lg font-bold text-lg transition duration-200 hover:bg-red-600 shadow-md">
+                        Làm lại Bài thi
+                    </button>
+                </div>
+                <div id="review-section" class="mt-8 hidden"></div>
+            `;
+        }
+        
+        // Review function (Show Answer)
+        function reviewAnswers() {
+            const reviewSection = document.getElementById('review-section');
+            reviewSection.classList.remove('hidden');
+            
+            let reviewHTML = '<h2 class="text-3xl font-bold text-primary mb-6 border-b pb-2">Bảng Tổng Hợp Đáp Án</h2>';
+
+            quizData.forEach((q, index) => {
+                const storedAnswerIndex = localStorage.getItem(`answer_${q.questionNumber}`);
+                const isAnswered = storedAnswerIndex !== null;
+                const userChoice = isAnswered ? q.answerOptions[parseInt(storedAnswerIndex)] : null;
+                const correctAnswer = q.answerOptions.find(opt => opt.isCorrect);
+                const isCorrect = isAnswered && userChoice.isCorrect;
+                
+                let userStatus = isAnswered ? (isCorrect ? 'Đúng' : 'Sai') : 'Chưa trả lời';
+                let statusColor = isCorrect ? 'text-correct-color' : (isAnswered ? 'text-error-color' : 'text-gray-500');
+
+                reviewHTML += `
+                    <div class="mb-8 p-5 border rounded-xl shadow-sm ${isCorrect ? 'border-correct-color/50 bg-green-50' : (isAnswered ? 'border-error-color/50 bg-red-50' : 'bg-gray-50')}">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">
+                            Câu ${q.questionNumber}: ${q.question.replace(/<div class="graph-container">[\s\S]*<\/div>/g, '[Đồ thị nóng chảy]') /* Hide complex SVG in review summary */ }
+                        </h3>
+                        <p class="mb-3 text-lg font-bold ${statusColor}">Trạng thái: ${userStatus}</p>
+
+                        <div class="space-y-2">
+                            ${q.answerOptions.map((option, optIndex) => {
+                                const isUserSelection = isAnswered && optIndex === parseInt(storedAnswerIndex);
+                                const isCorrectAnswer = option.isCorrect;
+                                
+                                let optionClass = 'p-3 rounded-md border text-sm';
+                                let icon = '';
+
+                                if (isCorrectAnswer) {
+                                    optionClass += ' bg-correct-color/20 border-correct-color font-bold';
+                                    icon = '✅';
+                                } else if (isUserSelection) {
+                                    optionClass += ' bg-error-color/20 border-error-color font-bold';
+                                    icon = '❌';
+                                } else {
+                                    optionClass += ' bg-white border-gray-200';
+                                }
+
+                                return `
+                                    <div class="${optionClass}">
+                                        <span class="font-bold mr-2">${String.fromCharCode(65 + optIndex)}.</span>
+                                        ${option.text} <span class="ml-2">${icon}</span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+
+                        <div class="mt-4 p-3 bg-white rounded-md border border-primary/50">
+                            <p class="font-bold text-primary mb-1">Giải thích chi tiết (Rationale):</p>
+                            <p class="text-gray-700">${correctAnswer.rationale}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            reviewSection.innerHTML = reviewHTML;
+        }
+
+        // Reset function
+        function resetQuiz() {
+            // Clear all stored answers
+            for (let i = 1; i <= totalQuestions; i++) {
+                localStorage.removeItem(`answer_${i}`);
+            }
+            // Reset state
+            currentQuestionIndex = 0;
+            score = 0;
+            timeLeft = 1200; // Reset to 20 minutes
+            quizState = 'running';
+            // Reload the initial state
+            document.getElementById('app').innerHTML = `
+                <header class="text-center mb-6">
+                    <h1 class="text-3xl font-bold text-primary">20 CÂU HỎI ÔN TẬP</h1>
+                    <p class="text-lg text-gray-600">CHỦ ĐỀ: NHIỆT VÀ SỰ CHUYỂN THỂ</p>
+                </header>
+
+                <!-- Status & Timer -->
+                <div class="flex flex-col md:flex-row justify-between items-center bg-indigo-50 p-3 rounded-lg shadow-md mb-6">
+                    <div class="text-lg font-semibold text-gray-700">Thời gian: <span id="timer" class="text-primary font-bold">20:00</span></div>
+                    <div class="text-sm text-gray-600 mt-2 md:mt-0">Tiến độ: <span id="progress">${currentQuestionIndex + 1}/${totalQuestions}</span></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <!-- Question Navigation Column -->
+                    <div class="md:col-span-1 bg-gray-50 p-4 rounded-lg shadow-inner question-list-container">
+                        <h3 class="font-bold text-lg text-gray-700 mb-3">Danh Mục Câu Hỏi</h3>
+                        <div id="question-nav" class="grid grid-cols-5 gap-2">
+                            <!-- Nav buttons will be injected here -->
+                        </div>
+                    </div>
+
+                    <!-- Quiz Content Column -->
+                    <div id="quiz-container" class="md:col-span-3 bg-white p-6 rounded-lg shadow-lg">
+                        <!-- Question content will be injected here -->
+                    </div>
+                </div>
+            `;
+            // Re-render
+            renderQuiz();
+        }
+
+        // Initialization
+        window.onload = () => {
+            renderQuiz();
+        };
+    </script>
+
+    <!-- Status & Timer -->
+    <div class="flex flex-col md:flex-row justify-between items-center bg-indigo-50 p-3 rounded-lg shadow-md mb-6">
+        <div class="text-lg font-semibold text-gray-700">Thời gian: <span id="timer" class="text-primary font-bold">20:00</span></div>
+        <div class="text-sm text-gray-600 mt-2 md:mt-0">Tiến độ: <span id="progress">1/20</span></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <!-- Question Navigation Column -->
+        <div class="md:col-span-1 bg-gray-50 p-4 rounded-lg shadow-inner question-list-container">
+            <h3 class="font-bold text-lg text-gray-700 mb-3">Danh Mục Câu Hỏi</h3>
+            <div id="question-nav" class="grid grid-cols-5 gap-2">
+                <!-- Nav buttons will be injected here -->
+            </div>
+        </div>
+
+        <!-- Quiz Content Column -->
+        <div id="quiz-container" class="md:col-span-3 bg-white p-6 rounded-lg shadow-lg">
+            <!-- Question content will be injected here -->
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
