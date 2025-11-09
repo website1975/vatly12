@@ -1,1 +1,446 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>20 Câu Trắc Nghiệm Thuyết Động Học Chất Khí (Tối ưu hóa)</title>
 
+    <!-- TỐI ƯU HÓA 1: Cấu hình MathJax được đặt trước khi gọi script để đảm bảo nó được áp dụng đúng -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            options: {
+                // Bỏ qua việc quét các thẻ không cần thiết
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            },
+            startup: {
+                // Sẽ không tự động chạy khi tải trang, chúng ta sẽ gọi thủ công
+                ready: () => {
+                    MathJax.startup.defaultReady();
+                    // Đánh dấu MathJax đã sẵn sàng
+                    document.body.classList.add('mathjax-ready');
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* CSS không thay đổi, giữ nguyên như cũ */
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            width: 95%;
+            max-width: 800px;
+            margin: auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .question-card {
+            border: 1px solid #cbd5e0;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #f7fafc;
+        }
+        .question-text {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        .option-label {
+            display: block;
+            background: #ffffff;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #e2e8f0;
+        }
+        .option-label:hover {
+            background-color: #edf2f7;
+            border-color: #a0aec0;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        .navigation, .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        .button:active {
+            transform: scale(0.98);
+        }
+        #prevBtn {
+            background-color: #a0aec0;
+            color: white;
+        }
+        #prevBtn:hover {
+            background-color: #718096;
+        }
+        #nextBtn {
+            background-color: #48bb78;
+            color: white;
+        }
+        #nextBtn:hover {
+            background-color: #38a169;
+        }
+        #submitBtn {
+            background-color: #e53e3e;
+            color: white;
+            flex-grow: 1;
+            margin-left: 10px;
+        }
+        #submitBtn:hover {
+            background-color: #c53030;
+        }
+        #timer {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #d64539;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 2px dashed #f6ad55;
+            border-radius: 8px;
+            background-color: #fffaf0;
+        }
+        .result-container {
+            display: none;
+            padding: 20px;
+            border: 3px solid #48bb78;
+            border-radius: 10px;
+            background-color: #f0fff4;
+        }
+        .result-item {
+            border-bottom: 1px dashed #e2e8f0;
+            padding: 15px 0;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .correct-label {
+            color: #28a745;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .user-label {
+            color: #007bff;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .result-status {
+            font-weight: bold;
+            margin: 5px 0;
+            padding: 5px 0;
+        }
+        .status-correct {
+            color: #28a745;
+        }
+        .status-wrong {
+            color: #dc3545;
+        }
+        .rationale {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e6f7ff;
+            border-left: 4px solid #3da8f8;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.95em;
+        }
+        .retry-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .retry-button:hover {
+            background-color: #0056b3;
+        }
+        .question-index-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        .index-box {
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .index-box.current {
+            background-color: #4c51bf;
+            color: white;
+            font-weight: bold;
+            border: 2px solid #667eea;
+        }
+        .index-box.answered {
+            background-color: #90ee90;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>20 CÂU TRẮC NGHIỆM THUYẾT ĐỘNG HỌC CHẤT KHÍ</h1>
+    <div id="timer">Thời gian còn lại: 30:00</div>
+    <div class="question-index-container" id="indexContainer"></div>
+    <div id="quizContainer"></div>
+    <div class="navigation">
+        <button id="prevBtn" class="button">← Câu Trước</button>
+        <button id="nextBtn" class="button">Câu Tiếp →</button>
+        <button id="submitBtn" class="button">Nộp Bài</button>
+    </div>
+    <div id="resultDiv" class="result-container"></div>
+</div>
+
+<!-- TỐI ƯU HÓA 2: Di chuyển script xuống cuối thẻ body -->
+<script>
+// Dữ liệu câu hỏi giữ nguyên
+const questions = [
+    {id:1,text:"Trong thuyết động học phân tử chất khí, nội dung nào sau đây là **sai**?",options:[{text:"Các phân tử khí chuyển động hỗn loạn không ngừng.",isCorrect:!1,label:"A"},{text:"Các phân tử khí luôn va chạm đàn hồi với thành bình và với nhau.",isCorrect:!1,label:"B"},{text:"Lực tương tác giữa các phân tử khí là đáng kể, đặc biệt khi khí bị nén.",isCorrect:!0,label:"C"},{text:"Thể tích riêng của các phân tử khí rất nhỏ so với thể tích bình chứa.",isCorrect:!1,label:"D"}],rationale:"Khí lý tưởng bỏ qua lực tương tác phân tử và thể tích riêng của chúng. Đối với khí thực ở điều kiện chuẩn, lực tương tác rất yếu. Phát biểu C mô tả đặc điểm của chất lỏng hoặc chất khí thực ở áp suất cao/nhiệt độ thấp, không phải là nội dung cơ bản của thuyết động học cho **khí lý tưởng**."},
+    {id:2,text:"Đại lượng vật lí nào sau đây là thước đo **năng lượng chuyển động hỗn loạn** của các phân tử khí?",options:[{text:"Áp suất $p$",isCorrect:!1,label:"A"},{text:"Thể tích $V$",isCorrect:!1,label:"B"},{text:"Nhiệt độ tuyệt đối $T$",isCorrect:!0,label:"C"},{text:"Mật độ $n$",isCorrect:!1,label:"D"}],rationale:"Nhiệt độ tuyệt đối $T$ của chất khí là đại lượng vật lí đo mức độ chuyển động hỗn loạn của các phân tử, cụ thể là tỉ lệ thuận với động năng tịnh tiến trung bình của phân tử: $\\overline{W_{đt}} = \\frac{3}{2}kT$."},
+    {id:3,text:"Công thức tính áp suất của chất khí lý tưởng theo thuyết động học phân tử là $p = \\frac{1}{3} n m_0 \\overline{v^2}$. Trong đó, $n$ là gì?",options:[{text:"Số mol khí.",isCorrect:!1,label:"A"},{text:"Khối lượng riêng của khí.",isCorrect:!1,label:"B"},{text:"Mật độ phân tử (số phân tử trên một đơn vị thể tích).",isCorrect:!0,label:"C"},{text:"Số Avogadro.",isCorrect:!1,label:"D"}],rationale:"Trong công thức $p = \\frac{1}{3} n m_0 \\overline{v^2}$, $n$ là mật độ phân tử, tức là số phân tử có trong một đơn vị thể tích ($n = N/V$). $m_0$ là khối lượng của một phân tử, và $\\overline{v^2}$ là tốc độ căn quân phương bình phương."},
+    {id:4,text:"Tốc độ trung bình của các phân tử khí sẽ **tăng** bao nhiêu lần nếu nhiệt độ tuyệt đối của khí tăng gấp đôi (giả sử khối lượng mol không đổi)?",options:[{text:"2 lần.",isCorrect:!1,label:"A"},{text:"4 lần.",isCorrect:!1,label:"B"},{text:"$\\sqrt{2}$ lần.",isCorrect:!0,label:"C"},{text:"$1/\\sqrt{2}$ lần.",isCorrect:!1,label:"D"}],rationale:"Động năng tịnh tiến trung bình tỉ lệ với nhiệt độ tuyệt đối: $\\overline{W_{đt}} \\sim T$. Mà $\\overline{W_{đt}} = \\frac{1}{2} m_0 \\overline{v^2}$, nên $\\overline{v^2} \\sim T$. Khi $T' = 2T$, ta có $\\overline{v'^2} = 2\\overline{v^2}$, suy ra tốc độ căn quân phương $v_{rms} = \\sqrt{\\overline{v^2}}$ tăng $\\sqrt{2}$ lần."},
+    {id:5,text:"Trong một quá trình đẳng tích ($V = const$) của một khối khí lý tưởng, khi nhiệt độ tuyệt đối tăng lên 3 lần, thì áp suất của khí sẽ thay đổi như thế nào?",options:[{text:"Giảm đi 3 lần.",isCorrect:!1,label:"A"},{text:"Không thay đổi.",isCorrect:!1,label:"B"},{text:"Tăng lên 3 lần.",isCorrect:!0,label:"C"},{text:"Tăng lên 9 lần.",isCorrect:!1,label:"D"}],rationale:"Theo định luật Charles (cho quá trình đẳng tích): $p/T = const$, hay $p_1/T_1 = p_2/T_2$. Khi $T_2 = 3T_1$, ta có $p_2 = 3p_1$. Áp suất tăng lên 3 lần."},
+    {id:6,text:"Động năng tịnh tiến trung bình của một phân tử khí lý tưởng được tính bằng công thức nào sau đây?",options:[{text:"$W_{đt} = \\frac{5}{2}kT$",isCorrect:!1,label:"A"},{text:"$W_{đt} = \\frac{3}{2}R T$",isCorrect:!1,label:"B"},{text:"$W_{đt} = \\frac{3}{2}kT$",isCorrect:!0,label:"C"},{text:"$W_{đt} = \\frac{1}{2}m_0 \\overline{v}$",isCorrect:!1,label:"D"}],rationale:"Động năng tịnh tiến trung bình của một phân tử khí lý tưởng là $\\overline{W_{đt}} = \\frac{3}{2}kT$, trong đó $k$ là hằng số Boltzmann ($k = R/N_A$). $R$ là hằng số khí lý tưởng."},
+    {id:7,text:"Khối khí ở nhiệt độ $27^\\circ\\text{C}$ được nung nóng đẳng tích đến $127^\\circ\\text{C}$. Áp suất của khí sẽ tăng lên bao nhiêu lần?",options:[{text:"4/3 lần.",isCorrect:!1,label:"A"},{text:"1,33 lần.",isCorrect:!1,label:"B"},{text:"4/3 lần, tương đương 1,333 lần.",isCorrect:!0,label:"C"},{text:"100/27 lần.",isCorrect:!1,label:"D"}],rationale:"Đổi nhiệt độ sang Kelvin: $T_1 = 27 + 273 = 300\\ \\text{K}$, $T_2 = 127 + 273 = 400\\ \\text{K}$. Quá trình đẳng tích: $p_1/T_1 = p_2/T_2 \\implies p_2/p_1 = T_2/T_1 = 400/300 = 4/3$ lần. (Lưu ý: A và B không phải đáp án chính xác nhất vì 1.333 là giá trị gần đúng, 4/3 là chính xác.)"},
+    {id:8,text:"Theo phương trình trạng thái khí lý tưởng $p_1V_1/T_1 = p_2V_2/T_2$, quá trình nào sau đây là quá trình **đẳng nhiệt**?",options:[{text:"$p_1/T_1 = p_2/T_2$",isCorrect:!1,label:"A"},{text:"$p_1V_1 = p_2V_2$",isCorrect:!0,label:"B"},{text:"$V_1/T_1 = V_2/T_2$",isCorrect:!1,label:"C"},{text:"$p_1/V_1 = p_2/V_1$",isCorrect:!1,label:"D"}],rationale:"Quá trình đẳng nhiệt là quá trình biến đổi trạng thái trong đó nhiệt độ tuyệt đối $T$ được giữ không đổi ($T_1 = T_2$). Thay vào phương trình trạng thái, ta được $p_1V_1 = p_2V_2$, đây chính là Định luật Boyle-Mariotte."},
+    {id:9,text:"Khí bị nén đẳng nhiệt từ thể tích $V_1$ xuống $V_2 = V_1/4$. Áp suất của khối khí thay đổi như thế nào?",options:[{text:"Tăng 4 lần.",isCorrect:!0,label:"A"},{text:"Giảm 4 lần.",isCorrect:!1,label:"B"},{text:"Tăng 2 lần.",isCorrect:!1,label:"C"},{text:"Giảm 2 lần.",isCorrect:!1,label:"D"}],rationale:"Quá trình đẳng nhiệt: $p_1V_1 = p_2V_2$. Với $V_2 = V_1/4$, ta có $p_1V_1 = p_2(V_1/4) \\implies p_2 = 4p_1$. Áp suất tăng 4 lần."},
+    {id:10,text:"Định luật Charles mô tả quá trình biến đổi trạng thái nào sau đây?",options:[{text:"Đẳng nhiệt.",isCorrect:!1,label:"A"},{text:"Đẳng áp.",isCorrect:!0,label:"B"},{text:"Đẳng tích.",isCorrect:!1,label:"C"},{text:"Đoạn nhiệt.",isCorrect:!1,label:"D"}],rationale:"Định luật Charles (cho quá trình đẳng áp): Với một lượng khí xác định, trong quá trình đẳng áp (áp suất không đổi), thể tích tỉ lệ thuận với nhiệt độ tuyệt đối: $V/T = const$. (Trong một số tài liệu khác, định luật này còn được gọi là Định luật Gay-Lussac)."},
+    {id:11,text:"Đặc điểm nào sau đây là **đúng** khi nói về phân tử của khí lý tưởng?",options:[{text:"Chúng có kích thước lớn và tương tác mạnh với nhau.",isCorrect:!1,label:"A"},{text:"Chúng có kích thước rất nhỏ và không tương tác với nhau (chỉ va chạm đàn hồi).",isCorrect:!0,label:"B"},{text:"Chúng chỉ chuyển động thẳng đều.",isCorrect:!1,label:"C"},{text:"Chúng chỉ chuyển động khi có tác dụng của lực bên ngoài.",isCorrect:!1,label:"D"}],rationale:"Khí lý tưởng là mô hình lý tưởng hóa, trong đó phân tử có kích thước không đáng kể, và không có lực tương tác giữa các phân tử (ngoài va chạm đàn hồi tức thời)."},
+    {id:12,text:"Một khối khí lý tưởng có thể tích $10 \\ \\text{L}$ ở nhiệt độ $27^\\circ\\text{C}$ và áp suất $1 \\ \\text{atm}$. Nếu nén đẳng áp để thể tích giảm còn $5 \\ \\text{L}$, nhiệt độ cuối cùng của khí là bao nhiêu (tính bằng $^\\circ\\text{C}$)?",options:[{text:"$13,5^\\circ\\text{C}$",isCorrect:!1,label:"A"},{text:"$150^\\circ\\text{C}$",isCorrect:!1,label:"B"},{text:"$-123^\\circ\\text{C}$",isCorrect:!0,label:"C"},{text:"$0^\\circ\\text{C}$",isCorrect:!1,label:"D"}],rationale:"Quá trình đẳng áp (Định luật Charles): $V_1/T_1 = V_2/T_2$. Đổi $T_1 = 27 + 273 = 300\\ \\text{K}$. Ta có: $T_2 = T_1 \\frac{V_2}{V_1} = 300 \\frac{5}{10} = 150\\ \\text{K}$. Đổi về Celsius: $t_2 = 150 - 273 = -123^\\circ\\text{C}$."},
+    {id:13,text:"Trong công thức liên hệ giữa áp suất $p$ và động năng tịnh tiến trung bình $\\overline{W_{đt}}$ của các phân tử khí, $p = \\frac{2}{3} n \\overline{W_{đt}}$, đại lượng $n$ là gì?",options:[{text:"Khối lượng riêng của khí.",isCorrect:!1,label:"A"},{text:"Số Avogadro.",isCorrect:!1,label:"B"},{text:"Mật độ phân tử.",isCorrect:!0,label:"C"},{text:"Động năng trung bình của toàn bộ khí.",isCorrect:!1,label:"D"}],rationale:"Xuất phát từ $p = \\frac{1}{3} n m_0 \\overline{v^2}$ và $\\overline{W_{đt}} = \\frac{1}{2} m_0 \\overline{v^2}$. Thay $m_0 \\overline{v^2} = 2\\overline{W_{đt}}$ vào công thức áp suất, ta được $p = \\frac{1}{3} n (2\\overline{W_{đt}}) = \\frac{2}{3} n \\overline{W_{đt}}$. $n$ vẫn là mật độ phân tử."},
+    {id:14,text:"Nếu thể tích của một lượng khí xác định tăng lên 3 lần và áp suất giảm đi 2 lần, thì nhiệt độ tuyệt đối của khối khí đó sẽ:",options:[{text:"Tăng 1,5 lần.",isCorrect:!0,label:"A"},{text:"Giảm 6 lần.",isCorrect:!1,label:"B"},{text:"Tăng 6 lần.",isCorrect:!1,label:"C"},{text:"Không đổi.",isCorrect:!1,label:"D"}],rationale:"Áp dụng phương trình trạng thái: $p_1V_1/T_1 = p_2V_2/T_2$. Ta có $p_2 = p_1/2$ và $V_2 = 3V_1$. Thay vào: $T_2 = T_1 \\frac{p_2V_2}{p_1V_1} = T_1 \\frac{(p_1/2)(3V_1)}{p_1V_1} = T_1 \\frac{3}{2} = 1.5 T_1$. Nhiệt độ tăng 1,5 lần."},
+    {id:15,text:"Lực va chạm của phân tử khí lên thành bình gây ra đại lượng vĩ mô nào sau đây?",options:[{text:"Thể tích.",isCorrect:!1,label:"A"},{text:"Nhiệt độ.",isCorrect:!1,label:"B"},{text:"Áp suất.",isCorrect:!0,label:"C"},{text:"Động năng tịnh tiến.",isCorrect:!1,label:"D"}],rationale:"Áp suất của chất khí lên thành bình là lực tổng hợp của các phân tử khí va chạm vào thành bình trong một đơn vị thời gian trên một đơn vị diện tích."},
+    {id:16,text:"Quá trình biến đổi trạng thái có áp suất và thể tích không đổi ($p = const$ và $V = const$) thì nhiệt độ tuyệt đối $T$ phải:",options:[{text:"Tăng.",isCorrect:!1,label:"A"},{text:"Giảm.",isCorrect:!1,label:"B"},{text:"Không đổi.",isCorrect:!0,label:"C"},{text:"Có thể tăng hoặc giảm.",isCorrect:!1,label:"D"}],rationale:"Theo phương trình trạng thái: $pV/T = const$. Nếu cả $p$ và $V$ đều không đổi, thì $T$ cũng phải không đổi để $pV/T$ giữ nguyên giá trị."},
+    {id:17,text:"Nhiệt độ của khối khí lý tưởng giảm $40^\\circ\\text{C}$ thì động năng tịnh tiến trung bình của phân tử khí:",options:[{text:"Giảm đi một lượng cố định.",isCorrect:!1,label:"A"},{text:"Tỉ lệ thuận với nhiệt độ ban đầu.",isCorrect:!1,label:"B"},{text:"Giảm theo nhiệt độ tuyệt đối.",isCorrect:!0,label:"C"},{text:"Không thay đổi.",isCorrect:!1,label:"D"}],rationale:"Động năng tịnh tiến trung bình $\\overline{W_{đt}} = \\frac{3}{2}kT$ tỉ lệ thuận với nhiệt độ tuyệt đối $T$. Việc giảm $40^\\circ\\text{C}$ (hay $40\\ \\text{K}$) làm giảm $T$, dẫn đến $\\overline{W_{đt}}$ giảm."},
+    {id:18,text:"Một bình kín chứa khí ở áp suất $2 \\ \\text{atm}$ và nhiệt độ $27^\\circ\\text{C}$. Nếu tăng nhiệt độ lên $127^\\circ\\text{C}$ thì áp suất trong bình là bao nhiêu? (Quá trình đẳng tích).",options:[{text:"$1.5 \\ \\text{atm}$",isCorrect:!1,label:"A"},{text:"$2.67 \\ \\text{atm}$",isCorrect:!0,label:"B"},{text:"$3 \\ \\text{atm}$",isCorrect:!1,label:"C"},{text:"$4 \\ \\text{atm}$",isCorrect:!1,label:"D"}],rationale:"Đổi nhiệt độ sang Kelvin: $T_1 = 27 + 273 = 300\\ \\text{K}$, $T_2 = 127 + 273 = 400\\ \\text{K}$. Quá trình đẳng tích (Định luật Charles): $p_1/T_1 = p_2/T_2$. Áp suất cuối: $p_2 = p_1 \\frac{T_2}{T_1} = 2 \\ \\text{atm} \\cdot \\frac{400\\ \\text{K}}{300\\ \\text{K}} = 2 \\cdot \\frac{4}{3} = \\frac{8}{3} \\approx 2.67 \\ \\text{atm}$."},
+    {id:19,text:"Khi thể tích của một lượng khí lý tưởng không đổi, đồ thị biểu diễn sự phụ thuộc của áp suất $p$ theo nhiệt độ tuyệt đối $T$ là một đường:",options:[{text:"Hypebol.",isCorrect:!1,label:"A"},{text:"Đường thẳng kéo dài đi qua gốc tọa độ.",isCorrect:!0,label:"B"},{text:"Đoạn thẳng song song với trục $T$.",isCorrect:!1,label:"C"},{text:"Parabol.",isCorrect:!1,label:"D"}],rationale:"Quá trình đẳng tích (Định luật Charles): $p/T = const$. Đây là mối quan hệ tỉ lệ thuận, có dạng $p = C T$ ($C$ là hằng số), nên đồ thị $p$ theo $T$ là một đường thẳng đi qua gốc tọa độ (nếu tính từ $T=0$)." },
+    {id:20,text:"Trong quá trình đẳng áp, nếu nhiệt độ tuyệt đối $T$ tăng 5 lần thì thể tích $V$ của khối khí sẽ:",options:[{text:"Giảm 5 lần.",isCorrect:!1,label:"A"},{text:"Tăng 5 lần.",isCorrect:!0,label:"B"},{text:"Tăng $\\sqrt{5}$ lần.",isCorrect:!1,label:"C"},{text:"Giảm 1/5 lần.",isCorrect:!1,label:"D"}],rationale:"Quá trình đẳng áp (Định luật Charles): $V/T = const$, hay $V \\sim T$. Nếu $T$ tăng 5 lần, thì $V$ cũng phải tăng 5 lần."}
+];
+
+// TỐI ƯU HÓA 3: Đặt tất cả code vào trong sự kiện DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    let currentQuestionIndex = 0;
+    const totalQuestions = questions.length;
+    const userAnswers = {};
+    let timerInterval;
+    const TIME_LIMIT_MINUTES = 30;
+
+    const quizContainer = document.getElementById('quizContainer');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const resultDiv = document.getElementById('resultDiv');
+    const timerDisplay = document.getElementById('timer');
+    const indexContainer = document.getElementById('indexContainer');
+
+    // TỐI ƯU HÓA 4: Hàm typesetMath được sửa đổi để chỉ xử lý một phần tử cụ thể
+    function typesetMath(element) {
+        // Chỉ chạy nếu MathJax đã sẵn sàng
+        if (window.MathJax && document.body.classList.contains('mathjax-ready')) {
+            // typesetPromise có thể nhận một mảng các element để xử lý
+            // Điều này nhanh hơn rất nhiều so với việc quét toàn bộ trang
+            MathJax.typesetPromise(element ? [element] : []);
+        }
+    }
+
+    function saveAnswer(questionId, selectedLabel) {
+        userAnswers[questionId] = selectedLabel;
+        updateIndexBoxes();
+    }
+
+    function createIndexBoxes() {
+        indexContainer.innerHTML = '';
+        questions.forEach((_, i) => {
+            const indexBox = document.createElement('div');
+            indexBox.className = 'index-box';
+            indexBox.textContent = i + 1;
+            indexBox.dataset.index = i;
+            indexBox.onclick = () => goToQuestion(i);
+            indexContainer.appendChild(indexBox);
+        });
+    }
+
+    function updateIndexBoxes() {
+        const boxes = indexContainer.querySelectorAll('.index-box');
+        boxes.forEach((box, index) => {
+            box.classList.remove('current', 'answered');
+            if (index === currentQuestionIndex) {
+                box.classList.add('current');
+            }
+            if (userAnswers[questions[index].id]) {
+                box.classList.add('answered');
+            }
+        });
+    }
+
+    function goToQuestion(index) {
+        if (index >= 0 && index < totalQuestions) {
+            currentQuestionIndex = index;
+            loadQuestion();
+        }
+    }
+
+    function goToNextQuestion() {
+        if (currentQuestionIndex < totalQuestions - 1) {
+            goToQuestion(currentQuestionIndex + 1);
+        }
+    }
+
+    function goToPreviousQuestion() {
+        if (currentQuestionIndex > 0) {
+            goToQuestion(currentQuestionIndex - 1);
+        }
+    }
+
+    function loadQuestion() {
+        const questionData = questions[currentQuestionIndex];
+        const currentQuestionId = questionData.id;
+
+        let html = `<div class="question-card" id="q-card-${currentQuestionId}">
+            <div class="question-text">Câu ${currentQuestionIndex + 1}: ${questionData.text}</div>
+            <form id="questionForm_${currentQuestionId}">`;
+
+        questionData.options.forEach(option => {
+            const isChecked = userAnswers[currentQuestionId] === option.label;
+            html += `<label class="option-label">
+                <input type="radio" name="q${currentQuestionId}" value="${option.label}" ${isChecked ? 'checked' : ''} onchange="saveAnswer(${currentQuestionId}, '${option.label}')">
+                ${option.label}. ${option.text}
+            </label>`;
+        });
+
+        html += `</form></div>`;
+        quizContainer.innerHTML = html;
+        
+        // TỐI ƯU HÓA 5: Gọi typesetMath chỉ cho phần tử câu hỏi vừa được tải
+        const currentCard = document.getElementById(`q-card-${currentQuestionId}`);
+        typesetMath(currentCard);
+
+        prevBtn.disabled = currentQuestionIndex === 0;
+        nextBtn.disabled = currentQuestionIndex === totalQuestions - 1;
+        submitBtn.style.display = (currentQuestionIndex === totalQuestions - 1) ? 'inline-block' : 'none';
+
+        updateIndexBoxes();
+    }
+
+    function startTimer() {
+        let timeRemaining = TIME_LIMIT_MINUTES * 60;
+        timerInterval = setInterval(() => {
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                submitQuiz(true);
+                return;
+            }
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            timerDisplay.textContent = `Thời gian còn lại: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            timeRemaining--;
+        }, 1000);
+    }
+
+    function submitQuiz(isTimeout) {
+        clearInterval(timerInterval);
+
+        let score = 0;
+        let resultHTML = isTimeout ? '<h2 style="color:#e53e3e;">HẾT GIỜ!</h2>' : '<h2>KẾT QUẢ BÀI LÀM</h2>';
+        
+        questions.forEach((question, index) => {
+            const userAnswer = userAnswers[question.id];
+            const correctOption = question.options.find(opt => opt.isCorrect);
+            const isCorrect = userAnswer === correctOption.label;
+            if (isCorrect) score++;
+
+            resultHTML += `<div class="result-item">
+                <p class="question-text"><strong>Câu ${index + 1}:</strong> ${question.text}</p>
+                <span class="user-label">Đáp án của bạn: <strong>${userAnswer || 'Chưa trả lời'}</strong></span>
+                <span class="correct-label">Đáp án đúng: <strong>${correctOption.label}</strong></span>
+                <p class="result-status ${isCorrect ? 'status-correct' : 'status-wrong'}">Kết quả: ${isCorrect ? 'Đúng' : 'Sai'}</p>
+                ${question.rationale ? `<div class="rationale"><strong>Lời giải:</strong> ${question.rationale}</div>` : ''}
+            </div>`;
+        });
+
+        resultHTML += `<p style="font-size: 1.5em; font-weight: bold; text-align: center;">Tổng điểm: ${score}/${totalQuestions}</p>`;
+        resultHTML += `<button class="retry-button" onclick="location.reload()">Làm Lại</button>`;
+
+        quizContainer.style.display = 'none';
+        document.querySelector('.navigation').style.display = 'none';
+        indexContainer.style.display = 'none';
+        timerDisplay.style.display = 'none';
+
+        resultDiv.innerHTML = resultHTML;
+        resultDiv.style.display = 'block';
+        
+        // TỐI ƯU HÓA 6: Gọi typesetMath chỉ cho khu vực kết quả
+        typesetMath(resultDiv);
+    }
+
+    // Khởi tạo Quiz
+    function initializeQuiz() {
+        createIndexBoxes();
+        loadQuestion();
+        startTimer();
+        
+        prevBtn.addEventListener('click', goToPreviousQuestion);
+        nextBtn.addEventListener('click', goToNextQuestion);
+        submitBtn.addEventListener('click', () => {
+            if (confirm("Bạn có chắc chắn muốn nộp bài?")) {
+                 submitQuiz(false); 
+            }
+        });
+    }
+    
+    // Chạy hàm khởi tạo
+    initializeQuiz();
+});
+</script>
+
+</body>
+</html>

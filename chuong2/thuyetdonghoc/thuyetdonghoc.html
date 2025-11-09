@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thuyết Động Học Phân Tử</title>
+    <!-- Tải Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Đảm bảo canvas sử dụng hết chiều rộng và chiều cao có sẵn trong container */
+        #simulationCanvas {
+            background-color: #e0f2f1; /* Màu nền xanh nhạt, tượng trưng cho nước */
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            touch-action: none; /* Ngăn trình duyệt can thiệp vào các sự kiện chạm/kéo */
+        }
+
+        /* Thiết lập font Inter mặc định */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+</script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#00838f', // Màu Teal đậm
+                        'secondary': '#80cbc4', // Màu Teal nhạt
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-7xl bg-white rounded-2xl shadow-xl p-6 md:p-8">
+        <h1 class="text-1xl md:text-3xl font-bold text-primary mb-6 text-center">
+            THUYẾT ĐỘNG HỌC PHÂN TỬ
+        </h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- CỘT 1: MÔ PHỎNG VÀ ĐIỀU KHIỂN -->
+            <div class="col-span-1">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">I. Mô Phỏng Thực Tế (Brownian & Phân Tử Nước)</h2>
+                
+                <!-- Canvas Mô Phỏng --><div class="relative w-full aspect-square max-h-[70vh]">
+                    <canvas id="simulationCanvas" class="w-full h-full"></canvas>
+                </div>
+                
+                <!-- Container cho Checkboxes và Reset --><div class="flex flex-col md:flex-row justify-center gap-4 mt-4 p-4 bg-secondary/20 rounded-lg">
+                    
+                    <!-- Checkbox 1: Chuyển động Brown --><label class="flex items-center space-x-3 cursor-pointer bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition">
+                        <input type="checkbox" id="brownianToggle" checked class="form-checkbox h-5 w-5 text-primary rounded border-gray-300 focus:ring-primary">
+                        <span class="text-gray-700 font-medium">
+                            1. Hiển thị Hạt Phấn Hoa
+                        </span>
+                    </label>
+
+                    <!-- Checkbox 2: Phân tử Nước --><label class="flex items-center space-x-3 cursor-pointer bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition">
+                        <input type="checkbox" id="waterToggle" checked class="form-checkbox h-5 w-5 text-primary rounded border-gray-300 focus:ring-primary">
+                        <span class="text-gray-700 font-medium">
+                            2. Hiển thị Phân Tử Nước
+                        </span>
+                    </label>
+
+                    <!-- Nút Reset -->
+                    <button id="resetButton" class="flex items-center justify-center space-x-2 bg-primary text-white p-3 rounded-lg shadow-md hover:bg-primary/90 transition font-medium">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181-3.181m5.996-5.996l3.181 3.181m0 2.296v-5.996h-.001M6.02 10.323l2.115-2.115m4.398 4.398l2.115 2.115m-4.398-4.398l-2.115 2.115m2.115-2.115l2.115-2.115z" />
+                        </svg>
+                        <span>Reset Quỹ Đạo</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CỘT 2: KIẾN THỨC LÝ THUYẾT -->
+            <div class="col-span-1 lg:overflow-y-auto p-4 rounded-lg bg-gray-50 text-gray-800">
+                <h2 class="text-xl font-semibold text-primary mb-4 border-b pb-2">II. Kiến Thức Cơ Bản về Thuyết Động Học Phân Tử</h2>
+                
+                <section class="mb-6">
+                    <h3 class="text-lg font-bold text-gray-700 mb-2">1. Chuyển động Brown (Brownian Motion)</h3>
+                    <p class="text-sm">
+                        Chuyển động Brown là chuyển động hỗn loạn, không ngừng của các hạt rất nhỏ (ví dụ: hạt phấn hoa) lơ lửng trong chất lỏng hoặc chất khí.
+                    </p>
+                    <p class="text-sm italic mt-1">
+                        <span class="font-semibold">Nguyên nhân:</span> Là do hạt phấn hoa bị các phân tử nước (đang chuyển động hỗn loạn và nhanh) va chạm từ mọi phía. Vì các va chạm không cân bằng tại mọi thời điểm, hạt phấn hoa bị xô đẩy theo những hướng ngẫu nhiên, tạo nên quỹ đạo gấp khúc.
+                    </p>
+                    
+                </section>
+
+                <section class="mb-6">
+                    <h3 class="text-lg font-bold text-gray-700 mb-2">2. Tính chất chất khí & Khái niệm Lượng chất</h3>
+                    <ul class="list-disc ml-5 text-sm space-y-1">
+                        <li><span class="font-semibold">Tính dễ nén:</span> Do khoảng cách giữa các phân tử rất lớn, chất khí rất dễ bị nén (giảm thể tích).</li>
+                        <li><span class="font-semibold">Thể tích:</span> Chất khí không có thể tích riêng, nó chiếm toàn bộ thể tích bình chứa.</li>
+                        <li><span class="font-semibold">Áp suất ($P$):</span> Gây áp suất lên thành bình do sự va chạm liên tục và hỗn loạn của các phân tử khí vào thành bình.</li>
+                        <li><span class="font-semibold">Quan hệ P-T:</span> Khi nhiệt độ ($T$) tăng, vận tốc phân tử tăng dẫn đến tần suất và lực va chạm tăng, làm áp suất ($P$) lên thành bình tăng theo (nếu thể tích không đổi).</li>
+                        <li><span class="font-semibold">Nhiệt độ ($T$):</span> Liên quan trực tiếp đến động năng trung bình của các phân tử. Phân tử chuyển động càng nhanh, nhiệt độ tuyệt đối càng cao.</li>
+                        <li><span class="font-semibold">Lượng chất ($\nu$):</span> Được đo bằng mol. Một mol của bất kỳ chất nào cũng chứa một số lượng hạt cố định:
+				$$N_A \approx 6.022 \times 10^{23} \text{ hạt/mol (Số Avogadro)}, n = \frac{N}{N_A}=\frac{m}{M}$$
+				$$m_{pt}=\frac{m}{N}=\frac{M}{N_A}$$
+                        </li>
+                    </ul>
+                </section>
+
+                <section class="mb-6">
+                    <h3 class="text-lg font-bold text-gray-700 mb-2">3. Thuyết động học phân tử chất khí</h3>
+                    <p class="text-sm font-semibold mb-1">Thuyết này giải thích tính chất của chất khí dựa trên ba nội dung cơ bản:</p>
+                    <ol class="list-decimal ml-5 text-sm space-y-2">
+                        <li><span class="font-semibold">Cấu tạo:</span> Các chất được cấu tạo từ các hạt riêng biệt (phân tử, nguyên tử) có khoảng cách rất lớn so với kích thước của chúng.</li>
+                        <li><span class="font-semibold">Chuyển động:</span> Các phân tử chuyển động hỗn loạn không ngừng. Chuyển động này càng nhanh thì nhiệt độ tuyệt đối của chất khí càng cao.</li>
+                        <li><span class="font-semibold">Tương tác:</span> Giữa các phân tử hầu như không có lực tương tác (trừ va chạm), vì khoảng cách giữa chúng rất lớn.</li>
+                    </ol>
+                    <p class="text-sm mt-2">
+                        <span class="font-semibold text-primary">Phương trình trạng thái khí lý tưởng:</span>
+                        $$P \cdot V = \nu \cdot R \cdot T$$
+                        (Trong đó $R=8,31(\frac{pa.m^3}{mol.k})$ là hằng số khí lý tưởng)
+                    </p>
+                    
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lấy tham chiếu đến Canvas và Context
+        const canvas = document.getElementById('simulationCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Lấy tham chiếu đến các nút điều khiển
+        const brownianToggle = document.getElementById('brownianToggle');
+        const waterToggle = document.getElementById('waterToggle');
+        const resetButton = document.getElementById('resetButton'); // Lấy nút Reset
+
+        // Định nghĩa các biến toàn cục cho simulation
+        const WATER_COUNT = 200; // Số lượng phân tử nước
+        const WATER_RADIUS = 2; // Bán kính phân tử nước (rất nhỏ)
+        const BROWNIAN_RADIUS = 15; // Bán kính hạt phấn hoa (lớn)
+        const WATER_MAX_SPEED = 2; // Tốc độ tối đa của phân tử nước
+        const BROWNIAN_DAMPING = 0.98; // Hệ số giảm xóc cho chuyển động Brown
+        const BROWNIAN_ROUGHNESS_POINTS = 8; // Số lượng "điểm gồ ghề" cho hạt phấn hoa
+        const BROWNIAN_ROUGHNESS_MAX_OFFSET = 0.6; // Độ lệch tối đa của các điểm gồ ghề so với bán kính
+
+        let waterParticles = [];
+        let brownianParticle;
+        let animationFrameId;
+        
+        // --- Cấu trúc hạt (Particle) ---
+
+        /**
+         * Lớp cơ sở cho các hạt trong mô phỏng.
+         */
+        class Particle {
+            constructor(x, y, r, color) {
+                this.x = x;
+                this.y = y;
+                this.r = r;
+                this.color = color;
+                this.vx = (Math.random() - 0.5) * WATER_MAX_SPEED;
+                this.vy = (Math.random() - 0.5) * WATER_MAX_SPEED;
+            }
+
+            // Vẽ hạt lên canvas (dùng cho phân tử nước)
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            // Cập nhật vị trí và xử lý va chạm biên
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Xử lý va chạm biên (đảo ngược vận tốc)
+                if (this.x + this.r > canvas.width || this.x - this.r < 0) {
+                    this.vx = -this.vx;
+                    // Đẩy hạt vào lại trong biên để tránh kẹt
+                    if (this.x + this.r > canvas.width) this.x = canvas.width - this.r;
+                    if (this.x - this.r < 0) this.x = this.r;
+                }
+                if (this.y + this.r > canvas.height || this.y - this.r < 0) {
+                    this.vy = -this.vy;
+                    if (this.y + this.r > canvas.height) this.y = canvas.height - this.r;
+                    if (this.y - this.r < 0) this.y = this.r;
+                }
+            }
+        }
+
+        /**
+         * Lớp đại diện cho Hạt Phấn Hoa (Brownian).
+         */
+        class BrownianParticle extends Particle {
+            constructor(x, y, r, color) {
+                super(x, y, r, color);
+                // Khởi tạo vận tốc nhỏ cho hạt Brown
+                this.vx = 0;
+                this.vy = 0;
+                this.history = []; // Mảng lưu trữ quỹ đạo
+                this.roughnessData = this._generateRoughness(); // Cố định hình dạng gồ ghề
+            }
+
+            /**
+             * Tạo và cố định dữ liệu cho các "mụn" gồ ghề.
+             */
+            _generateRoughness() {
+                const data = [];
+                for (let i = 0; i < BROWNIAN_ROUGHNESS_POINTS; i++) {
+                    // Góc và bán kính ngẫu nhiên nhưng cố định
+                    const angle = (i / BROWNIAN_ROUGHNESS_POINTS) * Math.PI * 2;
+                    const offsetRadius = this.r * (1 + (Math.random() * BROWNIAN_ROUGHNESS_MAX_OFFSET));
+                    const spikeRadius = this.r * (0.1 + Math.random() * 0.2); 
+                    const colorType = Math.random() > 0.5 ? 1 : 0; // 0 for dark, 1 for light
+                    data.push({ angle, offsetRadius, spikeRadius, colorType });
+                }
+                return data;
+            }
+
+            draw() {
+                // 1. Vẽ Quỹ đạo (Jagged Trajectory)
+                if (this.history.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.history[0].x, this.history[0].y);
+                    
+                    // Thiết lập nét vẽ mảnh mai, gấp khúc
+                    ctx.strokeStyle = 'rgba(100, 100, 100, 0.7)'; 
+                    ctx.lineWidth = 1;
+                    ctx.lineJoin = 'bevel'; 
+                    
+                    for (let i = 1; i < this.history.length; i++) {
+                        ctx.lineTo(this.history[i].x, this.history[i].y);
+                    }
+                    ctx.stroke();
+                }
+
+                // 2. Vẽ Hạt Phấn Hoa (Cố định, không chớp nháy)
+                const baseColor = this.color; 
+                const darkColor = '#cc8c00'; // Màu tối hơn
+                const lightColor = '#ffdb4d'; // Màu sáng hơn
+
+                // Vẽ hình tròn cơ bản ở giữa
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                ctx.fillStyle = baseColor;
+                ctx.fill();
+
+                // Vẽ các "mụn" nhỏ cố định
+                this.roughnessData.forEach(spike => {
+                    const angle = spike.angle;
+                    const offsetRadius = spike.offsetRadius;
+                    const spikeRadius = spike.spikeRadius;
+
+                    const spikeX = this.x + Math.cos(angle) * offsetRadius;
+                    const spikeY = this.y + Math.sin(angle) * offsetRadius;
+
+                    ctx.beginPath();
+                    ctx.arc(spikeX, spikeY, spikeRadius, 0, Math.PI * 2);
+                    // Sử dụng màu cố định từ dữ liệu
+                    ctx.fillStyle = spike.colorType === 1 ? lightColor : darkColor; 
+                    ctx.fill();
+                });
+
+                // Thêm điểm sáng ở trung tâm
+                ctx.beginPath();
+                ctx.arc(this.x + this.r * 0.1, this.y - this.r * 0.1, this.r * 0.2, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)'; 
+                ctx.fill();
+            }
+
+            update() {
+                // Thêm lực ngẫu nhiên (va chạm phân tử nước)
+                const randomForceX = (Math.random() - 0.5) * 0.5;
+                const randomForceY = (Math.random() - 0.5) * 0.5;
+
+                this.vx += randomForceX;
+                this.vy += randomForceY;
+
+                // Giảm xóc vận tốc
+                this.vx *= BROWNIAN_DAMPING;
+                this.vy *= BROWNIAN_DAMPING;
+
+                // Cập nhật vị trí
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Lưu trữ điểm quỹ đạo mới
+                this.history.push({ x: this.x, y: this.y });
+                // *** Quỹ đạo lưu vết toàn phần ***
+
+                // Xử lý va chạm biên
+                if (this.x + this.r > canvas.width) {
+                    this.vx = -Math.abs(this.vx);
+                    this.x = canvas.width - this.r;
+                } else if (this.x - this.r < 0) {
+                    this.vx = Math.abs(this.vx);
+                    this.x = this.r;
+                }
+
+                if (this.y + this.r > canvas.height) {
+                    this.vy = -Math.abs(this.vy);
+                    this.y = canvas.height - this.r;
+                } else if (this.y - this.r < 0) {
+                    this.vy = Math.abs(this.vy);
+                    this.y = this.r;
+                }
+            }
+        }
+
+        // --- Hàm Khởi tạo ---
+
+        function initSimulation() {
+            // Thiết lập kích thước canvas dựa trên kích thước của phần tử cha
+            const parent = canvas.parentElement;
+            canvas.width = parent.clientWidth;
+            canvas.height = parent.clientHeight;
+
+            // Khởi tạo hạt phấn hoa ở giữa
+            brownianParticle = new BrownianParticle(
+                canvas.width / 2, 
+                canvas.height / 2, 
+                BROWNIAN_RADIUS, 
+                '#ffb300' // Màu vàng/cam cho hạt Brown
+            );
+
+            // Khởi tạo các phân tử nước
+            waterParticles = [];
+            for (let i = 0; i < WATER_COUNT; i++) {
+                const x = Math.random() * (canvas.width - 2 * WATER_RADIUS) + WATER_RADIUS;
+                const y = Math.random() * (canvas.height - 2 * WATER_RADIUS) + WATER_RADIUS;
+                // Màu xanh da trời nhạt, trong suốt
+                const color = `rgba(0, 150, 255, ${Math.random() * 0.5 + 0.3})`; 
+                const water = new Particle(x, y, WATER_RADIUS, color);
+                // Phân tử nước di chuyển nhanh hơn, ngẫu nhiên hơn
+                water.vx = (Math.random() - 0.5) * WATER_MAX_SPEED; 
+                water.vy = (Math.random() - 0.5) * WATER_MAX_SPEED;
+                waterParticles.push(water);
+            }
+
+            // Bắt đầu vòng lặp animation
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            animate();
+        }
+        
+        // --- Hàm Reset Quỹ Đạo Hạt Brown ---
+        function resetBrownianParticle() {
+            if (brownianParticle) {
+                // Đặt lại vị trí về trung tâm
+                brownianParticle.x = canvas.width / 2;
+                brownianParticle.y = canvas.height / 2;
+                // Đặt lại vận tốc về 0 (hoặc một giá trị ngẫu nhiên rất nhỏ)
+                brownianParticle.vx = 0;
+                brownianParticle.vy = 0;
+                // Xóa lịch sử quỹ đạo
+                brownianParticle.history = [];
+            }
+        }
+        // --- Vòng lặp Animation Chính ---
+
+        function animate() {
+            // Xóa canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const showWater = waterToggle.checked;
+            const showBrownian = brownianToggle.checked;
+
+            if (showWater) {
+                // Cập nhật và vẽ các phân tử nước
+                waterParticles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+            }
+
+            if (showBrownian) {
+                // Cập nhật và vẽ hạt Brown
+                brownianParticle.update();
+                brownianParticle.draw();
+            }
+            
+            // Yêu cầu khung hình tiếp theo
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        // --- Xử lý sự kiện và Khởi động ---
+
+        // Khởi tạo mô phỏng khi cửa sổ tải xong và khi thay đổi kích thước
+        window.onload = function() {
+            initSimulation();
+            // Gắn sự kiện cho nút Reset sau khi simulation đã được khởi tạo
+            resetButton.addEventListener('click', resetBrownianParticle);
+        };
+        window.addEventListener('resize', initSimulation);
+
+        // Thêm lắng nghe sự kiện cho các checkboxes
+        brownianToggle.addEventListener('change', () => {
+             // Không cần làm gì đặc biệt, hàm animate sẽ tự động xử lý việc ẩn/hiện
+        });
+
+        waterToggle.addEventListener('change', () => {
+            // Không cần làm gì đặc biệt, hàm animate sẽ tự động xử lý việc ẩn/hiện
+        });
+
+    </script>
+</body>
+</html>
