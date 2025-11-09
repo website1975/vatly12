@@ -1,1 +1,378 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ứng Dụng Tích Hợp Định luật Boyle</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+</script>
+    <style>
+        /* Thiết lập font Inter mặc định và làm cho giao diện đẹp hơn */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
 
+        /* Styling cho bình khí (Mô phỏng) */
+        #cylinder-container {
+            width: 100px;
+            height: 250px; /* Chiều cao tối đa của bình */
+            background-color: #e0f2fe; /* light blue-100 */
+            border: 3px solid #075985; /* cyan-700 */
+            border-radius: 8px;
+            position: relative;
+            margin: 20px auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden; 
+        }
+
+        /* Đại diện cho khí - Thay đổi chiều cao dựa trên thể tích */
+        #gas-volume {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: #38bdf8; /* sky-400 */
+            transition: height 0.3s ease;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Piston - Thanh chắn phía trên khí */
+        #piston {
+            position: absolute;
+            bottom: 0; /* Vị trí được điều khiển bằng JS */
+            width: 120px;
+            height: 10px;
+            background-color: #ef4444; /* red-500 */
+            border: 2px solid #b91c1c; /* red-700 */
+            border-radius: 5px;
+            left: -10px;
+            cursor: grab;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        /* Styling cho các tiêu đề lý thuyết */
+        .section-title {
+            @apply text-2xl font-bold text-indigo-700 mt-6 mb-3 border-b pb-1;
+        }
+        .subsection-title {
+            @apply text-xl font-semibold text-gray-800 mt-4 mb-2;
+        }
+        .list-item-content {
+            @apply mb-2 p-2 bg-gray-50 rounded-lg;
+        }
+        .math-display {
+            @apply text-center text-lg font-mono my-4 p-2 bg-indigo-50 rounded-lg;
+        }
+    </style>
+    <script>
+        // Hằng số và biến trạng thái
+        const GAS_CONSTANT_R = 8.314; // Hằng số khí lý tưởng
+        const INITIAL_VOLUME = 100; // Thể tích ban đầu (đơn vị tùy ý)
+        const INITIAL_PRESSURE = 100; // Áp suất ban đầu (đơn vị: kPa)
+        const K_CONSTANT = INITIAL_PRESSURE * INITIAL_VOLUME; // Hằng số pV = nRT = K
+        const MAX_HEIGHT = 250; // Chiều cao tối đa của bình (px)
+        const MIN_HEIGHT = 50;  // Chiều cao tối thiểu của khí (px)
+
+        let currentVolume = INITIAL_VOLUME;
+        let currentPressure = INITIAL_PRESSURE;
+        let collectedData = [];
+
+        // Tham chiếu DOM
+        let cylinderContainer;
+        let gasVolumeElement;
+        let pistonElement;
+        let pressureDisplay;
+        let volumeDisplay;
+        let dataTableBody;
+        let statusMessage;
+
+        // Hàm chuyển đổi chiều cao (px) sang Thể tích (đơn vị tùy ý)
+        const heightToVolume = (h) => (h - MIN_HEIGHT) * (INITIAL_VOLUME / (MAX_HEIGHT - MIN_HEIGHT)) + (INITIAL_VOLUME / 5);
+        
+        // Hàm chuyển đổi Thể tích sang chiều cao (px)
+        const volumeToHeight = (V) => (V - (INITIAL_VOLUME / 5)) * ((MAX_HEIGHT - MIN_HEIGHT) / INITIAL_VOLUME) + MIN_HEIGHT;
+
+        // Hàm tính toán và cập nhật mô phỏng
+        const updateSimulation = (newVolume) => {
+            const minV = heightToVolume(MIN_HEIGHT);
+            const maxV = heightToVolume(MAX_HEIGHT);
+
+            if (newVolume < minV) newVolume = minV;
+            if (newVolume > maxV) newVolume = maxV;
+            
+            currentVolume = newVolume;
+            currentPressure = K_CONSTANT / currentVolume;
+
+            const newHeight = volumeToHeight(currentVolume);
+
+            pistonElement.style.bottom = `${newHeight}px`;
+            gasVolumeElement.style.height = `${newHeight}px`;
+
+            pressureDisplay.textContent = currentPressure.toFixed(2);
+            volumeDisplay.textContent = currentVolume.toFixed(2);
+            
+            statusMessage.textContent = 'Thay đổi thể tích để quan sát áp suất.';
+            statusMessage.classList.remove('text-green-600', 'text-red-600');
+            statusMessage.classList.add('text-gray-600');
+        };
+
+        // Hàm ghi lại dữ liệu
+        const recordData = () => {
+            if (collectedData.length > 0) {
+                const lastData = collectedData[collectedData.length - 1];
+                if (Math.abs(lastData.V - currentVolume) < 0.1) {
+                    statusMessage.textContent = 'Giá trị này đã được ghi lại (thay đổi quá ít). Vui lòng điều chỉnh thêm.';
+                    statusMessage.classList.remove('text-green-600');
+                    statusMessage.classList.add('text-red-600');
+                    return;
+                }
+            }
+            
+            const p = currentPressure;
+            const V = currentVolume;
+            const invV = 1 / V; 
+            
+            const newData = { V: V, P: p, invV: invV };
+            collectedData.push(newData);
+            
+            // Cập nhật bảng
+            const newRow = dataTableBody.insertRow();
+            newRow.insertCell(0).textContent = collectedData.length;
+            newRow.insertCell(1).textContent = V.toFixed(2);
+            newRow.insertCell(2).textContent = p.toFixed(2);
+            newRow.insertCell(3).textContent = invV.toFixed(4); 
+            
+            statusMessage.textContent = `Đã ghi lại điểm dữ liệu #${collectedData.length}.`;
+            statusMessage.classList.remove('text-red-600');
+            statusMessage.classList.add('text-green-600');
+        };
+
+        // Khởi tạo trạng thái và sự kiện khi DOM đã tải
+        window.onload = function() {
+            cylinderContainer = document.getElementById('cylinder-container');
+            gasVolumeElement = document.getElementById('gas-volume');
+            pistonElement = document.getElementById('piston');
+            pressureDisplay = document.getElementById('pressure-value');
+            volumeDisplay = document.getElementById('volume-value');
+            dataTableBody = document.getElementById('data-table-body');
+            statusMessage = document.getElementById('status-message');
+
+            document.getElementById('record-button').addEventListener('click', recordData);
+
+            // Thiết lập trạng thái ban đầu
+            updateSimulation(INITIAL_VOLUME);
+
+            // --- Xử lý sự kiện kéo (Drag) Piston ---
+            let isDragging = false;
+            let startY = 0;
+            let startPistonBottom = 0;
+
+            const startDrag = (e) => {
+                e.preventDefault();
+                isDragging = true;
+                pistonElement.style.cursor = 'grabbing';
+                startY = e.clientY || e.changedTouches[0].clientY; 
+                startPistonBottom = parseFloat(pistonElement.style.bottom);
+            };
+
+            const doDrag = (e) => {
+                if (!isDragging) return;
+                
+                const clientY = e.clientY || e.changedTouches[0].clientY;
+                const deltaY = startY - clientY; 
+                
+                let newBottom = startPistonBottom + deltaY;
+
+                if (newBottom < MIN_HEIGHT) newBottom = MIN_HEIGHT;
+                if (newBottom > MAX_HEIGHT) newBottom = MAX_HEIGHT;
+
+                const newVolume = heightToVolume(newBottom);
+                updateSimulation(newVolume);
+            };
+
+            const endDrag = () => {
+                isDragging = false;
+                pistonElement.style.cursor = 'grab';
+            };
+
+            // Sự kiện chuột
+            pistonElement.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', doDrag);
+            document.addEventListener('mouseup', endDrag);
+
+            // Sự kiện cảm ứng (Touch)
+            pistonElement.addEventListener('touchstart', startDrag);
+            document.addEventListener('touchmove', doDrag);
+            document.addEventListener('touchend', endDrag);
+        };
+    </script>
+</head>
+<body class="p-4 sm:p-8 min-h-screen">
+
+    <div class="max-w-7xl mx-auto bg-white p-6 rounded-xl shadow-2xl">
+        <h1 class="text-3xl font-bold text-center text-indigo-800 mb-6 border-b-4 border-indigo-200 pb-3">
+		LÝ THUYẾT ĐỊNH LUẬT BOYLE
+        </h1>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            
+            <!-- Cột 1: Mô Phỏng & Thu thập Dữ liệu (Khoảng 1/3) -->
+            <div class="lg:w-1/3 flex flex-col items-center p-4 bg-indigo-50 rounded-xl shadow-md border border-indigo-200">
+                <h2 class="text-2xl font-bold mb-4 text-indigo-700">I. THÍ NGHIỆM VÀ DỮ LIỆU</h2>
+
+                <!-- Hiển thị Giá trị -->
+                <div class="text-center mb-6 w-full p-3 bg-white rounded-lg shadow-inner">
+                    <p class="text-xl font-medium">Áp suất (p): <span id="pressure-value" class="font-bold text-3xl text-red-600">100.00</span> kPa</p>
+                    <p class="text-xl font-medium">Thể tích (V): <span id="volume-value" class="font-bold text-3xl text-blue-600">100.00</span> đơn vị</p>
+                </div>
+
+                <!-- Bình Khí và Piston -->
+                <div id="cylinder-container">
+                    <div id="gas-volume"></div>
+                    <div id="piston" style="bottom: 100px;"></div>
+                </div>
+
+                <div class="mt-6 w-full text-center">
+                    <button id="record-button" 
+                            class="w-full sm:w-auto px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-lg hover:bg-green-700 transition duration-200 transform hover:scale-105">
+                        Ghi lại Dữ liệu ($V, p$)
+                    </button>
+                    <p id="status-message" class="mt-3 text-sm h-5 font-medium text-gray-600">Sẵn sàng.</p>
+                </div>
+
+                <!-- Bảng Dữ liệu Thu thập -->
+                <h3 class="text-lg font-semibold mt-8 mb-2 text-indigo-600">Bảng Dữ liệu Thu thập</h3>
+                <div class="overflow-x-auto w-full shadow-lg rounded-lg border border-gray-300">
+                    <table class="min-w-full divide-y divide-gray-300">
+                        <thead class="bg-indigo-200">
+                            <tr>
+                                <th class="px-2 py-3 text-left text-xs font-bold text-indigo-800 uppercase tracking-wider">#</th>
+                                <th class="px-2 py-3 text-left text-xs font-bold text-indigo-800 uppercase tracking-wider">V (đv)</th>
+                                <th class="px-2 py-3 text-left text-xs font-bold text-indigo-800 uppercase tracking-wider">p (kPa)</th>
+                                <th class="px-2 py-3 text-left text-xs font-bold text-indigo-800 uppercase tracking-wider">1/V (1/đv)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-table-body" class="bg-white divide-y divide-gray-200 text-sm">
+                            <!-- Dữ liệu sẽ được chèn vào đây -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Cột 2: Lý Thuyết (Khoảng 2/3) -->
+            <div class="lg:w-2/3 p-4 bg-white rounded-xl shadow-lg border border-gray-200 overflow-y-auto ">
+                <!-- I. TRẠNG THÁI VÀ QUÁ TRÌNH BIẾN ĐỔI -->
+                <h3 class="subsection-title text-indigo-600 font-bold">I. TRẠNG THÁI VÀ QUÁ TRÌNH BIẾN ĐỔI CỦA KHÍ LÝ TƯỞNG</h3>
+
+                <ul class="space-y-3 text-gray-700">
+                    <li>
+                        <p class="font-bold">1. Thông số khí là gì?</p>
+                        <div class="list-item-content">
+                            <p>Ba thông số cơ bản xác định trạng thái vật lý của lượng khí:</p>
+                            <ul class="list-disc list-inside ml-4">
+                                <li>**Áp suất ($p$)**: Lực nén vuông góc lên một đơn vị diện tích.</li>
+                                <li>**Thể tích ($V$)**: Thể tích không gian khí chiếm giữ.</li>
+                                <li>**Nhiệt độ tuyệt đối ($T$)**: Đặc trưng cho mức độ chuyển động phân tử (thang Kelvin).</li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
+                        <p class="font-bold">2. Trạng thái khí là gì?</p>
+                        <div class="list-item-content">
+                            Là tập hợp ba thông số trạng thái: $(p, V, T)$. Ví dụ: Trạng thái 1 là $(p_1, V_1, T_1)$.
+                        </div>
+                    </li>
+                    <li>
+                        <p class="font-bold">3. Quá trình biến đổi trạng thái là gì?</p>
+                        <div class="list-item-content">
+                            Quá trình khí chuyển từ trạng thái này sang trạng thái khác, tức là có ít nhất một thông số $(p, V, T)$ thay đổi.
+                        </div>
+                    </li>
+                    <li>
+                        <p class="font-bold">4. Thế nào là Đẳng quá trình? Liệt kê ba Đẳng quá trình</p>
+                        <div class="list-item-content">
+                            Là quá trình biến đổi trạng thái trong đó **một thông số được giữ không đổi**.
+                            <ul class="list-disc list-inside ml-4 mt-2 font-medium">
+                                <li>**Đẳng nhiệt** ($T = \text{const}$): Nghiên cứu bởi ĐL Boyle. (Áp dụng cho mô phỏng cột 1)</li>
+                                <li>**Đẳng tích** ($V = \text{const}$): Nghiên cứu bởi ĐL Charles.</li>
+                                <li>**Đẳng áp** ($p = \text{const}$): Nghiên cứu bởi ĐL Gay-Lussac.</li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+
+                <!-- II. ĐỊNH LUẬT BOYLE - MARIOTTE -->
+                <h3 class="subsection-title text-red-600 font-bold">II. ĐỊNH LUẬT BOYLE - MARIOTTE ($T = \text{const}$)</h3>
+                
+                <p class="font-bold text-lg mt-4">1. Thí Nghiệm: Hướng dẫn học sinh cách sử dụng mô phỏng</p>
+                <div class="p-3 bg-yellow-100 border-l-4 border-yellow-500 rounded-lg text-sm text-gray-700">
+                    Mô phỏng ở **Cột 1** đang hoạt động trong điều kiện **Đẳng nhiệt** ($T$ không đổi). Học sinh hãy kéo Piston đỏ để thay đổi Thể tích ($V$) và quan sát sự biến đổi của Áp suất ($p$). Sử dụng nút **"Ghi lại Dữ liệu"** để thu thập các cặp $(V, p)$ nhằm kiểm chứng định luật bằng đồ thị.
+                </div>
+
+                <p class="font-bold text-lg mt-4">2. Phát biểu định luật</p>
+                <blockquote class="p-4 my-2 border-l-4 border-indigo-500 bg-indigo-50 italic text-gray-800 rounded-lg">
+                    Trong quá trình đẳng nhiệt của một lượng khí nhất định, **áp suất tỉ lệ nghịch với thể tích**.
+                </blockquote>
+                
+                <p class="font-bold mt-2">Biểu thức toán học:</p>
+                <div class="math-display">
+                    $$p \propto \frac{1}{V} \quad \text{hay} \quad p \cdot V = \text{const}$$
+                    $$p_1 V_1 = p_2 V_2 = \dots = p_n V_n$$
+                </div>
+
+                <p class="font-bold text-lg mt-6">3. Đồ thị đường đẳng nhiệt được vẽ trong ba hệ</p>
+                <p class="text-sm text-gray-600 mb-2">Đường biểu diễn sự phụ thuộc của áp suất theo thể tích khi nhiệt độ không đổi được gọi là **Đường đẳng nhiệt**.</p>
+                
+                
+
+                <div class="overflow-x-auto mt-3">
+                    <table class="w-full text-sm text-left text-gray-500 shadow-md rounded-lg">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-3 py-3">Hệ Tọa Độ</th>
+                                <th scope="col" class="px-3 py-3">Hình Dạng Đồ Thị</th>
+                                <th scope="col" class="px-3 py-3">Ý Nghĩa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="bg-white border-b">
+                                <td class="px-3 py-4 font-medium text-gray-900 whitespace-nowrap">$p$ **theo** $V$</td>
+                                <td class="px-3 py-4">Đường **Hypebol**</td>
+                                <td class="px-3 py-4">Thể hiện mối quan hệ tỉ lệ nghịch ($p \cdot V = \text{const}$).</td>
+                            </tr>
+                            <tr class="bg-white border-b">
+                                <td class="px-3 py-4 font-medium text-gray-900 whitespace-nowrap">$p$ **theo** $1/V$</td>
+                                <td class="px-3 py-4">Đường **Thẳng** đi qua gốc tọa độ</td>
+                                <td class="px-3 py-4">Chứng minh mối quan hệ tỉ lệ thuận giữa $p$ và $1/V$ ($p \propto 1/V$).</td>
+                            </tr>
+                            <tr class="bg-white">
+                                <td class="px-3 py-4 font-medium text-gray-900 whitespace-nowrap">$p-T$ **và** $V-T$</td>
+                                <td class="px-3 py-4">Đường thẳng song song trục $p$ hoặc $V$</td>
+                                <td class="px-3 py-4">Biểu diễn $T$ là thông số không đổi.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="font-bold text-lg mt-6">4. Giới thiệu về hoàn cảnh ra đời thí nghiệm này</p>
+                <div class="p-3 bg-gray-50 border-l-4 border-gray-300 rounded-lg text-sm text-gray-700">
+                    Định luật được **Robert Boyle** (Ireland) công bố năm 1662, sử dụng thí nghiệm **ống thủy tinh hình chữ J** với thủy ngân. Ông đã đo áp suất và thể tích của khối khí bị kẹt để tìm ra mối quan hệ $p \cdot V = \text{const}$.
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

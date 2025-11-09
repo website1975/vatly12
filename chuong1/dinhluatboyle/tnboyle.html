@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Kiểm Tra: Định Luật Boyle và Charles</title>
+    
+    <!-- Cải tiến: Tải MathJax nhanh hơn và chỉ tải sau khi DOM được xử lý -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <script>
+        window.MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+          },
+          options: {
+            ignoreHtmlClass: 'tex2jax_ignore',
+            processHtmlClass: 'tex2jax_process'
+          }
+        };
+    </script>
+    <style>
+        /* CSS cho thiết bị di động (ưu tiên) */
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            width: 95%;
+            max-width: 800px;
+            margin: auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            color: #007bff;
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #007bff30;
+            padding-bottom: 10px;
+        }
+        
+        /* Quiz Content */
+        .question-box {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background-color: #fcfcfc;
+        }
+        .question-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: #333;
+        }
+        .option-label {
+            display: block;
+            background: #f0f0f5;
+            padding: 10px 15px;
+            margin: 8px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            border: 1px solid #e0e0e5;
+        }
+        .option-label:hover {
+            background-color: #e5e5eb;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .option-label input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        /* Navigation & Buttons */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .nav-btn, .submit-btn, .retry-button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            flex-grow: 1; /* Cho phép nút mở rộng trên di động */
+            margin: 0 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .nav-btn:disabled, .submit-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        #prevBtn {
+            background-color: #6c757d;
+            color: white;
+        }
+        #nextBtn {
+            background-color: #007bff;
+            color: white;
+        }
+        .submit-btn, .retry-button {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+        #prevBtn:hover:not(:disabled) { background-color: #5a6268; }
+        #nextBtn:hover:not(:disabled) { background-color: #0056b3; }
+        .submit-btn:hover:not(:disabled), .retry-button:hover { background-color: #218838; }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+                width: 100%;
+            }
+            .navigation {
+                flex-direction: row;
+                justify-content: space-between;
+                gap: 5px;
+            }
+            .nav-btn {
+                flex-basis: 48%; /* Hai nút chiếm gần hết chiều rộng */
+                margin: 0;
+            }
+        }
+        
+        /* Results Styling */
+        .result-item {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+        .result-item strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .user-answer {
+            padding: 5px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .correct-answer {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .incorrect-answer {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .rationale {
+            margin-top: 10px;
+            font-style: italic;
+            color: #555;
+            border-top: 1px dashed #eee;
+            padding-top: 8px;
+            font-size: 0.9em;
+        }
+
+        /* Timer and Progress */
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        #progress {
+            font-weight: 600;
+            color: #007bff;
+        }
+        #timer {
+            font-weight: 600;
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 5px 10px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>20 Câu Trắc Nghiệm Định Luật Boyle và Charles</h1>
+        
+        <div class="header-info">
+            <span id="progress"></span>
+            <span id="timer"></span>
+        </div>
+
+        <div id="quizContainer">
+            <!-- Câu hỏi sẽ được chèn vào đây bởi JavaScript -->
+        </div>
+
+        <div class="navigation">
+            <button id="prevBtn" class="nav-btn" disabled>Câu Trước</button>
+            <button id="nextBtn" class="nav-btn">Câu Sau</button>
+        </div>
+
+        <button id="submitBtn" class="submit-btn" style="display: none;">Nộp Bài & Xem Kết Quả</button>
+
+        <div id="resultDiv" style="display: none;">
+            <!-- Kết quả sẽ được hiển thị tại đây -->
+        </div>
+    </div>
+
+    <script>
+        const quizData = {
+            "questions": [
+                {
+                    "questionNumber": 1,
+                    "question": "Phát biểu nào sau đây là nội dung của Định luật Boyle-Mariotte?",
+                    "answerOptions": [
+                        {"text": "Trong quá trình đẳng nhiệt, thể tích tỉ lệ nghịch với nhiệt độ tuyệt đối.", "isCorrect": false, "rationale": "Định luật Boyle-Mariotte mô tả quá trình đẳng nhiệt, nhưng thể tích tỉ lệ nghịch với áp suất, không phải nhiệt độ tuyệt đối."},
+                        {"text": "Trong quá trình đẳng áp, thể tích tỉ lệ thuận với nhiệt độ tuyệt đối.", "isCorrect": false, "rationale": "Đây là nội dung của Định luật Charles (quá trình đẳng áp)."},
+                        {"text": "Trong quá trình đẳng nhiệt, áp suất tỉ lệ nghịch với thể tích.", "isCorrect": true, "rationale": "Định luật Boyle-Mariotte (đẳng nhiệt) phát biểu: $p \\cdot V = const$, tức là áp suất tỉ lệ nghịch với thể tích."},
+                        {"text": "Trong quá trình đẳng tích, áp suất tỉ lệ thuận với nhiệt độ tuyệt đối.", "isCorrect": false, "rationale": "Đây là nội dung của Định luật Charles (quá trình đẳng tích - hoặc Định luật Sác-lơ)."}
+                    ]
+                },
+                {
+                    "questionNumber": 2,
+                    "question": "Trong hệ tọa độ $(p, T)$, đường đẳng tích là đường như thế nào?",
+                    "answerOptions": [
+                        {"text": "Đường hypebol.", "isCorrect": false, "rationale": "Đường hypebol là đồ thị của quá trình đẳng nhiệt ($p$ theo $V$)."},
+                        {"text": "Đường thẳng song song với trục $T$.", "isCorrect": false, "rationale": "Đây là đồ thị của quá trình đẳng áp ($p$ theo $T$)."},
+                        {"text": "Đường thẳng kéo dài đi qua gốc tọa độ.", "isCorrect": true, "rationale": "Theo Định luật Charles (đẳng tích): $p/T = const$, đồ thị $p$ theo $T$ là đường thẳng đi qua gốc tọa độ."},
+                        {"text": "Đoạn thẳng song song với trục $p$.", "isCorrect": false, "rationale": "Đây là đồ thị của quá trình đẳng áp ($T$ theo $V$)."}
+                    ]
+                },
+                {
+                    "questionNumber": 3,
+                    "question": "Công thức nào sau đây mô tả Định luật Charles (quá trình đẳng áp)?",
+                    "answerOptions": [
+                        {"text": "$p_1V_1 = p_2V_2$", "isCorrect": false, "rationale": "Đây là công thức của Định luật Boyle-Mariotte (đẳng nhiệt)."},
+                        {"text": "$\\frac{p_1}{T_1} = \\frac{p_2}{T_2}$", "isCorrect": false, "rationale": "Đây là công thức của quá trình đẳng tích."},
+                        {"text": "$\\frac{V_1}{T_1} = \\frac{V_2}{T_2}$", "isCorrect": true, "rationale": "Trong quá trình đẳng áp, tỉ số giữa thể tích và nhiệt độ tuyệt đối là không đổi."},
+                        {"text": "$V \\sim p$", "isCorrect": false, "rationale": "Đây là mối quan hệ giữa $V$ và $p$ trong quá trình đẳng nhiệt."}
+                    ]
+                },
+                {
+                    "questionNumber": 4,
+                    "question": "Nhiệt độ tuyệt đối $T$ được tính theo nhiệt độ Celsius $t$ theo công thức nào?",
+                    "answerOptions": [
+                        {"text": "$T = t - 273$", "isCorrect": false, "rationale": "Công thức chính xác là $T = t + 273$. Thiếu $273.15$ nhưng $273$ vẫn được chấp nhận trong nhiều bài toán vật lý."},
+                        {"text": "$T = t + 273.15$", "isCorrect": true, "rationale": "Nhiệt độ tuyệt đối được tính bằng nhiệt độ Celsius cộng với $273.15$ (hoặc xấp xỉ $273$)."},
+                        {"text": "$t = T + 273$", "isCorrect": false, "rationale": "Công thức này dùng để tính nhiệt độ Celsius từ nhiệt độ tuyệt đối: $t = T - 273$. "},
+                        {"text": "$T = 273 - t$", "isCorrect": false, "rationale": "Công thức này không đúng."}
+                    ]
+                },
+                {
+                    "questionNumber": 5,
+                    "question": "Trong quá trình đẳng nhiệt của một lượng khí, nếu thể tích tăng lên 3 lần thì áp suất sẽ thay đổi như thế nào?",
+                    "answerOptions": [
+                        {"text": "Tăng 3 lần.", "isCorrect": false, "rationale": "Trong quá trình đẳng nhiệt, áp suất tỉ lệ nghịch với thể tích. Nếu thể tích tăng, áp suất phải giảm."},
+                        {"text": "Giảm 3 lần.", "isCorrect": true, "rationale": "Theo Định luật Boyle-Mariotte: $p_1V_1 = p_2V_2$. Nếu $V_2 = 3V_1$ thì $p_2 = p_1/3$, tức là giảm 3 lần."},
+                        {"text": "Tăng 9 lần.", "isCorrect": false, "rationale": "Sự thay đổi này chỉ đúng nếu áp suất tỉ lệ thuận với bình phương thể tích, điều này không đúng."},
+                        {"text": "Giảm $\\sqrt{3}$ lần.", "isCorrect": false, "rationale": "Sự thay đổi này không đúng với Định luật Boyle-Mariotte."}
+                    ]
+                },
+                {
+                    "questionNumber": 6,
+                    "question": "Khi bơm không khí vào một quả bóng bay, dù nhiệt độ phòng không đổi, áp suất trong bóng vẫn tăng. Điều này có mâu thuẫn với Định luật Boyle-Mariotte không? Tại sao?",
+                    "answerOptions": [
+                        {"text": "Không mâu thuẫn, vì thể tích bóng bay cũng tăng theo, giữ cho $p \\cdot V$ không đổi.", "isCorrect": false, "rationale": "Định luật Boyle-Mariotte chỉ áp dụng cho một lượng khí **xác định**."},
+                        {"text": "Mâu thuẫn, vì nhiệt độ không đổi thì áp suất phải không đổi theo Định luật Boyle-Mariotte.", "isCorrect": false, "rationale": "Định luật Boyle-Mariotte chỉ áp dụng cho một lượng khí xác định, trong khi việc bơm khí làm tăng lượng (số mol) khí."},
+                        {"text": "Không mâu thuẫn, vì Định luật Boyle-Mariotte chỉ đúng khi lượng khí **không đổi**.", "isCorrect": true, "rationale": "Việc bơm khí làm tăng số lượng phân tử khí ($n$), vi phạm điều kiện tiên quyết của tất cả các định luật chất khí lý tưởng (cho một lượng khí xác định)."},
+                        {"text": "Không mâu thuẫn, vì quá trình bơm khí không phải là quá trình đẳng nhiệt.", "isCorrect": false, "rationale": "Lý do chính là do lượng khí đã thay đổi, không phải do quá trình không đẳng nhiệt."}
+                    ]
+                },
+                {
+                    "questionNumber": 7,
+                    "question": "Tại sao bánh xe đạp sau khi đi một quãng đường dài dưới trời nắng lại dễ bị nổ hơn so với khi để trong bóng râm?",
+                    "answerOptions": [
+                        {"text": "Do ma sát với mặt đường làm tăng thể tích ruột xe.", "isCorrect": false, "rationale": "Thể tích ruột xe gần như không đổi."},
+                        {"text": "Do nhiệt độ tăng làm thể tích khí giãn nở, theo Định luật Charles (đẳng áp).", "isCorrect": false, "rationale": "Thể tích săm xe không đổi (quá trình đẳng tích)."},
+                        {"text": "Do nhiệt độ môi trường và nhiệt độ do ma sát tăng làm tăng áp suất bên trong lốp, theo quá trình đẳng tích.", "isCorrect": true, "rationale": "Khi nhiệt độ tăng, theo Định luật Charles (quá trình đẳng tích: $p/T = const$), áp suất bên trong lốp tăng lên vượt quá giới hạn chịu đựng."},
+                        {"text": "Do sự thay đổi độ ẩm không khí làm áp suất giảm.", "isCorrect": false, "rationale": "Độ ẩm không khí không phải là yếu tố chính."}
+                    ]
+                },
+                {
+                    "questionNumber": 8,
+                    "question": "Theo thuyết động học phân tử, sự tăng áp suất trong quá trình đẳng nhiệt nén khí có thể được giải thích bằng điều gì?",
+                    "answerOptions": [
+                        {"text": "Động năng trung bình của các phân tử tăng lên.", "isCorrect": false, "rationale": "Nhiệt độ không đổi ($T=const$), nên động năng trung bình của phân tử cũng không đổi ($W_{đt} \\sim T$)."},
+                        {"text": "Lực tương tác giữa các phân tử tăng mạnh.", "isCorrect": false, "rationale": "Khí lý tưởng bỏ qua lực tương tác; đối với khí thực, đây không phải là lý do chính."},
+                        {"text": "Mật độ phân tử tăng, dẫn đến tần suất va chạm vào thành bình tăng.", "isCorrect": true, "rationale": "Khi nén khí, thể tích giảm nên mật độ phân tử ($n=N/V$) tăng, làm cho số lần va chạm của phân tử vào thành bình trong một đơn vị thời gian tăng, do đó áp suất tăng."},
+                        {"text": "Khối lượng riêng của khí giảm.", "isCorrect": false, "rationale": "Khi nén khí (thể tích giảm, khối lượng không đổi), khối lượng riêng phải tăng."}
+                    ]
+                },
+                {
+                    "questionNumber": 9,
+                    "question": "Khi lặn xuống độ sâu lớn, bọt khí thở ra từ bình lặn lại có xu hướng nở lớn hơn khi nổi lên mặt nước. Đây là ví dụ về quá trình biến đổi trạng thái nào?",
+                    "answerOptions": [
+                        {"text": "Đẳng nhiệt.", "isCorrect": true, "rationale": "Nhiệt độ nước thay đổi không nhiều và quá trình nổi lên diễn ra khá nhanh. Tuy nhiên, áp suất giảm rõ rệt (do độ sâu giảm), làm cho thể tích tăng, thể hiện rõ mối quan hệ đẳng nhiệt ($p \\cdot V = const$)."},
+                        {"text": "Đẳng áp.", "isCorrect": false, "rationale": "Áp suất thay đổi khi độ sâu thay đổi."},
+                        {"text": "Đẳng tích.", "isCorrect": false, "rationale": "Thể tích bọt khí thay đổi rõ rệt."},
+                        {"text": "Đoạn nhiệt.", "isCorrect": false, "rationale": "Quá trình trao đổi nhiệt với môi trường nước xảy ra liên tục."}
+                    ]
+                },
+                {
+                    "questionNumber": 10,
+                    "question": "Trong hệ tọa độ $(V, T)$, hai đường đẳng áp của cùng một lượng khí lý tưởng sẽ giao nhau tại điểm nào?",
+                    "answerOptions": [
+                        {"text": "Giao điểm của hai đường đẳng áp là một điểm bất kỳ.", "isCorrect": false, "rationale": "Hai đường đẳng áp (đường thẳng đi qua gốc tọa độ) chỉ có thể giao nhau tại gốc tọa độ."},
+                        {"text": "Chúng không bao giờ giao nhau vì đó là hai quá trình khác nhau.", "isCorrect": false, "rationale": "Hai đường đẳng áp chỉ giao nhau tại gốc tọa độ, ứng với thể tích $V=0$ và nhiệt độ $T=0$."},
+                        {"text": "Gốc tọa độ ($V = 0\\ \\text{m}^3, T = 0\\ \\text{K}$).", "isCorrect": true, "rationale": "Theo Định luật Charles: $V = (const/p) T$. Hai đường thẳng này sẽ luôn đi qua gốc tọa độ ($V=0$ khi $T=0$)."},
+                        {"text": "Giao nhau tại $T = 273.15\\ \\text{K}$.", "isCorrect": false, "rationale": "Điểm này không có ý nghĩa đặc biệt trong mối quan hệ đẳng áp."}
+                    ]
+                },
+                {
+                    "questionNumber": 11,
+                    "question": "Một bình kín chứa khí ở nhiệt độ $27^\\circ\\text{C}$ có áp suất $2 \\ \\text{atm}$. Nếu nung nóng đẳng tích bình đến $127^\\circ\\text{C}$ thì áp suất mới của khí là bao nhiêu?",
+                    "answerOptions": [
+                        {"text": "$2.67\\ \\text{atm}$", "isCorrect": true, "rationale": "Đổi nhiệt độ tuyệt đối: $T_1 = 27 + 273 = 300\\ \\text{K}$, $T_2 = 127 + 273 = 400\\ \\text{K}$. Áp dụng: $p_2 = p_1 \\frac{T_2}{T_1} = 2 \\cdot \\frac{400}{300} = \\frac{8}{3} \\approx 2.67\\ \\text{atm}$."},
+                        {"text": "$2.33\\ \\text{atm}$", "isCorrect": false, "rationale": "Sai do tính toán tỉ số nhiệt độ không chính xác."},
+                        {"text": "$1.5\\ \\text{atm}$", "isCorrect": false, "rationale": "Sai, kết quả này là của quá trình làm lạnh."},
+                        {"text": "$3.0\\ \\text{atm}$", "isCorrect": false, "rationale": "Sai, kết quả này tương ứng với tỉ số nhiệt độ $1.5$ lần."}
+                    ]
+                },
+                {
+                    "questionNumber": 12,
+                    "question": "Một lượng khí được nén đẳng nhiệt từ thể tích $V_1 = 6\\ \\text{L}$ với áp suất $p_1 = 1.0\\ \\text{atm}$ đến thể tích $V_2 = 2\\ \\text{L}$. Áp suất $p_2$ lúc này là bao nhiêu?",
+                    "answerOptions": [
+                        {"text": "$3.0\\ \\text{atm}$", "isCorrect": true, "rationale": "Áp dụng Định luật Boyle-Mariotte: $p_2 = p_1 \\frac{V_1}{V_2} = 1.0 \\cdot \\frac{6}{2} = 3.0\\ \\text{atm}$."},
+                        {"text": "$1/3\\ \\text{atm}$", "isCorrect": false, "rationale": "Đây là kết quả nếu thể tích tăng 3 lần."},
+                        {"text": "$2.0\\ \\text{atm}$", "isCorrect": false, "rationale": "Sai, kết quả này là áp suất ban đầu."},
+                        {"text": "$6.0\\ \\text{atm}$", "isCorrect": false, "rationale": "Sai, kết quả này tương ứng với thể tích giảm 6 lần."}
+                    ]
+                },
+                {
+                    "questionNumber": 13,
+                    "question": "Một khối khí có thể tích $V_1 = 5\\ \\text{L}$ ở nhiệt độ $27^\\circ\\text{C}$. Nếu làm nóng đẳng áp khối khí đến nhiệt độ $177^\\circ\\text{C}$ thì thể tích $V_2$ lúc này là bao nhiêu?",
+                    "answerOptions": [
+                        {"text": "$7.5\\ \\text{L}$", "isCorrect": true, "rationale": "Đổi nhiệt độ: $T_1 = 27 + 273 = 300\\ \\text{K}$, $T_2 = 177 + 273 = 450\\ \\text{K}$. Áp dụng: $V_2 = V_1 \\frac{T_2}{T_1} = 5 \\cdot \\frac{450}{300} = 5 \\cdot 1.5 = 7.5\\ \\text{L}$."},
+                        {"text": "$3.33\\ \\text{L}$", "isCorrect": false, "rationale": "Sai, kết quả này là của quá trình làm lạnh."},
+                        {"text": "$6.0\\ \\text{L}$", "isCorrect": false, "rationale": "Sai, kết quả này ứng với $T_2 = 360\\ \\text{K}$."},
+                        {"text": "$9.0\\ \\text{L}$", "isCorrect": false, "rationale": "Sai, kết quả này ứng với tỉ số nhiệt độ $1.8$ lần."}
+                    ]
+                },
+                {
+                    "questionNumber": 14,
+                    "question": "Một lượng khí bị nén đẳng nhiệt từ $V_1 = 10\\ \\text{L}$ đến $V_2 = 8\\ \\text{L}$. Nếu áp suất ban đầu là $p_1 = 1.5\\ \\text{atm}$, thì độ tăng áp suất $(\\Delta p = p_2 - p_1)$ là bao nhiêu?",
+                    "answerOptions": [
+                        {"text": "$0.375\\ \\text{atm}$", "isCorrect": true, "rationale": "Áp suất cuối: $p_2 = p_1 \\frac{V_1}{V_2} = 1.5 \\cdot \\frac{10}{8} = 1.875\\ \\text{atm}$. Độ tăng áp suất là $\\Delta p = p_2 - p_1 = 1.875 - 1.5 = 0.375\\ \\text{atm}$."},
+                        {"text": "$1.875\\ \\text{atm}$", "isCorrect": false, "rationale": "Đây là áp suất cuối cùng, không phải độ tăng áp suất."},
+                        {"text": "$0.2\\ \\text{atm}$", "isCorrect": false, "rationale": "Sai, kết quả này là của tỉ số $\\frac{1}{5}$."},
+                        {"text": "$-0.375\\ \\text{atm}$", "isCorrect": false, "rationale": "Áp suất tăng lên nên độ tăng phải là số dương."}
+                    ]
+                },
+                {
+                    "questionNumber": 15,
+                    "question": "Một khối khí lý tưởng có thể tích ban đầu $V_0$. Nếu áp suất tăng $50\\%$ (đẳng nhiệt), thể tích cuối cùng của khí là bao nhiêu?",
+                    "answerOptions": [
+                        {"text": "$0.67 V_0$", "isCorrect": true, "rationale": "Áp suất tăng $50\\%$: $p_2 = 1.5 p_1$. Áp dụng đẳng nhiệt: $V_2 = V_1 \\frac{p_1}{p_2} = V_0 \\frac{p_1}{1.5 p_1} = \\frac{1}{1.5} V_0 = \\frac{2}{3} V_0 \\approx 0.67 V_0$."},
+                        {"text": "$1.5 V_0$", "isCorrect": false, "rationale": "Đây là kết quả nếu quá trình là đẳng áp."},
+                        {"text": "$0.5 V_0$", "isCorrect": false, "rationale": "Đây là kết quả nếu áp suất tăng $100\\%$ (gấp đôi)."},
+                        {"text": "$2.0 V_0$", "isCorrect": false, "rationale": "Đây là kết quả nếu áp suất giảm $50\\%$ (tăng gấp đôi)."}
+                    ]
+                },
+                {
+                    "questionNumber": 16,
+                    "question": "Một ống thủy tinh hình trụ, một đầu kín, một đầu hở, đặt thẳng đứng và úp miệng xuống. Bên trong có một cột khí dài $l_1 = 15\\ \\text{cm}$ bị ngăn bởi một giọt thủy ngân dài $h = 5\\ \\text{cm}$. Khi lật ống đứng thẳng (miệng lên trên), cột khí bị ngăn sẽ dài bao nhiêu? Coi nhiệt độ không đổi. Cho áp suất khí quyển là $p_0 = 75\\ \\text{cmHg}$.",
+                    "answerOptions": [
+                        {"text": "$13.5\\ \\text{cm}$", "isCorrect": false, "rationale": "Sai số trong tính toán."},
+                        {"text": "$13.125\\ \\text{cm}$", "isCorrect": true, "rationale": "Trạng thái 1 (Úp miệng): $p_1 = p_0 - h = 75 - 5 = 70\\ \\text{cmHg}$, $V_1 \\sim l_1 = 15\\ \\text{cm}$. Trạng thái 2 (Đứng thẳng): $p_2 = p_0 + h = 75 + 5 = 80\\ \\text{cmHg}$, $V_2 \\sim l_2$. Áp dụng Boyle: $p_1 l_1 = p_2 l_2 \\implies l_2 = \\frac{70 \\cdot 15}{80} = 13.125\\ \\text{cm}$."},
+                        {"text": "$14.0\\ \\text{cm}$", "isCorrect": false, "rationale": "Sai, kết quả này có được nếu $p_2 = 75\\ \\text{cmHg}$."},
+                        {"text": "$12.5\\ \\text{cm}$", "isCorrect": false, "rationale": "Sai, kết quả này có được nếu $p_2 = 84\\ \\text{cmHg}$."}
+                    ]
+                },
+                {
+                    "questionNumber": 17,
+                    "question": "Một bình nén khí dung tích $V_{bình} = 50\\ \\text{L}$ chứa khí ở áp suất $p_1 = 10\\ \\text{atm}$. Người ta dùng bơm để bơm khí vào một bánh xe có dung tích $V_{bánh} = 10\\ \\text{L}$ đến áp suất $p_{bánh} = 3\\ \\text{atm}$. Coi nhiệt độ không đổi. Hỏi khí trong bình còn lại áp suất $p_{sau}$ là bao nhiêu?",
+                    "answerOptions": [
+                        {"text": "$9.4\\ \\text{atm}$", "isCorrect": true, "rationale": "Lượng khí bơm vào bánh xe (ở áp suất $1\\ \\text{atm}$) tương đương với: $p_{lấy} = p_{bánh} \\cdot V_{bánh} = 3 \\cdot 10 = 30\\ \\text{atm} \\cdot \\text{L}$ (đơn vị $p \\cdot V$). Lượng khí còn lại trong bình: $p_{sau} \\cdot V_{bình} = p_1 V_{bình} - p_{bánh} V_{bánh} = (10 \\cdot 50) - (3 \\cdot 10) = 500 - 30 = 470\\ \\text{atm} \\cdot \\text{L}$. Áp suất còn lại: $p_{sau} = \\frac{470}{50} = 9.4\\ \\text{atm}$."},
+                        {"text": "$7.0\\ \\text{atm}$", "isCorrect": false, "rationale": "Sai do tính toán chênh lệch áp suất không đúng."},
+                        {"text": "$6.0\\ \\text{atm}$", "isCorrect": false, "rationale": "Sai, áp suất không thể giảm mạnh như vậy."},
+                        {"text": "$8.2\\ \\text{atm}$", "isCorrect": false, "rationale": "Sai do tính toán sai khối lượng khí đã chuyển."}
+                    ]
+                },
+                {
+                    "questionNumber": 18,
+                    "question": "Một giọt thủy ngân ngăn một cột khí dài $L_1 = 10\\ \\text{cm}$ trong ống nghiệm đặt thẳng đứng, đầu kín ở trên. Áp suất khí quyển $p_0 = 76\\ \\text{cmHg}$, giọt thủy ngân dài $h = 4\\ \\text{cm}$. Nếu làm lạnh cột khí **đẳng tích** từ $27^\\circ\\text{C}$ xuống $0^\\circ\\text{C}$ thì cột khí có chiều dài thay đổi bao nhiêu?",
+                    "answerOptions": [
+                        {"text": "Không đổi (thay đổi $0\\ \\text{cm}$).", "isCorrect": true, "rationale": "Quá trình được mô tả là **đẳng tích**, có nghĩa là thể tích (và chiều dài $L$) của khối khí không thay đổi, mặc dù nhiệt độ có giảm và áp suất có giảm theo ($p/T=const$)."},
+                        {"text": "Giảm $0.9\\ \\text{cm}$", "isCorrect": false, "rationale": "Sai lầm khi áp dụng Định luật Charles ($V/T = const$) thay vì nhận ra quá trình là đẳng tích ($V=const$)."},
+                        {"text": "Tăng $0.9\\ \\text{cm}$", "isCorrect": false, "rationale": "Chiều dài không đổi vì thể tích không đổi."},
+                        {"text": "Không thể xác định vì thiếu áp suất cuối.", "isCorrect": false, "rationale": "Quá trình là đẳng tích, điều kiện $V=const$ (hay $L=const$) là đủ để kết luận."}
+                    ]
+                },
+                {
+                    "questionNumber": 19,
+                    "question": "Một khối khí ở áp suất $p_1 = 2\\ \\text{atm}$, thể tích $V_1 = 15\\ \\text{L}$. Khí được làm lạnh đẳng áp đến $T_2 = 1.5 T_1$, sau đó nén đẳng nhiệt để thể tích trở về $V_1$. Áp suất cuối cùng $p_3$ của khối khí là bao nhiêu?",
+                    "answerOptions": [
+                        {"text": "$3.0\\ \\text{atm}$", "isCorrect": true, "rationale": "Quá trình 1-2 (Đẳng áp): $\\frac{V_2}{T_2} = \\frac{V_1}{T_1} \\implies V_2 = V_1 \\frac{T_2}{T_1} = V_1 \\cdot 1.5 = 15 \\cdot 1.5 = 22.5\\ \\text{L}$. Quá trình 2-3 (Đẳng nhiệt): $p_2 V_2 = p_3 V_3$. Ta có $p_2 = p_1 = 2\\ \\text{atm}$ và $V_3 = V_1 = 15\\ \\text{L}$. Vậy $p_3 = p_2 \\frac{V_2}{V_3} = 2 \\cdot \\frac{22.5}{15} = 2 \\cdot 1.5 = 3.0\\ \\text{atm}$."},
+                        {"text": "$1.33\\ \\text{atm}$", "isCorrect": false, "rationale": "Sai do tính nhầm tỉ số $V_2/V_3$."},
+                        {"text": "$4.5\\ \\text{atm}$", "isCorrect": false, "rationale": "Sai, kết quả này có được nếu $T_2 = 2.25 T_1$."},
+                        {"text": "$2.0\\ \\text{atm}$", "isCorrect": false, "rationale": "Sai, áp suất cuối phải khác áp suất ban đầu."}
+                    ]
+                },
+                {
+                    "questionNumber": 20,
+                    "question": "Một bình chứa không khí được đậy bằng piston nhẹ, diện tích $S = 50\\ \\text{cm}^2$. Ban đầu piston cách đáy $L_1 = 20\\ \\text{cm}$ ở nhiệt độ $27^\\circ\\text{C}$. Hỏi phải tăng nhiệt độ lên bao nhiêu ($^\\circ\\text{C}$) để piston nâng thêm $5\\ \\text{cm}$ (coi áp suất ngoài không đổi)?",
+                    "answerOptions": [
+                        {"text": "$67.5^\\circ\\text{C}$", "isCorrect": false, "rationale": "Sai, đây không phải là kết quả cuối cùng."},
+                        {"text": "$102^\\circ\\text{C}$", "isCorrect": true, "rationale": "Quá trình đẳng áp ($p=const$). $T_1 = 27 + 273 = 300\\ \\text{K}$. Chiều dài cột khí $L_2 = 20 + 5 = 25\\ \\text{cm}$. $\\frac{V_1}{T_1} = \\frac{V_2}{T_2} \\implies \\frac{L_1 \\cdot S}{T_1} = \\frac{L_2 \\cdot S}{T_2} \\implies T_2 = T_1 \\frac{L_2}{L_1} = 300 \\cdot \\frac{25}{20} = 375\\ \\text{K}$. Nhiệt độ Celsius: $t_2 = 375 - 273 = 102^\\circ\\text{C}$."},
+                        {"text": "$125\\ \\text{K}$", "isCorrect": false, "rationale": "Sai do không đổi nhiệt độ ban đầu sang Kelvin hoặc tính toán tỉ số sai."},
+                        {"text": "$375\\ \\text{K}$", "isCorrect": false, "rationale": "Đây là nhiệt độ tuyệt đối cuối cùng, câu hỏi yêu cầu tính bằng $^\\circ\\text{C}$."}
+                    ]
+                }
+            ]
+        };
+
+        let currentQuestionIndex = 0;
+        const userAnswers = new Array(quizData.questions.length).fill(null);
+        const quizContainer = document.getElementById('quizContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const resultDiv = document.getElementById('resultDiv');
+        const progressDisplay = document.getElementById('progress');
+        const timerDisplay = document.getElementById('timer');
+
+        // Hàm biên dịch công thức LaTeX - Đảm bảo MathJax đã tải xong
+        function typesetMath() {
+             // Chờ MathJax sẵn sàng, sau đó Typeset
+            if (window.MathJax) {
+                // Đảm bảo chỉ typeset các phần tử mới hoặc thay đổi
+                MathJax.typesetPromise([quizContainer, resultDiv]).catch((err) => console.error('MathJax Typeset Error:', err));
+            } else {
+                // Nếu MathJax chưa sẵn sàng, thử lại sau 100ms
+                setTimeout(typesetMath, 100); 
+            }
+        }
+
+        // Lấy câu trả lời đã chọn của người dùng
+        function getSelectedOption() {
+            const currentQ = quizData.questions[currentQuestionIndex];
+            // Kiểm tra xem câu hỏi có tồn tại không trước khi truy cập
+            if (!currentQ) return null; 
+
+            const radios = document.getElementsByName('q' + currentQ.questionNumber);
+            for (const radio of radios) {
+                if (radio.checked) {
+                    return parseInt(radio.value);
+                }
+            }
+            return null;
+        }
+
+        // Lưu câu trả lời hiện tại
+        function saveAnswer() {
+            const selectedOptionIndex = getSelectedOption();
+            userAnswers[currentQuestionIndex] = selectedOptionIndex;
+        }
+
+        // Hiển thị câu hỏi hiện tại
+        function renderQuestion() {
+            saveAnswer(); // Luôn lưu câu trả lời trước khi chuyển trang
+
+            const currentQ = quizData.questions[currentQuestionIndex];
+            const totalQuestions = quizData.questions.length;
+
+            let html = `<div class="question-box">`;
+            html += `<div class="question-title">Câu ${currentQ.questionNumber}/${totalQuestions}: ${currentQ.question}</div>`;
+            
+            currentQ.answerOptions.forEach((option, index) => {
+                const isChecked = userAnswers[currentQuestionIndex] === index;
+                html += `
+                    <label class="option-label">
+                        <input type="radio" 
+                               name="q${currentQ.questionNumber}" 
+                               value="${index}"
+                               ${isChecked ? 'checked' : ''}
+                               onclick="saveAnswer()"
+                        >
+                        ${String.fromCharCode(65 + index)}. ${option.text}
+                    </label>
+                `;
+            });
+
+            html += `</div>`;
+            quizContainer.innerHTML = html;
+
+            updateNavigationButtons();
+            updateProgress();
+            typesetMath(); // Biên dịch công thức toán học
+        }
+
+        // Cập nhật trạng thái các nút
+        function updateNavigationButtons() {
+            const totalQuestions = quizData.questions.length;
+            prevBtn.disabled = currentQuestionIndex === 0;
+            nextBtn.disabled = currentQuestionIndex === totalQuestions - 1;
+
+            if (currentQuestionIndex === totalQuestions - 1) {
+                submitBtn.style.display = 'block';
+                nextBtn.style.display = 'none';
+            } else {
+                submitBtn.style.display = 'none';
+                nextBtn.style.display = 'block';
+            }
+        }
+
+        // Cập nhật tiến trình
+        function updateProgress() {
+            progressDisplay.textContent = `Tiến trình: ${currentQuestionIndex + 1}/${quizData.questions.length}`;
+        }
+
+        function goToPreviousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        }
+
+        function goToNextQuestion() {
+            if (currentQuestionIndex < quizData.questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            }
+        }
+
+        // Xử lý nộp bài
+        function submitQuiz() {
+            saveAnswer(); // Lưu câu trả lời cuối cùng
+            let score = 0;
+            const totalQuestions = quizData.questions.length;
+            let resultHTML = '<h2>Kết Quả Bài Làm Của Bạn</h2>';
+
+            quizData.questions.forEach((q, qIndex) => {
+                const userAnswerIndex = userAnswers[qIndex];
+                const correctOption = q.answerOptions.find(opt => opt.isCorrect);
+                const correctOptionIndex = q.answerOptions.findIndex(opt => opt.isCorrect);
+                const userAnswerText = userAnswerIndex !== null ? String.fromCharCode(65 + userAnswerIndex) + '. ' + q.answerOptions[userAnswerIndex].text : 'Chưa trả lời';
+                
+                const isCorrect = userAnswerIndex === correctOptionIndex;
+                if (isCorrect) {
+                    score++;
+                }
+
+                const resultClass = isCorrect ? 'correct-answer' : 'incorrect-answer';
+                const resultText = isCorrect ? 'ĐÚNG' : 'SAI';
+
+                resultHTML += `<div class="result-item">`;
+                resultHTML += `<strong>Câu ${q.questionNumber}:</strong> ${q.question}`;
+                resultHTML += `<div class="user-answer ${resultClass}">Bạn chọn (${resultText}): ${userAnswerText}</div>`;
+                
+                if (!isCorrect) {
+                    resultHTML += `<div class="correct-answer">Đáp án đúng: ${String.fromCharCode(65 + correctOptionIndex)}. ${correctOption.text}</div>`;
+                }
+                
+                if (correctOption && correctOption.rationale) {
+                    resultHTML += `<div class="rationale"><strong>Lời giải:</strong> ${correctOption.rationale}</div>`;
+                }
+                resultHTML += '</div>';
+            });
+
+            // TỔNG ĐIỂM
+            resultHTML += `<p style="font-size: 1.5em; font-weight: bold; color: ${score >= 16 ? '#28a745' : (score >= 10 ? '#ffc107' : '#dc3545')};">Tổng điểm: ${score}/${totalQuestions}</p>`;
+            resultHTML += `<button class="retry-button" onclick="location.reload()">Làm Lại</button>`;
+
+            quizContainer.style.display = 'none'; // Ẩn câu hỏi
+            document.querySelector('.navigation').style.display = 'none'; // Ẩn nút chuyển hướng
+            submitBtn.style.display = 'none'; // Ẩn nút nộp bài
+            timerDisplay.style.display = 'none'; // Ẩn đồng hồ
+
+            resultDiv.innerHTML = resultHTML;
+            resultDiv.style.display = 'block'; // Hiển thị kết quả
+            
+            typesetMath(); // Biên dịch công thức cho phần kết quả
+        }
+
+        // Gắn sự kiện cho các nút
+        prevBtn.addEventListener('click', goToPreviousQuestion);
+        nextBtn.addEventListener('click', goToNextQuestion);
+        submitBtn.addEventListener('click', submitQuiz);
+        
+        // Khởi tạo Quiz
+        window.onload = () => {
+            renderQuestion();
+            // Thiết lập timer (Ví dụ: 30 phút = 1800 giây)
+            let timeRemaining = 1800; 
+            const timerInterval = setInterval(() => {
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                timerDisplay.textContent = `Thời gian: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    timerDisplay.textContent = 'Hết giờ!';
+                    submitQuiz(); // Tự động nộp bài khi hết giờ
+                }
+                timeRemaining--;
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

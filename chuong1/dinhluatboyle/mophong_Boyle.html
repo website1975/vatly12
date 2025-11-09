@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô phỏng Định luật Boyle-Mariotte</title>
+    <!-- Tải Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải Chart.js cho đồ thị --><script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <style>
+        /* Thiết lập font Inter */
+        body { font-family: 'Inter', sans-serif; }
+        /* Đảm bảo canvas phản hồi tốt */
+        #simulationCanvas {
+            width: 100%;
+            height: 300px; /* Chiều cao cố định cho mô phỏng */
+            background-color: #e0f2f1; /* Nền xanh nhạt */
+            border-radius: 0.75rem;
+            border: 2px solid #00796b;
+        }
+        .data-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        /* Custom styling for range input */
+        input[type=range]::-webkit-slider-thumb {
+            background: #00796b;
+        }
+        input[type=range]::-moz-range-thumb {
+            background: #00796b;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-teal': '#00796b',
+                        'secondary-cyan': '#00bcd4',
+                        'comparison-blue': '#3b82f6',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-4xl font-extrabold text-primary-teal mb-6 text-center">
+            🧪 Mô phỏng Định luật Boyle-Mariotte ($P \cdot V \propto T$)
+        </h1>
+
+        <!-- Container 3 cột --><div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Cột 1: Mô phỏng hình thí nghiệm (Xi lanh - Piston) --><div class="bg-white p-6 rounded-xl shadow-2xl border-b-4 border-primary-teal flex flex-col">
+                <h2 class="text-2xl font-semibold mb-4 text-primary-teal border-b pb-2">1. Mô phỏng Thí nghiệm Hiện tại</h2>
+
+                <!-- Canvas cho xi lanh --><canvas id="simulationCanvas" class="mb-4"></canvas>
+
+                <!-- Bảng hiển thị thông số hiện tại --><div class="bg-gray-100 p-4 rounded-lg shadow-inner text-sm space-y-2 font-mono">
+                    <p>Áp suất hiện tại ($P$): <span id="pressureDisplay" class="font-bold text-red-600">100 kPa</span></p>
+                    <p>Thể tích hiện tại ($V$): <span id="volumeDisplay" class="font-bold text-blue-600">10.0 đơn vị</span></p>
+                    <p>Nhiệt độ (<span id="tempCurrentUnit">T</span>): <span id="temperatureDisplay" class="font-bold text-green-600">300 K</span></p>
+                    <p>Hằng số ($P \cdot V$): <span id="constantPV" class="font-bold text-purple-600">1000.0</span></p>
+                </div>
+
+                <!-- Thanh điều khiển Nhiệt độ --><div class="mt-6 border-t pt-4">
+                    <label for="tempSlider" class="block text-lg font-medium text-gray-700 mb-2">
+                        🌡️ Điều chỉnh Nhiệt độ ($T_{\text{current}}$):
+                    </label>
+                    <input type="range" id="tempSlider" min="200" max="600" step="10" value="300"
+                           class="w-full h-2 bg-green-400 rounded-lg appearance-none cursor-pointer range-lg" oninput="updateTemperature()">
+                    <p class="text-center text-xs text-gray-500 mt-1">Phạm vi: 200 K - 600 K</p>
+                </div>
+
+                <!-- Thanh điều khiển Thể tích --><div class="mt-4">
+                    <label for="volumeSlider" class="block text-lg font-medium text-gray-700 mb-2">
+                        Điều chỉnh Thể tích ($V$):
+                    </label>
+                    <input type="range" id="volumeSlider" min="5" max="20" step="0.1" value="10.0"
+                           class="w-full h-2 bg-secondary-cyan rounded-lg appearance-none cursor-pointer range-lg">
+                </div>
+
+                <!-- Nút ghi lại giá trị --><button id="recordButton"
+                        class="mt-4 w-full bg-primary-teal hover:bg-teal-700 text-white font-bold py-3 rounded-xl transition duration-300 shadow-md">
+                    📝 Ghi lại Giá trị & Vẽ đồ thị
+                </button>
+            </div>
+
+            <!-- Cột 2: Bảng giá trị V và P --><div class="bg-white p-6 rounded-xl shadow-2xl border-b-4 border-secondary-cyan flex flex-col">
+                <h2 class="text-2xl font-semibold mb-4 text-secondary-cyan border-b pb-2">2. Bảng Giá trị ($V$ & $P$ tại $T_{\text{current}}$)</h2>
+
+                <div class="data-table-container bg-gray-50 rounded-lg p-2">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-secondary-cyan text-white sticky top-0">
+                            <tr>
+                                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider rounded-tl-lg">Lần đo</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider">T (K)</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider">Thể tích $V$</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider rounded-tr-lg">Áp suất $P$ (kPa)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody" class="bg-white divide-y divide-gray-200 text-gray-700 text-sm">
+                            <!-- Dữ liệu sẽ được chèn vào đây --></tbody>
+                    </table>
+                </div>
+
+                <button id="clearDataButton"
+                        class="mt-4 w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 rounded-xl transition duration-300 shadow-md text-sm">
+                    Xóa Dữ liệu & Đồ thị
+                </button>
+            </div>
+
+            <!-- Cột 3: Đồ thị P theo V (So sánh Đẳng nhiệt) --><div class="bg-white p-6 rounded-xl shadow-2xl border-b-4 border-primary-teal flex flex-col">
+                <h2 class="text-2xl font-semibold mb-4 text-primary-teal border-b pb-2">3. Đồ thị $P$ theo $V$ (So sánh)</h2>
+
+                <!-- Control for Comparison Temperature --><div class="mb-4 p-3 border rounded-lg">
+                    <label for="tempCompareInput" class="block text-sm font-medium text-gray-700 mb-1">
+                        So sánh với Đường đẳng nhiệt $T_{\text{comp}}$:
+                    </label>
+                    <input type="number" id="tempCompareInput" value="400" min="100" max="800" step="10"
+                           class="w-full border border-gray-300 rounded-md shadow-sm p-2 text-center text-lg font-bold text-comparison-blue focus:ring-primary-teal focus:border-primary-teal"
+                           onchange="updateChart()">
+                    <p class="text-center text-xs text-gray-500 mt-1">Giá trị (K)</p>
+                </div>
+
+                <div class="flex-grow">
+                    <canvas id="boyleChart"></canvas>
+                </div>
+                <!-- Chú thích Định luật --><div class="mt-4 p-3 bg-teal-50 border-l-4 border-primary-teal rounded-lg text-sm">
+                    <p class="font-bold text-primary-teal">Nhận xét:</p>
+                    <p class="text-gray-700">Đường đẳng nhiệt ứng với nhiệt độ cao hơn (ví dụ $400 \text{ K}$) sẽ nằm xa gốc tọa độ hơn so với đường đẳng nhiệt ứng với nhiệt độ thấp hơn ($300 \text{ K}$).</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Hằng số và Biến trạng thái ---
+        // Thiết lập tỉ lệ tham chiếu: P_ref * V_ref = C_ref tại T_ref
+        const V_REF = 10.0;
+        const P_REF = 100.0;
+        const T_REF = 300.0;
+        const C_REF = P_REF * V_REF; // 1000.0
+
+        let currentTemperature = T_REF;
+        let currentPVConstant = C_REF;
+        let dataRecords = []; // Mảng lưu trữ các điểm (V, P, T) đã ghi lại
+        let currentVolume = V_REF; // Thể tích ban đầu
+        let currentPressure = P_REF; // Áp suất ban đầu
+
+        // --- 2. Khởi tạo DOM Elements ---
+        const canvas = document.getElementById('simulationCanvas');
+        const ctx = canvas.getContext('2d');
+        const slider = document.getElementById('volumeSlider');
+        const tempSlider = document.getElementById('tempSlider');
+        const tempCompareInput = document.getElementById('tempCompareInput');
+        const dataTableBody = document.getElementById('dataTableBody');
+        const pressureDisplay = document.getElementById('pressureDisplay');
+        const volumeDisplay = document.getElementById('volumeDisplay');
+        const temperatureDisplay = document.getElementById('temperatureDisplay');
+        const constantPV = document.getElementById('constantPV');
+        const recordButton = document.getElementById('recordButton');
+        const clearDataButton = document.getElementById('clearDataButton');
+
+        let boyleChart;
+
+        // --- 3. Hàm tính toán vật lý ---
+        /**
+         * Tính áp suất mới dựa trên thể tích mới và hằng số PV hiện tại
+         * @param {number} volume - Thể tích mới
+         * @returns {number} Áp suất mới (kPa)
+         */
+        function calculatePressure(volume, constant) {
+            // P = C / V
+            return constant / volume;
+        }
+
+        /**
+         * Cập nhật Nhiệt độ và Hằng số PV
+         */
+        function updateTemperature() {
+            currentTemperature = parseFloat(tempSlider.value);
+            // C_new = C_ref * (T_new / T_ref)
+            currentPVConstant = C_REF * (currentTemperature / T_REF);
+            
+            // Cập nhật hiển thị Nhiệt độ
+            temperatureDisplay.textContent = `${currentTemperature.toFixed(0)} K`;
+            
+            // Cập nhật mô phỏng
+            updateSimulation();
+            
+            // Cập nhật đồ thị so sánh (vì hằng số T current đã thay đổi)
+            updateChart();
+        }
+
+        // --- 4. Hàm vẽ Xi lanh - Piston (Cột 1) ---
+        function drawSimulation() {
+            // Lấy kích thước canvas thực tế
+            const width = canvas.width;
+            const height = canvas.height;
+            ctx.clearRect(0, 0, width, height);
+
+            // Cấu hình kích thước xi lanh
+            const CYLINDER_WIDTH = width * 0.4;
+            const CYLINDER_X = (width - CYLINDER_WIDTH) / 2;
+            const CYLINDER_Y = height * 0.1;
+            const CYLINDER_HEIGHT = height * 0.8;
+
+            // Tính toán vị trí Piston dựa trên Thể tích
+            const minV = parseFloat(slider.min);
+            const maxV = parseFloat(slider.max);
+            const volumeRatio = (currentVolume - minV) / (maxV - minV);
+            
+            const PISTON_HEIGHT = 20;
+            const PISTON_Y = CYLINDER_Y + CYLINDER_HEIGHT * (1 - volumeRatio) - PISTON_HEIGHT / 2;
+            const GAS_HEIGHT = CYLINDER_Y + CYLINDER_HEIGHT - PISTON_Y;
+
+
+            // 1. Vẽ Xi lanh (Đường viền)
+            ctx.strokeStyle = '#00796b';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            // Đáy
+            ctx.moveTo(CYLINDER_X, CYLINDER_Y + CYLINDER_HEIGHT);
+            ctx.lineTo(CYLINDER_X + CYLINDER_WIDTH, CYLINDER_Y + CYLINDER_HEIGHT);
+            // Thân
+            ctx.moveTo(CYLINDER_X, CYLINDER_Y);
+            ctx.lineTo(CYLINDER_X, CYLINDER_Y + CYLINDER_HEIGHT);
+            ctx.moveTo(CYLINDER_X + CYLINDER_WIDTH, CYLINDER_Y);
+            ctx.lineTo(CYLINDER_X + CYLINDER_WIDTH, CYLINDER_Y + CYLINDER_HEIGHT);
+            ctx.stroke();
+
+            // 2. Vẽ Khí (Gas). Màu sắc phụ thuộc vào Nhiệt độ
+            const tempRatio = (currentTemperature - 200) / (600 - 200); // 200K (min) đến 600K (max)
+            const red = Math.min(255, Math.floor(255 * tempRatio * 1.5)); // Tăng R khi T cao
+            const blue = Math.max(0, Math.floor(255 * (1 - tempRatio * 1.5))); // Giảm B khi T cao
+            ctx.fillStyle = `rgba(${red}, 100, ${blue}, 0.7)`; // Chuyển màu từ Xanh sang Đỏ
+            ctx.fillRect(CYLINDER_X + 2, PISTON_Y + PISTON_HEIGHT, CYLINDER_WIDTH - 4, GAS_HEIGHT - PISTON_HEIGHT);
+
+            // 3. Vẽ Piston
+            ctx.fillStyle = '#4a5568'; // Màu xám đậm
+            ctx.strokeStyle = '#2d3748';
+            ctx.lineWidth = 2;
+            ctx.fillRect(CYLINDER_X - 5, PISTON_Y, CYLINDER_WIDTH + 10, PISTON_HEIGHT);
+            ctx.strokeRect(CYLINDER_X - 5, PISTON_Y, CYLINDER_WIDTH + 10, PISTON_HEIGHT);
+
+
+            // 4. Vẽ Thanh Piston (Cần đẩy)
+            const ROD_WIDTH = 8;
+            ctx.fillStyle = '#a0aec0';
+            ctx.fillRect(CYLINDER_X + CYLINDER_WIDTH / 2 - ROD_WIDTH / 2, 0, ROD_WIDTH, PISTON_Y);
+
+            // 5. Thước đo Thể tích (V)
+            ctx.fillStyle = 'blue';
+            ctx.font = '14px Arial';
+            ctx.fillText(`V = ${currentVolume.toFixed(1)}`, CYLINDER_X + CYLINDER_WIDTH + 10, PISTON_Y + PISTON_HEIGHT / 2 + 5);
+
+            // 6. Mô phỏng Áp suất (P)
+            // Lỗi "Identifier 'minV' has already been declared" đã được sửa ở đây.
+            // minV được khai báo ở trên, giờ chỉ cần sử dụng nó.
+            const maxP_at_Tcurrent = currentPVConstant / minV; // Áp suất tối đa hiện tại
+            const pressureRatio = currentPressure / maxP_at_Tcurrent;
+            const GAUGE_X = CYLINDER_X - 40;
+            const GAUGE_Y = CYLINDER_Y + CYLINDER_HEIGHT / 2;
+            const GAUGE_LENGTH = 50;
+
+            // Thanh áp kế
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(GAUGE_X, GAUGE_Y - GAUGE_LENGTH);
+            ctx.lineTo(GAUGE_X, GAUGE_Y + GAUGE_LENGTH);
+            ctx.stroke();
+
+            // Kim/Thanh hiển thị áp suất
+            ctx.fillStyle = 'red';
+            const P_BAR_LENGTH = GAUGE_LENGTH * 2 * pressureRatio;
+            ctx.fillRect(GAUGE_X - 8, GAUGE_Y + GAUGE_LENGTH - P_BAR_LENGTH, 16, P_BAR_LENGTH);
+
+            // Chỉ số P
+            ctx.fillStyle = 'red';
+            ctx.font = '14px Arial';
+            ctx.fillText(`P: ${currentPressure.toFixed(1)}`, GAUGE_X - 10, GAUGE_Y - GAUGE_LENGTH - 10);
+        }
+
+        // --- 5. Hàm cập nhật giao diện (P, V) và Vẽ lại ---
+        function updateSimulation() {
+            currentVolume = parseFloat(slider.value);
+            currentPressure = calculatePressure(currentVolume, currentPVConstant);
+
+            // Cập nhật hiển thị số
+            pressureDisplay.textContent = `${currentPressure.toFixed(2)} kPa`;
+            volumeDisplay.textContent = `${currentVolume.toFixed(1)} đơn vị`;
+            constantPV.textContent = `${(currentPressure * currentVolume).toFixed(1)}`;
+
+            // Vẽ lại mô phỏng
+            drawSimulation();
+        }
+
+        // --- 6. Hàm xử lý Bảng giá trị (Cột 2) ---
+        function updateDataTable() {
+            dataTableBody.innerHTML = ''; // Xóa bảng cũ
+            dataRecords.forEach((record, index) => {
+                const row = dataTableBody.insertRow();
+                row.className = 'hover:bg-teal-50 transition duration-150';
+
+                // Cột Lần đo
+                let cell1 = row.insertCell();
+                cell1.className = 'px-3 py-2 whitespace-nowrap text-center';
+                cell1.textContent = index + 1;
+                
+                // Cột Nhiệt độ T
+                let cell2 = row.insertCell();
+                cell2.className = 'px-3 py-2 whitespace-nowrap font-medium text-green-600';
+                cell2.textContent = record.T.toFixed(0);
+
+                // Cột Thể tích V
+                let cell3 = row.insertCell();
+                cell3.className = 'px-3 py-2 whitespace-nowrap font-medium text-blue-600';
+                cell3.textContent = record.V.toFixed(1);
+
+                // Cột Áp suất P
+                let cell4 = row.insertCell();
+                cell4.className = 'px-3 py-2 whitespace-nowrap font-medium text-red-600';
+                cell4.textContent = record.P.toFixed(2);
+            });
+        }
+
+        // --- 7. Hàm xử lý Đồ thị (Cột 3) ---
+        function initializeChart() {
+            const ctxChart = document.getElementById('boyleChart').getContext('2d');
+            boyleChart = new Chart(ctxChart, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: `Dữ liệu Thực nghiệm (T = ${currentTemperature.toFixed(0)} K)`,
+                        data: [],
+                        borderColor: '#e53e3e',
+                        backgroundColor: 'rgba(229, 62, 62, 0.1)',
+                        tension: 0.4, 
+                        pointRadius: 0, // Đã thay đổi: ẩn các chấm tròn
+                        pointHoverRadius: 4, // Vẫn có thể highlight khi hover
+                        pointBackgroundColor: '#e53e3e',
+                        showLine: true, // Đã thay đổi: hiển thị đường nối
+                        borderWidth: 2 // Đã thay đổi: làm đường mảnh hơn
+                    },
+                    {
+                        label: `Đẳng nhiệt So sánh (T = ${tempCompareInput.value} K) - Lý thuyết`,
+                        data: [],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderDash: [5, 5], // Đường đứt nét
+                        tension: 0.6,
+                        pointRadius: 0,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true, position: 'top' },
+                        title: {
+                            display: true,
+                            text: 'Đồ thị Áp suất (P) theo Thể tích (V)',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Thể tích V (đơn vị)',
+                                font: { weight: 'bold' }
+                            },
+                            type: 'linear',
+                            min: 0,
+                            max: 22
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Áp suất P (kPa)',
+                                font: { weight: 'bold' }
+                            },
+                            type: 'linear',
+                            min: 0,
+                            max: 220 // Phù hợp với max T (600K) và min V (5)
+                        }
+                    }
+                }
+            });
+            updateComparisonCurve();
+        }
+
+        // Hàm tạo đường cong lý thuyết
+        function generateIsothermData(T) {
+            const constant = C_REF * (T / T_REF);
+            const data = [];
+            for (let V = parseFloat(slider.min); V <= parseFloat(slider.max) + 5; V += 0.5) {
+                 if (V > 0) {
+                    data.push({ x: V, y: constant / V });
+                }
+            }
+            return data;
+        }
+
+        // Cập nhật đường cong so sánh và dữ liệu thực nghiệm
+        function updateChart() {
+            const T_comp = parseFloat(tempCompareInput.value) || T_REF; // Đảm bảo là số
+            const T_current = currentTemperature;
+
+            // 1. Cập nhật Dữ liệu Thực nghiệm (Chấm đỏ)
+            const chartData = dataRecords
+                .filter(record => record.T === T_current) // Chỉ lấy các điểm có T_current hiện tại
+                .map(record => ({ x: record.V, y: record.P }));
+
+            boyleChart.data.datasets[0].data = chartData;
+            boyleChart.data.datasets[0].label = `Dữ liệu Thực nghiệm (T = ${T_current.toFixed(0)} K)`;
+
+            // 2. Cập nhật Đường cong So sánh (Đường xanh)
+            const compData = generateIsothermData(T_comp);
+            
+            boyleChart.data.datasets[1].data = compData;
+            boyleChart.data.datasets[1].label = `Đẳng nhiệt So sánh (T = ${T_comp.toFixed(0)} K) - Lý thuyết`;
+
+            boyleChart.update();
+        }
+
+        function updateComparisonCurve() {
+            updateChart();
+        }
+
+        // --- 8. Hàm sự kiện chính ---
+        function recordData() {
+            // Lấy giá trị hiện tại
+            const V = currentVolume;
+            const P = currentPressure;
+            const T = currentTemperature;
+
+            // Thêm vào mảng (không cần kiểm tra trùng lặp vì có thể ghi nhiều điểm ở cùng V nhưng T khác)
+            dataRecords.push({ V, P, T });
+            
+            // Sắp xếp theo V tăng dần (để đảm bảo thứ tự hiển thị)
+            dataRecords.sort((a, b) => a.V - b.V);
+            
+            // Cập nhật Bảng và Đồ thị
+            updateDataTable();
+            updateChart();
+        }
+
+        function clearData() {
+            // Sử dụng confirm custom
+            showModal("Xác nhận", "Bạn có chắc chắn muốn xóa tất cả dữ liệu thực nghiệm và đồ thị không?", () => {
+                dataRecords = [];
+                updateDataTable();
+                updateChart();
+            });
+        }
+
+        // --- 9. Khởi tạo và Gắn sự kiện ---
+        window.onload = function() {
+            // Đặt kích thước Canvas sau khi DOM load
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+
+            // Khởi tạo đồ thị
+            initializeChart();
+
+            // Khởi tạo trạng thái mô phỏng ban đầu
+            updateTemperature(); // Cập nhật T và C
+            updateSimulation();
+
+            // Gắn sự kiện cho Slider Thể tích
+            slider.addEventListener('input', updateSimulation);
+            
+            // Gắn sự kiện cho Slider Nhiệt độ (Hàm updateTemperature đã có sẵn)
+            // tempSlider.addEventListener('input', updateTemperature);
+
+            // Gắn sự kiện cho Input Nhiệt độ So sánh
+            tempCompareInput.addEventListener('change', updateComparisonCurve);
+
+            // Gắn sự kiện cho Nút ghi lại
+            recordButton.addEventListener('click', recordData);
+
+            // Gắn sự kiện cho Nút xóa dữ liệu
+            clearDataButton.addEventListener('click', clearData);
+        }
+
+        // Xử lý khi cửa sổ resize để canvas vẽ lại đúng kích thước
+        window.addEventListener('resize', () => {
+             // Đặt kích thước Canvas sau khi DOM load
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+            // Vẽ lại mô phỏng
+            drawSimulation();
+            // Cập nhật đồ thị để nó thay đổi kích thước theo container
+            boyleChart.resize();
+        });
+
+        // Hàm thay thế alert/confirm để tránh lỗi iFrame
+        function showModal(title, message, callback) {
+            // Nếu có callback, đây là confirm. Nếu không, là alert.
+            const isConfirm = !!callback; 
+            const existingModal = document.querySelector('.fixed.inset-0.bg-gray-600');
+            if (existingModal) existingModal.remove();
+
+            const container = document.createElement('div');
+            container.className = 'fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 transition-opacity duration-300';
+            container.innerHTML = `
+                <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full transform transition-transform duration-300 scale-95 opacity-0">
+                    <h3 class="text-xl font-bold ${isConfirm ? 'text-red-600' : 'text-primary-teal'} mb-4 border-b pb-2">${title}</h3>
+                    <p class="text-gray-700 mb-6">${message}</p>
+                    <div class="flex ${isConfirm ? 'justify-between' : 'justify-center'} space-x-4">
+                        ${isConfirm ? `
+                            <button id="modalConfirm" class="w-1/2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 rounded transition duration-300">Xác nhận</button>
+                            <button id="modalCancel" class="w-1/2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 rounded transition duration-300">Hủy</button>
+                        ` : `
+                            <button id="modalClose" class="w-full bg-primary-teal hover:bg-teal-700 text-white font-bold py-2 rounded transition duration-300">Đóng</button>
+                        `}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(container);
+
+            // Hiệu ứng Fade in
+            setTimeout(() => {
+                container.querySelector('div').classList.remove('scale-95', 'opacity-0');
+                container.querySelector('div').classList.add('scale-100', 'opacity-100');
+            }, 10);
+
+            if (isConfirm) {
+                document.getElementById('modalConfirm').onclick = () => {
+                    container.remove();
+                    callback();
+                };
+                document.getElementById('modalCancel').onclick = () => {
+                    container.remove();
+                };
+            } else {
+                document.getElementById('modalClose').onclick = () => {
+                    container.remove();
+                };
+            }
+        }
+        
+        // Thay thế hàm alert mặc định bằng modal
+        window.alert = (message) => showModal("Thông Báo", message);
+        // Thay thế hàm confirm mặc định bằng modal
+        window.confirm = (message) => { 
+            console.warn("Using showModal instead of native confirm.");
+            // Native confirm is synchronous, but we can't do that here. 
+            // The clearData function has been modified to use showModal directly.
+            // This placeholder is just to prevent other code (like the clearData function) from calling the native confirm.
+        };
+    </script>
+</body>
+</html>
