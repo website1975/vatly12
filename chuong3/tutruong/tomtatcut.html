@@ -1,1 +1,515 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Học: Từ Trường và Các Dạng Mạch Điện</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
+        }
+        .knowledge-section {
+            border-left: 4px solid #3b82f6; /* Màu xanh dương */
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .visual-section {
+            background-color: #e0f2fe; /* Màu xanh nhạt */
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+        /* Styling cho phần quiz */
+        .quiz-option {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .quiz-option:hover {
+            background-color: #f3f4f6;
+        }
+        /* Ẩn input radio mặc định */
+        .quiz-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        /* Style cho nút radio tùy chỉnh */
+        .custom-radio {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            border: 2px solid #9ca3af;
+            margin-right: 0.5rem;
+            position: relative;
+        }
+        .quiz-option input[type="radio"]:checked + .custom-radio::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background-color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
 
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-blue-800">TỪ TRƯỜNG CÁC DẠNG MẠCH ĐIỆN</h1>
+        </header>
+
+        <!-- Khối chứa 2 cột chính -->
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- CỘT 1: KHUNG HÌNH & VIDEO (Chiếm 1/3 màn hình lớn) -->
+            <div class="lg:col-span-1 space-y-8">
+                <div class="visual-section">
+                    <h2 class="text-1xl text-center font-bold text-blue-700 mb-4">TỪ TRƯỜNG DÂY THẲNG VÀ VÒNG </h2>
+                    
+                    <!-- Khung hình 1: Đã thay bằng placeholder image -->
+                    <div id="image-placeholder-1" class="w-full h-48 bg-gray-300 rounded-lg flex items-center justify-center text-gray-700 text-center mb-4 p-4 shadow-inner">
+                        <img src="../images/vongday.PNG" 
+                             alt="Minh họa Từ trường Dây Thẳng và Vòng Dây" 
+                             class="w-full h-full object-cover rounded-lg" 
+                             onerror="this.onerror=null; this.src='https://placehold.co/400x200/ccc/333?text=Loi+Tai+Anh'">
+                    </div>
+
+                    <!-- Nút Link Video 1 -->
+                    <button onclick="openVideo('https://youtu.be/zyvipGRAwKw?si=EmQ5fGYsAhbNg5fs')"
+                            class="video-btn w-full px-4 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition duration-300 shadow-md transform hover:scale-[1.02]">
+                        ▶️ Xem Video (Dây Thẳng Dài)
+                    </button>
+                    <p class="text-sm text-gray-500 mt-2 text-center">
+                        *URL video: https://www.youtube.com/watch?v=placeholder1
+                    </p>
+                </div>
+
+                <div class="visual-section">
+                    <h2 class="text-1xl text-center font-bold text-blue-700 mb-4">TỪ TRƯỜNG ỐNG DÂY</h2>
+                    
+                    <!-- Khung hình 2: Đã thay bằng placeholder image -->
+                    <div id="image-placeholder-2" class="w-full h-48 bg-gray-300 rounded-lg flex items-center justify-center text-gray-700 text-center mb-4 p-4 shadow-inner">
+                        <img src="../images/ongday.PNG" 
+                             alt="Minh họa Từ trường Ống Dây" 
+                             class="w-full h-full object-cover rounded-lg"
+                             onerror="this.onerror=null; this.src='https://placehold.co/400x200/ccc/333?text=Loi+Tai+Anh'">
+                    </div>
+
+                    <!-- Nút Link Video 2 -->
+                    <button onclick="openVideo('https://youtu.be/V96UXqi_p5c?si=ZF4klLXIqrLE0LKZ')"
+                            class="video-btn w-full px-4 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition duration-300 shadow-md transform hover:scale-[1.02]">
+                        ▶️ Xem Video (Vòng Dây & Ống Dây)
+                    </button>
+                    <p class="text-sm text-gray-500 mt-2 text-center">
+                        *URL video: https://www.youtube.com/watch?v=placeholder2
+                    </p>
+                </div>
+            </div>
+
+            <!-- CỘT 2: KIẾN THỨC HỌC (Chiếm 2/3 màn hình lớn) -->
+            <div class="lg:col-span-2 knowledge-section p-6 md:p-8 space-y-10">
+
+                <!-- I. Từ trường trong dây thẳng dài -->
+                <div>
+                    <h2 class="text-1xl font-bold text-blue-800 mb-4 border-b-2 border-blue-200 pb-2">
+                        I/ TỪ TRƯỜNG TRONG DÂY THẲNG DÀI
+                    </h2>
+                    <ol class="list-decimal list-inside space-y-3 pl-4">
+                            <p class="font-semibold text-gray-800">Khái niệm dây thẳng dài vô hạn:</p>
+                            <p class="text-gray-700 ml-5">Là một đoạn dây dẫn rất dài, sao cho điểm đang xét (M) gần dây hơn rất nhiều so với khoảng cách từ điểm đó đến hai đầu mút của dây (Mắt thường không thấy được hai đầu dây).</p>
+                            <p class="font-semibold text-gray-800">Mô tả từ phổ:</p>
+                            <p class="text-gray-700 ml-5">Từ phổ được tạo thành bởi các vòng tròn đồng tâm, nằm trong mặt phẳng vuông góc với dây dẫn, tâm là giao điểm của dây và mặt phẳng đó.</p>
+                            <p class="font-semibold text-gray-800">Đường sức từ (ĐST):</p>
+                            <ul class="list-disc list-inside ml-5 space-y-1 text-gray-700">
+                                <li>Là những đường tròn đồng tâm, tâm nằm trên dây.</li>
+                                <li>Mặt phẳng chứa ĐST vuông góc với dây.</li>
+                                <li>Chiều được xác định bằng <span class="font-extrabold text-red-600">Quy tắc nắm tay phải (hoặc Quy tắc vặn nút chai).</span></li>
+                            </ul>
+                            <p class="font-semibold text-gray-800">Khảo sát từ trường do dây thẳng mang dòng I gây ra tại 1 điểm cách dây r:</p>
+                            <ul class="list-disc list-inside ml-5 space-y-1 text-gray-700">
+                                <li class="font-medium">Điểm đặt: <span class="font-normal">Tại điểm đang xét (M).</span></li>
+                                <li class="font-medium">Phương: <span class="font-normal">Tiếp tuyến với đường sức từ tại M (tức là vuông góc với bán kính r).</span></li>
+                                <li class="font-medium">Chiều: <span class="font-normal">Xác định theo <span class="font-extrabold text-red-600">Quy tắc nắm tay phải.</span> (Chiều từ trường đi vào bốn ngón tay nắm lại khi ngón cái chỉ chiều dòng điện I).</span></li>
+                                <li class="font-medium">Độ lớn (Cảm ứng từ B): <span class="font-extrabold text-indigo-600">$$B = 2\cdot 10^{-7} \cdot \frac{I}{r}$$</span> (Trong đó: B là Tesla (T), I là Ampe (A), r là mét (m)).</li>
+                            </ul>
+                    </ol>
+                </div>
+
+                <!-- II. Từ trường trong vòng dây tròn -->
+                <div>
+                    <h2 class="text-1xl font-bold text-blue-800 mb-4 border-b-2 border-blue-200 pb-2">
+                        II/ TỪ TRƯỜNG TRONG VÒNG DÂY TRÒN
+                    </h2>
+                    <ol class="list-decimal list-inside space-y-3 pl-4">
+                           <p class="font-semibold text-gray-800">Khái niệm:</p>
+                            <p class="text-gray-700 ml-5">Vòng dây có bán kính R mang dòng điện I.</p>
+                            <p class="font-semibold text-gray-800">Đường sức từ:</p>
+                            <p class="text-gray-700 ml-5">Tập trung và dày đặc nhất ở tâm vòng dây, là đường cong khép kín. Xung quanh tâm, ĐST là các đường cong có hình dạng tương tự hình elip, càng xa tâm càng thưa dần.</p>
+                            <p class="font-semibold text-gray-800">Chiều:</p>
+                            <p class="text-gray-700 ml-5">Xác định bằng <span class="font-extrabold text-red-600">Quy tắc nắm tay phải mở rộng</span> (Nếu chiều khum bàn tay là chiều dòng điện I, thì ngón cái duỗi thẳng chỉ chiều đường sức từ xuyên qua mặt phẳng vòng dây).</p>
+                            <p class="font-semibold text-gray-800">Khảo sát từ trường do vòng dây gây ra tại tâm O:</p>
+                            <ul class="list-disc list-inside ml-5 space-y-1 text-gray-700">
+                                <li class="font-medium">Điểm đặt: <span class="font-normal">Tại tâm vòng dây (O).</span></li>
+                                <li class="font-medium">Phương: <span class="font-normal">Vuông góc với mặt phẳng vòng dây.</span></li>
+                                <li class="font-medium">Chiều: <span class="font-normal">Xác định theo <span class="font-extrabold text-red-600">Quy tắc nắm tay phải.</span></span></li>
+                                <li class="font-medium">Độ lớn (Cảm ứng từ B): <span class="font-extrabold text-indigo-600">$$B = 2\pi \cdot 10^{-7} \cdot \frac{n \cdot I}{R}$$</span> (n: số vòng dây, R: bán kính vòng dây (m)).</li>
+                            </ul>
+                    </ol>
+                </div>
+
+                <!-- III. Từ trường ống dây -->
+                <div>
+                    <h2 class="text-1xl font-bold text-blue-800 mb-4 border-b-2 border-blue-200 pb-2">
+                        III/ TỪ TRƯỜNG TRONG ỐNG DÂY (SOLENOID)
+                    </h2>
+                    <ol class="list-decimal list-inside space-y-3 pl-4">
+                           <p class="font-semibold text-gray-800">Khái niệm:</p>
+                            <p class="text-gray-700 ml-5">Ống dây dài (có chiều dài l lớn hơn nhiều so với bán kính R) được quấn chặt bằng N vòng dây.</p>
+                            <p class="font-semibold text-gray-800">Đường sức từ:</p>
+                            <ul class="list-disc list-inside ml-5 space-y-1 text-gray-700">
+                                <li><span class="font-medium">Bên ngoài:</span> ĐST tương tự từ trường của nam châm thẳng.</li>
+                                <li><span class="font-medium">Bên trong:</span> Các đường sức từ <span class="font-extrabold">song song, cách đều</span> và <span class="font-extrabold">vuông góc</span> với mặt phẳng tiết diện ống dây (Từ trường đều).</li>
+                            </ul>
+                            <p class="font-semibold text-gray-800">Chiều:</p>
+                            <p class="text-gray-700 ml-5">Xác định bằng <span class="font-extrabold text-red-600">Quy tắc nắm tay phải.</span> (Chiều từ trường đi ra từ cực Bắc - N, đi vào cực Nam - S).</p>
+                            <p class="font-semibold text-gray-800">Khảo sát từ trường bên trong lòng ống dây:</p>
+                            <ul class="list-disc list-inside ml-5 space-y-1 text-gray-700">
+                                <li class="font-medium">Điểm đặt: <span class="font-normal">Bất kỳ điểm nào bên trong lòng ống dây (Từ trường đều).</span></li>
+                                <li class="font-medium">Phương: <span class="font-normal">Song song và trùng với trục ống dây.</span></li>
+                                <li class="font-medium">Chiều: <span class="font-normal">Xác định theo <span class="font-extrabold text-red-600">Quy tắc nắm tay phải.</span></span></li>
+                                <li class="font-medium">Độ lớn (Cảm ứng từ B): <span class="font-extrabold text-indigo-600">$$B = 4\pi \cdot 10^{-7} \cdot \frac{N \cdot I}{l} = 4\pi \cdot 10^{-7} \cdot n \cdot I$$</span> (N: tổng số vòng dây, l: chiều dài ống dây (m), n: mật độ vòng dây $n = \frac{N}{l}$).</li>
+                            </ul>
+                            </ol>
+                </div>
+
+                <!-- IV. Củng cố bài bằng Trắc nghiệm -->
+                <div class="border-t-4 border-dashed border-gray-300 pt-8">
+                    <h2 class="text-1xl font-bold text-green-700 mb-6 text-center bg-green-50 p-3 rounded-lg">
+                        IV/ TRẮC NGHIỆM CỦNG CỐ KIẾN THỨC
+                    </h2>
+                    <div id="quiz-container" class="space-y-8">
+                        
+                        <!-- Question 1 -->
+                        <div class="quiz-question p-4 border border-gray-200 rounded-lg bg-gray-50" id="q1">
+                            <p class="font-semibold mb-3 text-lg">Câu 1: Đường sức từ của từ trường gây ra bởi dòng điện chạy trong dây dẫn thẳng dài vô hạn có dạng là gì?</p>
+                            <div class="space-y-2">
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q1_option" value="0">
+                                    <span class="custom-radio"></span> Các đường thẳng song song với dây dẫn.
+                                </label>
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q1_option" value="1">
+                                    <span class="custom-radio"></span> Các đường tròn đồng tâm nằm trong mặt phẳng vuông góc với dây dẫn.
+                                </label>
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q1_option" value="2">
+                                    <span class="custom-radio"></span> Các đường xoắn ốc.
+                                </label>
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q1_option" value="3">
+                                    <span class="custom-radio"></span> Các đường thẳng xuyên tâm đi ra từ dây dẫn.
+                                </label>
+                            </div>
+                            <button onclick="checkAnswer('q1', 1)" class="mt-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300">Kiểm tra</button>
+                            <div id="q1_result" class="mt-3 p-3 text-sm hidden rounded-md"></div>
+                        </div>
+
+                        <!-- Question 2 -->
+                        <div class="quiz-question p-4 border border-gray-200 rounded-lg bg-gray-50" id="q2">
+                            <p class="font-semibold mb-3 text-lg">Câu 2: Chiều của vectơ cảm ứng từ $\\vec{B}$ tại một điểm do dòng điện thẳng gây ra được xác định bằng quy tắc nào?</p>
+                            <div class="space-y-2">
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q2_option" value="0">
+                                    <span class="custom-radio"></span> Quy tắc bàn tay trái.
+                                </label>
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q2_option" value="1">
+                                    <span class="custom-radio"></span> Quy tắc nắm tay phải.
+                                </label>
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q2_option" value="2">
+                                    <span class="custom-radio"></span> Quy tắc bàn tay phải (dùng để xác định lực).
+                                </label>
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q2_option" value="3">
+                                    <span class="custom-radio"></span> Quy tắc vào Nam ra Bắc.
+                                </label>
+                            </div>
+                            <button onclick="checkAnswer('q2', 1)" class="mt-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300">Kiểm tra</button>
+                            <div id="q2_result" class="mt-3 p-3 text-sm hidden rounded-md"></div>
+                        </div>
+
+                        <!-- Question 3 -->
+                        <div class="quiz-question p-4 border border-gray-200 rounded-lg bg-gray-50" id="q3">
+                            <p class="font-semibold mb-3 text-lg">Câu 3: Đặc điểm nổi bật của từ trường bên trong lòng ống dây dài mang dòng điện là gì?</p>
+                            <div class="space-y-2">
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q3_option" value="0">
+                                    <span class="custom-radio"></span> Cảm ứng từ $\\vec{B}$ giảm dần từ tâm ra hai đầu ống dây.
+                                </label>
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q3_option" value="1">
+                                    <span class="custom-radio"></span> Từ trường là từ trường không đều, đường sức từ là các đường cong.
+                                </label>
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q3_option" value="2">
+                                    <span class="custom-radio"></span> Từ trường là từ trường đều, có đường sức từ song song và cách đều.
+                                </label>
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q3_option" value="3">
+                                    <span class="custom-radio"></span> Chiều của $\\vec{B}$ thay đổi liên tục dọc theo trục ống dây.
+                                </label>
+                            </div>
+                            <button onclick="checkAnswer('q3', 2)" class="mt-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300">Kiểm tra</button>
+                            <div id="q3_result" class="mt-3 p-3 text-sm hidden rounded-md"></div>
+                        </div>
+                        
+                        <!-- Question 4: Calculation -->
+                        <div class="quiz-question p-4 border border-gray-200 rounded-lg bg-gray-50" id="q4">
+                            <p class="font-semibold mb-3 text-lg">Câu 4 (Vận dụng): Một vòng dây tròn có bán kính $R = 5 \text{ cm}$ ($n=1$ vòng) mang dòng điện $I = 10 \text{ A}$. Tính cảm ứng từ $B$ tại tâm vòng dây. ($\pi \approx 3.14$)</p>
+                            <div class="space-y-2">
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q4_option" value="0">
+                                    <span class="custom-radio"></span> $B \approx 6.28 \cdot 10^{-5} \text{ T}$.
+                                </label>
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q4_option" value="1">
+                                    <span class="custom-radio"></span> $B \approx 1.256 \cdot 10^{-4} \text{ T}$.
+                                </label>
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q4_option" value="2">
+                                    <span class="custom-radio"></span> $B \approx 2.51 \cdot 10^{-3} \text{ T}$.
+                                </label>
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q4_option" value="3">
+                                    <span class="custom-radio"></span> $B \approx 3.14 \cdot 10^{-4} \text{ T}$.
+                                </label>
+                            </div>
+                            <button onclick="checkAnswer('q4', 1)" class="mt-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300">Kiểm tra</button>
+                            <div id="q4_result" class="mt-3 p-3 text-sm hidden rounded-md"></div>
+                        </div>
+
+                        <!-- Question 5 -->
+                        <div class="quiz-question p-4 border border-gray-200 rounded-lg bg-gray-50" id="q5">
+                            <p class="font-semibold mb-3 text-lg">Câu 5: Công thức tính độ lớn cảm ứng từ $B$ do dòng điện thẳng dài vô hạn gây ra tại điểm cách dây một khoảng $r$ là gì?</p>
+                            <div class="space-y-2">
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q5_option" value="0">
+                                    <span class="custom-radio"></span> $B = 4\pi \cdot 10^{-7} \cdot \frac{I}{r}$.
+                                </label>
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q5_option" value="1">
+                                    <span class="custom-radio"></span> $B = 2\pi \cdot 10^{-7} \cdot \frac{I}{R}$.
+                                </label>
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q5_option" value="2">
+                                    <span class="custom-radio"></span> $B = 2\cdot 10^{-7} \cdot \frac{I}{r}$.
+                                </label>
+                                <label class="quiz-option block p-2 rounded-md hover:bg-blue-50">
+                                    <input type="radio" name="q5_option" value="3">
+                                    <span class="custom-radio"></span> $B = 4\pi \cdot 10^{-7} \cdot n \cdot I$.
+                                </label>
+                            </div>
+                            <button onclick="checkAnswer('q5', 2)" class="mt-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300">Kiểm tra</button>
+                            <div id="q5_result" class="mt-3 p-3 text-sm hidden rounded-md"></div>
+                        </div>
+
+                    </div>
+                    <div class="mt-8 p-4 bg-indigo-100 border-l-4 border-indigo-500 text-indigo-800 rounded-lg">
+                        <p class="font-medium text-lg">
+                            🎉 **Hoàn thành:** Hãy kiểm tra lại các đáp án và lời giải để củng cố kiến thức trước khi chuyển sang các bài học tiếp theo nhé!
+                        </p>
+                    </div>
+                </div>
+                <!-- Kết thúc IV. Củng cố bài bằng Trắc nghiệm -->
+
+            </div>
+            <!-- Kết thúc Cột 2 -->
+
+        </main>
+        <!-- Kết thúc Khối chứa 2 cột chính -->
+    </div>
+
+    <script>
+        // Hàm mở video trong cửa sổ mới
+        function openVideo(url) {
+            // Kiểm tra và thay thế URL nếu cần
+            if (url.includes('placeholder')) {
+                const placeholderMessage = "URL này là chỗ giữ chỗ. Vui lòng thay 'placeholder1' hoặc 'placeholder2' bằng đường dẫn video thực tế của bạn trước khi sử dụng.";
+                // Thay vì alert, dùng console.warn để không làm gián đoạn người dùng
+                console.warn(placeholderMessage);
+            }
+            
+            // Mở cửa sổ mới
+            window.open(url, '_blank');
+        }
+
+        // Dữ liệu đáp án và giải thích (Rationale)
+        const quizData = {
+            'q1': {
+                correct: 1,
+                rationales: [
+                    "Đường thẳng song song chỉ xuất hiện bên trong lòng ống dây, không phải dây thẳng dài.",
+                    "Đây là định nghĩa chính xác về đường sức từ của dây dẫn thẳng dài vô hạn.",
+                    "Đường xoắn ốc không phải là dạng đường sức từ phổ biến trong các mạch điện đơn giản này.",
+                    "Đường thẳng xuyên tâm chỉ xuất hiện trong từ trường của một cực từ riêng biệt, không phải dòng điện thẳng."
+                ]
+            },
+            'q2': {
+                correct: 1,
+                rationales: [
+                    "Quy tắc bàn tay trái dùng để xác định lực từ (lực Lorentz, lực Ampe), không phải chiều cảm ứng từ B.",
+                    "Quy tắc nắm tay phải dùng để xác định chiều của $\\vec{B}$ do dòng điện thẳng hoặc vòng dây/ống dây gây ra.",
+                    "Quy tắc bàn tay phải (dùng để xác định lực) là không đúng, vì Quy tắc Bàn tay trái mới dùng cho Lực.",
+                    "Quy tắc 'vào Nam ra Bắc' chỉ dùng để xác định cực của nam châm, không phải chiều $\\vec{B}$ tại một điểm cụ thể."
+                ]
+            },
+            'q3': {
+                correct: 2,
+                rationales: [
+                    "Cảm ứng từ \\vec{B} chỉ giảm mạnh ở hai đầu ống dây, nhưng bên trong lòng ống dây là đều.",
+                    "Tính chất đặc trưng của ống dây dài là tạo ra từ trường đều ở bên trong.",
+                    "Đặc điểm cốt lõi là từ trường đều, với đường sức từ song song và cách đều, trùng với trục ống dây.",
+                    "Phương của $\\vec{B}$ là song song và không đổi (trùng với trục ống dây)."
+                ]
+            },
+            'q4': {
+                correct: 1,
+                rationales: [
+                    "Đây là kết quả sai, có thể do nhầm lẫn đơn vị hoặc công thức.",
+                    "Tính toán: $R = 0.05 \\text{ m}$. $B = 2\\pi \\cdot 10^{-7} \\cdot \frac{10}{0.05} = 400\pi \cdot 10^{-7} \text{ T} \approx 1.256 \cdot 10^{-4} \text{ T}$. Đây là đáp án đúng.",
+                    "Đây là kết quả sai, có thể do tính toán sai hệ số.",
+                    "Đây là kết quả sai, có thể do sử dụng nhầm công thức."
+                ]
+            },
+            'q5': {
+                correct: 2,
+                rationales: [
+                    "Đây là công thức của ống dây dài khi $\\frac{I}{r}$ bị thay bằng $\\frac{I}{r}$.",
+                    "Đây là công thức của cảm ứng từ tại tâm vòng dây tròn.",
+                    "Đây là công thức chính xác: $B = 2\cdot 10^{-7} \cdot \frac{I}{r}$ (trong chân không/không khí).",
+                    "Đây là công thức tính $B$ bên trong lòng ống dây dài, không phải dây thẳng."
+                ]
+            }
+        };
+
+        function checkAnswer(questionId, correctAnswerIndex) {
+            const questionElement = document.getElementById(questionId);
+            const selectedValue = questionElement.querySelector('input[name="' + questionId + '_option"]:checked')?.value;
+            const resultDiv = document.getElementById(questionId + '_result');
+            const button = questionElement.querySelector('button');
+            const options = questionElement.querySelectorAll('.quiz-option');
+
+            // Hiển thị nút kiểm tra lại và reset
+            button.textContent = 'Kiểm tra lại/Reset';
+            button.onclick = () => resetQuiz(questionId);
+
+            resultDiv.classList.remove('hidden', 'bg-red-100', 'bg-green-100', 'border-red-500', 'border-green-500');
+            resultDiv.innerHTML = '';
+            
+            // Lấy dữ liệu rationale
+            const rationales = quizData[questionId].rationales;
+
+            // Vô hiệu hóa các lựa chọn
+            options.forEach((option, index) => {
+                const input = option.querySelector('input');
+                input.disabled = true;
+                option.style.cursor = 'default';
+                
+                // Hiển thị rationale cho từng lựa chọn
+                const rationaleText = rationales[index];
+                const isCorrect = (index === correctAnswerIndex);
+                const isSelected = (index.toString() === selectedValue);
+
+                let statusIcon = '';
+                let bgColor = 'bg-gray-100';
+
+                if (isCorrect) {
+                    statusIcon = '✅ ĐÚNG';
+                    bgColor = 'bg-green-100 border-green-400';
+                } else if (isSelected) {
+                    statusIcon = '❌ SAI';
+                    bgColor = 'bg-red-100 border-red-400';
+                } else {
+                    statusIcon = '➖';
+                    bgColor = 'bg-gray-100 border-gray-300';
+                }
+                
+                const rationaleDisplay = document.createElement('div');
+                // Thêm viền và màu nền cho mỗi rationale
+                rationaleDisplay.className = `p-2 mt-1 rounded-md border text-gray-800 ${bgColor}`;
+                rationaleDisplay.innerHTML = `<span class="font-bold mr-2">${String.fromCharCode(65 + index)}. ${statusIcon}:</span> ${rationaleText}`;
+
+                
+                resultDiv.appendChild(rationaleDisplay);
+            });
+            // Nếu học sinh chưa chọn, hiển thị thông báo
+            if (selectedValue === null) {
+                resultDiv.innerHTML = '<p class="text-red-700 font-semibold">Vui lòng chọn một đáp án trước khi kiểm tra!</p>';
+                button.textContent = 'Kiểm tra'; // Giữ nút kiểm tra
+                button.onclick = () => checkAnswer(questionId, correctAnswerIndex); // Giữ hàm kiểm tra
+                options.forEach(option => option.querySelector('input').disabled = false); // Mở lại lựa chọn
+                return;
+            }
+        }
+
+        function resetQuiz(questionId) {
+            const questionElement = document.getElementById(questionId);
+            const inputs = questionElement.querySelectorAll('input[type="radio"]');
+            const resultDiv = document.getElementById(questionId + '_result');
+            const button = questionElement.querySelector('button');
+            const options = questionElement.querySelectorAll('.quiz-option');
+
+            // Bỏ chọn và mở lại input
+            inputs.forEach(input => {
+                input.checked = false;
+                input.disabled = false;
+            });
+
+            // Bỏ ẩn và xóa nội dung rationale
+            resultDiv.classList.add('hidden');
+            resultDiv.innerHTML = '';
+
+            // Đặt lại nút
+            button.textContent = 'Kiểm tra';
+            button.onclick = () => {
+                // Phải tìm lại correct index để gán đúng hàm checkAnswer
+                const qNum = parseInt(questionId.replace('q', ''));
+                let correctIndex;
+                if (qNum === 1) correctIndex = 1;
+                else if (qNum === 2) correctIndex = 1;
+                else if (qNum === 3) correctIndex = 2;
+                else if (qNum === 4) correctIndex = 1;
+                else if (qNum === 5) correctIndex = 2;
+                checkAnswer(questionId, correctIndex);
+            };
+
+            // Mở lại hover
+            options.forEach(option => option.style.cursor = 'pointer');
+        }
+    </script>
+</body>
+</html>

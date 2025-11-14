@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng và Lý Thuyết Lực Từ Tổng Hợp</title>
+    <!-- Tải Tailwind CSS cho styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải thư viện Three.js cho đồ họa 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Cấu hình MathJax để hiển thị công thức LaTeX -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+    </script>
+
+    <style>
+        /* Đảm bảo canvas chiếm toàn bộ khu vực mô phỏng */
+        #scene-container {
+            width: 100%;
+            height: 400px; /* Chiều cao ổn định cho mô phỏng */
+            background-color: #e5e7eb; /* Màu nền sáng */
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .control-panel button {
+            transition: all 0.15s;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+        }
+        .control-panel button:hover {
+            opacity: 0.9;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .active-btn {
+            background-color: #10b981 !important; /* green-500 */
+            color: white !important;
+            border-color: #059669 !important; /* green-600 */
+        }
+        .math-formula {
+            display: block;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 8px 0;
+            background-color: #f0f9ff;
+            border-radius: 6px;
+            margin: 10px 0;
+            /* Đảm bảo MathJax render vào đây */
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-2xl">
+        <h1 class="text-2xl font-bold text-center mb-6 text-indigo-700">MÔ PHỎNG VÀ KIẾN THỨC LỰC TỪ</h1>
+        
+        <!-- Bố cục 2 Cột Responsive -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- CỘT 1: MÔ PHỎNG (Simulation & Controls) -->
+            <div class="col-span-1 border-r md:pr-4">
+                <h2 class="text-1xl font-bold mb-4 text-indigo-600 border-b pb-2">MÔ PHỎNG LỰC TỪ ($\vec{F}$)</h2>
+                <p class="text-center text-sm text-gray-500 mb-4">Kéo chuột/chạm để xoay góc nhìn. Lực $\vec{F}$ làm dây dẫn di chuyển dọc theo trục Z.</p>
+
+                <!-- Khu vực mô phỏng 3D -->
+                <div id="scene-container" class="mb-6"></div>
+                
+                <!-- Khu vực điều khiển -->
+                <div class="control-panel space-y-4">
+                    <!-- Điều khiển Dòng điện I -->
+                    <div class="bg-red-50 p-3 rounded-lg border border-red-200">
+                        <h3 class="text-lg font-semibold mb-2 text-gray-800">1. Hướng Dòng Điện ($\vec{I}$) - ĐỎ</h3>
+                        <div class="flex space-x-3">
+                            <button id="btn-current-left" data-dir="negative_X" class="flex-1 py-2 rounded-lg bg-red-100 text-red-700 border font-medium hover:bg-red-200">
+                                <span class="font-mono">Sang Trái (-X)</span>
+                            </button>
+                            <button id="btn-current-right" data-dir="positive_X" class="flex-1 py-2 rounded-lg bg-red-100 text-red-700 border font-medium hover:bg-red-200">
+                                <span class="font-mono">Sang Phải (+X)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Điều khiển Từ trường B -->
+                    <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                        <h3 class="text-lg font-semibold mb-2 text-gray-800">2. Hướng Cảm Ứng Từ ($\vec{B}$) - XANH DƯƠNG</h3>
+                        <div class="flex space-x-3">
+                            <button id="btn-field-up" data-dir="positive_Y" class="flex-1 py-2 rounded-lg bg-blue-100 text-blue-700 border font-medium hover:bg-blue-200">
+                                <span class="font-mono">Hướng Lên (+Y)</span>
+                            </button>
+                            <button id="btn-field-down" data-dir="negative_Y" class="flex-1 py-2 rounded-lg bg-blue-100 text-blue-700 border font-medium hover:bg-blue-200">
+                                <span class="font-mono">Hướng Xuống (-Y)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Kết quả Lực F -->
+                    <div class="mt-4 p-4 bg-green-100 rounded-lg border-2 border-green-400">
+                        <h3 class="text-xl font-bold text-green-700 mb-2 text-center">KẾT QUẢ: LỰC TỪ ($\vec{F}$) - XANH LỤC</h3>
+                        <p id="force-result" class="text-center text-2xl font-extrabold text-green-800">Chưa xác định</p>
+                        <p class="text-center text-sm mt-1 text-gray-600">Áp dụng: Quy tắc Bàn Tay Trái</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- CỘT 2: KIẾN THỨC LÝ THUYẾT (Knowledge & Quiz) -->
+            <div class="col-span-1 md:pl-4">
+                <h2 class="text-1xl font-bold mb-4 text-indigo-600 border-b pb-2">KIẾN THỨC LỰC TỪ</h2>
+                
+                <!-- I. Lực từ tác dụng lên dây mang dòng điện -->
+                <div class="mb-4">
+                    <h3 class="text-1xl font-semibold text-gray-800">I. Lực từ tác dụng lên dây mang dòng điện ($\vec{F}$)</h3>
+                    <ul class="list-disc list-inside ml-4 mt-2 space-y-1 text-gray-700">
+                        <li>**Điểm đặt:** Trung điểm dây.</li>
+                        <li>**Phương:** Vuông góc mặt phẳng tạo bởi $\vec{I}$ và $\vec{B}$.</li>
+                        <li>**Chiều:** Xác định theo **Quy tắc Bàn Tay Trái**. </li>
+                        <li>**Phát biểu Quy tắc Bàn Tay Trái:** Đặt bàn tay trái sao cho các đường sức từ $\vec{B}$ xuyên vào lòng bàn tay, chiều từ cổ tay đến ngón tay giữa chỉ chiều dòng điện $I$, khi đó ngón tay cái choãi ra $90^\circ$ chỉ chiều của lực từ $\vec{F}$.</li>
+                        <li>**Độ lớn:**
+                            <div class="math-formula">
+                                $$F = BIl \sin\alpha$$
+                            </div>
+                            Trong đó $\alpha$ là góc hợp bởi chiều dòng điện $I$ và vectơ $\vec{B}$.
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- II. Ngẫu lực từ tác dụng lên khung dây -->
+                <div class="mb-4">
+                    <h3 class="text-1xl font-semibold text-gray-800">II. Ngẫu lực từ tác dụng lên khung dây</h3>
+                    <p class="text-gray-700">Xét khung dây có khả năng quay xung quanh 1 trục đi qua trung điểm 2 cạnh đối xứng, đặt trong từ trường đều có vectơ cảm ứng từ $\vec{B}$ hợp với pháp tuyến $\vec{n}$ một góc $\alpha$. Khung chịu ngẫu lực và tác dụng làm khung quay.</p>
+                    <p class="font-medium mt-2">**Mômen ngẫu lực ($M$):**</p>
+                    <div class="math-formula">
+                        $$M = B I S \sin\alpha$$
+                    </div>
+                    Trong đó $S$ là diện tích khung dây, $\alpha$ là góc hợp bởi $\vec{B}$ và pháp tuyến $\vec{n}$ của mặt phẳng khung dây.
+                </div>
+
+                <!-- III. Củng cố bằng Trắc nghiệm -->
+                <div class="mb-4 p-4 bg-yellow-50 rounded-lg border border-yellow-300">
+                    <h3 class="text-1xl font-bold text-yellow-700 mb-3">III. CỦNG CỐ KIẾN THỨC (5 CÂU TRẮC NGHIỆM)</h3>
+                    <div class="space-y-3 text-sm">
+                        
+                        <p><strong>Câu 1:</strong> Chọn phát biểu đúng về lực từ $\vec{F}$ tác dụng lên đoạn dây dẫn có dòng điện $I$ đặt trong từ trường đều $\vec{B}$.<br>
+                        A. $\vec{F}$ luôn cùng phương với $\vec{B}$.<br>
+                        B. $\vec{F}$ vuông góc với mặt phẳng chứa $\vec{I}$ và $\vec{B}$.<br>
+                        C. $\vec{F}$ luôn cùng chiều với chiều dòng điện $I$.<br>
+                        D. $\vec{F}$ tỉ lệ nghịch với cường độ dòng điện $I$.</p>
+                        
+                        <p><strong>Câu 2:</strong> Lực từ tác dụng lên một đoạn dây dẫn có dòng điện đặt trong từ trường đều lớn nhất khi:<br>
+                        A. Dây dẫn đặt song song với đường sức từ ($\alpha = 0^\circ$).<br>
+                        B. Dây dẫn hợp với $\vec{B}$ một góc $30^\circ$.<br>
+                        C. Dây dẫn đặt vuông góc với đường sức từ ($\alpha = 90^\circ$).<br>
+                        D. Dây dẫn đặt hợp với $\vec{B}$ một góc $60^\circ$.</p>
+                        
+                        <p><strong>Câu 3:</strong> Mômen ngẫu lực từ tác dụng lên khung dây bằng 0 khi góc hợp bởi vectơ pháp tuyến $\vec{n}$ của mặt phẳng khung dây và vectơ cảm ứng từ $\vec{B}$ là:<br>
+                        A. $\alpha = 0^\circ$.<br>
+                        B. $\alpha = 30^\circ$.<br>
+                        C. $\alpha = 60^\circ$.<br>
+                        D. Khung dây quay liên tục.</p>
+                        
+                        <p><strong>Câu 4:</strong> Đơn vị của cảm ứng từ $B$ trong hệ SI là:<br>
+                        A. Weber (Wb).<br>
+                        B. Tesla (T).<br>
+                        C. Vôn (V).<br>
+                        D. Ampe (A).</p>
+                        
+                        <p><strong>Câu 5 (Áp dụng công thức):</strong> Một đoạn dây dẫn dài $l = 20\text{ cm}$ mang dòng điện $I = 4\text{ A}$ đặt trong từ trường đều có $B = 0,5\text{ T}$. Lực từ tác dụng lên dây là $F = 0,2\text{ N}$. Góc hợp bởi chiều dòng điện và vectơ cảm ứng từ là:<br>
+                        A. $30^\circ$.<br>
+                        B. $45^\circ$.<br>
+                        C. $60^\circ$.<br>
+                        D. $90^\circ$.</p>
+                    </div>
+
+                    <!-- Đáp án kiểm tra (Dùng details để ẩn/hiện) -->
+                    <details class="mt-4 p-3 bg-white rounded-md border border-gray-300">
+                        <summary class="font-bold text-lg text-gray-700 cursor-pointer">Xem Đáp Án Kiểm Tra</summary>
+                        <table class="w-full text-left text-sm mt-2">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="p-2">Câu</th>
+                                    <th class="p-2">Đáp án</th>
+                                    <th class="p-2">Giải thích</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="p-2">1</td><td class="p-2 font-bold text-green-600">B</td><td class="p-2">Lực từ luôn vuông góc với mặt phẳng chứa $\vec{I}$ và $\vec{B}$.</td></tr>
+                                <tr><td class="p-2">2</td><td class="p-2 font-bold text-green-600">C</td><td class="p-2">Lực $F$ max khi $\sin\alpha = 1$, tức $\alpha = 90^\circ$.</td></tr>
+                                <tr><td class="p-2">3</td><td class="p-2 font-bold text-green-600">A</td><td class="p-2">$M=0$ khi $\sin\alpha = 0$, tức $\alpha = 0^\circ$ hoặc $180^\circ$.</td></tr>
+                                <tr><td class="p-2">4</td><td class="p-2 font-bold text-green-600">B</td><td class="p-2">Đơn vị chuẩn của cảm ứng từ là Tesla (T).</td></tr>
+                                <tr><td class="p-2">5</td><td class="p-2 font-bold text-green-600">A</td><td class="p-2">Áp dụng công thức: $\sin\alpha = \frac{F}{BIl} = \frac{0,2}{0,5 \times 4 \times 0,2} = \frac{0,2}{0,4} = 0,5$. Suy ra $\alpha = 30^\circ$.</td></tr>
+                            </tbody>
+                        </table>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Hướng dẫn sử dụng và chú thích (Footer) -->
+        <div class="mt-8 pt-4 border-t border-gray-300 text-sm text-gray-600 space-y-2">
+            <p><strong>Chú thích mô hình (Cột 1):</strong></p>
+            <ul class="list-disc list-inside ml-4">
+                <li><span class="text-red-600 font-bold">Màu Đỏ:</span> Vectơ Dòng điện $\vec{I}$ (Trục X).</li>
+                <li><span class="text-blue-600 font-bold">Màu Xanh Dương:</span> Vectơ Cảm ứng từ $\vec{B}$ (Trục Y).</li>
+                <li><span class="text-green-600 font-bold">Màu Xanh Lục:</span> Vectơ Lực từ $\vec{F}$ (Lực Laplace, Trục Z).</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // --- Cấu hình Three.js ---
+        // Trạng thái ban đầu: I Sang Phải (Dương X), B Lên (Dương Y) -> F Tiến (Dương Z)
+        let scene, camera, renderer, wire, currentDir = 'positive_X', fieldDir = 'positive_Y';
+        const container = document.getElementById('scene-container');
+        let isMoving = false; // Trạng thái di chuyển của dây
+
+        // Kích thước mô hình
+        const railLength = 10;
+        const railSeparation = 2;
+        const forceMagnitude = 0.05; // Tốc độ di chuyển
+
+        // Các đối tượng vectơ và nhãn
+        let arrowI, arrowB, arrowF;
+        let labelI, labelB, labelF;
+        const vectorLabels = []; // Mảng chứa các nhãn động (I, B, F)
+
+        // --- Hàm tạo Sprite Text cho các nhãn ---
+        function createTextSprite(message, position, color = '#000000', fontSize = 48, scale = 0.7) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 512;
+            canvas.height = 128; 
+            
+            context.font = `Bold ${fontSize}px Arial`;
+            context.fillStyle = color;
+            context.textAlign = 'center';
+            // Căn giữa văn bản trong canvas
+            context.fillText(message, canvas.width / 2, fontSize * 0.8);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            
+            const material = new THREE.SpriteMaterial({ map: texture });
+            const sprite = new THREE.Sprite(material);
+            sprite.scale.set(scale, scale * (canvas.height / canvas.width), 1).multiplyScalar(2); 
+            sprite.position.copy(position);
+            return sprite;
+        }
+
+        // --- Khởi tạo Scene ---
+        function init() {
+            // 1. Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xe5e7eb); 
+
+            // 2. Camera
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            // Thiết lập góc nhìn xiên ban đầu
+            camera.position.set(5, 5, 8); 
+            camera.lookAt(0, 0, 0);
+            
+            // Xử lý xoay camera 
+            let isDragging = false;
+            let previousMousePosition = { x: 0, y: 0 };
+            
+            const handleMouseDown = (e) => {
+                e.preventDefault();
+                isDragging = true;
+                previousMousePosition = { x: e.clientX || e.touches[0].clientX, y: e.clientY || e.touches[0].clientY };
+            };
+
+            const handleMouseUp = () => {
+                isDragging = false;
+            };
+
+            const handleMouseMove = (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+
+                const clientX = e.clientX || e.touches[0].clientX;
+                const clientY = e.clientY || e.touches[0].clientY;
+
+                const deltaX = clientX - previousMousePosition.x;
+                const deltaY = clientY - previousMousePosition.y;
+
+                const rotationSpeed = 0.01;
+                const rotationY = deltaX * rotationSpeed;
+                const rotationX = deltaY * rotationSpeed;
+                
+                const matrix = new THREE.Matrix4();
+                
+                // Rotate around Y (yaw)
+                matrix.makeRotationY(rotationY);
+                camera.position.applyMatrix4(matrix);
+
+                // Rotate around X (pitch)
+                const axisX = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+                matrix.makeRotationAxis(axisX, rotationX);
+                camera.position.applyMatrix4(matrix);
+
+                camera.lookAt(0, 0, 0);
+
+                previousMousePosition = { x: clientX, y: clientY };
+            };
+            
+            container.addEventListener('mousedown', handleMouseDown);
+            window.addEventListener('mouseup', handleMouseUp);
+            container.addEventListener('mousemove', handleMouseMove);
+            container.addEventListener('touchstart', handleMouseDown);
+            window.addEventListener('touchend', handleMouseUp);
+            container.addEventListener('touchmove', handleMouseMove);
+
+
+            // 3. Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            // 4. Lighting (Ánh sáng)
+            const light1 = new THREE.DirectionalLight(0xffffff, 1.5);
+            light1.position.set(10, 10, 10);
+            scene.add(light1);
+            const light2 = new THREE.DirectionalLight(0xffffff, 0.8);
+            light2.position.set(-10, 5, -10);
+            scene.add(light2);
+            scene.add(new THREE.AmbientLight(0x404040));
+
+            // 5. Build the physical setup
+            createSetup();
+            
+            // 6. Initial vectors (I, B, F)
+            updateVectors();
+
+            // 7. Event Listeners
+            document.querySelectorAll('.control-panel button').forEach(button => {
+                button.addEventListener('click', handleControlClick);
+                // Cập nhật trạng thái active button ban đầu
+                const dir = button.getAttribute('data-dir');
+                if (button.id.includes('current') && dir === currentDir) {
+                    button.classList.add('active-btn');
+                } else if (button.id.includes('field') && dir === fieldDir) {
+                    button.classList.add('active-btn');
+                } else {
+                     button.classList.remove('active-btn');
+                }
+            });
+
+            // Handle resize
+            window.addEventListener('resize', onWindowResize, false);
+            
+            // Start the animation loop
+            animate();
+        }
+
+        // --- Responsive Handling ---
+        function onWindowResize() {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        // --- Tạo các đối tượng 3D cố định ---
+        function createSetup() {
+            // 1. Rails (Thanh ray - cố định) - Dọc theo Trục Z
+            const railMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x888888, 
+                metalness: 0.8, 
+                roughness: 0.3 
+            });
+            const railGeometry = new THREE.CylinderGeometry(0.08, 0.08, railLength, 16);
+            
+            // Rail 1
+            const rail1 = new THREE.Mesh(railGeometry, railMaterial);
+            rail1.rotation.x = Math.PI / 2; // Xoay ngang (Cylinder dọc theo Z)
+            rail1.position.set(-railSeparation / 2, 0, 0);
+            scene.add(rail1);
+
+            // Rail 2
+            const rail2 = new THREE.Mesh(railGeometry, railMaterial);
+            rail2.rotation.x = Math.PI / 2; // Xoay ngang (Cylinder dọc theo Z)
+            rail2.position.set(railSeparation / 2, 0, 0);
+            scene.add(rail2);
+
+            // 2. Wire (Dây dẫn trượt - màu đỏ) - Dọc theo Trục X (nằm giữa 2 ray)
+            const wireGeometry = new THREE.CylinderGeometry(0.12, 0.12, railSeparation + 0.1, 16); 
+            const wireMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0xe53e3e, // Red
+                metalness: 0.1,
+                roughness: 0.2
+            }); 
+            wire = new THREE.Mesh(wireGeometry, wireMaterial);
+            wire.rotation.z = Math.PI / 2; // Xoay ngang (Dọc theo X)
+            wire.position.set(0, 0, 0); // Vị trí ban đầu (ở giữa ray)
+            scene.add(wire);
+
+            // 3. Ground Plane (Mặt phẳng ngang)
+            const planeGeometry = new THREE.PlaneGeometry(railLength + 2, railLength + 2);
+            const planeMaterial = new THREE.MeshPhongMaterial({ color: 0xcccccc, side: THREE.DoubleSide, transparent: true, opacity: 0.3 });
+            const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+            plane.rotation.x = Math.PI / 2; // Xoay ngang
+            plane.position.y = -0.1; // Hạ xuống một chút
+            scene.add(plane);
+
+            // 4. Coordinate Axes (Hệ trục tọa độ Oxyz)
+            // Trục X (đỏ) - Ngang
+            const xAxis = new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, 0), 4, 0xaaaaaa, 0.5, 0.3);
+            scene.add(xAxis);
+            // Trục Y (xanh lá) - Đứng
+            const yAxis = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 0), 4, 0xaaaaaa, 0.5, 0.3);
+            scene.add(yAxis);
+            // Trục Z (xanh dương) - Sâu
+            const zAxis = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, 0), 4, 0xaaaaaa, 0.5, 0.3);
+            scene.add(zAxis);
+
+            // Labels for X, Y, Z
+            scene.add(createTextSprite('X', new THREE.Vector3(4.5, 0, 0), '#888888'));
+            scene.add(createTextSprite('Y', new THREE.Vector3(0, 4.5, 0), '#888888'));
+            scene.add(createTextSprite('Z', new THREE.Vector3(0, 0, 4.5), '#888888'));
+            
+            // Label O for Origin
+            scene.add(createTextSprite('O', new THREE.Vector3(-0.5, -0.5, 0), '#888888', 36));
+        }
+
+        // --- Cập nhật các Vectơ (I, B, F) ---
+        function updateVectors() {
+            // Xóa các vectơ và nhãn cũ
+            if (arrowI) scene.remove(arrowI);
+            if (arrowB) scene.remove(arrowB);
+            if (arrowF) scene.remove(arrowF);
+            vectorLabels.forEach(label => scene.remove(label));
+            vectorLabels.length = 0;
+
+            // Chiều dài các vectơ
+            const V_SCALE = 2.5;
+
+            // 1. Vector I (Current Direction - Along X-axis) - RED
+            const dirI = currentDir === 'positive_X' ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(-1, 0, 0);
+            const originI = new THREE.Vector3(0, 0.2, 0);
+            arrowI = new THREE.ArrowHelper(dirI, originI, V_SCALE, 0xe53e3e, 0.4, 0.3);
+            scene.add(arrowI);
+            
+            // Nhãn I
+            const labelPosI = new THREE.Vector3().copy(dirI).multiplyScalar(V_SCALE + 0.5).add(originI);
+            labelI = createTextSprite('I', labelPosI, '#e53e3e');
+            scene.add(labelI);
+            vectorLabels.push(labelI);
+            
+            // 2. Vector B (Magnetic Field - Along Y-axis) - BLUE
+            const dirB = fieldDir === 'positive_Y' ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(0, -1, 0);
+            const originB = new THREE.Vector3(0, 0.5, 0);
+            arrowB = new THREE.ArrowHelper(dirB, originB, V_SCALE, 0x3182ce, 0.4, 0.3);
+            scene.add(arrowB);
+            
+            // Nhãn B
+            const labelPosB = new THREE.Vector3().copy(dirB).multiplyScalar(V_SCALE + 0.5).add(originB).add(new THREE.Vector3(0.5, 0, 0)); // Offset nhẹ
+            labelB = createTextSprite('B', labelPosB, '#3182ce');
+            scene.add(labelB);
+            vectorLabels.push(labelB);
+
+
+            // 3. Calculate Force Vector F (Left-Hand Rule / Cross Product) - GREEN
+            const dirL = new THREE.Vector3().copy(dirI); 
+            // F = L x B
+            const dirF = new THREE.Vector3().crossVectors(dirL, dirB); 
+            
+            // Force text result
+            let forceText;
+            if (dirF.z > 0.001) {
+                forceText = "Di chuyển TIẾN (Dương Z)";
+            } else if (dirF.z < -0.001) {
+                forceText = "Di chuyển LÙI (Âm Z)";
+            } else {
+                forceText = "Không có lực tác dụng ($\vec{I}$ song song $\vec{B}$)";
+            }
+            document.getElementById('force-result').textContent = forceText;
+            
+            // 4. Vector F (Force - Along Z-axis) - GREEN
+            const originF = new THREE.Vector3(0, 0.8, 0); 
+            arrowF = new THREE.ArrowHelper(dirF.normalize(), originF, V_SCALE, 0x38a169, 0.4, 0.3);
+            arrowF.position.z = wire.position.z; // Initialize F position to current wire position
+            scene.add(arrowF);
+
+            // Nhãn F
+            const labelOffsetF = new THREE.Vector3().copy(dirF).multiplyScalar(V_SCALE + 0.5);
+            labelF = createTextSprite('F', originF.clone().add(labelOffsetF), '#38a169');
+            labelF.position.z = wire.position.z; // Initialize F label position
+            scene.add(labelF);
+            vectorLabels.push(labelF);
+
+
+            // Store the force direction for animation
+            wire.userData.forceDirection = dirF;
+            isMoving = Math.abs(dirF.z) > 0.001; // Only move if there is a force (along Z)
+        }
+
+        // --- Xử lý sự kiện click ---
+        function handleControlClick(event) {
+            const button = event.currentTarget;
+            const dir = button.getAttribute('data-dir');
+            
+            // Reset active states for the group
+            let groupSelector;
+            if (button.id.includes('current')) {
+                groupSelector = '#btn-current-left, #btn-current-right';
+            } else if (button.id.includes('field')) {
+                groupSelector = '#btn-field-up, #btn-field-down';
+            }
+            document.querySelectorAll(groupSelector).forEach(b => b.classList.remove('active-btn'));
+            
+            // Set new active state
+            button.classList.add('active-btn');
+
+            if (button.id.includes('current')) {
+                currentDir = dir;
+            } else if (button.id.includes('field')) {
+                fieldDir = dir;
+            }
+
+            // Update 3D scene vectors
+            updateVectors();
+            
+            // Đặt lại vị trí dây về giữa trước khi di chuyển (chỉ reset trục Z)
+            if (isMoving) {
+                wire.position.z = 0; 
+                // Cập nhật ngay vị trí của F và nhãn F để đồng bộ hóa
+                if (arrowF) arrowF.position.z = 0;
+                if (labelF) labelF.position.z = 0;
+            }
+        }
+
+        // --- Vòng lặp Animation ---
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Only move the wire if a force exists
+            if (isMoving) {
+                const dir = wire.userData.forceDirection;
+                
+                // Calculate next position. Wire moves along Z-axis (along the rails)
+                const nextZ = wire.position.z + dir.z * forceMagnitude;
+                
+                // Limit movement within bounds (along Z-axis)
+                const bounds = railLength - 2; // Giới hạn di chuyển
+                const minZ = -bounds / 2;
+                const maxZ = bounds / 2;
+
+                if (nextZ > maxZ) {
+                    wire.position.z = maxZ;
+                    isMoving = false; // Stop movement when boundary is hit
+                } else if (nextZ < minZ) {
+                    wire.position.z = minZ;
+                    isMoving = false; // Stop movement when boundary is hit
+                } else {
+                    wire.position.z = nextZ;
+                }
+                
+                // CẬP NHẬT VỊ TRÍ VECTOR F VÀ NHÃN F THEO VỊ TRÍ DÂY DẪN
+                if (arrowF) arrowF.position.z = wire.position.z;
+                if (labelF) labelF.position.z = wire.position.z;
+
+            }
+            
+            renderer.render(scene, camera);
+        }
+
+        // --- Khởi động mô phỏng khi cửa sổ tải xong ---
+        window.onload = init;
+
+    </script>
+</body>
+</html>

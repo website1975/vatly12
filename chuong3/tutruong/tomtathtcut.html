@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng & Lý Thuyết Cảm Ứng Điện Từ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top */
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr; /* Default: Single column for mobile */
+            gap: 30px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        @media (min-width: 1024px) { /* Two columns for desktop (lg) */
+            .main-container {
+                grid-template-columns: 1fr 1.5fr; 
+            }
+        }
+
+        /* --- Simulation Area --- */
+        #simulationContainer {
+            width: 100%;
+            height: 400px;
+            background-color: #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            cursor: grab;
+        }
+        #simulationContainer.is-dragging {
+            cursor: grabbing;
+        }
+
+        /* --- Cuộn Dây (Coil) - Đã thay đổi thành hình Elip --- */
+        .coil {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 280px;
+            height: 150px;
+            border: 10px dashed #3b82f6;
+            border-radius: 50%; 
+            transition: border-color 0.1s ease-in-out;
+            z-index: 10;
+        }
+        
+        /* --- Nam Châm (Magnet) --- */
+        .magnet {
+            position: absolute;
+            width: 50px;
+            height: 120px;
+            top: 50px; 
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            transition: all 0.05s ease-out;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .magnet-pole {
+            height: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+        .magnet-n {
+            background-color: #ef4444;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+        }
+        .magnet-s {
+            background-color: #3b82f6;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+
+        /* --- Ammeter (Galvanometer) Styling --- */
+        .ammeter-container {
+            width: 150px;
+            height: 100px;
+            margin: 20px auto;
+            border: 2px solid #374151;
+            border-radius: 8px;
+            background-color: #e5e7eb;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .ammeter-scale {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+        }
+        .ammeter-needle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 60px;
+            height: 2px;
+            background-color: #ef4444;
+            transform-origin: 0% 50%;
+            transform: translate(0%, -50%) rotate(0deg);
+            transition: transform 0.2s linear;
+            z-index: 30;
+        }
+        .ammeter-pivot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #374151;
+            z-index: 40;
+        }
+
+        /* --- Current Vector (Arrow) Styling --- */
+        .current-arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 12px solid #059669; /* Green */
+            transition: opacity 0.1s, transform 0.2s;
+            opacity: 0;
+            z-index: 30;
+        }
+        #currentArrowTop {
+            top: calc(50% - 75px); 
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(0deg); 
+        }
+        #currentArrowBottom {
+            top: calc(50% + 75px); 
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(180deg);
+        }
+
+        /* --- Knowledge Column Styling --- */
+        .knowledge-column h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 5px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        .knowledge-column h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #4b5563;
+            margin-top: 10px;
+            margin-bottom: 8px;
+        }
+        .knowledge-column p, .knowledge-column ul, .knowledge-column li {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        .formula-box {
+            background-color: #f0f9ff;
+            border: 1px solid #3b82f6;
+            padding: 10px;
+            border-left: 5px solid #1d4ed8;
+            border-radius: 4px;
+            margin: 15px 0;
+            text-align: left; /* ĐÃ CĂN TRÁI Ở ĐÂY */
+        }
+        .solution-box {
+            background-color: #ecfdf5;
+            border: 1px solid #10b981;
+            padding: 15px;
+            border-left: 5px solid #059669;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+        .math {
+            font-family: monospace;
+            font-size: 1.1em;
+            color: #9d174d; /* Pink for formulas */
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="main-container">
+        <!-- CỘT 1: MÔ PHỎNG TƯƠNG TÁC -->
+        <div class="simulation-column">
+            <h1 class="text-1xl font-bold text-center mb-4 text-gray-800">MÔ PHỎNG CẢM ỨNG ĐIỆN TỪ</h1>
+            <div id="simulationContainer">
+                <div id="coil" class="coil"></div>
+                <div id="magnet" class="magnet">
+                    <div id="poleN" class="magnet-pole magnet-n">N</div>
+                    <div id="poleS" class="magnet-pole magnet-s">S</div>
+                </div>
+                <!-- Mũi tên chỉ chiều dòng điện -->
+                <div id="currentArrowTop" class="current-arrow"></div>
+                <div id="currentArrowBottom" class="current-arrow"></div>
+            </div>
+
+            <!-- Đồng hồ đo Ampe/Galvanometer -->
+            <div class="ammeter-container">
+                <div class="ammeter-scale">
+                    <span class="text-xs text-gray-600">- Max</span>
+                    <span class="text-xs text-gray-600">0</span>
+                    <span class="text-xs text-gray-600">+ Max</span>
+                </div>
+                <div class="ammeter-needle" id="needle"></div>
+                <div class="ammeter-pivot"></div>
+            </div>
+
+            <div class="flex justify-center mt-4">
+                <button id="togglePoleBtn" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-gray-300 transition duration-150 mr-2">
+                    Đổi Cực Nam Châm (N-S)
+                </button>
+            </div>
+            <!-- Vùng Thông Báo Kết Quả -->
+            <div id="infoBox" class="info-box mt-4 p-3 bg-indigo-100 border-l-4 border-indigo-500 text-indigo-700 rounded-md">
+                <p class="font-semibold">Hướng dẫn:</p>
+                <p class="text-sm">Kéo thả chuột lên nam châm để di chuyển vào/ra cuộn dây. Quan sát kim Ampe kế và chiều dòng điện (mũi tên xanh lá cây).</p>
+            </div>
+        </div>
+
+        <!-- CỘT 2: KIẾN THỨC LIÊN QUAN -->
+        <div class="knowledge-column">
+            <h1 class="text-3xl font-bold text-center mb-4 text-blue-800">CẢM ỨNG ĐIỆN TỪ</h1>
+            
+            <h2 id="concept-flux">I. Khái niệm Từ thông (<span class="math">\(\Phi\)</span>)</h2>
+            <p>Từ thông qua một diện tích $S$ đặt trong từ trường đều $\vec{B}$ là đại lượng đặc trưng cho số đường sức từ xuyên qua diện tích đó.</p>
+            
+            <div class="formula-box">
+                <p>Biểu thức Từ thông:</p>
+                <p class="math">$$\Phi = B S \cos(\alpha)$$</p>
+                <p>Trong đó:</p>
+                <ul>
+                    <li>$\Phi$: Từ thông (Đơn vị: Weber, $Wb$).</li>
+                    <li>$B$: Cảm ứng từ (Đơn vị: Tesla, $T$).</li>
+                    <li>$S$: Diện tích mặt phẳng (Đơn vị: $m^2$).</li>
+                    <li>$\alpha$: Góc tạo bởi vector cảm ứng từ $\vec{B}$ và vector pháp tuyến $\vec{n}$ của mặt phẳng $S$.</li>
+                </ul>
+            </div>
+            <h2 id="flux-change">2. Các trường hợp làm cho Từ thông thay đổi</h2>
+            <p>Từ thông $\Phi$ thay đổi nếu có sự thay đổi một trong ba yếu tố sau:</p>
+            <ul class="list-disc ml-6">
+                <li>Thay đổi cảm ứng từ B: B tăng hoặc giảm (ví dụ: đưa nam châm lại gần hoặc ra xa như trong mô phỏng).$\Delta\Phi=(B_2-B_1).S.cos\alpha$</li>
+                <li>Thay đổi diện tích S: Diện tích vòng dây bị biến dạng hoặc thay đổi.$\Delta\Phi=B.(S_2-S_1).cos\alpha$</li>
+                <li>Thay đổi góc $\alpha$: Vòng dây quay trong từ trường.$\Delta\Phi=B.S.(cos\alpha_2-cos\alpha_1)$</li>
+            </ul>
+
+            <h2 id="induction">3. Hiện tượng Cảm ứng Điện từ</h2>
+            
+            <h3>a) Phát biểu</h3>
+            <p>Dòng điện cảm ứng xuất hiện trong mạch kín khi từ thông qua mạch đó biến thiên theo thời gian.</p>
+            
+            <h3>b) Suất điện động cảm ứng ($e_c$)</h3>
+            <p>Suất điện động cảm ứng ($e_c$) là nguyên nhân sinh ra dòng điện cảm ứng.</p>
+            
+            <div class="formula-box">
+                <p>Suất điện động cảm ứng trung bình:</p>
+                <p class="math">$$e_{tb} = - \frac{\Delta \Phi}{\Delta t} = - \frac{\Phi_2 - \Phi_1}{t_2 - t_1}$$</p>
+                <p>Suất điện động cảm ứng tức thời (Luật Faraday):</p>
+                <p class="math">$$e = - \frac{d \Phi}{d t}$$</p>
+                <p>Dấu "$-$" thể hiện Quy tắc Lenz.</p>
+            </div>
+
+            <h3>c) Cường độ dòng điện cảm ứng ($I_c$)</h3>
+            <p>Nếu mạch kín có tổng điện trở là $R$, cường độ dòng điện cảm ứng được tính theo Định luật Ohm cho toàn mạch (bỏ qua điện trở trong của nguồn $e_c$):</p>
+            <div class="formula-box">
+                <p class="math">$$I_c = \frac{|e_c|}{R}$$</p>
+            </div>
+
+            <h3>d) Xác định chiều $I_c$ theo Quy tắc Len-xơ</h3>
+            <p>Dòng điện cảm ứng có chiều sao cho từ trường cảm ứng ($B_c$) do nó sinh ra chống lại **nguyên nhân** sinh ra nó (tức là chống lại sự biến thiên của từ thông $\Delta \Phi$).</p>
+            <ul class="list-disc ml-6">
+                <li>**Nếu $\Phi$ tăng**: $B_c$ ngược chiều với $B$ ban đầu (chống lại sự tăng).</li>
+                <li>**Nếu $\Phi$ giảm**: $B_c$ cùng chiều với $B$ ban đầu (chống lại sự giảm).</li>
+            </ul>
+            <p>Sau khi xác định được chiều $\vec{B_c}$, dùng Quy tắc nắm tay phải để xác định chiều của $I_c$.</p> 
+
+            <h2 id="exercises">4. Bài tập Vận dụng</h2>
+            <p> **Bài toán:** Một khung dây tròn có 100 vòng, diện tích mỗi vòng là $S = 20 cm^2$ đặt trong từ trường đều có cảm ứng từ $B = 0.5 T$. Mặt phẳng khung dây vuông góc với $\vec{B}$.
+            Tính suất điện động cảm ứng trung bình xuất hiện trong khung dây nếu trong thời gian $\Delta t = 0.02 s$, cảm ứng từ giảm đều từ $0.5 T$ đến $0$.</p>
+
+            <div class="solution-box">
+                <h3 class="font-bold text-green-700">Hướng dẫn Giải chi tiết</h3>
+                <ol class="list-decimal ml-6">
+                    <li>**Đổi đơn vị:** $S = 20 cm^2 = 20 \times 10^{-4} m^2 = 0.002 m^2$.</li>
+                    <li>**Tính Từ thông ban đầu ($\Phi_1$)**:
+                        <p>Khung vuông góc với $\vec{B}$ $\implies$ vector pháp tuyến $\vec{n}$ song song $\vec{B}$ $\implies \alpha = 0^{\circ}$.</p>
+                        <p>Áp dụng cho $N$ vòng dây: $\Phi = N B S \cos(\alpha)$</p>
+                        <p class="math">$$\Phi_1 = 100 \times 0.5 \times 0.002 \times \cos(0^{\circ}) = 0.1 Wb$$</p>
+                    </li>
+                    <li>**Tính Từ thông lúc sau ($\Phi_2$)**:
+                        <p>Cảm ứng từ giảm về $0$, nên $B_2 = 0$.</p>
+                        <p class="math">$$\Phi_2 = N B_2 S \cos(\alpha) = 100 \times 0 \times 0.002 \times 1 = 0 Wb$$</p>
+                    </li>
+                    <li>**Tính Suất điện động cảm ứng trung bình ($e_{tb}$)**:
+                        <p class="math">$$e_{tb} = - \frac{\Phi_2 - \Phi_1}{\Delta t} = - \frac{0 - 0.1}{0.02} = 5 V$$</p>
+                    </li>
+                </ol>
+                <p class="mt-3 font-semibold text-green-800">Kết quả: Suất điện động cảm ứng trung bình là $5 V$.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Các biến Firebase toàn cục KHÔNG được sử dụng trong mô phỏng vật lý đơn giản này.
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : '';
+        // Kết thúc khai báo biến toàn cục.
+
+        const simulationContainer = document.getElementById('simulationContainer');
+        const magnet = document.getElementById('magnet');
+        const coil = document.getElementById('coil');
+        const needle = document.getElementById('needle');
+        const infoBox = document.getElementById('infoBox');
+        const togglePoleBtn = document.getElementById('togglePoleBtn');
+        const poleN = document.getElementById('poleN');
+        const poleS = document.getElementById('poleS');
+        const currentArrowTop = document.getElementById('currentArrowTop');
+        const currentArrowBottom = document.getElementById('currentArrowBottom');
+
+        let isDragging = false;
+        let startY;
+        let magnetInitialY;
+        let previousY;
+        let previousTimestamp = 0;
+        let isPoleNS = true; // True: N trên (Đỏ), S dưới (Xanh)
+
+        // Hằng số Mô phỏng
+        const COIL_Y_CENTER = 200; // Tọa độ Y trung tâm của cuộn dây (400px / 2)
+        const COIL_VISUAL_HEIGHT = 150; // Chiều cao thực tế của elip
+        const COIL_RADIUS_Y = COIL_VISUAL_HEIGHT / 2; // Nửa chiều cao của cuộn dây (75px)
+        const INFLUENCE_RANGE = COIL_RADIUS_Y * 2.5; // Phạm vi ảnh hưởng của từ trường xung quanh cuộn dây
+
+        // Hàm cập nhật góc kim Ampe kế
+        function updateNeedle(angle) {
+            // Giới hạn góc lệch tối đa là 90 độ
+            const limitedAngle = Math.max(-90, Math.min(90, angle));
+            needle.style.transform = `translate(0%, -50%) rotate(${limitedAngle}deg)`;
+        }
+
+        // Hàm tính toán cường độ Dòng Điện Cảm Ứng (chủ yếu dựa trên Tốc độ di chuyển)
+        function calculateCurrent(velocity, magnetY) {
+            // Tính toán khoảng cách theo trục Y từ tâm cuộn dây (Y=200)
+            const distanceY = Math.abs(magnetY - COIL_Y_CENTER);
+            
+            // Dùng hàm Gaussian để mô tả độ mạnh từ trường tập trung ở tâm cuộn
+            // Khi distanceY = 0 (ở tâm), fieldFactor = 1. Khi xa, fieldFactor giảm nhanh.
+            const normalizedDistance = distanceY / COIL_RADIUS_Y;
+            // Tinh chỉnh hệ số 3.0 để từ trường giảm nhanh hơn khi ra xa elip
+            let fieldFactor = Math.exp(-normalizedDistance * normalizedDistance * 3.0); 
+
+            // Cường độ dòng điện tỷ lệ với vận tốc và hệ số từ trường.
+            // Hệ số vận tốc cao để tạo hiệu ứng lệch kim rõ rệt
+            let inducedCurrent = velocity * 1500 * fieldFactor * (isPoleNS ? 1 : -1);
+
+            const maxCurrent = 250; 
+            return Math.max(-maxCurrent, Math.min(maxCurrent, inducedCurrent));
+        }
+
+        // Hàm cập nhật hiệu ứng 2D (khi nam châm đi vào/ra)
+        function update2DEffects(magnetY) {
+            const containerHeight = simulationContainer.clientHeight;
+            const normalizedY = magnetY / containerHeight; // 0 (top) to 1 (bottom)
+
+            // 1. Hiệu ứng Parallax (Scale & Depth)
+            const baseScale = 0.8;
+            const scaleRange = 0.4;
+            const currentScale = baseScale + normalizedY * scaleRange; 
+            
+            // 2. Hiệu ứng Z-Index (Đi vào/ra)
+            const isBehindCoil = magnetY < COIL_Y_CENTER;
+            magnet.style.zIndex = isBehindCoil ? 5 : 25;
+
+            // 3. Áp dụng CSS Transform
+            magnet.style.transform = `translateX(-50%) scale(${currentScale})`;
+        }
+
+        // Hàm cập nhật mũi tên dòng điện (Lenz's Law)
+        function updateCurrentArrow(current) {
+            if (Math.abs(current) > 5) { // Chỉ hiển thị mũi tên nếu dòng điện đủ lớn
+                currentArrowTop.style.opacity = 1;
+                currentArrowBottom.style.opacity = 1;
+
+                if (current > 0) { // Dòng điện dương (Ví dụ: N-pole đi vào -> CCW)
+                    // Quy ước: I > 0 <=> CCW (Trái ở trên, Phải ở dưới)
+                    currentArrowTop.style.transform = `translate(-50%, -50%) rotate(270deg)`; // Sang trái
+                    currentArrowBottom.style.transform = `translate(-50%, -50%) rotate(90deg)`; // Sang phải
+                } else { // Dòng điện âm (Ví dụ: N-pole đi ra -> CW)
+                    // Quy ước: I < 0 <=> CW (Phải ở trên, Trái ở dưới)
+                    currentArrowTop.style.transform = `translate(-50%, -50%) rotate(90deg)`; // Sang phải
+                    currentArrowBottom.style.transform = `translate(-50%, -50%) rotate(270deg)`; // Sang trái
+                }
+            } else {
+                currentArrowTop.style.opacity = 0;
+                currentArrowBottom.style.opacity = 0;
+            }
+        }
+
+        // --- Interaction Handlers ---
+
+        function handleStart(e) {
+            e.preventDefault();
+            isDragging = true;
+            simulationContainer.classList.add('is-dragging');
+
+            startY = e.clientY || e.touches[0].clientY;
+            magnetInitialY = magnet.offsetTop;
+            previousY = startY;
+            previousTimestamp = Date.now();
+        }
+
+        function handleMove(e) {
+            if (!isDragging) return;
+
+            const currentY = e.clientY || e.touches[0].clientY;
+            const currentTimestamp = Date.now();
+            const timeDelta = currentTimestamp - previousTimestamp;
+
+            // Tịnh tiến vị trí Y mới
+            let newY = magnetInitialY + (currentY - startY);
+            
+            // Giới hạn trong vùng chứa (simulationContainer: 400px height)
+            const magnetHeight = magnet.clientHeight;
+            const containerHeight = simulationContainer.clientHeight;
+            newY = Math.max(0, Math.min(newY, containerHeight - magnetHeight));
+
+            magnet.style.top = `${newY}px`;
+            
+            // Cập nhật hiệu ứng 2D
+            const magnetYCenter = newY + magnetHeight / 2;
+            update2DEffects(magnetYCenter); 
+
+            if (timeDelta > 0) {
+                // Tính vận tốc (pixels/ms)
+                const velocity = (currentY - previousY) / timeDelta;
+                
+                // Tính dòng điện cảm ứng
+                const current = calculateCurrent(velocity, magnetYCenter);
+                
+                // Kiểm tra xem nam châm có trong phạm vi ảnh hưởng của cuộn dây không
+                const isInsideInfluence = Math.abs(magnetYCenter - COIL_Y_CENTER) < INFLUENCE_RANGE;
+                
+                let message = "";
+                let inducedCurrent = 0;
+
+                if (isInsideInfluence) {
+                    inducedCurrent = current;
+                    
+                    if (Math.abs(velocity) > 0.005) { // Nếu đang di chuyển
+                        // Vận tốc dương (kéo xuống) -> Nam châm đi vào cuộn dây -> Dòng điện dương (hoặc âm tùy cực)
+                        message = `<span class="font-bold">ĐANG CẢM ỨNG:</span> Tốc độ di chuyển ${velocity > 0 ? 'xuống' : 'lên'}. Kim lệch sang ${inducedCurrent > 0 ? 'Phải (+)' : 'Trái (-)'}.`;
+                    } else { // Đứng yên
+                        inducedCurrent = 0;
+                        message = "NAM CHÂM ĐỨNG YÊN. Không có sự thay đổi từ thông, $I_{cảm\ ứng} = 0$.";
+                    }
+                } else {
+                    inducedCurrent = 0;
+                    message = "NAM CHÂM Ở XA. Từ thông không thay đổi đủ lớn để tạo dòng điện cảm ứng.";
+                }
+
+                // Cập nhật kim đo 2D và Mũi tên Lenz
+                const angle = (inducedCurrent / 250) * 90;
+                updateNeedle(angle);
+                updateCurrentArrow(inducedCurrent);
+                
+                // Cập nhật thông báo
+                infoBox.innerHTML = `
+                    <p class="text-base">${message}</p>
+                    <p class="text-xs mt-1">Vận tốc (tương đối): ${velocity.toFixed(3)} px/ms | Dòng điện (tương đối): ${inducedCurrent.toFixed(1)}</p>
+                `;
+
+                // Cập nhật vị trí và thời gian trước đó
+                previousY = currentY;
+                previousTimestamp = currentTimestamp;
+            }
+        }
+
+        function handleEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+            simulationContainer.classList.remove('is-dragging');
+            
+            // Khi dừng, kim và mũi tên phải trở về 0 ngay lập tức
+            updateNeedle(0);
+            updateCurrentArrow(0);
+            infoBox.innerHTML = `<p class="font-semibold">NAM CHÂM ĐỨNG YÊN.</p><p class="text-sm">Không có sự thay đổi từ thông, $I_{cảm\ ứng} = 0$.</p>`;
+        }
+        
+        // --- Logic Đổi Cực (Pole Toggle Logic) ---
+        togglePoleBtn.addEventListener('click', () => {
+            isPoleNS = !isPoleNS;
+            
+            // Đổi màu và label N/S
+            if (isPoleNS) {
+                poleN.style.backgroundColor = '#ef4444';
+                poleS.style.backgroundColor = '#3b82f6';
+                poleN.innerHTML = 'N';
+                poleS.innerHTML = 'S';
+            } else {
+                poleN.style.backgroundColor = '#3b82f6';
+                poleS.style.backgroundColor = '#ef4444';
+                poleN.innerHTML = 'S';
+                poleS.innerHTML = 'N';
+            }
+
+            infoBox.innerHTML = `<p class="font-semibold">ĐÃ ĐỔI CỰC NAM CHÂM.</p><p class="text-sm">Hiện tại: Cực ${isPoleNS ? 'N (Đỏ)' : 'S (Xanh)'} ở trên. Quan sát sự thay đổi hướng lệch của kim và chiều dòng điện!</p>`;
+
+            updateNeedle(0);
+            updateCurrentArrow(0);
+        });
+
+        // --- Initialize ---
+        window.onload = function() {
+            // Thiết lập vị trí 2D và hiệu ứng ban đầu
+            const initialMagnetYCenter = COIL_Y_CENTER;
+            const magnetHeight = magnet.clientHeight;
+            const initialMagnetTop = initialMagnetYCenter - magnetHeight / 2;
+            magnet.style.top = `${initialMagnetTop}px`;
+            update2DEffects(initialMagnetYCenter);
+            
+            // Gán sự kiện cho chuột và chạm
+            simulationContainer.addEventListener('mousedown', handleStart);
+            simulationContainer.addEventListener('touchstart', handleStart);
+            
+            document.addEventListener('mousemove', handleMove);
+            document.addEventListener('touchmove', handleMove);
+            
+            document.addEventListener('mouseup', handleEnd);
+            document.addEventListener('touchend', handleEnd);
+            document.addEventListener('touchcancel', handleEnd);
+
+            // Cập nhật lại vị trí khi resize để đảm bảo nam châm ở giữa
+            window.addEventListener('resize', () => {
+                const containerHeight = simulationContainer.clientHeight;
+                const newInitialMagnetYCenter = containerHeight / 2;
+                const newInitialMagnetTop = newInitialMagnetYCenter - magnet.clientHeight / 2;
+                magnet.style.top = `${newInitialMagnetTop}px`;
+                update2DEffects(newInitialMagnetYCenter);
+            });
+        }
+    </script>
+</body>
+</html>

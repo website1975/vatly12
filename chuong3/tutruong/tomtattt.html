@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Từ Trường</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+    </script>
+
+    <style>
+        /* Tùy chỉnh font cho tiếng Việt */
+        :root {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Styling cho các phần tử mô phỏng */
+        .magnet-pole-n { background-color: #ef4444; color: white; } /* Đỏ - North */
+        .magnet-pole-s { background-color: #3b82f6; color: white; } /* Xanh - South */
+        .wire { background-color: #1f2937; height: 4px; width: 100%; position: absolute; top: 50%; transform: translateY(-50%); }
+        .current-dot { width: 10px; height: 10px; border-radius: 50%; background-color: #f59e0b; position: absolute; top: 50%; transform: translateY(-50%); }
+        .compass { width: 40px; height: 10px; background-color: #cbd5e1; border-radius: 2px; position: relative; transition: transform 0.5s ease-in-out; margin: 0 auto; }
+        .compass-n { width: 50%; height: 100%; background-color: #ef4444; position: absolute; left: 0; border-radius: 2px 0 0 2px; }
+        .force-text { min-height: 24px; }
+        /* CSS cho chuyển động của nam châm và dây dẫn */
+        .magnet-wrapper {
+            transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth transition cho di chuyển */
+        }
+        /* Transition cho dây dẫn (đã thêm vào JS/HTML) */
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-red': '#ef4444',
+                        'primary-blue': '#3b82f6',
+                        'bg-light': '#f9fafb',
+                        'bg-dark': '#e5e7eb',
+                    }
+                }
+            }
+        }
+
+        // --- Logic cho Mô phỏng Tương tác Từ ---
+
+        // Định nghĩa vị trí tương đối của nam châm (độ dịch chuyển X so với vị trí trung tâm)
+        const ATTRACTION_OFFSET = 0;   // Nam châm dính vào nhau (0px gap)
+        const INITIAL_OFFSET = 20;     // Khoảng cách ban đầu (40px gap tổng cộng)
+        const REPULSION_OFFSET = 40;   // Nam châm bị đẩy ra xa (80px gap tổng cộng)
+
+        // Hàm hỗ trợ để hoán đổi cực của Nam châm 2
+        function setMagnet2Poles(pole1, pole2, color1, color2) {
+            const mag2Pole1 = document.getElementById('mag2Pole1'); // Cực 1 của nam châm 2 (đối diện S của nam châm 1)
+            const mag2Pole2 = document.getElementById('mag2Pole2'); // Cực 2 của nam châm 2
+            
+            // Cực 1 (Đối diện S)
+            mag2Pole1.textContent = pole1;
+            mag2Pole1.className = 'p-3 font-medium text-sm rounded-l-lg';
+            mag2Pole1.classList.add(color1);
+
+            // Cực 2 (Bên ngoài)
+            mag2Pole2.textContent = pole2;
+            mag2Pole2.className = 'p-3 font-medium text-sm rounded-r-lg';
+            mag2Pole2.classList.add(color2);
+        }
+
+        // Hàm hỗ trợ di chuyển nam châm
+        function setMagnetPosition(offset) {
+            const wrapper1 = document.getElementById('magnetWrapper1');
+            const wrapper2 = document.getElementById('magnetWrapper2');
+            // Wrapper 1 di chuyển sang trái (-offset), Wrapper 2 di chuyển sang phải (+offset)
+            wrapper1.style.transform = `translateX(${-offset}px)`; 
+            wrapper2.style.transform = `translateX(${offset}px)`;
+        }
+
+        /**
+         * Thiết lập trạng thái ban đầu của nam châm
+         */
+        function setInitialSeparation() {
+            setMagnetPosition(INITIAL_OFFSET);
+            // Thiết lập nam châm 2 ở trạng thái Hút (N-S) để người dùng có thể thấy sự khác biệt
+            setMagnet2Poles('N', 'S', 'magnet-pole-n', 'magnet-pole-s');
+            
+            const resultDiv = document.getElementById('magnetResult');
+            resultDiv.innerHTML = '<span class="text-gray-600 font-bold">KHOẢNG CÁCH BAN ĐẦU</span> (Chọn tương tác bên dưới)';
+            resultDiv.classList.remove('bg-primary-red/20', 'bg-primary-blue/20');
+            resultDiv.classList.add('bg-gray-200');
+        }
+
+        /**
+         * 1. Tương tác Nam châm - Nam châm
+         * Nam châm 1 (Bên trái) cố định: N | S. Cực tương tác là S.
+         * interactionType: 'same' (S vs S - Đẩy) hoặc 'opposite' (S vs N - Hút)
+         */
+        function simulateMagnetInteraction(interactionType) {
+            const resultDiv = document.getElementById('magnetResult');
+            
+            if (interactionType === 'same') { 
+                // S vs S (Cùng cực) -> ĐẨY
+                // Nam châm 2: S | N (cực tương tác là S)
+                setMagnet2Poles('S', 'N', 'magnet-pole-s', 'magnet-pole-n');
+                
+                // ĐẨY: Di chuyển đến REPULSION_OFFSET (Ra xa hơn khoảng cách ban đầu)
+                setMagnetPosition(REPULSION_OFFSET);
+                
+                resultDiv.innerHTML = '<span class="text-primary-red font-bold">LỰC ĐẨY</span> (S - S, Cùng cực) → Ra xa';
+                resultDiv.classList.add('bg-primary-red/20');
+                resultDiv.classList.remove('bg-primary-blue/20', 'bg-gray-200');
+
+            } else { 
+                // S vs N (Khác cực) -> HÚT
+                // Nam châm 2: N | S (cực tương tác là N)
+                setMagnet2Poles('N', 'S', 'magnet-pole-n', 'magnet-pole-s');
+                
+                // HÚT: Di chuyển đến ATTRACTION_OFFSET (Lại gần/Dính vào nhau)
+                setMagnetPosition(ATTRACTION_OFFSET);
+                
+                resultDiv.innerHTML = '<span class="text-primary-blue font-bold">LỰC HÚT</span> (S - N, Khác cực) → Lại gần';
+                resultDiv.classList.add('bg-primary-blue/20');
+                resultDiv.classList.remove('bg-primary-red/20', 'bg-gray-200');
+            }
+        }
+
+        // 2. Tương tác Dòng điện - Kim nam châm
+        function simulateCompassDeflection(direction) {
+            const compass = document.getElementById('compassNeedle');
+            const resultDiv = document.getElementById('compassResult');
+            const currentDir = document.getElementById('currentDirection');
+
+            if (direction === 'none') {
+                compass.style.transform = 'rotate(0deg)';
+                resultDiv.innerHTML = 'Không có dòng điện: <span class="text-gray-500">Kim nam châm đứng yên.</span>';
+                currentDir.textContent = 'Dòng điện (I = 0)';
+            } else if (direction === 'up') {
+                compass.style.transform = 'rotate(-30deg)'; // Lệch trái (quy tắc nắm tay phải)
+                resultDiv.innerHTML = 'Dòng điện đi lên: <span class="text-primary-red">Kim nam châm LỆCH TRÁI.</span>';
+                currentDir.textContent = 'Dòng điện đi lên (I ↑)';
+            } else { // down
+                compass.style.transform = 'rotate(30deg)'; // Lệch phải
+                resultDiv.innerHTML = 'Dòng điện đi xuống: <span class="text-primary-red">Kim nam châm LỆCH PHẢI.</span>';
+                currentDir.textContent = 'Dòng điện đi xuống (I ↓)';
+            }
+        }
+
+        // 3. Tương tác Dòng điện - Dòng điện (Mô phỏng cong dây)
+        function simulateCurrentInteraction(type) {
+            const resultDiv = document.getElementById('currentResult');
+            const wire1Dir = document.getElementById('wire1Direction');
+            const wire2Dir = document.getElementById('wire2Direction');
+            const arrow1 = document.getElementById('arrow1'); // Mũi tên chỉ lực
+            const arrow2 = document.getElementById('arrow2'); // Mũi tên chỉ lực
+
+            const wire1El = document.getElementById('wire1'); // Dây 1
+            const wire2El = document.getElementById('wire2'); // Dây 2
+
+            // Reset transform
+            wire1El.style.transform = '';
+            wire2El.style.transform = '';
+
+            if (type === 'parallel') {
+                // Cùng chiều: Hút. Dây cong vào trong.
+                wire1Dir.textContent = 'I₁ (↑)';
+                wire2Dir.textContent = 'I₂ (↑)';
+                arrow1.classList.add('text-primary-blue');
+                arrow2.classList.add('text-primary-blue');
+                
+                // Lực Hút: Mũi tên chỉ vào nhau
+                arrow1.style.transform = 'translateX(20px)';
+                arrow2.style.transform = 'translateX(-20px)';
+                
+                // Mô phỏng uốn cong vào trong (Sử dụng translate và rotate nhẹ để tạo cảm giác cong)
+                // Dây 1 (Trái) dịch phải nhẹ và xoay phải nhẹ
+                wire1El.style.transform = 'translateX(5px) rotate(3deg)'; 
+                // Dây 2 (Phải) dịch trái nhẹ và xoay trái nhẹ
+                wire2El.style.transform = 'translateX(-5px) rotate(-3deg)'; 
+
+                resultDiv.innerHTML = '<span class="text-primary-blue font-bold">LỰC HÚT</span> (Cùng chiều) → Dây cong vào';
+                resultDiv.classList.add('bg-primary-blue/20');
+                resultDiv.classList.remove('bg-primary-red/20');
+            } else {
+                // Ngược chiều: Đẩy. Dây cong ra ngoài.
+                wire1Dir.textContent = 'I₁ (↑)';
+                wire2Dir.textContent = 'I₂ (↓)';
+                arrow1.classList.remove('text-primary-blue');
+                arrow2.classList.remove('text-primary-blue');
+                
+                // Lực Đẩy: Mũi tên chỉ ra xa
+                arrow1.style.transform = 'translateX(-20px)';
+                arrow2.style.transform = 'translateX(20px)';
+                
+                // Mô phỏng uốn cong ra ngoài
+                // Dây 1 (Trái) dịch trái nhẹ và xoay trái nhẹ
+                wire1El.style.transform = 'translateX(-5px) rotate(-3deg)'; 
+                // Dây 2 (Phải) dịch phải nhẹ và xoay phải nhẹ
+                wire2El.style.transform = 'translateX(5px) rotate(3deg)'; 
+                
+                resultDiv.innerHTML = '<span class="text-primary-red font-bold">LỰC ĐẨY</span> (Ngược chiều) → Dây cong ra';
+                resultDiv.classList.add('bg-primary-red/20');
+                resultDiv.classList.remove('bg-primary-blue/20');
+            }
+        }
+
+        // Khởi tạo trạng thái ban đầu khi tải trang
+        window.onload = () => {
+            setInitialSeparation(); // Nam châm: Thiết lập khoảng cách ban đầu
+            simulateCompassDeflection('up'); 
+            simulateCurrentInteraction('parallel'); // Dòng điện: Thiết lập cùng chiều (Hút)
+        };
+    </script>
+</head>
+<body class="bg-gray-100 text-gray-800 p-4 md:p-8">
+
+    <h1 class="text-3xl font-bold text-indigo-700 mb-6 text-center">TỪ TRƯỜNG</h1>
+
+    <div class="flex flex-col lg:flex-row gap-6">
+
+        <!-- CỘT 1: MÔ PHỎNG TƯƠNG TÁC TỪ -->
+        <div class="lg:w-1/2 p-6 bg-white shadow-xl rounded-xl border border-gray-200">
+            <h2 class="text-2xl font-bold text-indigo-600 mb-4 border-b pb-2">Mô Phỏng Tương Tác Từ (Tương Tác Đơn Giản)</h2>
+
+            <!-- 1. Tương tác Nam châm - Nam châm -->
+            <div class="mb-6 p-4 border rounded-lg bg-bg-light">
+                <h3 class="text-xl font-semibold text-primary-red mb-3">1. Tương tác Nam châm - Nam châm (Hai khối riêng biệt)</h3>
+                
+                <!-- Khu vực mô phỏng Nam châm -->
+                <div class="flex justify-center items-center h-16 mb-4 relative">
+                    <!-- Magnet 1 (Fixed: N-S). Pole facing interaction is S -->
+                    <div id="magnetWrapper1" class="magnet-wrapper flex shadow-md rounded-lg">
+                        <div class="p-3 font-medium text-sm magnet-pole-n rounded-l-lg">N</div>
+                        <div class="p-3 font-medium text-sm magnet-pole-s rounded-r-lg">S</div>
+                    </div>
+                    
+                    <!-- Magnet 2 (Flippable: N-S or S-N) -->
+                    <div id="magnetWrapper2" class="magnet-wrapper flex shadow-md rounded-lg" style="transform-origin: center;">
+                        <!-- Mặc định: N | S -->
+                        <div id="mag2Pole1" class="p-3 font-medium text-sm magnet-pole-n rounded-l-lg">N</div>
+                        <div id="mag2Pole2" class="p-3 font-medium text-sm magnet-pole-s rounded-r-lg">S</div>
+                    </div>
+                </div>
+
+
+                <div id="magnetResult" class="force-text text-center text-lg p-2 rounded-lg bg-gray-200 mb-3">
+                    <span class="text-gray-600 font-bold">KHOẢNG CÁCH BAN ĐẦU</span> (Chọn tương tác bên dưới)
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-3">
+                    <button onclick="simulateMagnetInteraction('same')" class="px-4 py-2 text-white bg-primary-red hover:bg-red-700 rounded-lg shadow-md transition">S - S (Cùng cực - Đẩy)</button>
+                    <button onclick="simulateMagnetInteraction('opposite')" class="px-4 py-2 text-white bg-primary-blue hover:bg-blue-700 rounded-lg shadow-md transition">S - N (Khác cực - Hút)</button>
+                    <button onclick="setInitialSeparation()" class="px-4 py-2 text-gray-800 bg-gray-300 hover:bg-gray-400 rounded-lg shadow-md transition">← Reset (Khoảng cách ban đầu)</button>
+                </div>
+            </div>
+
+            <!-- 2. Tương tác Dòng điện - Kim nam châm (Quy tắc nắm tay phải) -->
+            <div class="mb-6 p-4 border rounded-lg bg-bg-light">
+                <h3 class="text-xl font-semibold text-primary-red mb-3">2. Dòng điện - Kim nam châm (Lệch)</h3>
+                <div class="flex flex-col items-center justify-center space-y-4 mb-4">
+                    <p id="currentDirection" class="text-sm font-mono text-gray-700">Dòng điện đi lên (I ↑)</p>
+                    <div class="relative w-16 h-16 flex items-center justify-center border-2 border-gray-400 rounded-full">
+                        <div class="wire w-1 h-full bg-gray-900 absolute left-1/2 transform -translate-x-1/2"></div>
+                        <div id="compassNeedle" class="compass absolute bottom-[-10px] shadow-lg">
+                            <div class="compass-n"></div>
+                        </div>
+                    </div>
+                    <div class="mt-8 text-center text-sm text-gray-500">(Kim nam châm nằm dưới dây dẫn)</div>
+                </div>
+                
+                <div id="compassResult" class="force-text text-center text-lg p-2 rounded-lg bg-primary-red/20 mb-3">
+                    Dòng điện đi lên: <span class="text-primary-red">Kim nam châm LỆCH TRÁI.</span>
+                </div>
+
+                <div class="flex justify-center space-x-3">
+                    <button onclick="simulateCompassDeflection('up')" class="px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg shadow-md transition">I ↑ (Đi lên)</button>
+                    <button onclick="simulateCompassDeflection('down')" class="px-4 py-2 text-white bg-orange-600 hover:bg-orange-700 rounded-lg shadow-md transition">I ↓ (Đi xuống)</button>
+                    <button onclick="simulateCompassDeflection('none')" class="px-4 py-2 text-gray-800 bg-gray-300 hover:bg-gray-400 rounded-lg shadow-md transition">I = 0 (Tắt)</button>
+                </div>
+            </div>
+
+            <!-- 3. Tương tác Dòng điện - Dòng điện (Đã thêm hiệu ứng cong) -->
+            <div class="p-4 border rounded-lg bg-bg-light">
+                <h3 class="text-xl font-semibold text-primary-red mb-3">3. Dòng điện - Dòng điện (Dây thẳng song song)</h3>
+                <div class="flex justify-center items-center space-x-12 mb-4 relative h-20"> <!-- Tăng chiều cao h-20 để thấy cong rõ hơn -->
+                    <!-- Dây 1 -->
+                    <div class="flex flex-col items-center">
+                        <!-- Mũi tên chỉ lực hút/đẩy -->
+                        <div id="arrow1" class="text-3xl transition duration-500 absolute left-[30%] top-1/2 -translate-y-1/2 text-primary-blue">&leftarrow;</div>
+                        <div id="wire1" class="w-1 h-16 bg-gray-900 border-2 border-gray-600 rounded-sm transition duration-500 ease-in-out origin-center"></div>
+                        <p id="wire1Direction" class="text-sm font-mono mt-1">I₁ (↑)</p>
+                    </div>
+
+                    <!-- Lực tương tác -->
+                    <div class="w-16 h-1 bg-gray-300 rounded-full absolute"></div>
+
+                    <!-- Dây 2 -->
+                    <div class="flex flex-col items-center">
+                         <!-- Mũi tên chỉ lực hút/đẩy -->
+                        <div id="arrow2" class="text-3xl transition duration-500 absolute right-[30%] top-1/2 -translate-y-1/2 text-primary-blue">&rightarrow;</div>
+                        <div id="wire2" class="w-1 h-16 bg-gray-900 border-2 border-gray-600 rounded-sm transition duration-500 ease-in-out origin-center"></div>
+                        <p id="wire2Direction" class="text-sm font-mono mt-1">I₂ (↑)</p>
+                    </div>
+                </div>
+
+                <div id="currentResult" class="force-text text-center text-lg p-2 rounded-lg bg-primary-blue/20 mb-3">
+                    <span class="text-primary-blue font-bold">LỰC HÚT</span> (Cùng chiều) → Dây cong vào
+                </div>
+
+                <div class="flex justify-center space-x-3">
+                    <button onclick="simulateCurrentInteraction('parallel')" class="px-4 py-2 text-white bg-primary-blue hover:bg-blue-700 rounded-lg shadow-md transition">Cùng chiều (Hút)</button>
+                    <button onclick="simulateCurrentInteraction('anti-parallel')" class="px-4 py-2 text-white bg-primary-red hover:bg-red-700 rounded-lg shadow-md transition">Ngược chiều (Đẩy)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CỘT 2: TÓM TẮT KIẾN THỨC -->
+        <div class="lg:w-1/2 p-6 bg-white shadow-xl rounded-xl border border-gray-200">
+            <h2 class="text-2xl font-bold text-indigo-600 mb-4 border-b pb-2">Kiến Thức Liên Quan Đến Từ Trường</h2>
+
+            <!-- 1/ Thế nào là tương tác từ? -->
+            <div class="mb-5 p-3 rounded-lg bg-yellow-50/70 border-l-4 border-yellow-500">
+                <h3 class="text-xl font-semibold text-yellow-700 mb-2">1. Thế nào là Tương tác từ?</h3>
+                <p><strong>Tương tác từ</strong> là lực tương tác xảy ra giữa các vật có từ tính (nam châm) hoặc giữa dòng điện với dòng điện, và giữa dòng điện với nam châm. Lực này có thể là lực hút hoặc lực đẩy.</p>
+                <ul class="list-disc list-inside mt-2 text-sm space-y-1">
+                    <li>Hai nam châm: Cùng cực *đẩy*, khác cực *hút*.</li>
+                    <li>Hai dòng điện song song: Cùng chiều *hút*, ngược chiều *đẩy*. (Lực Ampere).</li>
+                    <li>Nam châm và dòng điện: Lực từ tác dụng lên dòng điện (Lực Lorentz lên điện tích chuyển động) làm dòng điện bị lệch hoặc nam châm bị quay (kim nam châm).</li>
+                </ul>
+            </div>
+
+            <!-- 2/ Từ trường và Cảm ứng từ (Đã cập nhật theo yêu cầu) -->
+            <div class="mb-5 p-3 rounded-lg bg-blue-50/70 border-l-4 border-blue-500">
+                <h3 class="text-xl font-semibold text-blue-700 mb-2">2. Từ trường và Cảm ứng từ ($\vec{B}$)</h3>
+                
+                <h4 class="font-medium mt-1">a) Bản chất của Từ trường:</h4>
+                <p class="text-sm ml-2">Từ trường là dạng vật chất tồn tại xung quanh nam châm hoặc dòng điện. Nó có khả năng: <strong class="text-blue-600">Tác dụng lực từ lên nam châm hoặc dòng điện đặt trong nó.</strong></p>
+
+                <h4 class="font-medium mt-2">b) Đặc trưng bằng Cảm ứng từ ($\vec{B}$):</h4>
+                <p class="text-sm ml-2">Cảm ứng từ là đại lượng véc-tơ đặc trưng cho <strong class="text-blue-600">độ mạnh yếu</strong> và <strong class="text-blue-600">hướng</strong> của từ trường tại một điểm, kí hiệu là $\vec{B}$.</p>
+                
+                <ul class="list-disc list-inside mt-1 text-sm ml-2 space-y-1">
+                    <li><strong class="font-semibold">Độ lớn $B$:</strong> Được xác định bằng công thức: $B = \frac{F}{I \cdot l \cdot \sin\alpha}$ (trong đó $F$ là lực từ tác dụng lên đoạn dây dẫn $l$ mang dòng điện $I$ <strong class="text-blue-600">đặt trong từ trường $B$</strong>).</li>
+                    <li><strong class="font-semibold">Đơn vị:</strong> Tesla ($\text{T}$).</li>
+                    <li><strong class="font-semibold">Hướng:</strong> Hướng của từ trường tại một điểm <strong class="text-blue-600">trùng với hướng Nam - Bắc của kim nam châm thử</strong> đặt tại điểm đó (cực Bắc của kim chỉ hướng).</li>
+                </ul>
+            </div>
+
+            <!-- 3/ Từ phổ và đường sức -->
+            <div class="mb-5 p-3 rounded-lg bg-green-50/70 border-l-4 border-green-500">
+                <h3 class="text-xl font-semibold text-green-700 mb-2">3. Từ phổ và Đường sức từ</h3>
+                <h4 class="font-medium mt-1">Từ phổ:</h4>
+                <p class="text-sm ml-2">Là hình ảnh trực quan của các đường cong tạo thành bởi các mạt sắt trong từ trường. Nó cho ta hình dung về hình dạng của các đường sức từ. </p>
+                <h4 class="font-medium mt-2">Đường sức từ:</h4>
+                <ul class="list-disc list-inside mt-1 text-sm ml-2 space-y-1">
+                    <li>Là những đường cong được vẽ trong không gian có từ trường.</li>
+                    <li><strong>Tính chất 1:</strong> Tại mỗi điểm của đường sức từ, véc-tơ cảm ứng từ $\vec{B}$ có phương tiếp tuyến với đường sức từ đó.</li>
+                    <li><strong>Tính chất 2:</strong> Chiều của đường sức từ là chiều của véc-tơ cảm ứng từ ($\vec{B}$) tại điểm đó.</li>
+                    <li><strong>Tính chất 3:</strong> Các đường sức từ là các đường cong <strong class="text-green-600">khép kín</strong>.</li>
+                    <li><strong>Tính chất 4:</strong> Nơi nào từ trường mạnh, các đường sức từ dày đặc hơn và ngược lại.</li>
+                </ul>
+            </div>
+
+            <!-- 4/ đường sức một số dạng mạch đặt biệt. -->
+            <div class="mb-5 p-3 rounded-lg bg-indigo-50/70 border-l-4 border-indigo-500">
+                <h3 class="text-xl font-semibold text-indigo-700 mb-2">4. Đường sức từ của một số dạng mạch đặc biệt</h3>
+                <h4 class="font-medium mt-1">a) Dây dẫn thẳng dài (Quy tắc nắm tay phải):</h4>
+                <p class="text-sm ml-2">Là những đường tròn đồng tâm nằm trong các mặt phẳng vuông góc với dây dẫn, tâm nằm trên dây. Chiều được xác định bằng quy tắc nắm tay phải (ngón cái chỉ chiều $I$, các ngón tay khum lại chỉ chiều $\vec{B}$).</p>
+                <h4 class="font-medium mt-2">b) Dòng điện tròn (Vòng dây):</h4>
+                <p class="text-sm ml-2">Các đường sức từ xuyên qua và vuông góc mặt phẳng vòng dây, qua tâm là đường thẳng, càng xa tâm độ cong càng giảm. Chiều cũng xác định bằng quy tắc nắm tay phải (ngón cái chỉ $\vec{B}$ xuyên tâm, các ngón tay khum lại chỉ chiều $I$).</p>
+                <h4 class="font-medium mt-2">c) Ống dây có dòng điện:</h4>
+                <p class="text-sm ml-2">Bên ngoài giống nam châm thẳng. Bên trong ống dây, đường sức từ là những <strong class="text-indigo-600">đường thẳng song song và cách đều</strong> nhau. Chiều xác định bằng quy tắc nắm tay phải.</p>
+            </div>
+
+            <!-- 5/ Từ trường đều -->
+            <div class="p-3 rounded-lg bg-red-50/70 border-l-4 border-red-500">
+                <h3 class="text-xl font-semibold text-red-700 mb-2">5. Từ trường đều</h3>
+                <p class="text-sm ml-2">Là từ trường mà véc-tơ cảm ứng từ $\vec{B}$ có <strong class="text-red-600">hướng và độ lớn như nhau</strong> tại mọi điểm. Trong từ trường đều, các đường sức từ là những <strong class="text-red-600">đường thẳng song song và cách đều</strong> nhau.</p>
+                <p class="text-sm ml-2 mt-2 italic">Ví dụ: Từ trường ở giữa hai cực của nam châm hình chữ $\text{U}$ hoặc từ trường bên trong ống dây điện.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
