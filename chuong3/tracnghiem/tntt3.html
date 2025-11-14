@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn Tập Chuyên Đề Từ Trường - Cấu Trúc Mới</title>
+    <script>
+        // Cấu hình MathJax trước khi tải script chính
+        // Thiết lập này giúp MathJax chỉ tìm kiếm các khối TeX và sử dụng renderer CHTML (nhanh hơn SVG)
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']], // Cho phép cú pháp $...$ cho inline math
+                displayMath: [['$$', '$$'], ['\\[', '\\]']], // Cú pháp cho display math
+                processEnvironments: true,
+                processRefs: true
+            },
+            options: {
+                renderActions: {
+                    // Chỉ xử lý các phần tử được chỉ định (tăng tốc độ xử lý DOM)
+                    addMenu: [20, '', {
+                        // Thêm menu chuột phải
+                    }, '']
+                }
+            },
+            loader: {
+                load: ['input/tex', 'output/chtml'] // Chỉ tải input TeX và output CHTML
+            }
+        };
+    </script>
+    <!-- Tải MathJax: Sử dụng async để không chặn DOM rendering -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+        /* Layout 2 Cột bằng CSS Grid */
+        .exam-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            min-height: 80vh;
+        }
+        /* Cột 1: Thanh bên (Sidebar) */
+        .sidebar {
+            padding: 20px;
+            background-color: #34495e;
+            color: white;
+            border-radius: 8px 0 0 8px;
+            position: sticky;
+            top: 0;
+            align-self: start;
+            height: fit-content;
+        }
+        .sidebar h3 {
+            border-bottom: 2px solid #2ecc71;
+            padding-bottom: 10px;
+        }
+        .timer, .controls {
+            margin-bottom: 25px;
+            padding: 10px;
+            background-color: #2c3e50;
+            border-radius: 4px;
+        }
+        .timer span {
+            font-size: 1.5em;
+            font-weight: bold;
+            display: block;
+            text-align: center;
+        }
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .nav-grid button {
+            padding: 8px 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #ecf0f1;
+            color: #34495e;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .nav-grid button.answered {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .submit-btn, .reset-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .submit-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .reset-btn {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        /* CỘT 2: Nội dung chính */
+        .main-content {
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .question-block {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-left: 5px solid #3498db;
+            border-radius: 4px;
+            counter-increment: question-counter;
+        }
+        .question-block::before {
+            content: "Câu " counter(question-counter) ". ";
+            font-weight: bold;
+            color: #3498db;
+            margin-right: 5px;
+        }
+        .options label {
+            display: block;
+            margin: 8px 0;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .options input[type="radio"], .true-false-options input[type="radio"] {
+            margin-right: 8px;
+        }
+        
+        /* --- ĐÚNG/SAI CẬP NHẬT --- */
+        .true-false-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; /* Căn chỉnh lên trên */
+            padding: 8px 0;
+            border-bottom: 1px dashed #ecf0f1;
+        }
+        .true-false-item p {
+            flex-grow: 1;
+            margin: 0;
+            padding-right: 10px; /* Khoảng cách với cột lựa chọn */
+        }
+        .true-false-options {
+            min-width: 120px; /* Cố định bề rộng để Đúng/Sai không nhảy dòng */
+            flex-shrink: 0; /* Ngăn không cho co lại */
+            text-align: right;
+        }
+        .true-false-options label {
+            margin-left: 5px;
+        }
+        /* -------------------------- */
+
+        .short-answer input[type="text"] {
+            padding: 8px;
+            border: 1px solid #bdc3c7;
+            border-radius: 3px;
+            width: 150px;
+            margin-top: 5px;
+        }
+
+        /* Khối hiển thị kết quả */
+        #result-view {
+            display: none; /* Mặc định ẩn */
+            padding: 20px;
+        }
+        .result-question-block {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-left: 5px solid #1abc9c;
+            border-radius: 4px;
+        }
+        .your-answer {
+            font-weight: bold;
+            color: #e74c3c; /* Màu đỏ cho câu trả lời của thí sinh */
+            display: block;
+            margin-top: 5px;
+        }
+        .correct-answer {
+            font-weight: bold;
+            color: #2ecc71; /* Màu xanh cho đáp án đúng */
+            display: block;
+            margin-top: 5px;
+        }
+        .solution-detail {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f7f9f9;
+            border: 1px dashed #1abc9c;
+        }
+        .solution-detail strong {
+            color: #1abc9c;
+        }
+        .incorrect-q {
+             border-left-color: #e74c3c; /* Đổi màu viền sang đỏ nếu làm sai */
+        }
+        .correct-q {
+             border-left-color: #2ecc71; /* Màu xanh nếu làm đúng */
+        }
+    </style>
+</head>
+<body>
+
+<div class="exam-container">
+    
+    <!-- CỘT 1: THANH ĐIỀU HƯỚNG VÀ KIỂM SOÁT -->
+    <div class="sidebar">
+        <h3>THỜI GIAN</h3>
+        <div class="timer">
+            Thời gian còn lại: <span id="time-display">45:00</span>
+        </div>
+
+        <h3>BỘ ĐIỀU HƯỚNG CÂU HỎI</h3>
+        <div id="nav-container" class="nav-grid">
+            <!-- Nút điều hướng -->
+        </div>
+        
+        <div class="controls">
+            <button class="submit-btn" onclick="submitExam()">NỘP BÀI VÀ XEM KẾT QUẢ</button>
+            <button class="reset-btn" onclick="resetForm()">LÀM LẠI</button>
+        </div>
+    </div>
+
+    <!-- CỘT 2: KHU VỰC CHÍNH -->
+    <div class="main-content">
+        <!-- KHỐI ĐỀ THI (ẨN/HIỆN KHI LÀM LẠI) -->
+        <div id="exam-questions">
+            <h1>BÀI ÔN TẬP: CHUYÊN ĐỀ TỪ TRƯỜNG</h1>
+            <p><em>Tổng số: 20 Câu (15 MC, 2 T/F (8 ý), 3 TLN).</em></p>
+
+            <!-- PHẦN I: TRẮC NGHIỆM 4 LỰA CHỌN (15 CÂU) -->
+            <h2>Phần I: Trắc nghiệm Đa lựa chọn (15 Câu)</h2>
+
+            <!-- Bắt đầu các câu hỏi mẫu -->
+            <div id="q1" class="question-block" data-answer="B">
+                <p>Đơn vị của cảm ứng từ (<span class="math">B</span>) trong hệ SI là:</p>
+                <div class="options">
+                    <label><input type="radio" name="q1_mcq" value="A"> A. Vêbe (Wb)</label>
+                    <label><input type="radio" name="q1_mcq" value="B"> B. Tesla (T)</label>
+                    <label><input type="radio" name="q1_mcq" value="C"> C. Henry (H)</label>
+                    <label><input type="radio" name="q1_mcq" value="D"> D. Ampe (A)</label>
+                </div>
+            </div>
+            <div id="q2" class="question-block" data-answer="C">
+                <p>Chọn câu đúng. Lực từ tác dụng lên đoạn dây dẫn mang dòng điện <span class="math">I</span> đặt trong từ trường đều <span class="math">B</span> có độ lớn:</p>
+                <div class="options">
+                    <label><input type="radio" name="q2_mcq" value="A"> A. $F = B I l$</label>
+                    <label><input type="radio" name="q2_mcq" value="B"> B. $F = B I l \cos\theta$</label>
+                    <label><input type="radio" name="q2_mcq" value="C"> C. $F = B I l \sin\theta$</label>
+                    <label><input type="radio" name="q2_mcq" value="D"> D. $F = q v B \sin\theta$</label>
+                </div>
+            </div>
+            <div id="q3" class="question-block" data-answer="B"><p>Quy tắc nắm tay phải dùng để xác định:</p><div class="options"><label><input type="radio" name="q3_mcq" value="A"> A. Lực từ.</label><label><input type="radio" name="q3_mcq" value="B"> B. Hướng của cảm ứng từ trong ống dây.</label><label><input type="radio" name="q3_mcq" value="C"> C. Lực Lorentz.</label><label><input type="radio" name="q3_mcq" value="D"> D. Chiều dòng điện cảm ứng.</label></div></div>
+            <div id="q4" class="question-block" data-answer="D"><p>Vecto cảm ứng từ tại một điểm do dòng điện thẳng dài gây ra:</p><div class="options"><label><input type="radio" name="q4_mcq" value="A"> A. Song song với dây dẫn.</label><label><input type="radio" name="q4_mcq" value="B"> B. Hướng về phía dòng điện.</label><label><input type="radio" name="q4_mcq" value="C"> C. Nằm trong mặt phẳng vuông góc với dây dẫn.</label><label><input type="radio" name="q4_mcq" value="D"> D. Tiếp tuyến với đường sức từ tại điểm đó.</label></div></div>
+            <div id="q5" class="question-block" data-answer="B"><p>Phát biểu nào sau đây **sai** khi nói về Lực Lorentz?</p><div class="options"><label><input type="radio" name="q5_mcq" value="A"> A. Luôn vuông góc với vận tốc.</label><label><input type="radio" name="q5_mcq" value="B"> B. Có độ lớn tỉ lệ với khối lượng hạt.</label><label><input type="radio" name="q5_mcq" value="C"> C. Không làm thay đổi độ lớn vận tốc hạt.</label><label><input type="radio" name="q5_mcq" value="D"> D. Chỉ tác dụng lên hạt mang điện chuyển động.</label></div></div>
+            <div id="q6" class="question-block" data-answer="D"><p>Công thức tính cảm ứng từ tại tâm vòng dây tròn là:</p><div class="options"><label><input type="radio" name="q6_mcq" value="A"> A. $B = 2\pi \cdot 10^{-7} \frac{I}{R}$</label><label><input type="radio" name="q6_mcq" value="B"> B. $B = 2 \cdot 10^{-7} \frac{I}{R}$</label><label><input type="radio" name="q6_mcq" value="C"> C. $B = 4\pi \cdot 10^{-7} n I$</label><label><input type="radio" name="q6_mcq" value="D"> D. $B = 2\pi \cdot 10^{-7} \frac{N I}{R}$</label></div></div>
+            <div id="q7" class="question-block" data-answer="B"><p>Hai dây dẫn thẳng song song, dài vô hạn, mang dòng điện cùng chiều sẽ:</p><div class="options"><label><input type="radio" name="q7_mcq" value="A"> A. Đẩy nhau.</label><label><input type="radio" name="q7_mcq" value="B"> B. Hút nhau.</label><label><input type="radio" name="q7_mcq" value="C"> C. Không tương tác.</label><label><input type="radio" name="q7_mcq" value="D"> D. Hút nhau nếu cùng cường độ, đẩy nhau nếu khác.</label></div></div>
+            <div id="q8" class="question-block" data-answer="C"><p>Trong từ trường đều, một hạt electron chuyển động với vận tốc vuông góc với $\vec{B}$. Quỹ đạo chuyển động của electron là:</p><div class="options"><label><input type="radio" name="q8_mcq" value="A"> A. Đường thẳng.</label><label><input type="radio" name="q8_mcq" value="B"> B. Đường parabol.</label><label><input type="radio" name="q8_mcq" value="C"> C. Đường tròn.</label><label><input type="radio" name="q8_mcq" value="D"> D. Đường xoắn ốc.</label></div></div>
+            <div id="q9" class="question-block" data-answer="C"><p>Lực tương tác giữa hai dòng điện song song không phụ thuộc vào:</p><div class="options"><label><input type="radio" name="q9_mcq" value="A"> A. Cường độ hai dòng điện.</label><label><input type="radio" name="q9_mcq" value="B"> B. Chiều dài dây dẫn.</label><label><input type="radio" name="q9_mcq" value="C"> C. Điện trở suất của dây.</label><label><input type="radio" name="q9_mcq" value="D"> D. Khoảng cách giữa hai dây.</label></div></div>
+            <div id="q10" class="question-block" data-answer="A"><p>Mômen lực từ cực đại tác dụng lên khung dây có $N$ vòng, diện tích $S$, mang dòng $I$ trong từ trường $B$ là:</p><div class="options"><label><input type="radio" name="q10_mcq" value="A"> A. $M = N I S B$</label><label><input type="radio" name="q10_mcq" value="B"> B. $M = I S B$</label><label><input type="radio" name="q10_mcq" value="C"> C. $M = N I B \sin\alpha$</label><label><input type="radio" name="q10_mcq" value="D"> D. $M = N I S B \cos\alpha$</label></div></div>
+            <div id="q11" class="question-block" data-answer="C"><p>Chiều của lực Lorentz được xác định bằng:</p><div class="options"><label><input type="radio" name="q11_mcq" value="A"> A. Quy tắc bàn tay phải.</label><label><input type="radio" name="q11_mcq" value="B"> B. Quy tắc nắm tay phải.</label><label><input type="radio" name="q11_mcq" value="C"> C. Quy tắc bàn tay trái.</label><label><input type="radio" name="q11_mcq" value="D"> D. Quy tắc vặn nút chai.</label></div></div>
+            <div id="q12" class="question-block" data-answer="D"><p>Tần số cyclotron của hạt mang điện chuyển động trong từ trường đều *không* phụ thuộc vào:</p><div class="options"><label><input type="radio" name="q12_mcq" value="A"> A. Độ lớn cảm ứng từ $B$.</label><label><input type="radio" name="q12_mcq" value="B"> B. Khối lượng $m$ của hạt.</label><label><input type="radio" name="q12_mcq" value="C"> C. Điện tích $q$ của hạt.</label><label><input type="radio" name="q12_mcq" value="D"> D. Tốc độ $v$ của hạt.</label></div></div>
+            <div id="q13" class="question-block" data-answer="D"><p>Đường sức từ có đặc điểm nào sau đây?</p><div class="options"><label><input type="radio" name="q13_mcq" value="A"> A. Xuất phát từ cực Bắc, kết thúc tại cực Nam.</label><label><input type="radio" name="q13_mcq" value="B"> B. Là những đường cong hở.</label><label><input type="radio" name="q13_mcq" value="C"> C. Có thể cắt nhau.</label><label><input type="radio" name="q13_mcq" value="D"> D. Là những đường cong khép kín.</label></div></div>
+            <div id="q14" class="question-block" data-answer="C"><p>Chọn câu **sai**: Lực từ (lực Ampere) là lực:</p><div class="options"><label><input type="radio" name="q14_mcq" value="A"> A. Vuông góc với dòng điện.</label><label><input type="radio" name="q14_mcq" value="B"> B. Vuông góc với cảm ứng từ.</label><label><input type="radio" name="q14_mcq" value="C"> C. Luôn cùng phương với dòng điện.</label><label><input type="radio" name="q14_mcq" value="D"> D. Tác dụng lên đoạn dây dẫn mang dòng điện.</label></div></div>
+            <div id="q15" class="question-block" data-answer="A"><p>Thành phần nằm ngang của từ trường Trái Đất ở TP.HCM là $B_H \approx 3,0 \times 10^{-5} \text{ T}$. Từ trường này hướng:</p><div class="options"><label><input type="radio" name="q15_mcq" value="A"> A. Từ Nam địa lí đến Bắc địa lí.</label><label><input type="radio" name="q15_mcq" value="B"> B. Từ Bắc địa lí đến Nam địa lí.</label><label><input type="radio" name="q15_mcq" value="C"> C. Thẳng đứng lên.</label><label><input type="radio" name="q15_mcq" value="D"> D. Thẳng đứng xuống.</label></div></div>
+            
+            <!-- PHẦN II: TRẮC NGHIỆM ĐÚNG/SAI (2 CÂU LỚN, 8 Ý NHỎ) -->
+            <h2>Phần II: Trắc nghiệm Đúng/Sai (2 Câu, 8 Ý nhỏ)</h2>
+
+            <!-- Câu 16 -->
+            <div id="q16" class="question-block" data-answer="Sai,Dung,Dung,Dung">
+                <p><strong>Câu 16:</strong> Về đặc điểm của Từ trường, hãy chọn **Đúng** hoặc **Sai** cho các nhận định sau:</p>
+                <div class="true-false-item">
+                    <p>A. Lực từ tác dụng lên một đoạn dây dẫn luôn lớn nhất khi dây song song với đường sức từ.</p>
+                    <div class="true-false-options">
+                        <label><input type="radio" name="q16a_tf" value="Sai"> Sai</label>
+                        <label><input type="radio" name="q16a_tf" value="Dung"> Đúng</label>
+                    </div>
+                </div>
+                <div class="true-false-item">
+                    <p>B. Xung quanh một nam châm đứng yên, có từ trường.</p>
+                    <div class="true-false-options">
+                        <label><input type="radio" name="q16b_tf" value="Sai"> Sai</label>
+                        <label><input type="radio" name="q16b_tf" value="Dung"> Đúng</label>
+                    </div>
+                </div>
+                <div class="true-false-item">
+                    <p>C. Tại mọi điểm trên đường sức từ, cảm ứng từ $\vec{B}$ luôn tiếp tuyến với đường sức từ đó.</p>
+                    <div class="true-false-options">
+                        <label><input type="radio" name="q16c_tf" value="Sai"> Sai</label>
+                        <label><input type="radio" name="q16c_tf" value="Dung"> Đúng</label>
+                    </div>
+                </div>
+                <div class="true-false-item">
+                    <p>D. Lực Lorentz luôn có phương vuông góc với vectơ cảm ứng từ $\vec{B}$.</p>
+                    <div class="true-false-options">
+                        <label><input type="radio" name="q16d_tf" value="Sai"> Sai</label>
+                        <label><input type="radio" name="q16d_tf" value="Dung"> Đúng</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Câu 17 -->
+            <div id="q17" class="question-block" data-answer="Dung,Sai,Dung,Sai">
+                <p><strong>Câu 17:</strong> Về các yếu tố ảnh hưởng đến cảm ứng từ và lực từ, hãy chọn **Đúng** hoặc **Sai** cho các nhận định sau:</p>
+                <div class="true-false-item">
+                    <p>A. Cảm ứng từ trong lòng ống dây không phụ thuộc vào bán kính ống dây.</p>
+                    <div class="true-false-options">
+                        <label><input type="radio" name="q17a_tf" value="Sai"> Sai</label>
+                        <label><input type="radio" name="q17a_tf" value="Dung"> Đúng</label>
+                    </div>
+                </div>
+                <div class="true-false-item">
+                    <p>B. Độ lớn lực tương tác giữa hai dòng điện song song tỉ lệ thuận với bình phương cường độ dòng điện.</p>
+                    <div class="true-false-options">
+                        <label><input type="radio" name="q17b_tf" value="Sai"> Sai</label>
+                        <label><input type="radio" name="q17b_tf" value="Dung"> Đúng</label>
+                    </div>
+                </div>
+                <div class="true-false-item">
+                    <p>C. Khi một hạt proton bay vào từ trường, nó không bị từ trường làm tăng tốc.</p>
+                    <div class="true-false-options">
+                        <label><input type="radio" name="q17c_tf" value="Sai"> Sai</label>
+                        <label><input type="radio" name="q17c_tf" value="Dung"> Đúng</label>
+                    </div>
+                </div>
+                <div class="true-false-item">
+                    <p>D. Cảm ứng từ của dòng điện thẳng dài tỉ lệ nghịch với cường độ dòng điện.</p>
+                    <div class="true-false-options">
+                        <label><input type="radio" name="q17d_tf" value="Sai"> Sai</label>
+                        <label><input type="radio" name="q17d_tf" value="Dung"> Đúng</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHẦN III: TRẢ LỜI NGẮN ĐIỀN SỐ (3 CÂU) -->
+            <h2>Phần III: Trả lời ngắn (3 Câu Điền số)</h2>
+
+            <!-- Câu 18 -->
+            <div id="q18" class="question-block short-answer" data-answer="3">
+                <p><strong>Câu 18:</strong> Một dòng điện thẳng dài vô hạn có cường độ $I = 15 \text{ A}$. Cảm ứng từ tại điểm $M$ cách dòng điện $10 \text{ cm}$ có độ lớn là $B_M = X \times 10^{-5} \text{ T}$. Giá trị của $X$ là bao nhiêu? **(Làm tròn đến chữ số hàng đơn vị)**</p>
+                <p>Đáp số $X$: <input type="text" name="q18_ans" id="q18_answer"></p>
+            </div>
+
+            <!-- Câu 19 -->
+            <div id="q19" class="question-block short-answer" data-answer="0.25">
+                <p><strong>Câu 19:</strong> Một đoạn dây dẫn dài $l = 50 \text{ cm}$ mang dòng điện $I = 5 \text{ A}$ được đặt trong từ trường đều có $B = 0,2 \text{ T}$. Đoạn dây hợp với $\vec{B}$ một góc $30^{\circ}$. Lực từ tác dụng lên đoạn dây có độ lớn là $F = Y \text{ N}$. Giá trị của $Y$ là bao nhiêu? **(Làm tròn đến chữ số thập phân thứ hai)**</p>
+                <p>Đáp số $Y$: <input type="text" name="q19_ans" id="q19_answer"></p>
+            </div>
+
+            <!-- Câu 20 -->
+            <div id="q20" class="question-block short-answer" data-answer="21">
+                <p><strong>Câu 20:</strong> Một hạt proton ($q = 1,6 \times 10^{-19} \text{ C}$) bay vào từ trường đều $B = 0,1 \text{ T}$ với vận tốc $v = 2 \times 10^6 \text{ m/s}$ (vuông góc với $\vec{B}$). Bán kính quỹ đạo tròn của hạt là $R = Z \text{ cm}$. Biết khối lượng proton $m_p \approx 1,67 \times 10^{-27} \text{ kg}$. Giá trị của $Z$ là bao nhiêu? **(Làm tròn đến chữ số hàng đơn vị)**</p>
+                <p>Đáp số $Z$: <input type="text" name="q20_ans" id="q20_answer"></p>
+            </div>
+            
+            <p style="text-align: center; font-style: italic;">--- HẾT BÀI KIỂM TRA ---</p>
+        </div>
+        
+        <!-- KHỐI HIỂN THỊ KẾT QUẢ VÀ LỜI GIẢI -->
+        <div id="result-view">
+            <h1>KẾT QUẢ BÀI LÀM</h1>
+            <p><strong>Điểm số:</strong> <span id="score-display">0/20</span></p>
+            
+            <!-- Nội dung chi tiết kết quả được chèn bằng JS -->
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const TIME_LIMIT = 45 * 60;
+    let timeRemaining = TIME_LIMIT;
+    let timerInterval;
+
+    // --- ĐÁP ÁN VÀ LỜI GIẢI CHI TIẾT CỦA TOÀN BỘ BÀI ---
+    const SOLUTIONS = {
+        q1: { ans: "B", detail: "Đơn vị của cảm ứng từ trong hệ SI là Tesla (T)." },
+        q2: { ans: "C", detail: "Công thức lực Ampere: $F = B I l \\sin\\theta$." },
+        q3: { ans: "B", detail: "Quy tắc nắm tay phải dùng để xác định hướng của cảm ứng từ trong ống dây hoặc dây tròn." },
+        q4: { ans: "D", detail: "Vectơ cảm ứng từ luôn tiếp tuyến với đường sức từ." },
+        q5: { ans: "B", detail: "Độ lớn lực Lorentz $F = |q|vB\\sin\\theta$, không phụ thuộc vào khối lượng hạt." },
+        q6: { ans: "D", detail: "Công thức tổng quát cho $N$ vòng dây tròn bán kính $R$: $B = 2\\pi \\cdot 10^{-7} \\frac{N I}{R}$." },
+        q7: { ans: "B", detail: "Hai dòng điện cùng chiều thì hút nhau, ngược chiều thì đẩy nhau." },
+        q8: { ans: "C", detail: "Lực Lorentz đóng vai trò lực hướng tâm, gây ra chuyển động tròn đều." },
+        q9: { ans: "C", detail: "Lực tương tác chỉ phụ thuộc vào $I_1, I_2, l, r$ và hằng số $\\mu_0$, không liên quan đến điện trở suất." },
+        q10: { ans: "A", detail: "Mômen lực từ cực đại khi mặt phẳng khung vuông góc với $\\vec{B}$ (hay $\\sin\\alpha = 1$). $M_{max} = N I S B$." },
+        q11: { ans: "C", detail: "Chiều của lực Lorentz được xác định bằng Quy tắc bàn tay trái." },
+        q12: { ans: "D", detail: "Tần số cyclotron $f = \\frac{|q| B}{2\\pi m}$, không phụ thuộc vào tốc độ $v$." },
+        q13: { ans: "D", detail: "Đường sức từ là những đường cong khép kín." },
+        q14: { ans: "C", detail: "Lực từ vuông góc với dòng điện. Lựa chọn C (cùng phương với dòng điện) là sai." },
+        q15: { ans: "A", detail: "Thành phần nằm ngang của từ trường Trái Đất hướng gần đúng từ Nam địa lí đến Bắc địa lí." },
+        q16: { ans: ["Sai", "Dung", "Dung", "Dung"], detail: ["Lớn nhất khi vuông góc.", "Xung quanh nam châm có từ trường là định nghĩa.", "Đúng theo định nghĩa đường sức từ.", "Đúng, $\\vec{F}$ vuông góc với mặt phẳng chứa $\\vec{v}$ và $\\vec{B}$."] },
+        q17: { ans: ["Dung", "Sai", "Dung", "Sai"], detail: ["$B = 4\\pi \\cdot 10^{-7} n I$, không có $R$.", "Tỉ lệ thuận với tích $I_1 I_2$, không phải bình phương.", "Lực Lorentz không sinh công, không làm thay đổi động năng/tốc độ.", "Tỉ lệ thuận với $I$: $B = 2 \\cdot 10^{-7} \\frac{I}{r}$."] },
+        q18: { ans: "3", detail: "$B = 2 \\cdot 10^{-7} \\frac{I}{r} = 2 \\cdot 10^{-7} \\frac{15}{0,1} = 30 \\cdot 10^{-6} \text{ T} = 3 \\times 10^{-5} \text{ T}$. Vậy $X = 3$." },
+        q19: { ans: "0.25", detail: "$F = B I l \\sin\\theta = 0,2 \\times 5 \\times 0,5 \\times \\sin 30^{\\circ} = 0,25 \text{ N}$." },
+        q20: { ans: "21", detail: "$R = \\frac{m v}{|q| B} = \\frac{1,67 \\times 10^{-27} \\times 2 \\times 10^6}{1,6 \\times 10^{-19} \\times 0,1} \\approx 0,20875 \text{ m} = 20,875 \text{ cm}$. Làm tròn đến hàng đơn vị là $21$." }
+    };
+    // -------------------------------------------------------------
+
+    // 1. CHỨC NĂNG ĐỒNG HỒ
+    function startTimer() {
+        const display = document.getElementById('time-display');
+        
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            let minutes = Math.floor(timeRemaining / 60);
+            let seconds = timeRemaining % 60;
+
+            minutes = String(minutes).padStart(2, '0');
+            seconds = String(seconds).padStart(2, '0');
+
+            display.textContent = `${minutes}:${seconds}`;
+
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                display.textContent = "HẾT GIỜ";
+                submitExam();
+            }
+        }, 1000);
+    }
+    
+    // 2. CHỨC NĂNG TẠO VÀ CẬP NHẬT NÚT ĐIỀU HƯỚNG
+    function setupNavigation() {
+        const navContainer = document.getElementById('nav-container');
+        navContainer.innerHTML = ''; // Xóa nội dung cũ
+        const allQuestions = document.querySelectorAll('#exam-questions .question-block');
+        
+        allQuestions.forEach((qBlock, index) => {
+            const qId = `q${index + 1}`;
+            const button = document.createElement('button');
+            button.textContent = `Q${index + 1}`;
+            button.id = `nav-${qId}`;
+            button.onclick = () => {
+                // Chỉ cuộn khi đang ở chế độ làm bài
+                if (document.getElementById('exam-questions').style.display !== 'none') {
+                    qBlock.scrollIntoView({ behavior: 'smooth' });
+                }
+            };
+            navContainer.appendChild(button);
+        });
+        
+        // Gắn sự kiện để đánh dấu đã trả lời
+        document.querySelectorAll('#exam-questions input').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const qBlock = e.target.closest('.question-block');
+                if (qBlock) {
+                    const qId = qBlock.id;
+                    document.getElementById(`nav-${qId}`).classList.add('answered');
+                }
+            });
+            input.addEventListener('input', (e) => { // Dành cho input text
+                if (e.target.value.trim() !== '') {
+                    const qId = e.target.closest('.question-block').id;
+                    document.getElementById(`nav-${qId}`).classList.add('answered');
+                }
+            });
+        });
+    }
+    
+    // 3. HÀM NỘP BÀI VÀ HIỂN THỊ KẾT QUẢ
+    function submitExam() {
+        clearInterval(timerInterval);
+        document.getElementById('exam-questions').style.display = 'none'; // Ẩn đề thi
+        const resultView = document.getElementById('result-view');
+        resultView.style.display = 'block'; // Hiển thị kết quả
+        resultView.innerHTML = `<h1>KẾT QUẢ BÀI LÀM</h1>`; // Xóa nội dung cũ
+        let totalScore = 0;
+        let totalQuestions = 20;
+
+        for (let i = 1; i <= totalQuestions; i++) {
+            const qId = `q${i}`;
+            const qBlock = document.getElementById(qId);
+            const correctAns = SOLUTIONS[qId].ans;
+            const detail = SOLUTIONS[qId].detail;
+            let userAnswer = "Chưa trả lời";
+            let isCorrect = false;
+            
+            // Lấy câu trả lời của thí sinh
+            if (i <= 15) { // Trắc nghiệm 4 lựa chọn
+                const checked = document.querySelector(`input[name="q${i}_mcq"]:checked`);
+                if (checked) {
+                    userAnswer = checked.value;
+                    if (userAnswer === correctAns) {
+                        isCorrect = true;
+                        totalScore++;
+                    }
+                }
+                userAnswer = userAnswer === "Chưa trả lời" ? userAnswer : `Đáp án: ${userAnswer}`;
+            } else if (i <= 17) { // Trắc nghiệm Đúng/Sai (4 ý nhỏ)
+                const tf_answers = [];
+                let correctCount = 0;
+                for (let j = 0; j < 4; j++) {
+                    const subQuestionId = `${qId}${String.fromCharCode(97 + j)}`;
+                    const checked = document.querySelector(`input[name="${subQuestionId}_tf"]:checked`);
+                    const user_tf = checked ? checked.value : "BỎ QUA";
+                    tf_answers.push(user_tf);
+                    if (user_tf === correctAns[j]) {
+                        correctCount++;
+                    }
+                }
+                userAnswer = tf_answers.join(", ");
+                if (correctCount === 4) {
+                    isCorrect = true;
+                    totalScore++;
+                }
+            } else { // Trả lời ngắn (Điền số)
+                const inputVal = document.getElementById(`${qId}_answer`).value.trim();
+                if (inputVal !== "") {
+                    // Chuyển đổi sang số để so sánh (có thể bỏ qua)
+                    // Ở đây so sánh chuỗi vì đã làm tròn sẵn trong đáp án
+                    userAnswer = inputVal;
+                    // Xử lý làm tròn số cho trả lời ngắn (vì đề bài yêu cầu làm tròn)
+                    if (parseFloat(inputVal) === parseFloat(correctAns)) {
+                        isCorrect = true;
+                        totalScore++;
+                    }
+                }
+                userAnswer = userAnswer === "Chưa trả lời" ? userAnswer : `Đáp số: ${userAnswer}`;
+            }
+
+            // Tạo khối hiển thị kết quả
+            const resultBlock = document.createElement('div');
+            resultBlock.className = `result-question-block ${isCorrect ? 'correct-q' : 'incorrect-q'}`;
+            resultBlock.innerHTML = `
+                <p><strong>Câu ${i}:</strong> ${qBlock.querySelector('p').innerHTML}</p>
+                <span class="your-answer">Câu trả lời của bạn: ${userAnswer}</span>
+                <span class="correct-answer">Đáp án đúng: ${Array.isArray(correctAns) ? correctAns.join(", ") : correctAns}</span>
+                <div class="solution-detail">
+                    <strong>Giải thích:</strong> ${Array.isArray(detail) ? detail.join("<br>") : detail}
+                </div>
+            `;
+            resultView.appendChild(resultBlock);
+        }
+
+        // Cập nhật điểm
+        const scoreDisplay = document.createElement('p');
+        scoreDisplay.innerHTML = `<strong>Điểm số:</strong> <span id="score-display">${totalScore}/${totalQuestions}</span>`;
+        resultView.prepend(scoreDisplay);
+    }
+    
+    // 4. CHỨC NĂNG LÀM LẠI
+    function resetForm() {
+        if (confirm("Bạn có chắc chắn muốn làm lại không? Toàn bộ câu trả lời sẽ bị xóa.")) {
+            // Đặt lại trạng thái form
+            document.querySelectorAll('input').forEach(input => {
+                if (input.type === 'radio') {
+                    input.checked = false;
+                } else if (input.type === 'text') {
+                    input.value = '';
+                }
+            });
+
+            // Đặt lại timer
+            clearInterval(timerInterval);
+            timeRemaining = TIME_LIMIT;
+            document.getElementById('time-display').textContent = "45:00";
+            startTimer();
+
+            // Đặt lại nút điều hướng
+            document.querySelectorAll('.nav-grid button').forEach(btn => {
+                btn.classList.remove('answered');
+            });
+
+            // Hiển thị lại đề bài và ẩn kết quả
+            document.getElementById('exam-questions').style.display = 'block';
+            document.getElementById('result-view').style.display = 'none';
+        }
+    }
+
+    // Khởi tạo khi trang tải xong
+    document.addEventListener('DOMContentLoaded', () => {
+        setupNavigation();
+        startTimer();
+    });
+</script>
+
+</body>
+</html>

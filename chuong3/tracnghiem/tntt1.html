@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn Tập Từ Trường & Mạch Điện</title>
+    
+    <!-- TỐI ƯU HÓA 1: LOẠI BỎ polyfill.min.js (Hầu hết các trình duyệt hiện đại đều hỗ trợ ES6) -->
+    
+    <!-- TỐI ƯU HÓA 2: Cấu hình MathJax để tải nhanh hơn -->
+    <script>
+        // Cấu hình MathJax trước khi tải script chính
+        // Thiết lập này giúp MathJax chỉ tìm kiếm các khối TeX và sử dụng renderer CHTML (nhanh hơn SVG)
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']], // Cho phép cú pháp $...$ cho inline math
+                displayMath: [['$$', '$$'], ['\\[', '\\]']], // Cú pháp cho display math
+                processEnvironments: true,
+                processRefs: true
+            },
+            options: {
+                renderActions: {
+                    // Chỉ xử lý các phần tử được chỉ định (tăng tốc độ xử lý DOM)
+                    addMenu: [20, '', {
+                        // Thêm menu chuột phải
+                    }, '']
+                }
+            },
+            loader: {
+                load: ['input/tex', 'output/chtml'] // Chỉ tải input TeX và output CHTML
+            }
+        };
+    </script>
+    <!-- Tải MathJax: Sử dụng async để không chặn DOM rendering -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* ... (Giữ nguyên phần CSS của bạn) ... */
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --bg-light: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: var(--bg-light);
+        }
+
+        .quiz-container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .controls-column {
+            flex: 0 0 250px;
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .questions-column {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        /* --- Cột điều khiển --- */
+        .timer-box {
+            background-color: var(--danger-color);
+            padding: 15px;
+            text-align: center;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .timer-box h3 { margin-top: 0; font-size: 1.2em; }
+        #countdown { font-size: 2em; font-weight: bold; }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        .nav-button {
+            padding: 8px;
+            font-size: 0.9em;
+            cursor: pointer;
+            border: 1px solid var(--secondary-color);
+            border-radius: 4px;
+            background-color: var(--secondary-color);
+            color: white;
+            transition: background-color 0.2s;
+        }
+        .nav-button:hover { background-color: #5a6268; }
+        .nav-button.active { background-color: var(--primary-color); border-color: var(--primary-color); }
+        .nav-button.answered { background-color: var(--success-color); border-color: var(--success-color); }
+
+        .control-buttons button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+        }
+        #submitBtn { background-color: var(--danger-color); color: white; }
+        #submitBtn:hover { background-color: #c82333; }
+        #resetBtn { background-color: var(--warning-color); color: #212529; }
+        #resetBtn:hover { background-color: #e0a800; }
+
+        /* --- Cột câu hỏi --- */
+        #question-display h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+        }
+        .question-text {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .options label {
+            display: block;
+            padding: 10px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .options label:hover { background-color: var(--bg-light); }
+        .options input[type="radio"] { margin-right: 10px; }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        .navigation button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            background-color: var(--primary-color);
+            color: white;
+            transition: opacity 0.2s;
+        }
+        .navigation button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* --- Hiển thị kết quả --- */
+        #results-display {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid var(--success-color);
+            border-radius: 8px;
+            background-color: #e6ffe6;
+        }
+        .result-item {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-left: 5px solid;
+        }
+        .result-item.correct { border-color: var(--success-color); background-color: #f0fff0; }
+        .result-item.incorrect { border-color: var(--danger-color); background-color: #fff0f0; }
+        .explanation {
+            margin-top: 10px;
+            font-style: italic;
+            color: #333;
+        }
+
+        /* Responsive */
+        @media (max-width: 800px) {
+            .quiz-container {
+                flex-direction: column;
+            }
+            .controls-column {
+                flex: none;
+                order: 2; /* Đặt cột điều khiển xuống dưới trên mobile */
+                border-right: none;
+                border-top: 1px solid var(--border-color);
+            }
+            .questions-column {
+                order: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    
+    <!-- Cột 1: Thông tin và Điều khiển -->
+    <div class="controls-column">
+        <h4><center>TRẮC NGHIỆM TỪ TRƯỜNG </center></h4>
+        
+        <div class="timer-box">
+            <h3>THỜI GIAN</h3>
+            <div id="countdown">10:00</div>
+        </div>
+
+        <h4>BỘ CHUYỂN HƯỚNG CÂU HỎI</h4>
+        <div class="nav-grid" id="question-nav">
+            <!-- Nút chuyển hướng sẽ được tạo bằng JS -->
+        </div>
+
+        <div class="control-buttons">
+            <button id="submitBtn" onclick="submitQuiz()">NỘP BÀI</button>
+            <button id="resetBtn" onclick="resetQuiz()">LÀM LẠI</button>
+        </div>
+    </div>
+    
+    <!-- Cột 2: Nội dung trắc nghiệm -->
+    <div class="questions-column">
+        
+        <div id="quiz-content">
+            <div id="question-display">
+                <!-- Nội dung câu hỏi sẽ được tải bằng JS -->
+            </div>
+    
+            <div class="navigation">
+                <button id="backBtn" onclick="prevQuestion()" disabled>&#9664; Back</button>
+                <button id="nextBtn" onclick="nextQuestion()">Next &#9654;</button>
+            </div>
+        </div>
+
+        <div id="results-display">
+            <!-- Hiển thị kết quả sau khi nộp bài -->
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    // Dữ liệu 20 câu hỏi (5 Biết, 5 Hiểu, 5 Vận dụng, 5 Vận dụng cao)
+    const questions = [
+        // --- 5 CÂU MỨC ĐỘ BIẾT ---
+        {
+            id: 1, type: "Biết",
+            question: "Đường sức từ của dòng điện chạy trong dây dẫn thẳng dài là:",
+            options: ["Đường thẳng song song với dây dẫn.", "Đường tròn đồng tâm, nằm trong mặt phẳng vuông góc với dây dẫn.", "Đường xoắn ốc.", "Đường thẳng đi qua dây dẫn."],
+            answer: 1, // index của đáp án đúng (0, 1, 2, 3)
+            explanation: "Đường sức từ của dây dẫn thẳng dài là các đường tròn đồng tâm, nằm trong mặt phẳng vuông góc với dây dẫn, với tâm là vị trí của dây dẫn. Chiều được xác định bằng quy tắc nắm tay phải."
+        },
+        {
+            id: 2, type: "Biết",
+            question: "Công thức tính cảm ứng từ $B$ gây ra bởi dòng điện $I$ trong dây dẫn thẳng dài vô hạn, tại điểm cách dây một khoảng $r$ là:",
+            options: ["$B = \\mu_0 I r$", "$B = \\frac{\\mu_0 I}{2\\pi r}$", "$B = \\frac{2\\pi \\mu_0 I}{r}$", "$B = \\frac{\\mu_0 I}{2r}$"],
+            answer: 1,
+            explanation: "Công thức chính xác là $B = \\frac{\\mu_0 I}{2\\pi r}$. Trong đó, $\\mu_0 = 4\\pi \\cdot 10^{-7}$ (T.m/A) là độ từ thẩm của chân không."
+        },
+        {
+            id: 3, type: "Biết",
+            question: "Đại lượng nào sau đây là hằng số vật lý liên quan đến từ trường trong chân không?",
+            options: ["Cường độ dòng điện $I$.", "Khoảng cách $r$.", "Độ từ thẩm $\\mu$.", "Độ từ thẩm của chân không $\\mu_0$."],
+            answer: 3,
+            explanation: "Độ từ thẩm của chân không, $\\mu_0 = 4\\pi \\cdot 10^{-7}$ T.m/A, là hằng số vật lý xác định mối liên hệ giữa từ trường và dòng điện trong chân không."
+        },
+        {
+            id: 4, type: "Biết",
+            question: "Cảm ứng từ tại tâm vòng dây tròn bán kính $R$ có $N$ vòng dây và dòng điện $I$ chạy qua được tính bằng công thức:",
+            options: ["$B = \\frac{\\mu_0 N I}{R}$", "$B = \\frac{\\mu_0 N I}{2R}$", "$B = \\frac{\\mu_0 I}{2\\pi R}$", "$B = \\frac{2\\pi \\mu_0 N I}{R}$"],
+            answer: 1,
+            explanation: "Công thức là $B = \\frac{\\mu_0 N I}{2R}$. Với trường hợp vòng dây đơn ($N=1$), $B = \\frac{\\mu_0 I}{2R}$."
+        },
+        {
+            id: 5, type: "Biết",
+            question: "Trong lòng ống dây solenoid, từ trường là từ trường:",
+            options: ["Không đều và song song với trục.", "Đồng đều và song song với trục.", "Đồng đều và vuông góc với trục.", "Không đều và không xác định."],
+            answer: 1,
+            explanation: "Trong lòng ống dây solenoid lý tưởng, từ trường là từ trường đồng đều (hay từ trường đều), có đường sức từ song song và cùng chiều với trục ống dây."
+        },
+        
+        // --- 5 CÂU MỨC ĐỘ HIỂU ---
+        {
+            id: 6, type: "Hiểu",
+            question: "Khi tăng cường độ dòng điện trong ống dây solenoid lên gấp đôi ($I' = 2I$), đồng thời giảm chiều dài ống dây đi một nửa ($l' = l/2$) (giữ nguyên số vòng $N$), thì cảm ứng từ $B$ bên trong ống dây sẽ thay đổi như thế nào?",
+            options: ["Tăng gấp 2 lần.", "Giảm 2 lần.", "Tăng gấp 4 lần.", "Không đổi."],
+            answer: 2,
+            explanation: "Công thức $B = \\mu_0 n I = \\mu_0 \\frac{N}{l} I$. Khi $I$ tăng 2 lần và $l$ giảm 2 lần, $B' = \\mu_0 \\frac{N}{l/2} (2I) = 4 \\cdot \\mu_0 \\frac{N}{l} I = 4B$. Cảm ứng từ tăng gấp 4 lần."
+        },
+        {
+            id: 7, type: "Hiểu",
+            question: "Hai dòng điện thẳng, dài vô hạn, song song cùng chiều, cách nhau một khoảng $a$. Lực từ do hai dòng điện này tác dụng lên nhau là:",
+            options: ["Lực đẩy.", "Lực hút.", "Không có lực tác dụng.", "Lực đẩy khi $I_1 = I_2$, lực hút khi $I_1 \\neq I_2$."],
+            answer: 1,
+            explanation: "Theo quy tắc, hai dòng điện song song cùng chiều thì hút nhau, ngược chiều thì đẩy nhau (nguyên tắc này thường được gọi là quy tắc bàn tay trái để xác định lực Lorentz hoặc Ampe)."
+        },
+        {
+            id: 8, type: "Hiểu",
+            question: "Trong một mạch kín, dòng điện cảm ứng chỉ xuất hiện khi:",
+            options: ["Mạch điện đặt trong từ trường đều.", "Mạch điện có cường độ dòng điện lớn.", "Có sự biến thiên của từ thông $\\Phi$ qua mạch.", "Mạch điện chuyển động tịnh tiến trong từ trường."],
+            answer: 2,
+            explanation: "Theo định luật Faraday về cảm ứng điện từ, dòng điện cảm ứng (suất điện động cảm ứng) chỉ xuất hiện khi có sự biến thiên (thay đổi) của từ thông ($\\Phi = B A \\cos \\alpha$) qua diện tích của mạch kín."
+        },
+        {
+            id: 9, type: "Hiểu",
+            question: "Một khung dây đặt trong từ trường. Để tạo ra suất điện động cảm ứng lớn nhất, cần thay đổi đại lượng nào sau đây một cách nhanh nhất?",
+            options: ["Cường độ dòng điện chạy trong khung.", "Khối lượng của khung dây.", "Cảm ứng từ $B$ xuyên qua khung.", "Chu vi của khung dây."],
+            answer: 2,
+            explanation: "Suất điện động cảm ứng $e_c = -\\frac{\\Delta \\Phi}{\\Delta t}$. Để $e_c$ lớn nhất, cần có sự thay đổi từ thông $\\Delta \\Phi$ lớn trong thời gian $\\Delta t$ ngắn nhất. Vì $\\Phi = B A \\cos \\alpha$, việc thay đổi $B$ (hoặc $A$, hoặc $\\alpha$) nhanh nhất sẽ tạo ra $e_c$ lớn nhất. Thay đổi $B$ là cách trực tiếp nhất."
+        },
+        {
+            id: 10, type: "Hiểu",
+            question: "Quy tắc bàn tay trái dùng để xác định:",
+            options: ["Chiều của đường sức từ.", "Chiều của dòng điện cảm ứng.", "Lực từ tác dụng lên dây dẫn có dòng điện $I$ hoặc lực Lorentz.", "Cảm ứng từ $B$ của dòng điện."],
+            answer: 2,
+            explanation: "Quy tắc bàn tay trái dùng để xác định chiều của lực từ (lực Ampe) tác dụng lên đoạn dây dẫn có dòng điện $I$ đặt trong từ trường hoặc lực Lorentz tác dụng lên điện tích chuyển động."
+        },
+
+        // --- 5 CÂU MỨC ĐỘ VẬN DỤNG ---
+        {
+            id: 11, type: "Vận dụng",
+            question: "Một dây dẫn thẳng dài mang dòng điện $I = 5 \\text{ A}$. Tính cảm ứng từ $B$ tại điểm cách dây $r = 10 \\text{ cm}$ trong không khí. (Lấy $\\mu_0 = 4\\pi \\cdot 10^{-7} \\text{ T.m/A}$)",
+            options: ["$10^{-5} \\text{ T}$", "$10^{-6} \\text{ T}$", "$2\\cdot 10^{-5} \\text{ T}$", "$2\\pi \\cdot 10^{-5} \\text{ T}$"],
+            answer: 2,
+            explanation: "Công thức: $B = \\frac{\\mu_0 I}{2\\pi r}$.\\nThay số: $B = \\frac{4\\pi \\cdot 10^{-7} \\cdot 5}{2\\pi \\cdot 0.1} = \\frac{2\\cdot 10^{-7} \\cdot 5}{0.1} = \\frac{10^{-6}}{0.1} = 10^{-5} \\text{ T}$. Đáp án A ($10^{-5} \\text{ T}$) là chính xác."
+        },
+        {
+            id: 12, type: "Vận dụng",
+            question: "Một ống dây solenoid dài $20 \\text{ cm}$, gồm $1000$ vòng dây. Dòng điện chạy qua mỗi vòng là $0.5 \\text{ A}$. Tính cảm ứng từ bên trong lòng ống dây. (Lấy $\\mu_0 = 4\\pi \\cdot 10^{-7} \\text{ T.m/A}$)",
+            options: ["$3.14 \\cdot 10^{-3} \\text{ T}$", "$6.28 \\cdot 10^{-4} \\text{ T}$", "$3.14 \\cdot 10^{-4} \\text{ T}$", "$6.28 \\cdot 10^{-3} \\text{ T}$"],
+            answer: 1,
+            explanation: "Công thức: $B = \\mu_0 n I = \\mu_0 \\frac{N}{l} I$.\\nThay số: $B = 4\\pi \\cdot 10^{-7} \\cdot \\frac{1000}{0.2} \\cdot 0.5 = 4\\pi \\cdot 10^{-7} \\cdot 5000 \\cdot 0.5 = 4\\pi \\cdot 10^{-7} \\cdot 2500 = 31415.9 \\cdot 10^{-7} \\approx 3.14 \\cdot 10^{-3} \\text{ T}$."
+        },
+        {
+            id: 13, type: "Vận dụng",
+            question: "Một đoạn dây dẫn dài $l = 20 \\text{ cm}$ mang dòng điện $I = 2 \\text{ A}$ đặt vuông góc với cảm ứng từ $\\vec{B}$. Nếu lực từ tác dụng lên đoạn dây là $F = 0.04 \\text{ N}$, độ lớn của $B$ là:",
+            options: ["$0.1 \\text{ T}$", "$0.2 \\text{ T}$", "$0.5 \\text{ T}$", "$1.0 \\text{ T}$"],
+            answer: 1,
+            explanation: "Công thức Lực Ampe: $F = B I l \\sin \\alpha$. Do $\\vec{B}$ vuông góc với dây dẫn nên $\\sin \\alpha = 1$. $F = B I l$. $B = \\frac{F}{I l} = \\frac{0.04}{2 \\cdot 0.2} = \\frac{0.04}{0.4} = 0.1 \\text{ T}$."
+        },
+        {
+            id: 14, type: "Vận dụng",
+            question: "Một vòng dây tròn bán kính $R=5 \\text{ cm}$ có $N=10$ vòng, mang dòng $I=2 \\text{ A}$. Tính $B$ tại tâm. (Lấy $\\mu_0 = 4\\pi \\cdot 10^{-7} \\text{ T.m/A}$)",
+            options: ["$2.51 \\cdot 10^{-4} \\text{ T}$", "$2.51 \\cdot 10^{-3} \\text{ T}$", "$1.26 \\cdot 10^{-4} \\text{ T}$", "$1.26 \\cdot 10^{-3} \\text{ T}$"],
+            answer: 2,
+            explanation: "Công thức: $B = \\frac{\\mu_0 N I}{2R}$.\\nThay số: $B = \\frac{4\\pi \\cdot 10^{-7} \\cdot 10 \\cdot 2}{2 \\cdot 0.05} = \\frac{80\\pi \\cdot 10^{-7}}{0.1} = 800\\pi \\cdot 10^{-7} \\approx 2.51 \\cdot 10^{-4} \\text{ T}$."
+        },
+        {
+            id: 15, type: "Vận dụng",
+            question: "Một khung dây hình vuông cạnh $10 \\text{ cm}$ được đặt vuông góc với cảm ứng từ $B = 0.5 \\text{ T}$. Tính từ thông $\\Phi$ xuyên qua khung dây.",
+            options: ["$0.005 \\text{ Wb}$", "$0.05 \\text{ Wb}$", "$5 \\text{ Wb}$", "$50 \\text{ Wb}$"],
+            answer: 0,
+            explanation: "Công thức: $\\Phi = B A \\cos \\alpha$.\\n$A = (0.1 \\text{ m})^2 = 0.01 \\text{ m}^2$. Do đặt vuông góc nên $\\alpha = 0^\\circ, \\cos 0^\\circ = 1$. $\\Phi = 0.5 \\cdot 0.01 \\cdot 1 = 0.005 \\text{ Wb}$."
+        },
+
+        // --- 5 CÂU MỨC ĐỘ VẬN DỤNG CAO ---
+        {
+            id: 16, type: "Vận dụng Cao",
+            question: "Hai dây dẫn thẳng song song, cách nhau $d=10 \\text{ cm}$, mang dòng điện $I_1=10 \\text{ A}$ (hướng lên) và $I_2=20 \\text{ A}$ (hướng xuống). Cảm ứng từ tổng hợp $\\vec{B}_{th}$ tại điểm $M$ nằm giữa hai dây và cách $I_1$ một khoảng $4 \\text{ cm}$ có độ lớn là:",
+            options: ["$1.5 \\cdot 10^{-5} \\text{ T}$", "$1.0 \\cdot 10^{-5} \\text{ T}$", "$2.5 \\cdot 10^{-5} \\text{ T}$", "$3.5 \\cdot 10^{-5} \\text{ T}$"],
+            answer: 3,
+            explanation: "Tại $M$, $\\vec{B}_1$ (do $I_1$) hướng vào trong và $\\vec{B}_2$ (do $I_2$) cũng hướng vào trong (theo quy tắc nắm tay phải), nên $\\vec{B}_{th} = \\vec{B}_1 + \\vec{B}_2$. Độ lớn: $B_{th} = B_1 + B_2 = \\frac{\\mu_0 I_1}{2\\pi r_1} + \\frac{\\mu_0 I_2}{2\\pi r_2}$.\\n$r_1 = 0.04 \\text{ m}$, $r_2 = 0.1 - 0.04 = 0.06 \\text{ m}$.\\n$B_{th} = 2 \\cdot 10^{-7} \\left( \\frac{10}{0.04} + \\frac{20}{0.06} \\right) = 2 \\cdot 10^{-7} (250 + 333.33) \\approx 3.55 \\cdot 10^{-5} \\text{ T}$."
+        },
+        {
+            id: 17, type: "Vận dụng Cao",
+            question: "Một khung dây diện tích $A=0.01 \\text{ m}^2$ có $N=100$ vòng, được đặt trong từ trường đều, $\\vec{B}$ vuông góc với mặt phẳng khung. Nếu cảm ứng từ tăng từ $0.1 \\text{ T}$ đến $0.5 \\text{ T}$ trong thời gian $0.1 \\text{ s}$, suất điện động cảm ứng trung bình $\\left| E_c \\right|$ xuất hiện trong khung là:",
+            options: ["$4.0 \\text{ V}$", "$0.4 \\text{ V}$", "$0.04 \\text{ V}$", "$40 \\text{ V}$"],
+            answer: 1,
+            explanation: "Công thức: $\\left| E_c \\right| = \\left| -N \\frac{\\Delta \\Phi}{\\Delta t} \\right| = N \\frac{|\\Delta B| A}{\\Delta t}$ (vì $A$ và $\\cos \\alpha$ không đổi). $\\Delta B = 0.5 - 0.1 = 0.4 \\text{ T}$.\\n$\\left| E_c \\right| = 100 \\cdot \\frac{0.4 \\cdot 0.01}{0.1} = 100 \\cdot 0.04 = 4.0 \\text{ V}$. (Lưu ý: Đề bài tính suất điện động trung bình chứ không phải dòng điện)."
+        },
+        {
+            id: 18, type: "Vận dụng Cao",
+            question: "Một dây dẫn hình chữ nhật $a \\times b$ mang dòng điện $I$, được đặt trong từ trường đều $\\vec{B}$ sao cho mặt phẳng khung song song với $\\vec{B}$. Mô-men lực từ tác dụng lên khung dây là:",
+            options: ["$M = B I a b$", "$M = B I a$", "$M = B I b$", "$M = 0$"],
+            answer: 0,
+            explanation: "Công thức Mô-men lực từ: $M = N B I A \\sin \\theta$. Trong đó, $\\theta$ là góc giữa $\\vec{B}$ và vector pháp tuyến $\\vec{n}$ của khung. Mặt phẳng khung song song với $\\vec{B}$ $\\Rightarrow \\vec{n}$ vuông góc với $\\vec{B}$ $\\Rightarrow \\theta = 90^\\circ \\Rightarrow \\sin \\theta = 1$. $A = a \\cdot b$. Vì $N=1$, $M = B I (a b)$."
+        },
+        {
+            id: 19, type: "Vận dụng Cao",
+            question: "Trong một máy biến áp lý tưởng, cuộn sơ cấp có $N_1$ vòng, cuộn thứ cấp có $N_2$ vòng. Nếu $N_1 > N_2$, máy này có tác dụng gì?",
+            options: ["Tăng hiệu điện thế (áp).", "Giảm hiệu điện thế (áp).", "Tăng cường độ dòng điện.", "Không làm thay đổi hiệu điện thế."],
+            answer: 1,
+            explanation: "Tỷ lệ biến áp: $\\frac{U_1}{U_2} = \\frac{N_1}{N_2}$. Nếu $N_1 > N_2$, thì $\\frac{N_1}{N_2} > 1$, dẫn đến $U_1 > U_2$. Máy này là máy hạ áp (giảm hiệu điện thế). Tuy nhiên, theo định luật bảo toàn năng lượng ($P_1 = P_2$), khi $U$ giảm thì $I$ sẽ tăng."
+        },
+        {
+            id: 20, type: "Vận dụng Cao",
+            question: "Một thanh kim loại dài $l$ trượt với vận tốc $\\vec{v}$ không đổi trên hai thanh ray kim loại song song, cách nhau $l$, trong từ trường $\\vec{B}$ đều và vuông góc với mặt phẳng chứa ray. Suất điện động cảm ứng trong thanh là:",
+            options: ["$E_c = B v l^2$", "$E_c = 0$", "$E_c = B v l$", "$E_c = B v / l$"],
+            answer: 2,
+            explanation: "Đây là trường hợp suất điện động cảm ứng do thanh dây chuyển động cắt đường sức từ. Công thức tính suất điện động cảm ứng xuất hiện giữa hai đầu thanh là $E_c = B v l \\sin \\alpha$. Do $\\vec{v}$ vuông góc với $\\vec{B}$, nên $\\sin \\alpha = 1$. $E_c = B v l$."
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let userAnswers = new Array(questions.length).fill(null);
+    const TIME_LIMIT = 60 * 10; // 10 phút
+    let timeRemaining = TIME_LIMIT;
+    let timerInterval;
+    let quizSubmitted = false;
+
+    // --- CHỨC NĂNG KHỞI TẠO ---
+    function initQuiz() {
+        // Tái tạo lại trạng thái ban đầu
+        currentQuestionIndex = 0;
+        timeRemaining = TIME_LIMIT;
+        quizSubmitted = false;
+        
+        createNavButtons();
+        loadQuestion(currentQuestionIndex);
+        startTimer();
+    }
+
+    // --- TIMER ---
+    function startTimer() {
+        clearInterval(timerInterval); // Đảm bảo không có timer nào chạy song song
+        timerInterval = setInterval(() => {
+            if (quizSubmitted) {
+                clearInterval(timerInterval);
+                return;
+            }
+            timeRemaining--;
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('countdown').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                alert('Hết giờ! Hệ thống tự động nộp bài.');
+                submitQuiz(true); // Tự động nộp
+            }
+        }, 1000);
+    }
+
+    // --- NAVIGATOR ---
+    function createNavButtons() {
+        const navContainer = document.getElementById('question-nav');
+        navContainer.innerHTML = '';
+        questions.forEach((q, index) => {
+            const button = document.createElement('button');
+            button.className = 'nav-button';
+            button.textContent = index + 1;
+            button.onclick = () => loadQuestion(index);
+            button.id = `nav-btn-${index}`;
+            navContainer.appendChild(button);
+        });
+        updateNavButtons();
+    }
+
+    function updateNavButtons() {
+        questions.forEach((q, index) => {
+            const btn = document.getElementById(`nav-btn-${index}`);
+            if (!btn) return;
+            
+            btn.classList.remove('active', 'answered');
+            if (index === currentQuestionIndex) {
+                btn.classList.add('active');
+            }
+            if (userAnswers[index] !== null) {
+                btn.classList.add('answered');
+            }
+            if (quizSubmitted) {
+                btn.disabled = true;
+            }
+        });
+    }
+
+    // --- LOAD CÂU HỎI ---
+    function loadQuestion(index) {
+        if (quizSubmitted) return;
+
+        currentQuestionIndex = index;
+        const q = questions[index];
+        const display = document.getElementById('question-display');
+        
+        // Cập nhật tiêu đề câu hỏi
+        let html = `
+            <h2>Câu hỏi ${q.id} (${q.type})</h2>
+            <div class="question-text">
+                ${q.question}
+            </div>
+            <div class="options">
+        `;
+
+        // Thêm các lựa chọn
+        q.options.forEach((option, i) => {
+            const checked = userAnswers[index] === i ? 'checked' : '';
+            html += `
+                <label>
+                    <input type="radio" name="q${q.id}" value="${i}" ${checked} 
+                           onchange="saveAnswer(${index}, ${i})">
+                    ${String.fromCharCode(65 + i)}. ${option}
+                </label>
+            `;
+        });
+
+        html += '</div>';
+        display.innerHTML = html;
+
+        // Cập nhật trạng thái nút Next/Back
+        document.getElementById('backBtn').disabled = currentQuestionIndex === 0;
+        document.getElementById('nextBtn').disabled = currentQuestionIndex === questions.length - 1;
+
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            MathJax.typesetPromise([display]).then(() => {
+                updateNavButtons();
+            });
+        } else {
+            updateNavButtons();
+        }
+    }
+
+    // --- THAO TÁC NGƯỜI DÙNG ---
+    function saveAnswer(qIndex, selectedOption) {
+        userAnswers[qIndex] = selectedOption;
+        updateNavButtons();
+    }
+
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            loadQuestion(currentQuestionIndex + 1);
+        }
+    }
+
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            loadQuestion(currentQuestionIndex - 1);
+        }
+    }
+
+    // --- XỬ LÝ NỘP BÀI ---
+    function submitQuiz(isTimeout = false) {
+        if (quizSubmitted) return;
+
+        if (!isTimeout) {
+            const confirmation = confirm('Bạn có chắc chắn muốn NỘP BÀI? Bạn sẽ không thể thay đổi câu trả lời sau khi nộp.');
+            if (!confirmation) {
+                return;
+            }
+        }
+        
+        quizSubmitted = true;
+        clearInterval(timerInterval); // Dừng timer ngay lập tức
+        document.getElementById('quiz-content').style.display = 'none';
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('resetBtn').disabled = false; // ResetBtn phải bật để có thể làm lại
+        
+        displayResults();
+    }
+
+    function displayResults() {
+        let score = 0;
+        const resultsDisplay = document.getElementById('results-display');
+        let resultsHTML = '<h2>KẾT QUẢ BÀI LÀM</h2>';
+
+        questions.forEach((q, index) => {
+            const userAnswer = userAnswers[index];
+            const isCorrect = userAnswer === q.answer;
+            
+            if (isCorrect) {
+                score++;
+            }
+
+            const statusClass = isCorrect ? 'correct' : 'incorrect';
+            const statusText = isCorrect ? 'Đúng' : 'Sai';
+            const correctAnswerText = q.options[q.answer];
+            const userAnswerText = userAnswer !== null ? q.options[userAnswer] : 'Chưa trả lời';
+
+            resultsHTML += `
+                <div class="result-item ${statusClass}">
+                    <strong>Câu ${q.id} (${q.type}): ${statusText}</strong>
+                    <p><strong>Câu hỏi:</strong> ${q.question}</p>
+                    <p><strong>Đáp án của bạn:</strong> ${userAnswer !== null ? String.fromCharCode(65 + userAnswer) + '. ' : ''}${userAnswerText}</p>
+                    <p><strong>Đáp án đúng:</strong> ${String.fromCharCode(65 + q.answer)}. ${correctAnswerText}</p>
+                    <div class="explanation">
+                        <strong>Giải đáp chi tiết:</strong> ${q.explanation.replace(/\\n/g, '<br>')}
+                    </div>
+                </div>
+            `;
+        });
+
+        resultsHTML = `
+            <h3>Điểm số của bạn: ${score}/${questions.length}</h3>
+            <p>Thời gian làm bài: ${TIME_LIMIT - timeRemaining} giây.</p>
+            <hr>
+        ` + resultsHTML;
+
+        resultsDisplay.innerHTML = resultsHTML;
+        resultsDisplay.style.display = 'block';
+
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            MathJax.typesetPromise([resultsDisplay]);
+        }
+    }
+
+    // --- LÀM LẠI (ĐÃ KHẮC PHỤC) ---
+    function resetQuiz() {
+        const confirmation = confirm('Bạn có chắc chắn muốn LÀM LẠI? Toàn bộ kết quả và thời gian sẽ bị mất.');
+        if (!confirmation) {
+            return;
+        }
+
+        userAnswers.fill(null);
+        currentQuestionIndex = 0;
+        timeRemaining = TIME_LIMIT;
+        quizSubmitted = false;
+        clearInterval(timerInterval); // Đảm bảo timer được clear
+
+        document.getElementById('countdown').textContent = '10:00'; // Đặt lại hiển thị thời gian
+        document.getElementById('quiz-content').style.display = 'block';
+        document.getElementById('results-display').style.display = 'none';
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('resetBtn').disabled = false;
+        
+        // Cần đảm bảo rằng initQuiz() được gọi sau khi tất cả các biến đã được reset
+        initQuiz();
+    }
+
+    // Khởi động khi tải trang
+    document.addEventListener('DOMContentLoaded', initQuiz);
+</script>
+
+</body>
+</html>

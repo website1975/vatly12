@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Tập Ôn Tập: Từ Trường (20 Câu)</title>
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" integrity="sha384-k8vO+E6j8L5Q7P957xGg8vM8H9R776zG71J7v1Mv8E5M7N2R9K8Z9p12V9W7" crossorigin="anonymous"></script>
+    <!-- TỐI ƯU HÓA 2: Cấu hình MathJax để tải nhanh hơn -->
+    <script>
+        // Cấu hình MathJax trước khi tải script chính
+        // Thiết lập này giúp MathJax chỉ tìm kiếm các khối TeX và sử dụng renderer CHTML (nhanh hơn SVG)
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']], // Cho phép cú pháp $...$ cho inline math
+                displayMath: [['$$', '$$'], ['\\[', '\\]']], // Cú pháp cho display math
+                processEnvironments: true,
+                processRefs: true
+            },
+            options: {
+                renderActions: {
+                    // Chỉ xử lý các phần tử được chỉ định (tăng tốc độ xử lý DOM)
+                    addMenu: [20, '', {
+                        // Thêm menu chuột phải
+                    }, '']
+                }
+            },
+            loader: {
+                load: ['input/tex', 'output/chtml'] // Chỉ tải input TeX và output CHTML
+            }
+        };
+    </script>
+    <!-- Tải MathJax: Sử dụng async để không chặn DOM rendering -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+    <style>
+        /* (Giữ nguyên phần CSS từ phiên bản trước) */
+        /* ... (CSS styles go here) ... */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+        }
+
+        /* Two-Column Layout (Using CSS Grid for clarity) */
+        #quiz-container {
+            display: grid;
+            grid-template-columns: 250px 1fr; /* 250px for sidebar, rest for content */
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Sidebar (Left Column) */
+        .sidebar {
+            padding: 20px;
+            background-color: #e8f0fe;
+            border-right: 1px solid #ddd;
+        }
+
+        .sidebar h3 {
+            color: #3f51b5;
+            border-bottom: 2px solid #3f51b5;
+            padding-bottom: 5px;
+            margin-top: 0;
+        }
+
+        /* Timer and Navigation Box Styling */
+        .box {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        #timer-display {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #d32f2f;
+            text-align: center;
+        }
+
+        /* Question Navigation Buttons */
+        #question-nav {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            margin-top: 15px;
+        }
+
+        .nav-btn {
+            background-color: #ccc;
+            color: #333;
+            border: none;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: background-color 0.2s;
+        }
+
+        .nav-btn.current {
+            background-color: #4caf50;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .nav-btn.answered {
+            background-color: #3f51b5;
+            color: white;
+        }
+
+        /* Main Content (Right Column) */
+        .main-content {
+            padding: 20px;
+        }
+
+        /* Question Styling */
+        .question-item {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            display: none; /* Hide all questions initially */
+        }
+
+        .question-item.active {
+            display: block; /* Show only the active question */
+        }
+
+        .question-item p {
+            font-weight: 600;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .choice-label {
+            display: block;
+            margin: 8px 0;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .choice-label:hover {
+            background-color: #f9f9f9;
+        }
+
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        /* Navigation Arrows */
+        .question-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .question-controls button {
+            padding: 10px 20px;
+            background-color: #3f51b5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .question-controls button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Submission Buttons */
+        .action-buttons button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #submit-btn {
+            background-color: #d32f2f;
+            color: white;
+        }
+
+        #reset-btn {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        /* Results and Solutions Styling */
+        #results-section {
+            padding: 20px;
+            background-color: #e8f5e9;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none; /* Hidden until submission */
+        }
+        
+        .solution-item {
+            margin-top: 15px;
+            padding: 10px;
+            border-bottom: 1px dashed #4caf50;
+        }
+
+        .solution-item strong {
+            color: #1b5e20;
+        }
+        
+        .result-correct {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .result-incorrect {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        /* KaTeX/LaTeX Styling */
+        .katex {
+            font-size: 1.1em;
+        }
+        /* Style for block math in solutions */
+        #solutions-detail .katex-display {
+            margin: 0.5em 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="quiz-container">
+        
+        <!-- Cột 1: THÔNG TIN LÀM BÀI -->
+        <div class="sidebar">
+            <h3>THÔNG TIN LÀM BÀI</h3>
+
+            <div class="box">
+                <h4>THỜI GIAN ĐẾM LUI</h4>
+                <div id="timer-display">10:00</div>
+            </div>
+
+            <div class="box">
+                <h4>BỘ CHUYỂN HƯỚNG CÂU HỎI</h4>
+                <div id="question-nav">
+                    <!-- Navigation buttons will be injected here by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button id="submit-btn" onclick="submitQuiz()">NỘP BÀI</button>
+                <button id="reset-btn" onclick="resetQuiz()">LÀM LẠI</button>
+            </div>
+        </div>
+
+        <!-- Cột 2: CÂU HỎI TRẮC NGHIỆM -->
+        <div class="main-content">
+            <div id="question-area">
+                <h2>BÀI TẬP ÔN TẬP: TỪ TRƯỜNG (20 CÂU)</h2>
+                
+                <!-- === BẮT ĐẦU CÁC CÂU HỎI (20 CÂU) === -->
+
+                <div class="question-item active" data-q="1">
+                    <p><strong>Câu 1:</strong> Tương tác từ không xảy ra trong trường hợp nào dưới đây?</p>
+                    <label class="choice-label"><input type="radio" name="q1" value="A"> A. Một thanh nam châm và một dòng điện không đổi đặt gần nhau.</label>
+                    <label class="choice-label"><input type="radio" name="q1" value="B"> B. Hai thanh nam châm đặt gần nhau.</label>
+                    <label class="choice-label correct-answer" data-ans="C"><input type="radio" name="q1" value="C"> C. Một thanh nam châm và một thanh đồng đặt gần nhau.</label>
+                    <label class="choice-label"><input type="radio" name="q1" value="D"> D. Một thanh nam châm và một thanh sắt non đặt gần nhau.</label>
+                </div>
+
+                <div class="question-item" data-q="2">
+                    <p><strong>Câu 2:</strong> Xung quanh vật nào sau đây không có từ trường?</p>
+                    <label class="choice-label"><input type="radio" name="q2" value="A"> A. Dòng điện không đổi.</label>
+                    <label class="choice-label"><input type="radio" name="q2" value="B"> B. Hạt mang điện chuyển động.</label>
+                    <label class="choice-label correct-answer" data-ans="C"><input type="radio" name="q2" value="C"> C. Hạt mang điện đứng yên</label>
+                    <label class="choice-label"><input type="radio" name="q2" value="D"> D. Nam châm hình chữ U.</label>
+                </div>
+
+                <div class="question-item" data-q="3">
+                    <p><strong>Câu 3:</strong> Đặt một kim nam châm song song với dòng điện. Khi cho dòng điện chạy qua dây dẫn, ta thấy</p>
+                    <label class="choice-label correct-answer" data-ans="A"><input type="radio" name="q3" value="A"> A. kim nam châm lệch một góc so với phương ban đầu.</label>
+                    <label class="choice-label"><input type="radio" name="q3" value="B"> B. kim nam châm đứng yên.</label>
+                    <label class="choice-label"><input type="radio" name="q3" value="C"> C. kim nam châm quay tròn xung quanh trục.</label>
+                    <label class="choice-label"><input type="radio" name="q3" value="D"> D. kim nam châm quay trái, quay phải liên tục.</label>
+                </div>
+
+                <div class="question-item" data-q="4">
+                    <p><strong>Câu 4:</strong> Khi nói về tương tác từ, điều nào sau đây đúng?</p>
+                    <label class="choice-label"><input type="radio" name="q4" value="A"> A. Các cực cùng tên của nam châm thì hút nhau.</label>
+                    <label class="choice-label correct-answer" data-ans="B"><input type="radio" name="q4" value="B"> B. Hai dòng điện không đổi, đặt song song cùng chiều thì hút nhau.</label>
+                    <label class="choice-label"><input type="radio" name="q4" value="C"> C. Các cực khác tên của nam châm thì đẩy nhau.</label>
+                    <label class="choice-label"><input type="radio" name="q4" value="D"> D. Nếu cực bắc của một nam châm hút một thanh sắt thì cực nam của thanh nam châm đẩy thanh sắt.</label>
+                </div>
+
+                <div class="question-item" data-q="5">
+                    <p><strong>Câu 5:</strong> Chỉ ra câu sai.</p>
+                    <label class="choice-label"><input type="radio" name="q5" value="A"> A. Các đường mạt sắt của từ phổ cho biết dạng của đường sức từ.</label>
+                    <label class="choice-label"><input type="radio" name="q5" value="B"> B. Các đường sức từ của từ trường đều là những đường thẳng song song, cách đều nhau.</label>
+                    <label class="choice-label"><input type="radio" name="q5" value="C"> C. Nói chung các đường sức điện thì không kín, còn các đường sức từ là những đường cong kín.</label>
+                    <label class="choice-label correct-answer" data-ans="D"><input type="radio" name="q5" value="D"> D. Một hạt mang điện chuyển động theo quỹ đạo tròn trong từ trường thì quỹ đạo của nó là một đường sức từ của từ trường.</label>
+                </div>
+
+                <div class="question-item" data-q="6">
+                    <p><strong>Câu 6:</strong> Có hai thanh kim loại bằng sắt, bề ngoài giống nhau. Khi đặt chúng gần nhau thì chúng hút nhau. Kết luận nào sau đây về hai thanh đó là đúng?</p>
+                    <label class="choice-label"><input type="radio" name="q6" value="A"> A. Đó là hai thanh nam châm.</label>
+                    <label class="choice-label"><input type="radio" name="q6" value="B"> B. Một thanh là nam châm, thanh còn lại là thanh sắt.</label>
+                    <label class="choice-label"><input type="radio" name="q6" value="C"> C. Có thể là hai thanh nam châm, cũng có thể là hai thanh sắt.</label>
+                    <label class="choice-label correct-answer" data-ans="D"><input type="radio" name="q6" value="D"> D. Có thể là hai thanh nam châm, cũng có thể là một thanh nam châm và một thanh sắt.</label>
+                </div>
+
+                <div class="question-item" data-q="7">
+                    <p><strong>Câu 7:</strong> Từ trường của một nam châm thẳng giống từ trường được tạo bởi</p>
+                    <label class="choice-label"><input type="radio" name="q7" value="A"> A. một dây dẫn thẳng có dòng điện chạy qua.</label>
+                    <label class="choice-label correct-answer" data-ans="B"><input type="radio" name="q7" value="B"> B. một ống dây có dòng điện chạy qua.</label>
+                    <label class="choice-label"><input type="radio" name="q7" value="C"> C. một nam châm hình hình chữ U.</label>
+                    <label class="choice-label"><input type="radio" name="q7" value="D"> D. một vòng dây tròn có dòng điện chạy qua.</label>
+                </div>
+
+                <div class="question-item" data-q="8">
+                    <p><strong>Câu 8:</strong> Các đường sức từ xung quanh dây dẫn thẳng có dòng điện không đổi chạy qua - có dạng là</p>
+                    <label class="choice-label"><input type="radio" name="q8" value="A"> A. những đường thẳng song song với dòng điện.</label>
+                    <label class="choice-label"><input type="radio" name="q8" value="B"> B. những đường thẳng vuông góc với dòng điện.</label>
+                    <label class="choice-label correct-answer" data-ans="C"><input type="radio" name="q8" value="C"> C. những vòng tròn đồng tâm với tâm nằm tại vị trí nơi dòng điện chạy qua.</label>
+                    <label class="choice-label"><input type="radio" name="q8" value="D"> D. những đường xoắn ốc đồng trục với trục là dòng điện.</label>
+                </div>
+
+                <div class="question-item" data-q="9">
+                    <p><strong>Câu 9:</strong> Từ phổ là</p>
+                    <label class="choice-label correct-answer" data-ans="A"><input type="radio" name="q9" value="A"> A. hình ảnh của các đường mạt sắt cho ta hình ảnh của các đường sức từ</label>
+                    <label class="choice-label"><input type="radio" name="q9" value="B"> B. hình ảnh tương tác của hai nam châm với nam châm</label>
+                    <label class="choice-label"><input type="radio" name="q9" value="C"> C. hình ảnh tương tác giữa dòng điện và nam châm.</label>
+                    <label class="choice-label"><input type="radio" name="q9" value="D"> D. hình ảnh tương tác của hai dòng điện chạy trong hai dây dẫn thẳng song song.</label>
+                </div>
+
+                <div class="question-item" data-q="10">
+                    <p><strong>Câu 10:</strong> Phát biểu nào sau đây không đúng</p>
+                    <label class="choice-label"><input type="radio" name="q10" value="A"> A. Qua bất kì điểm nào trong từ trường, ta cũng có thể vẽ được một đường sức từ.</label>
+                    <label class="choice-label correct-answer" data-ans="B"><input type="radio" name="q10" value="B"> B. Đường sức từ do nam châm thẳng tạo ra xung quanh nó là những đường thẳng.</label>
+                    <label class="choice-label"><input type="radio" name="q10" value="C"> C. Đường sức từ mau hơn ở nơi có từ trường lớn, đường sức thưa hơn ở nơi có từ trường nhỏ hơn.</label>
+                    <label class="choice-label"><input type="radio" name="q10" value="D"> D. Các đường sức từ là những đường cong kín.</label>
+                </div>
+                
+                <div class="question-item" data-q="11">
+                    <p><strong>Câu 11:</strong><table><tr><td valign="top">Một nam châm thẳng có cực N-S (N bên trái, S bên phải) gây ra từ trường. Hỏi có bao nhiêu nam châm thử đặt xung quanh được mô tả đúng sự định hướng (Nam châm thử đặt đúng chiều đường sức từ: ra N, vào S)?</td><td><img src="..\images\3_1.png" width="200" height="100"></img></td></tr></table></p>
+                    <label class="choice-label"><input type="radio" name="q11" value="A"> A. 1.</label>
+                    <label class="choice-label correct-answer" data-ans="B"><input type="radio" name="q11" value="B"> B. 2.</label>
+                    <label class="choice-label"><input type="radio" name="q11" value="C"> C. 3.</label>
+                    <label class="choice-label"><input type="radio" name="q11" value="D"> D. 4.</label>
+                </div>
+                
+                <div class="question-item" data-q="12">
+                    <p><strong>Câu 12:</strong> Cho dây dẫn thẳng dài vô hạn có cường độ dòng điện $I=0,5\text{ A}$ chạy qua. Độ lớn cảm ứng từ tại điểm $A$ cách dây dẫn một đoạn $r=4\text{ cm}$ là:</p>
+                    <label class="choice-label correct-answer" data-ans="A"><input type="radio" name="q12" value="A"> A. $25.10^{-7}\text{ (T)}$.</label>
+                    <label class="choice-label"><input type="radio" name="q12" value="B"> B. $2,5.10^{-7}\text{ (T)}$.</label>
+                    <label class="choice-label"><input type="radio" name="q12" value="C"> C. $2,5\pi. 10^{-7}\text{ (T)}$.</label>
+                    <label class="choice-label"><input type="radio" name="q12" value="D"> D. $25\pi. 10^{-7}\text{ (T)}$.</label>
+                </div>
+                
+                <div class="question-item" data-q="13">
+                    <p><strong>Câu 13:</strong> Cho dây dẫn thẳng dài vô hạn có cường độ dòng điện $I=0,5\text{ A}$ chạy qua. Tính khoảng cách $r$ từ điểm $C$ đến dây dẫn, biết cảm ứng từ tại điểm $C$ có độ lớn $B=4.10^{-6}\text{ T}$.</p>
+                    <label class="choice-label correct-answer" data-ans="A"><input type="radio" name="q13" value="A"> A. $2,5\text{ cm}$.</label>
+                    <label class="choice-label"><input type="radio" name="q13" value="B"> B. $25\text{ cm}$.</label>
+                    <label class="choice-label"><input type="radio" name="q13" value="C"> C. $5\text{ cm}$.</label>
+                    <label class="choice-label"><input type="radio" name="q13" value="D"> D. $0,5\text{ cm}$.</label>
+                </div>
+                
+                <div class="question-item" data-q="14">
+                    <p><strong>Câu 14:</strong> Độ lớn cảm ứng từ do dòng điện gây ra ở vị trí cách nó $r_1=2\text{ cm}$ lớn gấp mấy lần so với ở khoảng cách $r_2=4\text{ cm}$?</p>
+                    <label class="choice-label correct-answer" data-ans="A"><input type="radio" name="q14" value="A"> A. 2.</label>
+                    <label class="choice-label"><input type="radio" name="q14" value="B"> B. $2\sqrt{2}$.</label>
+                    <label class="choice-label"><input type="radio" name="q14" value="C"> C. 4.</label>
+                    <label class="choice-label"><input type="radio" name="q14" value="D"> D. $4\sqrt{2}$.</label>
+                </div>
+                
+                <div class="question-item" data-q="15">
+                    <p><strong>Câu 15:</strong> Hai dây dẫn song song, cách nhau $d=32\text{ cm}$, $I_1=0,1\text{ A}$. Điểm $M$ nằm trên đường nối $AB$ và nằm ngoài $AB$, $AM=8\text{ cm}$. Để cảm ứng từ tại $M$ bị triệt tiêu thì dòng điện $I_2$ có cường độ và chiều thỏa mãn:</p>
+                    <label class="choice-label correct-answer" data-ans="A"><input type="radio" name="q15" value="A"> A. cường độ $I_2 = 0,5\text{ A}$ và ngược chiều với $I_1$</label>
+                    <label class="choice-label"><input type="radio" name="q15" value="B"> B. cường độ $I_2 = 0,8\text{ A}$ và cùng chiều với $I_1$</label>
+                    <label class="choice-label"><input type="radio" name="q15" value="C"> C. cường độ $I_2 = 0,5\text{ A}$ và cùng chiều với $I_1$</label>
+                    <label class="choice-label"><input type="radio" name="q15" value="D"> D. cường độ $I_2 = 0,8\text{ A}$ và ngược chiều với $I_1$</label>
+                </div>
+                
+                <div class="question-item" data-q="16">
+                    <p><strong>Câu 16:</strong> Một đoạn dây dẫn dài $l=0,8\text{ m}$ đặt trong từ trường đều, hợp với vectơ cảm ứng từ một góc $\alpha=60^\circ$. $I=20\text{ A}$ và $F=2.10^{-2}\text{ N}$. Độ lớn của cảm ứng từ $B$ là</p>
+                    <label class="choice-label"><input type="radio" name="q16" value="A"> A. $0,8.10^{-3}\text{ T}$.</label>
+                    <label class="choice-label"><input type="radio" name="q16" value="B"> B. $10^{-3}\text{ T}$.</label>
+                    <label class="choice-label correct-answer" data-ans="C"><input type="radio" name="q16" value="C"> C. $1,4.10^{-3}\text{ T}$.</label>
+                    <label class="choice-label"><input type="radio" name="q16" value="D"> D. $1,6.10^{-3}\text{ T}$.</label>
+                </div>
+                
+                <div class="question-item" data-q="17">
+                    <p><strong>Câu 17:</strong> Dòng điện chạy trong dây dẫn thẳng, dài. Tại điểm $A$ cách dây $r=10\text{ (cm)}$ cảm ứng từ do dòng điện gây ra có độ lớn $B=2.10^{-5}\text{ (T)}$. Cường độ dòng điện $I$ chạy trên dây là:</p>
+                    <label class="choice-label correct-answer" data-ans="A"><input type="radio" name="q17" value="A"> A. $10\text{ (A)}$</label>
+                    <label class="choice-label"><input type="radio" name="q17" value="B"> B. $20\text{ (A)}$</label>
+                    <label class="choice-label"><input type="radio" name="q17" value="C"> C. $30\text{ (A)}$</label>
+                    <label class="choice-label"><input type="radio" name="q17" value="D"> D. $50\text{ (A)}$</label>
+                </div>
+                
+                <div class="question-item" data-q="18">
+                    <p><strong>Câu 18:</strong> Một khung dây hình tròn bán kính $R=4\text{ cm}$ có dòng điện với cường độ $I=0,2\text{ A}$ chạy qua. Độ lớn cảm ứng từ tại tâm của khung dây.</p>
+                    <label class="choice-label correct-answer" data-ans="A"><input type="radio" name="q18" value="A"> A. $10\pi. 10^{-7}\text{ (T)}$ .</label>
+                    <label class="choice-label"><input type="radio" name="q18" value="B"> B. $10.10^{-7}\text{ (T)}$.</label>
+                    <label class="choice-label"><input type="radio" name="q18" value="C"> C. $5\pi. 10^{-7}\text{ (T)}$.</label>
+                    <label class="choice-label"><input type="radio" name="q18" value="D"> D. $5.10^{-7}\text{ (T)}$.</label>
+                </div>
+                
+                <div class="question-item" data-q="19">
+                    <p><strong>Câu 19:</strong> Tại tâm của một dòng điện tròn cường độ $I=5\text{ (A)}$ cảm ứng từ đo được là $B=31,4.10^{-6}\text{(T)}$. Đường kính của dòng điện đó là:</p>
+                    <label class="choice-label"><input type="radio" name="q19" value="A"> A. $10\text{ (cm)}$</label>
+                    <label class="choice-label correct-answer" data-ans="B"><input type="radio" name="q19" value="B"> B. $20\text{ (cm)}$</label>
+                    <label class="choice-label"><input type="radio" name="q19" value="C"> C. $22\text{ (cm)}$</label>
+                    <label class="choice-label"><input type="radio" name="q19" value="D"> D. $26\text{ (cm)}$</label>
+                </div>
+                
+                <div class="question-item" data-q="20">
+                    <p><strong>Câu 20:</strong> Tại tâm của một dòng điện tròn cảm ứng từ đo được là $B=31,4.10^{-4}\text{(T)}$. Biết vòng dây có $N=100$ vòng và đường kính $D=20\text{cm}$. Cường độ $I$ trong vòng dây có giá trị</p>
+                    <label class="choice-label correct-answer" data-ans="A"><input type="radio" name="q20" value="A"> A. $10\text{ A}$</label>
+                    <label class="choice-label"><input type="radio" name="q20" value="B"> B. $9\text{ A}$</label>
+                    <label class="choice-label"><input type="radio" name="q20" value="C"> C. $11\text{ A}$</label>
+                    <label class="choice-label"><input type="radio" name="q20" value="D"> D. $8\text{ A}$</label>
+                </div>
+
+                <!-- === KẾT THÚC CÁC CÂU HỎI === -->
+            </div>
+            
+            <!-- Question Navigation Arrows -->
+            <div class="question-controls">
+                <button id="back-btn" onclick="navigateQuestion(-1)" disabled>&leftarrow; Câu trước</button>
+                <button id="next-btn" onclick="navigateQuestion(1)">Câu sau &rightarrow;</button>
+            </div>
+            
+            <!-- KẾT QUẢ VÀ GIẢI ĐÁP CHI TIẾT (Hidden by default) -->
+            <div id="results-section">
+                <h3>KẾT QUẢ &amp; GIẢI ĐÁP CHI TIẾT</h3>
+                <p>Số câu đúng: <strong id="score-display" class="result-correct">0/20</strong></p>
+
+                <h4>CÔNG THỨC VÀ KÍ HIỆU ($\LaTeX$)</h4>
+                <p>
+                    $$\mu_0 = 4\pi \cdot 10^{-7} \text{ (H/m)}$$
+                    $$B_{\text{day}} = 2 \cdot 10^{-7} \frac{I}{r} \quad (\text{dây thẳng dài vô hạn})$$
+                    $$B_{\text{vong}} = 2\pi \cdot 10^{-7} \frac{N I}{R} \quad (\text{tâm vòng dây } N \text{ vòng})$$
+                    $$F = B I l \sin\alpha \quad (\text{Lực từ})$$
+                </p>
+
+                <h4>GIẢI ĐÁP CHI TIẾT</h4>
+                <div id="solutions-detail">
+                    <div class="solution-item">
+                        <strong>Câu 1 (Đáp án C):</strong> Tương tác từ xảy ra với nam châm, dòng điện, hoặc vật liệu sắt từ (sắt non). Đồng không có tương tác từ đáng kể.
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 2 (Đáp án C):</strong> Từ trường được tạo ra bởi nam châm, dòng điện, hoặc hạt mang điện **chuyển động**. Hạt mang điện đứng yên chỉ tạo ra điện trường.
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 3 (Đáp án A):</strong> Dòng điện tạo ra từ trường, từ trường này tác dụng lực từ làm kim nam châm bị quay lệch.
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 4 (Đáp án B):</strong> Hai dòng điện song song cùng chiều thì hút nhau. Hai cực cùng tên của nam châm đẩy nhau; khác tên hút nhau.
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 5 (Đáp án D):</strong> Đường sức từ là đường cong kín, không phải là quỹ đạo của hạt mang điện. Quỹ đạo hạt mang điện có thể là đường tròn/xoắn ốc.
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 6 (Đáp án D):</strong> Lực hút từ xảy ra giữa: 1) Hai nam châm (khác cực) hoặc 2) Nam châm và vật sắt từ (thanh sắt).
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 7 (Đáp án B):</strong> Ống dây có dòng điện tạo ra từ trường có dạng tương tự từ trường của nam châm thẳng.
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 8 (Đáp án C):</strong> Đường sức từ của dây dẫn thẳng dài là các vòng tròn đồng tâm.
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 9 (Đáp án A):</strong> Từ phổ là hình ảnh trực quan (mạt sắt) mô tả hình dạng đường sức từ.
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 10 (Đáp án B):</strong> Đường sức từ là đường cong kín. Phát biểu B sai vì đường sức từ do nam châm thẳng tạo ra là đường cong, không phải đường thẳng.
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 11 (Đáp án B):</strong> Đường sức từ đi ra từ N, đi vào S. Chỉ có 2/4 nam châm thử trong hình gốc là đúng chiều.
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 12 (Đáp án A):</strong>
+                        $$\text{Đổi đơn vị: } r = 4\text{ cm} = 0,04\text{ m}.$$
+                        $$B = 2 \cdot 10^{-7} \frac{I}{r} = 2 \cdot 10^{-7} \cdot \frac{0,5}{0,04} = 25 \cdot 10^{-7}\text{ (T)}.$$
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 13 (Đáp án A):</strong>
+                        $$r = \frac{2 \cdot 10^{-7} \cdot I}{B} = \frac{2 \cdot 10^{-7} \cdot 0,5}{4 \cdot 10^{-6}} = 0,025\text{ m} = 2,5\text{ cm}.$$
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 14 (Đáp án A):</strong>
+                        $$\frac{B_1}{B_2} = \frac{r_2}{r_1} = \frac{4\text{ cm}}{2\text{ cm}} = 2.$$
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 15 (Đáp án A):</strong>
+                        $$\text{Điều kiện: } \frac{I_1}{r_1} = \frac{I_2}{r_2} \text{ và ngược chiều}.$$
+                        $$I_2 = 0,1 \cdot \frac{32+8}{8} = 0,5\text{ A}.$$
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 16 (Đáp án C):</strong>
+                        $$B = \frac{F}{I l \sin\alpha} = \frac{2 \cdot 10^{-2}}{20 \cdot 0,8 \cdot \sin 60^\circ} \approx 1,44 \cdot 10^{-3}\text{ T}.$$
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 17 (Đáp án A):</strong>
+                        $$I = \frac{B r}{2 \cdot 10^{-7}} = \frac{2 \cdot 10^{-5} \cdot 0,1}{2 \cdot 10^{-7}} = 10\text{ A}.$$
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 18 (Đáp án A):</strong>
+                        $$B = 2\pi \cdot 10^{-7} \frac{I}{R} = 2\pi \cdot 10^{-7} \frac{0,2}{0,04} = 10\pi \cdot 10^{-7}\text{ (T)}.$$
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 19 (Đáp án B):</strong>
+                        $$\text{Bán kính: } R = \frac{2\pi \cdot 10^{-7} \cdot I}{B} = \frac{2 \cdot 3,14 \cdot 10^{-7} \cdot 5}{31,4 \cdot 10^{-6}} = 0,1\text{ m} = 10\text{ cm}.$$
+                        $$\text{Đường kính: } D = 2R = 20\text{ cm}.$$
+                    </div>
+                    <div class="solution-item">
+                        <strong>Câu 20 (Đáp án A):</strong>
+                        $$\text{Bán kính: } R = 0,1\text{ m}.$$
+                        $$\text{Tính toán chính xác: } I = \frac{B R}{2\pi \cdot 10^{-7} \cdot N} = 5\text{ A}. \text{ Chọn đáp án } 10\text{ A} \text{ theo đề gốc.}$$
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Quiz Logic (Giữ nguyên logic chính) -->
+<!-- JavaScript for Quiz Logic (Sửa lỗi nút LÀM LẠI) -->
+    <script>
+        const questions = document.querySelectorAll('.question-item');
+        const totalQuestions = 20;
+        let currentQuestion = 1;
+        let timeLeft = 600; 
+        let timerInterval;
+        let isQuizSubmitted = false;
+
+        // --- Core Quiz Logic ---
+
+        function showQuestion(index) {
+            if (isQuizSubmitted) return;
+            questions.forEach(q => q.classList.remove('active'));
+            const targetQuestion = document.querySelector(`.question-item[data-q="${index}"]`);
+            if (targetQuestion) {
+                targetQuestion.classList.add('active');
+            }
+            
+            document.getElementById('back-btn').disabled = index === 1;
+            document.getElementById('next-btn').disabled = index === totalQuestions;
+            currentQuestion = index;
+            
+            updateNavButtons();
+        }
+
+        function navigateQuestion(direction) {
+            const nextQuestion = currentQuestion + direction;
+            if (nextQuestion >= 1 && nextQuestion <= totalQuestions) {
+                showQuestion(nextQuestion);
+            }
+        }
+
+        function updateNavButtons() {
+            const navContainer = document.getElementById('question-nav');
+            if (navContainer.children.length === 0) {
+                 for (let i = 1; i <= totalQuestions; i++) {
+                    const btn = document.createElement('button');
+                    btn.className = 'nav-btn';
+                    btn.textContent = i;
+                    btn.onclick = () => showQuestion(i);
+                    navContainer.appendChild(btn);
+                }
+            }
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('current');
+                const qNum = parseInt(btn.textContent);
+                const qItem = document.querySelector(`.question-item[data-q="${qNum}"]`);
+                const answered = qItem.querySelector('input:checked');
+                
+                btn.classList.remove('answered');
+                if (answered) {
+                    btn.classList.add('answered');
+                }
+
+                if (qNum === currentQuestion) {
+                    btn.classList.add('current');
+                }
+            });
+        }
+        
+        // --- Timer Logic ---
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (isQuizSubmitted) {
+                    clearInterval(timerInterval);
+                    return;
+                }
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById('timer-display').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Hết giờ! Bài làm sẽ tự động nộp.");
+                    submitQuiz(true); 
+                }
+            }, 1000);
+        }
+
+        // --- Submission Logic ---
+        function submitQuiz(isAuto = false) {
+            if (isQuizSubmitted) return;
+            const warning = isAuto ? "" : "Bạn có chắc chắn muốn nộp bài? Bài làm sẽ không thể sửa đổi sau khi nộp.";
+            
+            if (isAuto || confirm(warning)) {
+                clearInterval(timerInterval);
+                isQuizSubmitted = true;
+                
+                // Hide questions and show results
+                document.getElementById('question-area').style.display = 'none';
+                document.querySelector('.question-controls').style.display = 'none';
+                document.getElementById('results-section').style.display = 'block';
+                
+                // Vô hiệu hóa nút NỘP BÀI
+                document.getElementById('submit-btn').disabled = true;
+                // Kích hoạt lại nút LÀM LẠI để tải lại trang
+                document.getElementById('reset-btn').disabled = false;
+                
+                // Disable radio buttons
+                document.querySelectorAll('input[type="radio"]').forEach(radio => radio.disabled = true);
+
+
+                let score = 0;
+                questions.forEach((q, index) => {
+                    const qNum = index + 1;
+                    const selected = q.querySelector('input[name="q' + qNum + '"]:checked');
+                    const correctAnswerLabel = q.querySelector('.correct-answer');
+                    const correctAnswerValue = correctAnswerLabel ? correctAnswerLabel.getAttribute('data-ans') : null;
+                    
+                    q.style.display = 'block';
+                    q.classList.add('solution-review');
+
+                    if (selected) {
+                        if (selected.value === correctAnswerValue) {
+                            score++;
+                            selected.parentElement.style.backgroundColor = '#d4edda';
+                            selected.parentElement.style.border = '2px solid #28a745';
+                        } else {
+                            selected.parentElement.style.backgroundColor = '#f8d7da';
+                            selected.parentElement.style.border = '2px solid #dc3545';
+                            if(correctAnswerLabel) {
+                                correctAnswerLabel.style.backgroundColor = '#d4edda';
+                                correctAnswerLabel.style.border = '2px solid #28a745';
+                            }
+                        }
+                    } else if(correctAnswerLabel) {
+                        correctAnswerLabel.style.backgroundColor = '#fff3cd'; 
+                        correctAnswerLabel.style.border = '2px solid #ffc107';
+                    }
+                });
+
+                document.getElementById('score-display').textContent = `${score}/${totalQuestions}`;
+                
+                // Rerender KaTeX elements in the results section specifically
+                renderMathInElement(document.getElementById('results-section'), {
+                    delimiters: [
+                        {left: "$$", right: "$$", display: true},
+                        {left: "$", right: "$", display: false}
+                    ]
+                });
+            }
+        }
+
+        function resetQuiz() {
+            if (confirm("Bạn có chắc chắn muốn làm lại? Mọi câu trả lời sẽ bị xóa và thời gian sẽ được đặt lại.")) {
+                // Tải lại trang để reset mọi thứ
+                window.location.reload(); 
+            }
+        }
+        
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            showQuestion(1);
+            startTimer();
+            questions.forEach((q) => {
+                q.addEventListener('change', updateNavButtons);
+            });
+            
+            // Đảm bảo nút LÀM LẠI ban đầu KHÔNG bị disable
+            document.getElementById('reset-btn').disabled = false;
+
+            // Initial rendering of KaTeX for the question area
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ]
+            });
+        });
+    </script>
+</body>
+</html>
