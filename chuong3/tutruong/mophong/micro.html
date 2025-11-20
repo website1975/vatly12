@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô phỏng Micro & Lý Thuyết</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #eee;
+            /* Thiết lập body cho chế độ 2 cột trên desktop */
+            height: 100vh;
+            overflow: auto; /* Mặc định cuộn trên mobile */
+        }
+        @media (min-width: 768px) {
+            body {
+                overflow: hidden; /* Ngăn cuộn toàn bộ trang trên desktop */
+            }
+        }
+        canvas {
+            display: block;
+            background: #0f0f0f;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            /* Đảm bảo canvas sử dụng hết không gian còn lại */
+            width: 100%;
+            height: 100%;
+        }
+        .control-panel {
+            background: rgba(40, 40, 40, 0.9);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid #444;
+            /* Loại bỏ border-bottom cũ */
+        }
+        input[type=range] {
+            accent-color: #3b82f6;
+        }
+        /* Styles cho phần lý thuyết */
+        .theory-section h2 {
+            color: #60a5fa;
+            border-bottom: 2px solid #374151;
+            padding-bottom: 0.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .theory-section h3 {
+            color: #9ca3af;
+            font-weight: bold;
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+        }
+        .theory-section ul {
+            list-style-type: disc;
+            margin-left: 1.5rem;
+            color: #d1d5db;
+        }
+        .theory-section li {
+            margin-bottom: 0.5rem;
+        }
+        .theory-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background-color: #262626;
+        }
+        .theory-table th, .theory-table td {
+            border: 1px solid #4b5563;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        .theory-table th {
+            background-color: #374151;
+            color: #fff;
+        }
+        .math-box {
+            background-color: #262626;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0.5rem 0;
+            border-left: 4px solid #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CONTAINER CHÍNH: CHUYỂN SANG GRID 2 CỘT TỪ MD: TRỞ LÊN -->
+    <div class="h-full flex flex-col md:grid md:grid-cols-2">
+
+        <!-- CỘT TRÁI: MÔ PHỎNG VÀ ĐIỀU KHIỂN (FIXED) -->
+        <div id="left-column" class="flex flex-col bg-gray-900 p-4 md:p-6 md:h-full h-[60vh]">
+            
+            <!-- 1. KHU VỰC CANVAS (Mô phỏng) -->
+            <div class="flex-grow relative flex justify-center items-center rounded-lg overflow-hidden border border-gray-700">
+                <canvas id="simCanvas"></canvas>
+                
+                <!-- Overlay hướng dẫn -->
+                <div class="absolute top-4 left-4 text-xs md:text-sm text-gray-400 bg-black/60 p-2 rounded backdrop-blur-sm border border-gray-700 z-10">
+                    <p class="font-bold mb-1 text-white">Chú giải:</p>
+                    <p><span class="inline-block w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>Sóng âm</p>
+                    <p><span class="inline-block w-3 h-3 bg-orange-400 rounded-full mr-2"></span>Cuộn dây</p>
+                    <p><span class="inline-block w-3 h-3 bg-green-400 rounded-full mr-2"></span>Tín hiệu điện</p>
+                </div>
+            </div>
+
+            <!-- 2. BẢNG ĐIỀU KHIỂN -->
+            <div class="control-panel p-4 shrink-0 mt-4 rounded-lg">
+                <div class="max-w-4xl mx-auto grid grid-cols-1 gap-4 md:gap-8">
+                    <!-- Điều khiển Âm lượng -->
+                    <div class="flex flex-col space-y-1">
+                        <label for="volume" class="flex justify-between font-medium text-sm md:text-base">
+                            <span>Cường độ âm (Biên độ)</span>
+                            <span id="volValue" class="text-blue-400">50%</span>
+                        </label>
+                        <input type="range" id="volume" min="0" max="100" value="50" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <!-- Điều khiển Tần số -->
+                    <div class="flex flex-col space-y-1">
+                        <label for="freq" class="flex justify-between font-medium text-sm md:text-base">
+                            <span>Cao độ âm (Tần số)</span>
+                            <span id="freqValue" class="text-blue-400">Trung bình</span>
+                        </label>
+                        <input type="range" id="freq" min="1" max="10" value="3" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-2 text-xs text-gray-400 md:hidden">
+                Cuộn xuống dưới để xem lý thuyết chi tiết ↓
+            </div>
+        </div>
+
+        <!-- CỘT PHẢI: LÝ THUYẾT (SCROLLABLE) -->
+        <div id="right-column" class="theory-section bg-gray-800 text-gray-300 p-6 md:p-10 md:overflow-y-auto h-auto md:h-full border-t md:border-t-0 md:border-l border-gray-700">
+            <div class="max-w-4xl mx-auto">
+                <h1 class="text-3xl md:text-4xl font-bold text-white mb-6 border-b border-gray-600 pb-4">Kiến Thức Về Micro Điện Động</h1>
+
+                <!-- Mục 1 -->
+                <h2>1. Nguyên Lý Làm Việc</h2>
+                <p class="mb-4">Micro điện động hoạt động dựa trên hiện tượng <strong class="text-white">Cảm ứng điện từ</strong>.</p>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li><strong>Đầu vào:</strong> Cơ năng (Dao động của sóng âm).</li>
+                    <li><strong>Đầu ra:</strong> Điện năng (Dao động điện cùng tần số).</li>
+                </ul>
+                <p class="mt-4 font-semibold text-white">Cơ chế hoạt động: [Image of Dynamic microphone diagram]</p>
+                <ol class="list-decimal pl-5 space-y-1 mt-2">
+                    <li>Nguồn âm phát ra sóng âm truyền đến màng rung.</li>
+                    <li>Sóng âm làm <strong>màng rung</strong> dao động, kéo theo <strong>cuộn dây</strong> gắn với nó.</li>
+                    <li>Cuộn dây di chuyển trong từ trường của <strong>nam châm</strong>, cắt các đường sức từ.</li>
+                    <li>Từ thông biến thiên sinh ra <strong>suất điện động cảm ứng</strong> ở hai đầu cuộn dây.</li>
+                </ol>
+
+                <!-- Mục 2 -->
+                <h2>2. Cấu Tạo và Nhiệm Vụ</h2>
+                <div class="overflow-x-auto">
+                    <table class="theory-table">
+                        <thead>
+                            <tr>
+                                <th>Bộ phận</th>
+                                <th>Đặc điểm</th>
+                                <th>Nhiệm vụ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-bold text-white">1. Màng rung (Diaphragm)</td>
+                                <td>Mỏng, nhẹ, đàn hồi tốt.</td>
+                                <td>Nhận sóng âm, chuyển thành dao động cơ.</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold text-white">2. Cuộn dây (Voice Coil)</td>
+                                <td>Nhiều vòng dây, gắn vào màng.</td>
+                                <td>Vật dẫn chuyển động cắt từ trường sinh điện.</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold text-white">3. Nam châm (Magnet)</td>
+                                <td>Nam châm vĩnh cửu mạnh.</td>
+                                <td>Tạo môi trường từ trường tĩnh.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mục 3 -->
+                <h2>3. Các Công Thức Cần Nhớ</h2>
+                
+                <h3>a. Từ thông qua cuộn dây ($\Phi$)</h3>
+                <div class="math-box">
+                    &Phi; = N &middot; B &middot; S &middot; cos(&omega;t + &phi;)
+                </div>
+                <ul class="text-sm italic">
+                    <li>N: Số vòng dây</li>
+                    <li>B: Cảm ứng từ (Tesla)</li>
+                    <li>S: Diện tích cuộn dây (m²)</li>
+                    <li>&omega;: Tần số góc (rad/s)</li>
+                </ul>
+
+                <h3>b. Suất điện động cảm ứng (e)</h3>
+                <p>Theo định luật Faraday:</p>
+                <div class="math-box">
+                    e = -(&Phi;)' = N &middot; B &middot; S &middot; &omega; &middot; sin(&omega;t + &phi;)
+                </div>
+
+                <h3>c. Biên độ suất điện động (E₀)</h3>
+                <p>Độ lớn cực đại của tín hiệu (Volume max):</p>
+                <div class="math-box">
+                    E₀ = N &middot; B &middot; S &middot; &omega;
+                </div>
+                <p class="text-yellow-400 text-sm mt-2">
+                    ⚠ <strong>Lưu ý:</strong> Tín hiệu điện tỉ lệ thuận với tần số (&omega;). Âm thanh bổng (tần số cao) sinh ra điện áp lớn hơn âm trầm.
+                </p>
+                
+                <div class="h-20"></div> <!-- Khoảng trắng cuối trang -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- JAVASCRIPT MÔ PHỎNG (Giữ nguyên logic cũ) ---
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let volume = 0.5; 
+        let frequency = 0.05; 
+        let time = 0;
+        let signalHistory = []; 
+        const maxHistory = 400; 
+
+        const volumeInput = document.getElementById('volume');
+        const freqInput = document.getElementById('freq');
+        const volDisplay = document.getElementById('volValue');
+        const freqDisplay = document.getElementById('freqValue');
+
+        volumeInput.addEventListener('input', (e) => {
+            volume = e.target.value / 100;
+            volDisplay.innerText = e.target.value + "%";
+        });
+
+        freqInput.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            frequency = 0.02 + (val * 0.015); 
+            let label = "Trung bình";
+            if(val < 4) label = "Thấp (Trầm)";
+            else if(val > 7) label = "Cao (Bổng)";
+            freqDisplay.innerText = label;
+        });
+
+        // Hàm resize canvas để luôn fit không gian hiện tại của cha
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const w = canvas.width;
+            const h = canvas.height;
+            const centerX = w / 2;
+            const centerY = h / 3; 
+            const graphY = h * 0.75; 
+
+            // Cập nhật lại vị trí các điểm neo dựa trên kích thước mới
+            const dispMultiplier = w / 10; // Giới hạn biên độ tương đối với chiều rộng
+            const graphStart = h * 0.65; // Bắt đầu biểu đồ ở 65% chiều cao
+
+            const displacement = Math.sin(time) * (volume * (dispMultiplier * 0.6)); 
+            const signal = displacement; 
+
+            signalHistory.push(signal);
+            if (signalHistory.length > maxHistory) {
+                signalHistory.shift();
+            }
+
+            // --- VẼ MÔ HÌNH MICRO ---
+            
+            // Kích thước cố định (tương đối)
+            const coilW = 80;
+            const magW = 60;
+            
+            // Nam châm (Cố định)
+            ctx.fillStyle = "#ef4444"; 
+            ctx.fillRect(centerX - magW/2, centerY - 20, magW/2, 40);
+            ctx.fillStyle = "white";
+            ctx.font = "bold 14px Arial";
+            ctx.fillText("N", centerX - 20, centerY + 5);
+            ctx.fillStyle = "#3b82f6";
+            ctx.fillRect(centerX, centerY - 20, magW/2, 40);
+            ctx.fillStyle = "white";
+            ctx.fillText("S", centerX + 10, centerY + 5);
+
+            // Vỏ Mic (Khung cố định)
+            ctx.strokeStyle = "#555";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.rect(centerX - 50, centerY - 50, 100, 100);
+            ctx.stroke();
+
+            // Cuộn dây (Di chuyển)
+            const coilX = centerX + displacement; 
+            
+            ctx.strokeStyle = "#fb923c";
+            ctx.lineWidth = 3;
+            
+            // Vẽ cuộn dây
+            for(let i = 0; i < 5; i++) {
+                let x = coilX - coilW/2 + (i * 15);
+                ctx.beginPath();
+                ctx.moveTo(x, centerY - 25);
+                ctx.lineTo(x + 10, centerY - 25);
+                ctx.moveTo(x, centerY + 25);
+                ctx.lineTo(x + 10, centerY + 25);
+                ctx.stroke();
+            }
+
+            // Màng rung
+            const diaphragmX = coilX - coilW/2 - 10; 
+            ctx.beginPath();
+            ctx.moveTo(diaphragmX, centerY - 45);
+            ctx.quadraticCurveTo(diaphragmX - 10, centerY, diaphragmX, centerY + 45);
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = "#ddd"; 
+            ctx.stroke();
+            
+            // Nón hứng âm
+            ctx.fillStyle = "rgba(200, 200, 200, 0.15)";
+            ctx.beginPath();
+            ctx.moveTo(diaphragmX, centerY - 45);
+            ctx.lineTo(diaphragmX - 30, centerY - 60);
+            ctx.lineTo(diaphragmX - 30, centerY + 60);
+            ctx.lineTo(diaphragmX, centerY + 45);
+            ctx.fill();
+
+            // Sóng âm
+            if (volume > 0.05) {
+                ctx.strokeStyle = `rgba(234, 179, 8, ${volume})`; 
+                ctx.lineWidth = 2;
+                for (let i = 0; i < 5; i++) {
+                    let waveX = (centerX - 200) + ((time * 50 + i * 40) % 150);
+                    let waveSize = 20 + (waveX - (centerX-200)) / 4; 
+                    ctx.beginPath();
+                    ctx.arc(waveX, centerY, waveSize, -0.5, 0.5);
+                    ctx.stroke();
+                }
+            }
+
+            // Dây nối
+            ctx.beginPath();
+            ctx.strokeStyle = "#4ade80"; 
+            ctx.lineWidth = 2;
+            ctx.moveTo(coilX + 15, centerY + 25); 
+            ctx.lineTo(coilX + 15, graphStart - 60);
+            ctx.lineTo(w - 50, graphStart - 60); 
+            ctx.stroke();
+
+            // --- VẼ BIỂU ĐỒ ---
+            const chartPadding = 20;
+            const chartW = w - 2 * chartPadding;
+            const chartX = chartPadding;
+
+            ctx.strokeStyle = "#555";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(chartX, graphStart);
+            ctx.lineTo(chartW + chartX, graphStart); 
+            ctx.stroke();
+
+            ctx.fillStyle = "#aaa";
+            ctx.font = "14px Arial";
+            ctx.fillText("Tín hiệu ra (Volt)", chartX, graphStart - 70);
+
+            ctx.beginPath();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "#4ade80"; 
+            const startX = chartW + chartX; 
+            
+            // Duyệt ngược mảng lịch sử để vẽ từ phải qua trái
+            for (let i = 0; i < signalHistory.length; i++) {
+                const x = startX - i * 2; 
+                const y = graphStart - signalHistory[signalHistory.length - 1 - i]; 
+                if (x < chartX) break; 
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            
+            time += frequency;
+            requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
+</body>
+</html>

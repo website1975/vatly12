@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng & Kiến Thức Cơ Bản Về Loa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải MathJax cho việc hiển thị công thức LaTeX -->
+        <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+</script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+<style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            overflow-x: hidden;
+        }
+        .canvas-container {
+            border: 1px solid #ccc;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            min-height: 250px;
+        }
+        
+        /* --- Cấu tạo Loa (Cột 2) - Dựa trên hình ảnh mặt cắt ngang mới --- */
+        .speaker-sim-area {
+            position: relative;
+            width: 90%; 
+            max-width: 300px;
+            height: 150px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #000000; /* Nền đen */
+            border-radius: 8px;
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
+            padding: 10px 0;
+            overflow: hidden;
+        }
+
+        /* 1. Nam châm Vòng ngoài (Cực S) */
+        .outer-magnet-yoke {
+            position: absolute;
+            width: 140px; 
+            height: 70px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            /* Tạo khoảng hở bên trong bằng box-shadow/viền */
+            border: 5px solid #3b82f6; /* Xanh - S */
+            background-color: transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            z-index: 5;
+        }
+        .outer-pole-label {
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        /* 2. Cực giữa (Pole Piece - Cực N) */
+        .inner-pole-piece {
+            position: absolute;
+            width: 80px; 
+            height: 30px;
+            background-color: #ef4444; /* Đỏ - N */
+            z-index: 10;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            border-radius: 2px;
+        }
+
+        /* 3. Cuộn dây (Voice Coil) - Nằm trong khoảng hở giữa N và S */
+        .speaker-coil {
+            position: absolute;
+            width: 30px; 
+            height: 50px;
+            background-color: transparent;
+            border: 2px dashed #fcd34d; /* Màu cam/vàng đứt nét */
+            z-index: 15;
+            left: 60px; /* Vị trí bắt đầu nằm trong khoảng hở từ trường */
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 5px;
+            box-sizing: border-box;
+            padding: 5px;
+            transition: transform 0.05s linear; /* Thêm transition cho chuyển động mượt */
+        }
+        
+        /* 4. Màng loa (Cone) - ĐÃ ĐIỀU CHỈNH: Hình dáng mặt cắt tam giác */
+        .speaker-cone {
+            position: absolute;
+            width: 80px; 
+            height: 100px;
+            background-color: transparent; /* Bỏ màu nền */
+            /* Sử dụng viền để tạo hình tam giác mặt cắt (dày 2px) */
+            border-left: 2px solid #a9a9a9; 
+            border-top: 2px solid #a9a9a9; 
+            border-bottom: 2px solid #a9a9a9; 
+            
+            /* Dùng clip-path để tạo hình tam giác thay vì hình nón */
+            clip-path: polygon(100% 50%, 0% 0%, 0% 100%);
+            
+            z-index: 10;
+            left: 20px; /* Vị trí bắt đầu phía trước */
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.05s linear;
+        }
+
+        /* Thay đổi vị trí Sóng Âm ra để nằm chính xác ở đầu màng loa */
+        .output-cone {
+            position: absolute;
+            left: -10px; /* Đẩy ra phía trước màng loa */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 20px 0 20px 40px; 
+            border-color: transparent transparent transparent #f59e0b; 
+            opacity: 0;
+            z-index: 12;
+        }
+
+        /* Dây tín hiệu (Wire) */
+        .signal-wire {
+            position: absolute;
+            width: 200px; 
+            height: 3px; 
+            background-color: #10b981; /* Màu xanh lá */
+            bottom: 0px; 
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+        }
+
+        /* Lực Từ (Mũi tên) */
+        .force-arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.1s ease-in-out;
+            left: 100px; /* Gần cuộn dây */
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .arrow-right {
+            border-width: 8px 0 8px 16px;
+            border-color: transparent transparent transparent #059669; /* Green: Lực đẩy ra */
+        }
+        .arrow-left {
+            border-width: 8px 16px 8px 0;
+            border-color: transparent #ef4444 transparent transparent; /* Red: Lực kéo vào */
+        }
+
+        /* Định dạng cho công thức LaTeX */
+        .latex-formula {
+            display: block;
+            margin: 1rem 0;
+            padding: 0.5rem 1rem;
+            background-color: #f0f4f8;
+            border-left: 4px solid #3b82f6;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.1em;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <h1 class="text-3xl font-extrabold text-center text-gray-900 mb-8">
+            Mô Phỏng & Tài Liệu Tham Khảo Về Loa Điện Động
+        </h1>
+        
+        <!-- ============================================== -->
+        <!-- PHẦN MÔ PHỎNG TƯƠNG TÁC -->
+        <!-- ============================================== -->
+
+        <section id="simulation" class="mb-10 p-6 bg-white rounded-xl shadow-2xl border border-blue-100">
+            <h2 class="text-2xl font-bold mb-4 text-blue-800">Mô Phỏng 3 Phần Hoạt Động Của Loa</h2>
+
+            <!-- Khu vực Điều khiển -->
+            <div class="p-4 mb-6 bg-gray-50 rounded-lg border border-gray-200">
+                <h3 class="text-xl font-semibold mb-3 text-gray-800">Điều chỉnh Tín hiệu Đầu vào</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <!-- Điều khiển Biên độ -->
+                    <div>
+                        <label for="amplitudeRange" class="block text-sm font-medium text-gray-700 mb-1">
+                            Biên độ (Amplitude): <span id="amplitudeValue" class="font-bold text-blue-600">0.5</span>
+                        </label>
+                        <input type="range" id="amplitudeRange" min="0.1" max="1.0" step="0.05" value="0.5" 
+                               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg">
+                    </div>
+
+                    <!-- Điều khiển Tần số -->
+                    <div>
+                        <label for="frequencyRange" class="block text-sm font-medium text-gray-700 mb-1">
+                            Tần số (Frequency): <span id="frequencyValue" class="font-bold text-red-600">1.0</span> Hz
+                        </label>
+                        <input type="range" id="frequencyRange" min="0.2" max="5.0" step="0.1" value="1.0" 
+                               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer range-lg">
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Khu vực hiển thị 3 cột -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+                <!-- Cột 1: Tín hiệu Điện (Đầu vào) - Sóng Động -->
+                <div class="canvas-container col-span-1 p-3">
+                    <h4 class="text-lg font-semibold mb-2 text-blue-700">1. Tín hiệu Điện (Đầu vào)</h4>
+                    <canvas id="electricSignalCanvas" class="w-full h-40"></canvas>
+                    <p class="text-xs mt-1 text-center text-gray-600">Cường độ dòng điện $I(t)$</p>
+                </div>
+
+                <!-- Cột 2: Mô phỏng Cơ học (Lực từ và Dao động) - ĐÃ CẬP NHẬT MÀNG LOA -->
+                <div class="canvas-container col-span-1 p-3 flex flex-col items-center justify-center">
+                    <h4 class="text-lg font-semibold mb-2 text-purple-700">2. Lực Từ & Dao Động Cơ</h4>
+                    <div class="speaker-sim-area">
+                        
+                        <!-- Nam châm Vòng ngoài (S) -->
+                        <div class="outer-magnet-yoke">
+                            <div class="outer-pole-label">S</div>
+                            <div class="outer-pole-label">S</div>
+                        </div>
+                        
+                        <!-- Cực giữa (N) -->
+                        <div class="inner-pole-piece">N</div>
+                        
+                        <!-- Cuộn dây (Voice Coil) - Dao động tịnh tiến -->
+                        <div id="voiceCoil" class="speaker-coil"></div>
+
+                        <!-- Màng loa (Cone) - Mặt cắt tam giác -->
+                        <div id="speakerCone" class="speaker-cone">
+                            <!-- Sóng âm ra (hình nón nhỏ) -->
+                            <div id="outputCone" class="output-cone"></div>
+                        </div>
+                        
+                        <!-- Lực Từ (Mũi tên) - Thay đổi chiều và vị trí -->
+                        <div id="forceArrow" class="force-arrow"></div>
+
+                        <!-- Dây tín hiệu (Phần dưới) -->
+                        <div class="signal-wire"></div>
+
+                    </div>
+                    <p class="text-xs mt-2 text-center text-gray-600">Độ dịch chuyển $x(t)$ (Lực từ $F \sim I$).</p>
+                </div>
+
+                <!-- Cột 3: Sóng Âm (Đầu ra) - Sóng Động -->
+                <div class="canvas-container col-span-1 p-3">
+                    <h4 class="text-lg font-semibold mb-2 text-red-700">3. Sóng Âm (Đầu ra)</h4>
+                    <canvas id="soundWaveCanvas" class="w-full h-40"></canvas>
+                    <p class="text-xs mt-1 text-center text-gray-600">Áp suất sóng âm $P(t)$</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- PHẦN KIẾN THỨC CƠ BẢN -->
+        <!-- ============================================== -->
+
+        <section id="theory" class="p-6 bg-white rounded-xl shadow-2xl border border-yellow-100">
+            <h2 class="text-2xl font-bold mb-4 text-yellow-800">Kiến Thức Cơ Bản Về Loa Điện Động</h2>
+            
+            <p class="mb-4 text-gray-700">Loa điện động là thiết bị điện âm thanh có nhiệm vụ chuyển đổi tín hiệu điện (tín hiệu âm thanh) thành sóng âm thanh (sóng cơ học) mà tai người có thể nghe được.</p>
+            
+            <!-- 1/ Nguyên Lý làm việc -->
+            <h3 class="text-xl font-semibold mt-4 mb-2 text-gray-900">1/ Nguyên Lý Làm Việc</h3>
+            <p class="mb-3 text-gray-700">Nguyên lý hoạt động dựa trên **hiện tượng cảm ứng điện từ** và **tác dụng của lực từ (Lực Lorentz)** lên dây dẫn có dòng điện chạy qua, đặt trong từ trường. </p>
+            <ul class="list-disc list-inside ml-4 space-y-2 text-gray-700">
+                <li>**Tín hiệu vào:** Tín hiệu điện xoay chiều $I(t)$ đi vào Cuộn dây động.</li>
+                <li>**Chuyển đổi Điện - Cơ:** Dòng điện $I(t)$ chạy qua cuộn dây nằm trong từ trường của nam châm, sinh ra **Lực từ $\vec{F}$** làm cuộn dây dao động.</li>
+                <li>**Dao động:** Do tín hiệu là AC, lực $\vec{F}$ đổi chiều liên tục, khiến cuộn dây và Màng loa dao động tịnh tiến qua lại.</li>
+                <li>**Đầu ra:** Sự dao động của Màng loa tạo ra sóng áp suất không khí (Sóng âm thanh $P(t)$).</li>
+            </ul>
+
+            <!-- 2/ Cấu tạo -->
+            <h3 class="text-xl font-semibold mt-6 mb-2 text-gray-900">2/ Cấu Tạo Chính</h3>
+            <p class="mb-3 text-gray-700">Cấu tạo của loa điện động bao gồm bốn thành phần chính:</p>
+            <ul class="list-disc list-inside ml-4 space-y-2 text-gray-700">
+                <li>**Nam châm vĩnh cửu (Magnet):** Tạo ra từ trường $\vec{B}$ mạnh, cố định.</li>
+                <li>**Cuộn dây động (Voice Coil):** Nhận tín hiệu điện, là nơi sinh ra Lực từ $\vec{F}$.</li>
+                <li>**Màng loa (Cone/Diaphragm):** Đẩy và kéo không khí để tạo sóng âm.</li>
+                <li>**Hệ thống treo (Suspension System):** Giữ cuộn dây ở trung tâm và cho phép màng loa dao động tự do.</li>
+            </ul>
+
+            <!-- 3/ Các công thức liên quan -->
+            <h3 class="text-xl font-semibold mt-6 mb-2 text-gray-900">3/ Các Công Thức Liên Quan</h3>
+            
+            <h4 class="text-lg font-medium mt-3 mb-1 text-gray-800">a) Công thức Lực từ (Lực Lorentz)</h4>
+            <p class="text-gray-700">Lực tác dụng lên cuộn dây có dòng điện $I$ trong từ trường $B$:</p>
+            <div class="latex-formula">
+                $$F = B I L$$
+            </div>
+            <ul class="list-disc list-inside ml-4 space-y-1 text-sm text-gray-600">
+                <li>$F$: Lực từ (Newton).</li>
+                <li>$B$: Cảm ứng từ (Tesla).</li>
+                <li>$I$: Cường độ dòng điện tức thời (Ampere).</li>
+                <li>$L$: Tổng chiều dài dây dẫn trong từ trường (mét).</li>
+            </ul>
+
+            <h4 class="text-lg font-medium mt-4 mb-1 text-gray-800">b) Mối quan hệ giữa Tần số và Tần số góc</h4>
+            <div class="latex-formula">
+                $$\omega = 2 \pi f$$
+            </div>
+            <p class="text-gray-700">Tần số $f$ (Hz) của tín hiệu điện quyết định tần số dao động $\omega$ (rad/s) của màng loa và tần số của sóng âm.</p>
+
+            <!-- 4/ Lưu ý khi làm bài -->
+            <h3 class="text-xl font-semibold mt-6 mb-2 text-gray-900">4/ Lưu Ý Khi Làm Bài</h3>
+            <ul class="list-disc list-inside ml-4 space-y-2 text-gray-700">
+                <li>**Tính Đồng bộ Tần số:** Tần số tín hiệu điện ($f_{dien}$) luôn bằng tần số dao động cơ học ($f_{co}$) và tần số sóng âm ($f_{am}$).</li>
+                <li>**Quan hệ Biên độ (Độ To):** Biên độ dòng điện ($I_0$) tỉ lệ thuận với Biên độ dịch chuyển ($A$) của màng loa, và tỉ lệ thuận với Độ to của âm thanh. $I_0 \uparrow \rightarrow A \uparrow \rightarrow \text{Âm thanh to hơn}$.</li>
+                <li>**Chiều Lực:** Sử dụng **Quy tắc Bàn tay trái** để xác định chiều của lực từ $\vec{F}$ (chiều dịch chuyển).</li>
+            </ul>
+        </section>
+    </div>
+
+    <script>
+        // Lấy các phần tử DOM cho Controls
+        const amplitudeRange = document.getElementById('amplitudeRange');
+        const frequencyRange = document.getElementById('frequencyRange');
+        const amplitudeValue = document.getElementById('amplitudeValue');
+        const frequencyValue = document.getElementById('frequencyValue');
+
+        // Lấy các phần tử DOM cho mô phỏng Cơ học (Cột 2)
+        const voiceCoil = document.getElementById('voiceCoil');
+        const speakerCone = document.getElementById('speakerCone');
+        const forceArrow = document.getElementById('forceArrow');
+        const outputCone = document.getElementById('outputCone'); // Sóng âm ra nhỏ
+        
+        // Lấy các Canvas
+        const electricCanvas = document.getElementById('electricSignalCanvas');
+        const soundCanvas = document.getElementById('soundWaveCanvas');
+        const electricCtx = electricCanvas.getContext('2d');
+        const soundCtx = soundCanvas.getContext('2d');
+
+        let startTime = null;
+        let currentAmplitude = parseFloat(amplitudeRange.value);
+        let currentFrequency = parseFloat(frequencyRange.value);
+
+        // Cập nhật giá trị khi thanh trượt thay đổi
+        amplitudeRange.addEventListener('input', () => {
+            currentAmplitude = parseFloat(amplitudeRange.value);
+            amplitudeValue.textContent = currentAmplitude.toFixed(2);
+        });
+
+        frequencyRange.addEventListener('input', () => {
+            currentFrequency = parseFloat(frequencyRange.value);
+            frequencyValue.textContent = currentFrequency.toFixed(1);
+            startTime = null; // Reset thời gian để sóng bắt đầu lại với tần số mới
+        });
+
+
+        /**
+         * Hàm vẽ đồ thị hình sin di chuyển trên Canvas (ĐỒ THỊ ĐỘNG)
+         */
+        function drawMovingSineWave(ctx, canvas, color, label, amplitude, offset) {
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerY = height / 2;
+
+            // Xóa canvas
+            ctx.clearRect(0, 0, width, height);
+
+            // Vẽ trục tọa độ
+            ctx.strokeStyle = '#cccccc';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(width, centerY); // Trục ngang (Thời gian)
+            ctx.stroke();
+
+            // Vẽ nhãn
+            ctx.fillStyle = '#6b7280';
+            ctx.font = '10px Inter';
+            ctx.textAlign = 'right';
+            ctx.fillText(label, 20, centerY - 10);
+            ctx.fillText('0', 20, centerY + 15);
+            ctx.fillText('+', 20, centerY - height / 2 + 15);
+            ctx.fillText('-', 20, height - 5);
+
+
+            // Vẽ đường hình sin
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            const visualAmplitude = amplitude * 0.4; 
+
+            for (let x = 0; x < width; x++) {
+                // Sóng di chuyển theo thời gian
+                const angle = (x / width) * 4 * Math.PI + offset; 
+                const y = centerY - Math.sin(angle) * height * visualAmplitude;
+                
+                if (x === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+        }
+
+        /**
+         * Hàm chính cho vòng lặp mô phỏng
+         */
+        function animate(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const elapsed = timestamp - startTime;
+
+            const timePeriod = 1000 / currentFrequency; 
+            const angle = (elapsed % timePeriod) / timePeriod * 2 * Math.PI;
+            const sineValue = Math.sin(angle); 
+            const waveOffset = (elapsed / 1000) * currentFrequency * 2 * Math.PI; 
+
+            // 1. Tín hiệu Điện (Đầu vào)
+            drawMovingSineWave(electricCtx, electricCanvas, '#1e40af', 'I', currentAmplitude, waveOffset); 
+            
+            // 2. Mô phỏng Cơ học (Lực từ và Dao động)
+            
+            // Độ dịch chuyển tối đa (maxShift)
+            const maxShift = 10; 
+            const shift = sineValue * maxShift * currentAmplitude;
+            
+            // Cập nhật vị trí của cuộn dây và màng loa bằng translateX
+            voiceCoil.style.transform = `translateY(-50%) translateX(${shift.toFixed(2)}px)`;
+            speakerCone.style.transform = `translateY(-50%) translateX(${shift.toFixed(2)}px)`;
+
+            // Cập nhật Sóng âm ra (output cone) 
+            const outputConeOpacity = Math.max(0, currentAmplitude * 2); 
+            outputCone.style.opacity = outputConeOpacity;
+            // outputCone là con của speakerCone nên không cần thêm shift, nó tự dịch chuyển theo cha
+
+            // Cập nhật mũi tên Lực Từ
+            const forceOpacity = (Math.abs(sineValue) > 0.1 && currentAmplitude > 0.1) ? 1 : 0;
+            forceArrow.style.opacity = forceOpacity;
+
+            // Mũi tên nằm gần cuộn dây và dịch chuyển cùng nó
+            forceArrow.style.transform = `translateY(-50%) translateX(${shift.toFixed(2)}px)`;
+
+            if (sineValue > 0.05) { // Lực đẩy (Mũi tên sang trái, đẩy màng loa ra)
+                forceArrow.className = 'force-arrow absolute arrow-left';
+            } else if (sineValue < -0.05) { // Lực kéo (Mũi tên sang phải, kéo màng loa vào)
+                forceArrow.className = 'force-arrow absolute arrow-right';
+            } else {
+                forceArrow.style.opacity = 0; // Khi giá trị sin gần 0
+            }
+
+
+            // 3. Sóng Âm (Đầu ra)
+            drawMovingSineWave(soundCtx, soundCanvas, '#b91c1c', 'P', currentAmplitude, waveOffset); 
+
+            requestAnimationFrame(animate);
+        }
+
+        // Đảm bảo canvas có kích thước phù hợp
+        function resizeCanvas() {
+            electricCanvas.width = electricCanvas.clientWidth;
+            electricCanvas.height = electricCanvas.clientHeight;
+            soundCanvas.width = soundCanvas.clientWidth;
+            soundCanvas.height = soundCanvas.clientHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        window.onload = function() {
+            // Thiết lập kích thước ban đầu
+            resizeCanvas(); 
+            
+            // Cập nhật nhãn giá trị ban đầu
+            amplitudeValue.textContent = currentAmplitude.toFixed(2);
+            frequencyValue.textContent = currentFrequency.toFixed(1);
+
+            // Bắt đầu mô phỏng
+            animate(0); 
+        }
+    </script>
+</body>
+</html>

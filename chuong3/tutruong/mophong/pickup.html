@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng & Kiến Thức Pickup Điện Tử</title>
+    <!-- Tải Tailwind CSS cho styling và đảm bảo thiết kế responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải MathJax cho việc hiển thị công thức LaTeX -->
+        <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+
+    <style>
+        /* Custom styles for better visual separation and fixed height for simulation */
+        .simulation-container {
+            height: 400px; /* Chiều cao cố định cho canvas */
+            background-color: #1f2937; /* Gray-800 background cho canvas */
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .content-column {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        /* Style cho công thức toán học */
+        .math-formula {
+            font-family: monospace;
+            background-color: #f3f4f6;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 md:p-8 font-sans">
+
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-4xl font-extrabold text-center mb-8 text-indigo-700">
+            Mô Phỏng và Phân Tích Pickup Điện Tử
+        </h1>
+
+        <!-- Bố cục Hai Cột cho màn hình lớn, Một Cột cho màn hình nhỏ -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Cột 1: Mô Phỏng Trực Quan -->
+            <div class="space-y-4">
+                <h2 class="text-2xl font-bold text-gray-800 border-b pb-2 text-indigo-600">
+                    Mô Phỏng Hoạt Động Cảm Ứng
+                </h2>
+                
+                <div class="flex justify-center">
+                    <button id="pluckButton" 
+                            class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full transition duration-300 shadow-lg transform hover:scale-105 active:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50">
+                        Gảy Dây Đàn
+                    </button>
+                </div>
+
+                <div class="simulation-container">
+                    <canvas id="pickupCanvas" width="700" height="400"></canvas>
+                </div>
+                
+                <div class="p-4 bg-white rounded-lg shadow-md text-sm text-gray-700">
+                    <h3 class="font-semibold text-lg text-blue-500 mb-1">Giải thích Mô phỏng:</h3>
+                    <ul class="list-disc ml-4 space-y-1">
+                        <li>**Dây Đàn (Xanh lá):** Biểu diễn sóng đứng (dao động hình sin) của dây đàn.</li>
+                        <li>**Pickup (Đỏ/Xanh/Vàng):** Mặt cắt ngang của Nam châm (N-S) và Cuộn dây (vòng vàng).</li>
+                        <li>**Tín hiệu ra (Cam):** Điện áp xoay chiều (AC) hình sin, tần số khớp với dây đàn, biên độ tỉ lệ với biên độ rung.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Cột 2: Kiến Thức Cơ Bản -->
+            <div class="content-column">
+                <h2 class="text-2xl font-bold text-gray-800 border-b pb-2 text-indigo-600">
+                    Kiến Thức Cơ Bản Về Bộ Pickup Điện Tử
+                </h2>
+
+                <h3 class="text-xl font-semibold mt-4 mb-2 text-gray-700">1. Nguyên lý làm việc</h3>
+                <p class="text-gray-600">
+                    Pickup hoạt động dựa trên **Định luật Cảm ứng Điện từ Faraday**. Dây đàn kim loại (sắt từ) khi dao động trong từ trường của nam châm sẽ làm thay đổi từ thông ($\Phi_B$) xuyên qua cuộn dây. Sự thay đổi từ thông này cảm ứng ra một suất điện động (điện áp AC) có tần số bằng tần số dao động của dây đàn.
+                </p>
+
+                <h3 class="text-xl font-semibold mt-4 mb-2 text-gray-700">2. Cấu tạo</h3>
+                <ul class="list-disc ml-5 text-gray-600 space-y-2">
+                    <li>**Nam châm (Magnet):** Tạo ra từ trường tĩnh. Thường là Alnico (ấm, cổ điển) hoặc Ceramic (mạnh, hiện đại). </li>
+                    <li>**Cuộn dây (Coil):** Hàng ngàn vòng dây đồng mỏng, quấn quanh nam châm. Số vòng dây quyết định trở kháng và độ lớn tín hiệu.</li>
+                    <li>**Thanh cực (Pole Pieces):** Các lõi từ nằm dưới mỗi dây, dẫn từ trường tập trung hơn.</li>
+                </ul>
+                <p class="text-sm italic text-gray-500 mt-2">Phân loại: Single-Coil (tín hiệu sáng, dễ nhiễu) và Humbucker (tín hiệu mạnh, triệt tiêu nhiễu).</p>
+
+                <h3 class="text-xl font-semibold mt-4 mb-2 text-gray-700">3. Công thức liên quan</h3>
+                <p class="text-gray-600">
+                    **Định luật Faraday:** Suất điện động cảm ứng ($\mathcal{E}$) tỉ lệ với tốc độ thay đổi từ thông ($\Phi_B$).
+                </p>
+                <div class="math-formula">
+                    $$\mathcal{E} \propto - N \cdot \frac{d\Phi_B}{dt}$$
+                    <p class="text-xs mt-1">($N$: Số vòng dây; $\frac{d\Phi_B}{dt}$: Tốc độ thay đổi từ thông)</p>
+                </div>
+                <p class="text-gray-600">
+                    **Tần số cộng hưởng ($f_r$):** Quyết định âm sắc (tone) của pickup.
+                </p>
+                <div class="math-formula">
+                    $$f_r = \frac{1}{2\pi \sqrt{L \cdot C}}$$
+                    <p class="text-xs mt-1">($L$: Cuộn cảm - tỉ lệ với $N^2$; $C$: Tụ điện của mạch)</p>
+                </div>
+
+                <h3 class="text-xl font-semibold mt-4 mb-2 text-gray-700">4. Lưu ý khi làm bài/ứng dụng</h3>
+                <ul class="list-disc ml-5 text-gray-600 space-y-2">
+                    <li>**Khoảng cách Dây - Pickup:** Cực kỳ quan trọng. Quá gần gây ra "String Pull" (lực hút từ làm tắt dây), quá xa làm yếu tín hiệu.</li>
+                    <li>**Vị trí Pickup:** Pickup gần cần đàn (Neck) cho âm ấm, đầy đặn (nhiều âm cơ bản). Gần ngựa đàn (Bridge) cho âm sáng, mỏng (nhiều hài âm bậc cao).</li>
+                    <li>**Tính chất dây đàn:** Pickup chỉ hoạt động với vật liệu **sắt từ** (Ferrimagnetic), không hoạt động với dây nylon.</li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Get canvas and context
+        const canvas = document.getElementById('pickupCanvas');
+        const ctx = canvas.getContext('2d');
+        const pluckButton = document.getElementById('pluckButton');
+
+        // Global simulation state
+        let animationFrameId;
+        let amplitude = 0; // Current string vibration amplitude (decays over time)
+        let frequency = 110; // Base frequency (e.g., A2 note)
+        let startTime = 0; // Time when plucking started
+        const decayRate = 0.9995; // Rate at which amplitude decays
+
+        // Configuration
+        const canvasWidth = 700;
+        const canvasHeight = 400;
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+
+        const pickupX = canvasWidth / 2; // X-position of the pickup
+        const stringY = canvasHeight / 4; // Y-position for the string's neutral line
+        const signalY = canvasHeight * 0.75; // Y-position for the signal's neutral line
+
+        // Function to draw the vibrating string (Standing Wave / Sóng Đứng)
+        function drawGuitarString(time) {
+            ctx.save();
+            ctx.strokeStyle = '#34D399'; // Green-400
+            ctx.lineWidth = 3;
+
+            // Draw the fixed ends (cầu đàn/lược đàn)
+            ctx.fillStyle = '#6B7280'; // Gray-500
+            ctx.fillRect(0, stringY - 10, 5, 20); // Left end
+            ctx.fillRect(canvasWidth - 5, stringY - 10, 5, 20); // Right end
+
+            ctx.beginPath();
+            // Start at the left fixed point (x=0)
+            ctx.moveTo(0, stringY); 
+
+            const waveLength = 2 * (canvasWidth); // Wavelength related to string length
+            const k = (2 * Math.PI) / waveLength; // Wave number
+            const omega = 2 * Math.PI * frequency; // Angular frequency
+
+            // Calculate the current decay based on time
+            const elapsedTime = (time - startTime) / 1000; // Time in seconds
+            const currentAmplitude = amplitude * Math.pow(decayRate, elapsedTime * 60);
+
+            // Draw the standing wave
+            for (let x = 0; x <= canvasWidth; x++) {
+                // Standing wave equation: y(x, t) = A * sin(k*x) * cos(omega*t)
+                // We use a simple sine curve for k*x for visualization
+                const stringShape = Math.sin(Math.PI * x / canvasWidth); 
+                const yOffset = currentAmplitude * stringShape * Math.cos(omega * elapsedTime);
+                ctx.lineTo(x, stringY + yOffset);
+            }
+            
+            ctx.stroke();
+            ctx.restore();
+            
+            // Return the current (decayed) amplitude for use in the signal drawing
+            return currentAmplitude;
+        }
+
+        // Function to draw the pickup cross-section (Mặt Cắt Pickup)
+        function drawPickup() {
+            const magnetWidth = 30;
+            const magnetHeight = 60;
+            const coilRadius = 40;
+            const polePieceRadius = 6;
+            const magnetY = stringY + 10;
+            
+            ctx.save();
+            ctx.translate(pickupX, magnetY);
+
+            // 1. Draw the Coil (Cuộn dây) - Bọc ngoài
+            ctx.strokeStyle = '#FBBF24'; // Amber-400
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(0, magnetHeight / 2, coilRadius, 0, 2 * Math.PI);
+            ctx.stroke();
+            
+            // 2. Draw the Magnet (Nam châm) - N-S
+            // N pole (Top part, usually facing the string)
+            ctx.fillStyle = '#EF4444'; // Red (North)
+            ctx.fillRect(-magnetWidth / 2, 0, magnetWidth, magnetHeight / 2);
+            // S pole (Bottom part)
+            ctx.fillStyle = '#3B82F6'; // Blue (South)
+            ctx.fillRect(-magnetWidth / 2, magnetHeight / 2, magnetWidth, magnetHeight / 2);
+            
+            // Text labels for poles
+            ctx.fillStyle = 'white';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('N', 0, 15);
+            ctx.fillText('S', 0, magnetHeight - 5);
+
+            // 3. Draw the pole piece (Lõi cực - thường là vít) - optional, for single coils
+            ctx.fillStyle = '#9CA3AF'; // Gray-400
+            ctx.beginPath();
+            ctx.arc(0, 0, polePieceRadius, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.restore();
+        }
+        
+        // Function to draw the output signal (Tín hiệu ra Hình Sin)
+        function drawOutputSignal(currentAmplitude, time) {
+            ctx.save();
+            
+            // Draw the time axis (Trục thời gian)
+            ctx.strokeStyle = '#4B5563'; // Gray-600
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, signalY);
+            ctx.lineTo(canvasWidth, signalY);
+            ctx.stroke();
+
+            // Draw the signal
+            ctx.strokeStyle = '#F97316'; // Orange-500
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            const signalScale = 5; // Scale the small magnetic field change to a visible signal
+            const signalAmplitude = currentAmplitude * signalScale;
+            
+            const elapsedTime = (time - startTime) / 1000; // Time in seconds
+            const omega = 2 * Math.PI * frequency;
+
+            // Draw the sine wave for the output signal
+            for (let x = 0; x <= canvasWidth; x++) {
+                // Time-dependent sine wave
+                const yOffset = signalAmplitude * Math.sin(omega * elapsedTime + x * 0.05);
+                
+                if (x === 0) {
+                    ctx.moveTo(x, signalY + yOffset);
+                } else {
+                    ctx.lineTo(x, signalY + yOffset);
+                }
+            }
+            
+            ctx.stroke();
+            
+            // Label the signal
+            ctx.fillStyle = '#F97316';
+            ctx.font = '14px sans-serif';
+            ctx.fillText('Tín hiệu ra (Điện áp AC)', 10, signalY - signalAmplitude - 5);
+            
+            ctx.restore();
+        }
+
+
+        // Animation loop
+        function animate(timestamp) {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            // Fill background (for dark mode)
+            ctx.fillStyle = '#1f2937';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+
+            // Section Labels (Tiêu đề các phần)
+            ctx.fillStyle = '#9CA3AF'; // Gray-400
+            ctx.font = '16px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Dây Đàn', 10, 20);
+            ctx.fillText('Pickup (Mặt cắt)', pickupX + 50, stringY + 40);
+            ctx.fillText('Tín Hiệu Ra', 10, signalY - 100);
+
+            // Draw the components
+            const currentAmplitude = drawGuitarString(timestamp);
+            drawPickup();
+            drawOutputSignal(currentAmplitude, timestamp);
+            
+            // Continue or stop animation based on amplitude
+            if (currentAmplitude > 0.5) {
+                animationFrameId = requestAnimationFrame(animate);
+            } else {
+                // Stop the simulation once the vibration has almost died out
+                amplitude = 0;
+                cancelAnimationFrame(animationFrameId);
+                
+                // Redraw one last time to show final static state
+                ctx.fillStyle = '#1f2937';
+                ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+                drawGuitarString(timestamp);
+                drawPickup();
+                drawOutputSignal(0, timestamp);
+            }
+        }
+
+        // Event listener for the Pluck Button
+        pluckButton.addEventListener('click', () => {
+            // Reset state and start animation
+            amplitude = 50; // Initial amplitude of vibration (pixel height)
+            startTime = performance.now();
+            
+            // Cancel any previous loop before starting a new one
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            
+            animate(startTime);
+        });
+
+        // Initial render of the static view
+        window.onload = function() {
+             // Draw a static, non-vibrating string and pickup on load
+            const initialTime = performance.now();
+            
+            ctx.fillStyle = '#1f2937';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            
+            // Draw static string (amplitude 0)
+            ctx.save();
+            ctx.strokeStyle = '#34D399'; 
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(0, stringY);
+            ctx.lineTo(canvasWidth, stringY);
+            ctx.stroke();
+            ctx.restore();
+            
+            drawPickup();
+            drawOutputSignal(0, initialTime);
+            
+            // Section Labels (Tiêu đề các phần)
+            ctx.fillStyle = '#9CA3AF'; // Gray-400
+            ctx.font = '16px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Dây Đàn', 10, 20);
+            ctx.fillText('Pickup (Mặt cắt)', pickupX + 50, stringY + 40);
+            ctx.fillText('Tín Hiệu Ra', 10, signalY - 100);
+
+            // Draw the fixed ends (cầu đàn/lược đàn)
+            ctx.fillStyle = '#6B7280'; // Gray-500
+            ctx.fillRect(0, stringY - 10, 5, 20); // Left end
+            ctx.fillRect(canvasWidth - 5, stringY - 10, 5, 20); // Right end
+        };
+        
+    </script>
+</body>
+</html>

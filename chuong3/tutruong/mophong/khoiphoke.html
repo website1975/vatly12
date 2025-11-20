@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng & Lý Thuyết Khối Phổ Kế</title>
+    <!-- Tải Tailwind CSS để tạo kiểu dáng hiện đại và responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải MathJax cho việc hiển thị công thức LaTeX -->
+        <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+
+    <style>
+        /* Thiết lập font Inter */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+        }
+        .stage-card {
+            min-height: 180px;
+        }
+        .ion {
+            position: absolute;
+            width: 6px; 
+            height: 6px; 
+            border-radius: 50%;
+            transition: transform 1.2s ease-out; 
+            transform: translate(0, 0); 
+            z-index: 10; 
+        }
+        #simulation-area {
+            position: relative;
+            background: linear-gradient(135deg, #1f2937, #374151); 
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Style cho dấu hiệu Từ trường B */
+        .b-field-dot {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.3;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 8px;
+            font-weight: bold;
+        }
+        .b-field-out::after {
+            content: '';
+            width: 3px;
+            height: 3px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+        }
+        .b-field-in {
+            /* Dấu X (xuyên vào) */
+            content: 'x';
+        }
+
+        /* Hiệu ứng khi ion chạm màn hình */
+        .hit {
+            box-shadow: 0 0 5px 3px rgba(255, 255, 255, 0.8);
+        }
+        /* Thay đổi CSS cho thanh bar để hỗ trợ biểu đồ cột đứng */
+        .bar {
+            transition: height 0.3s ease-out;
+            min-height: 2px; 
+        }
+
+        /* Ẩn các tab không hoạt động */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Cấu hình Tailwind CSS
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+
+        const ionsData = [
+            { id: 'light', m_z: 50, color: 'bg-green-500', label: 'Ion nhẹ (m/z 50)', deflectionFactor: 120, hexColor: '#10B981' }, 
+            { id: 'medium', m_z: 100, color: 'bg-yellow-500', label: 'Ion trung bình (m/z 100)', deflectionFactor: 60, hexColor: '#F59E0B' }, 
+            { id: 'heavy', m_z: 150, color: 'bg-red-500', label: 'Ion nặng (m/z 150)', deflectionFactor: 30, hexColor: '#EF4444' }, 
+        ];
+
+        // Tỷ lệ phân phối ion: Ion trung bình là Base Peak
+        const weightedIons = [
+            'light', 
+            'medium', 'medium', 
+            'heavy'
+        ];
+        
+        const DETECTOR_X_PERCENT = 85; 
+        const ACCEL_X_PERCENT = 20;
+        const FIRE_INTERVAL_MS = 150; 
+
+        let simulationInterval = null;
+        let ionCounter = 0;
+        let detectionCounts = {}; 
+        let isBFieldReversed = false; 
+
+        // Hàm chuyển đổi tab
+        function switchTab(tabId) {
+            // Ẩn tất cả nội dung tab
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            // Loại bỏ active khỏi tất cả nút tab
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('border-indigo-600', 'text-indigo-600', 'font-bold');
+                button.classList.add('border-transparent', 'text-gray-500', 'font-medium');
+            });
+
+            // Hiển thị nội dung tab được chọn
+            const activeContent = document.getElementById(tabId);
+            activeContent.classList.add('active');
+            
+            // Đánh dấu nút tab được chọn
+            const activeTabButton = document.getElementById(`tab-btn-${tabId}`);
+            activeTabButton.classList.remove('border-transparent', 'text-gray-500', 'font-medium');
+            activeTabButton.classList.add('border-indigo-600', 'text-indigo-600', 'font-bold');
+
+            // Xử lý logic đặc biệt cho Tab Mô Phỏng
+            if (tabId === 'tab-simulation') {
+                // Đảm bảo mô phỏng chạy khi tab được chọn
+                if (!simulationInterval) {
+                    startSimulation();
+                }
+            } else {
+                // Dừng mô phỏng khi chuyển sang tab khác
+                if (simulationInterval) {
+                    stopSimulation();
+                }
+            }
+        }
+
+        // --- HÀM MÔ PHỎNG (Giữ nguyên từ bản trước) ---
+
+        function generateBFieldDots(reversed) {
+            const container = document.getElementById('b-field-visual');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            const rows = 8;
+            const cols = 15;
+            
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'b-field-dot';
+                    
+                    if (reversed) {
+                        dot.textContent = 'x'; 
+                        document.getElementById('b-field-status').textContent = 'Từ trường: Hướng XUYÊN VÀO';
+                    } else {
+                        dot.classList.add('b-field-out'); 
+                        document.getElementById('b-field-status').textContent = 'Từ trường: Hướng RA NGOÀI';
+                    }
+
+                    const top = ((r + 0.5) / rows) * 100;
+                    const left = ((c + 0.5) / cols) * 100;
+                    
+                    dot.style.top = `${top}%`;
+                    dot.style.left = `${left}%`;
+                    
+                    container.appendChild(dot);
+                }
+            }
+        }
+
+        function toggleBField() {
+            isBFieldReversed = !isBFieldReversed;
+            generateBFieldDots(isBFieldReversed);
+
+            const button = document.getElementById('toggle-b-button');
+            if (isBFieldReversed) {
+                button.classList.replace('bg-indigo-600', 'bg-red-600');
+            } else {
+                button.classList.replace('bg-red-600', 'bg-indigo-600');
+            }
+        }
+
+        function updateStats() {
+            const statsOutput = document.getElementById('stats-output');
+            const totalDetections = Object.values(detectionCounts).reduce((sum, count) => sum + count, 0);
+            const CHART_HEIGHT_PX = 150; 
+
+            if (totalDetections === 0) {
+                statsOutput.innerHTML = `
+                    <div class="font-bold text-sm text-gray-800 mb-2">Phổ Khối (Số lượng hạt):</div>
+                    <div class="h-[${CHART_HEIGHT_PX}px] flex items-end justify-around border-b-2 border-l border-gray-400 p-1 relative pt-4">
+                        <p class="text-sm text-gray-500 text-center absolute inset-0 flex items-center justify-center">Đang chờ tín hiệu...</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const maxCount = Math.max(...Object.values(detectionCounts));
+            let chartBody = '';
+
+            let htmlContent = `
+                <div class="font-bold text-sm text-gray-800 mb-2">Phổ Khối (Số lượng hạt):</div>
+                <div class="h-[${CHART_HEIGHT_PX}px] flex items-end justify-around border-b-2 border-l border-gray-400 p-1 relative pt-4">
+                    <!-- Trục Y: Nhãn 100% -->
+                    <span class="absolute -left-7 text-[9px] text-gray-500 top-2">Max</span>
+                    <!-- Đường tham chiếu 50% Intensity -->
+                    <div class="absolute w-full border-t border-dashed border-gray-300 left-0" style="bottom: 50%;">
+                        <span class="absolute -left-5 text-[9px] text-gray-500">50%</span>
+                    </div>
+            `;
+
+            ionsData.forEach(ion => {
+                const count = detectionCounts[ion.id] || 0;
+                const barHeight = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                
+                chartBody += `
+                    <div class="flex flex-col items-center h-full justify-end w-1/4">
+                        <span class="text-[10px] font-bold text-gray-800 -mb-2 z-10">${count}</span>
+                        <div 
+                            class="bar w-full max-w-6 rounded-t-sm shadow-md transition-all duration-300 border-x border-t border-gray-700/10"
+                            style="height: ${barHeight}%; background-color: ${ion.hexColor};"
+                            title="${ion.label}: ${count} hạt"
+                        >
+                            
+                        </div>
+                        <div class="text-[10px] text-gray-700 mt-1 font-medium">${ion.m_z}</div>
+                    </div>
+                `;
+            });
+            
+            htmlContent += chartBody;
+            htmlContent += '</div>'; 
+            htmlContent += '<div class="text-xs text-gray-500 mt-2 text-center">Trục ngang: m/z | Trục dọc: Cường độ (Intensity)</div>';
+            statsOutput.innerHTML = htmlContent;
+        }
+
+        function fireSingleIon(ion) {
+            const container = document.getElementById('simulation-area');
+            if (!container) return;
+
+            ionCounter++;
+            const ionEl = document.createElement('div');
+            ionEl.id = `${ion.id}-${ionCounter}`;
+            ionEl.className = `ion ${ion.color}`;
+            
+            const initialYOffset = (Math.random() - 0.5) * 5; 
+
+            ionEl.style.left = '5%';
+            ionEl.style.top = `calc(50% + ${initialYOffset}px)`;
+            ionEl.style.marginTop = '-3px'; 
+            ionEl.textContent = '·';
+            ionEl.title = ion.label;
+            container.appendChild(ionEl);
+
+            const ACCEL_X = container.offsetWidth * (ACCEL_X_PERCENT / 100);
+            ionEl.style.transform = `translate(${ACCEL_X}px, 0)`; 
+            ionEl.style.transitionDuration = '0.3s'; 
+
+            
+            setTimeout(() => {
+                const TRANSLATE_X_PERCENT = DETECTOR_X_PERCENT - 5;
+                const TRANSLATE_X = container.offsetWidth * (TRANSLATE_X_PERCENT / 100);
+                
+                const deflectionMultiplier = isBFieldReversed ? -1 : 1; 
+
+                const yDeflection = (ion.deflectionFactor * deflectionMultiplier) + initialYOffset; 
+                
+                ionEl.style.transform = `translate(${TRANSLATE_X}px, ${yDeflection}px)`;
+                ionEl.style.transitionDuration = '1.2s'; 
+
+                setTimeout(() => {
+                    if (simulationInterval) { 
+                        const output = document.getElementById('detector-output-list');
+                        
+                        ionEl.classList.add('hit');
+                        ionEl.style.opacity = '0.5';
+
+                        detectionCounts[ion.id] = (detectionCounts[ion.id] || 0) + 1;
+                        updateStats();
+                        
+                        output.innerHTML = `
+                            <div class="flex items-center space-x-2 p-1 bg-white rounded-lg shadow-sm mb-1">
+                                <span class="w-2 h-2 ${ion.color} rounded-full"></span>
+                                <span class="text-xs font-medium text-gray-700">${ion.label}</span>
+                                <span class="text-xs text-indigo-600">-> Phát Hiện</span>
+                            </div>` + output.innerHTML;
+                        
+                        while (output.children.length > 5) {
+                            output.removeChild(output.lastChild);
+                        }
+                    }
+                    
+                    setTimeout(() => ionEl.remove(), 100); 
+                }, 1200); 
+            }, 300); 
+        }
+
+        function continuousFire() {
+            const ionId = weightedIons[Math.floor(Math.random() * weightedIons.length)];
+            const ion = ionsData.find(i => i.id === ionId);
+            if (ion) {
+                fireSingleIon(ion);
+            }
+        }
+
+        function startSimulation() {
+            if (simulationInterval) {
+                clearInterval(simulationInterval);
+            }
+            
+            detectionCounts = {};
+            
+            document.getElementById('simulation-area').querySelectorAll('.ion').forEach(ion => ion.remove());
+            document.getElementById('detector-output-list').innerHTML = ''; 
+            updateStats();
+            
+            document.getElementById('stage-1-2').classList.add('bg-blue-100');
+            document.getElementById('stage-3').classList.add('bg-indigo-100');
+            document.getElementById('stage-4').classList.add('bg-purple-100');
+
+            document.getElementById('run-button').textContent = 'ĐANG CHẠY - CLICK ĐỂ RESET';
+            document.getElementById('run-button').classList.remove('bg-blue-600', 'bg-red-600');
+            document.getElementById('run-button').classList.add('bg-green-600'); 
+            document.getElementById('run-button').disabled = false; 
+
+            document.getElementById('stop-button').disabled = false;
+            document.getElementById('toggle-b-button').disabled = false;
+
+
+            document.getElementById('status').textContent = 'Đang mô phỏng liên tục...';
+            document.getElementById('status').classList.remove('text-green-600', 'text-red-600');
+            document.getElementById('status').classList.add('text-blue-600');
+            
+            simulationInterval = setInterval(continuousFire, FIRE_INTERVAL_MS);
+        }
+
+        function stopSimulation() {
+            if (simulationInterval) {
+                clearInterval(simulationInterval);
+                simulationInterval = null;
+                
+                document.getElementById('stage-1-2').classList.remove('bg-blue-100');
+                document.getElementById('stage-3').classList.remove('bg-indigo-100');
+                document.getElementById('stage-4').classList.remove('bg-purple-100');
+
+                document.getElementById('run-button').textContent = 'BẮT ĐẦU MÔ PHỎNG'; 
+                document.getElementById('run-button').classList.remove('bg-green-600', 'bg-gray-400');
+                document.getElementById('run-button').classList.add('bg-blue-600'); 
+                document.getElementById('run-button').disabled = false;
+                document.getElementById('stop-button').disabled = true;
+                document.getElementById('toggle-b-button').disabled = true;
+
+                document.getElementById('status').textContent = 'Mô phỏng đã dừng. (Tổng số hạt đã được thống kê)';
+                document.getElementById('status').classList.remove('text-blue-600', 'text-red-600');
+                document.getElementById('status').classList.add('text-green-600');
+            }
+        }
+
+        // --- KHỞI TẠO ---
+        window.onload = function() {
+            document.getElementById('toggle-b-button').addEventListener('click', toggleBField);
+            document.getElementById('run-button').addEventListener('click', startSimulation);
+            document.getElementById('stop-button').addEventListener('click', stopSimulation);
+            
+            // Lắng nghe sự kiện click cho các nút tab
+            document.getElementById('tab-btn-tab-simulation').addEventListener('click', () => switchTab('tab-simulation'));
+            document.getElementById('tab-btn-tab-knowledge').addEventListener('click', () => switchTab('tab-knowledge'));
+
+            generateBFieldDots(isBFieldReversed);
+            
+            // Mở tab mô phỏng mặc định
+            switchTab('tab-simulation'); 
+        };
+    </script>
+
+    <div class="container mx-auto p-4 md:p-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center">
+            Ứng Dụng Khối Phổ Kế <br> (Mass Spectrometer)
+        </h1>
+        
+        <!-- Tab Navigation -->
+        <div class="border-b border-gray-200 mb-6">
+            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                <button id="tab-btn-tab-simulation" class="tab-button whitespace-nowrap py-3 px-1 border-b-2 font-bold text-indigo-600 border-indigo-600" role="tab">
+                    Mô Phỏng
+                </button>
+                <button id="tab-btn-tab-knowledge" class="tab-button whitespace-nowrap py-3 px-1 border-b-2 font-medium text-gray-500 border-transparent hover:border-gray-300 hover:text-gray-700" role="tab">
+                    Kiến Thức Cơ Bản
+                </button>
+            </nav>
+        </div>
+
+        <!-- Tab Content 1: Simulation -->
+        <div id="tab-simulation" class="tab-content active bg-white p-6 rounded-xl shadow-2xl">
+            <h2 class="text-2xl font-bold text-indigo-800 mb-4">Mô phỏng Giai đoạn Tách ion</h2>
+            
+            <p class="text-lg text-gray-600 mb-6 text-center">
+                Thiết bị khối phổ kế hoạt động theo 4 giai đoạn chính để phân tích mẫu:
+            </p>
+
+            <!-- 4 Giai đoạn -->
+            <div class="grid md:grid-cols-4 gap-4 mb-8">
+                <div id="stage-1-2" class="stage-card p-4 bg-white rounded-xl shadow-lg border-b-4 border-blue-500 transition duration-300">
+                    <h3 class="font-bold text-xl text-blue-700 mb-2">1. Ion hóa & 2. Tăng tốc</h3>
+                    <p class="text-sm text-gray-600">Tạo ion dương (M+). Các ion được tăng tốc bằng điện trường ($\vec{E}$) để có cùng động năng.</p>
+                </div>
+                <div id="stage-3" class="stage-card p-4 bg-white rounded-xl shadow-lg border-b-4 border-indigo-500 transition duration-300">
+                    <h3 class="font-bold text-xl text-indigo-700 mb-2">3. Tách ion (Deflection)</h3>
+                    <p class="text-sm text-gray-600">Các ion đi qua một từ trường ($\vec{B}$). Lực Lorentz ($ \vec{F} = q(\vec{v} \times \vec{B})$) làm lệch quỹ đạo ion theo tỉ lệ $m/z$.</p>
+                </div>
+                <div id="stage-4" class="stage-card p-4 bg-white rounded-xl shadow-lg border-b-4 border-purple-500 transition duration-300">
+                    <h3 class="font-bold text-xl text-purple-700 mb-2">4. Phát hiện & Ghi phổ</h3>
+                    <p class="text-sm text-gray-600">Ion va chạm với detector, tạo ra tín hiệu điện. Cường độ tín hiệu tỷ lệ với số lượng ion va chạm.</p>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-xl shadow-lg border-l-4 border-gray-400">
+                    <h3 class="font-bold text-xl text-gray-700 mb-2">Kết quả</h3>
+                    <p class="text-sm text-gray-600">Phổ khối (Mass Spectrum) được tạo ra, biểu diễn cường độ tín hiệu theo $m/z$ và là "dấu vân tay" để nhận dạng chất.</p>
+                </div>
+            </div>
+
+            <!-- SIMULATION AREA -->
+            <div id="simulation-area" class="w-full h-64 relative mb-6"> 
+                <div id="b-field-visual" class="absolute inset-0 opacity-50 pointer-events-none"></div>
+                <div id="beam-path" class="absolute h-px bg-white/70 w-full" style="top: 50%;"></div>
+                
+                <div class="absolute left-1 top-1/2 -translate-y-1/2 p-2 bg-blue-500 text-white rounded-r-md text-xs font-semibold">
+                    Nguồn Ion
+                </div>
+                <div id="detector-line" class="absolute top-0 bottom-0 w-2 bg-purple-500 flex items-center justify-center" style="right: 15%;">
+                    <span class="absolute top-1/2 transform -translate-x-1/2 -rotate-90 text-white text-xs font-bold">Màn Tín Hiệu</span>
+                </div>
+            </div>
+
+            <!-- CONTROL AND OUTPUT AREA (BELOW SIMULATION) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Column 1: Controls & Status -->
+                <div class="md:col-span-1 relative z-20">
+                    <div class="flex space-x-2 mb-2">
+                        <button id="run-button" class="w-1/2 py-2 px-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-200 shadow-md">
+                            ĐANG CHẠY - CLICK ĐỂ RESET
+                        </button>
+                        <button id="stop-button" disabled class="w-1/2 py-2 px-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition duration-200 shadow-md">
+                            Dừng Mô Phỏng
+                        </button>
+                    </div>
+                    
+                    <button id="toggle-b-button" class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition duration-200 shadow-md mb-4" disabled>
+                        Đảo Chiều Từ Trường ($\vec{B}$) - Lực Lorentz Đảo Chiều
+                    </button>
+                    
+                    <p id="b-field-status" class="text-center text-sm font-medium text-gray-700 mb-2">Từ trường: Hướng RA NGOÀI</p>
+                    <p id="status" class="mt-4 text-center font-semibold text-blue-600">Đang mô phỏng liên tục...</p>
+                    
+                    <div class="mt-4 p-2 bg-indigo-50 rounded-lg text-sm text-indigo-800">
+                        <p>Nguyên lý: Ion nhẹ ($m/z$ nhỏ) bị lệch nhiều hơn, ion nặng ($m/z$ lớn) bị lệch ít hơn. Chiều lệch phụ thuộc vào chiều của $\vec{B}$.</p>
+                    </div>
+                </div>
+
+                <!-- Column 2: Mass Spectrum/Stats -->
+                <div class="md:col-span-1">
+                     <div id="stats-output" class="p-3 bg-white h-full rounded-lg shadow-inner border border-gray-200">
+                        <!-- Nội dung Phổ Khối được cập nhật bởi JS -->
+                        <div class="font-bold text-sm text-gray-800 mb-2">Phổ Khối (Số lượng hạt):</div>
+                        <p class="text-sm text-gray-500 text-center">Đang chờ tín hiệu...</p>
+                    </div>
+                </div>
+
+                <!-- Column 3: Recent Detections -->
+                <div class="md:col-span-1">
+                    <div id="detector-output" class="p-3 bg-gray-100 rounded-lg max-h-40 overflow-y-auto">
+                        <div class="font-bold text-lg text-gray-800 mb-2">Phát hiện Gần đây:</div>
+                        <div id="detector-output-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content 2: Knowledge -->
+        <div id="tab-knowledge" class="tab-content bg-white p-6 rounded-xl shadow-2xl">
+            <h2 class="text-2xl font-bold text-indigo-800 mb-4 border-b pb-2">Kiến Thức Cơ Bản về Khối Phổ Kế</h2>
+            
+            <!-- 1. Nguyên Lý Làm Việc -->
+            <div class="mb-6">
+                <h3 class="text-xl font-bold text-gray-700 mb-2">1. Nguyên Lý Làm Việc</h3>
+                <p class="text-gray-600">Khối phổ kế hoạt động dựa trên nguyên tắc tách các ion tích điện dương dựa vào tỉ số khối lượng/điện tích ($m/z$).</p>
+                <ul class="list-disc list-inside ml-4 text-gray-600">
+                    <li>Sau khi được tăng tốc để đạt cùng động năng, các ion đi vào một vùng có từ trường đều ($\vec{B}$).</li>
+                    <li>Lực Lorentz ($\vec{F}$) tác dụng lên ion ($ \vec{F} = q(\vec{v} \times \vec{B})$) buộc chúng chuyển động theo quỹ đạo cong (một phần đường tròn).</li>
+                    <li>Ion có tỉ số $m/z$ nhỏ (nhẹ) sẽ bị lệch nhiều hơn và có bán kính quỹ đạo nhỏ hơn.</li>
+                    <li>Ion có tỉ số $m/z$ lớn (nặng) sẽ bị lệch ít hơn và có bán kính quỹ đạo lớn hơn.</li>
+                    <li>Bằng cách thay đổi cường độ từ trường ($\vec{B}$) hoặc điện áp gia tốc ($U$), các ion có $m/z$ khác nhau sẽ lần lượt chạm vào bộ phát hiện (detector) để ghi nhận phổ.</li>
+                </ul>
+            </div>
+
+            <!-- 2. Cấu Tạo -->
+            <div class="mb-6">
+                <h3 class="text-xl font-bold text-gray-700 mb-2">2. Cấu Tạo [Image of Mass Spectrometer Diagram]</h3>
+                <p class="text-gray-600">Thiết bị khối phổ kế hiện đại thường bao gồm bốn bộ phận chính hoạt động trong môi trường chân không cao:</p>
+                <ul class="list-disc list-inside ml-4 text-gray-600">
+                    <li><strong>Nguồn ion (Ion Source):</strong> Biến mẫu trung hòa thành các ion tích điện dương (thường là phương pháp va chạm electron).</li>
+                    <li><strong>Bộ gia tốc (Accelerator):</strong> Sử dụng điện trường ($\vec{E}$) để tăng tốc các ion, đảm bảo chúng có cùng động năng $K$.</li>
+                    <li><strong>Bộ phân tích/Tách ion (Mass Analyzer):</strong> Thường là buồng có từ trường đều ($\vec{B}$) và/hoặc điện trường để phân tách các ion theo tỉ số $m/z$.</li>
+                    <li><strong>Bộ phát hiện (Detector):</strong> Ghi lại số lượng ion và cường độ tín hiệu khi chúng chạm vào, sau đó gửi dữ liệu đến máy tính để xử lý thành phổ khối.</li>
+                </ul>
+            </div>
+
+            <!-- 3. Các Công Thức Liên Quan -->
+            <div class="mb-6">
+                <h3 class="text-xl font-bold text-gray-700 mb-2">3. Các Công Thức Liên Quan</h3>
+                <p class="text-gray-600">Đối với khối phổ kế có bộ phân tích từ trường ($\vec{B}$) và bộ gia tốc điện trường ($\vec{E}$):</p>
+                <ul class="list-disc list-inside ml-4 text-gray-600">
+                    <li><strong>Công thức động năng (Gia tốc):</strong> Động năng mà ion đạt được nhờ điện trường $U$ là:
+                        $$K = \frac{1}{2}mv^2 = qU$$
+                    </li>
+                    <li><strong>Công thức bán kính quỹ đạo (Phân tách):</strong> Bán kính quỹ đạo tròn $R$ của ion trong từ trường $B$:
+                        $$R = \frac{mv}{qB}$$
+                    </li>
+                    <li><strong>Công thức khối phổ cơ bản:</strong> Kết hợp hai công thức trên để tìm ra tỉ số $m/q$ theo các hằng số đo được ($B, R, U$):
+                        $$\frac{m}{q} = \frac{B^2 R^2}{2U}$$
+                        (Trong đó $m$ là khối lượng ion, $q$ là điện tích ion, $B$ là cường độ từ trường, $R$ là bán kính quỹ đạo, $U$ là hiệu điện thế gia tốc).
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- 4. Lưu ý khi làm bài tập -->
+            <div class="mb-6">
+                <h3 class="text-xl font-bold text-gray-700 mb-2">4. Lưu ý khi làm bài tập</h3>
+                <ul class="list-disc list-inside ml-4 text-gray-600">
+                    <li><strong>Đơn vị:</strong> Luôn đổi tất cả đơn vị về hệ SI: Khối lượng $m$ (kg), điện tích $q$ (C), từ trường $B$ (Tesla), hiệu điện thế $U$ (V), bán kính $R$ (m).</li>
+                    <li><strong>Điện tích $q$:</strong> Trong các bài toán phổ thông, ion thường là ion dương hóa trị một, nên $q = +e \approx 1.602 \times 10^{-19} \text{ C}$.</li>
+                    <li><strong>Đỉnh phân tử (Molecular Ion Peak):</strong> Đỉnh có $m/z$ lớn nhất thường tương ứng với khối lượng ion phân tử ($M^{+}$).</li>
+                    <li><strong>Đỉnh cơ bản (Base Peak):</strong> Là đỉnh cao nhất trong phổ, được gán cường độ tương đối 100%. Đỉnh này biểu thị ion bền nhất, dồi dào nhất.</li>
+                    <li><strong>Tách chất đồng vị:</strong> Khối phổ kế được dùng để tách và xác định tỉ lệ phần trăm các chất đồng vị (ví dụ: $^{20}\text{Ne}^{+}$ và $^{22}\text{Ne}^{+}$).</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
