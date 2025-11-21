@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Hình Dynamo Hai Cột</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+<!-- Three.js Library --><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+<!-- OrbitControls for camera interaction --><script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải MathJax cho việc hiển thị công thức LaTeX -->
+        <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+
+    <style>
+        /* Đặt body thành flex container và chiếm toàn bộ viewport */
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            font-family: 'Inter', sans-serif; 
+            display: flex;
+            height: 100vh;
+            background-color: #1f2937; /* Nền xám đậm */
+        }
+        canvas { 
+            display: block; 
+            width: 100%; 
+            height: 100%;
+        }
+        
+        /* Cột bên trái (UI) */
+        #controls-panel {
+            min-width: 300px;
+            max-width: 400px;
+            width: 30%; /* Chiếm 30% chiều rộng màn hình */
+            background-color: #111827; /* Nền đen hơn */
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        /* Hiển thị giá trị điện áp */
+        .voltage-display {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #4ade80; /* Màu xanh lá cây sáng */
+            background: #252525;
+            padding: 0.75rem;
+            border-radius: 6px;
+        }
+        .graph-canvas {
+            flex-shrink: 0; /* Không co lại */
+            background: #1f2937;
+            border-radius: 8px;
+            border: 1px solid #374151;
+        }
+        /* Style cho thanh trượt */
+        input[type=range] {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 8px;
+            background: #444;
+            border-radius: 5px;
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fcd34d; /* Màu vàng */
+            cursor: pointer;
+            box-shadow: 0 0 4px #fcd34d;
+        }
+
+        /* Style cho Tabs */
+        .tab-button {
+            padding: 8px 16px;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            background-color: #1f2937;
+            color: #9ca3af;
+        }
+        .tab-button.active {
+            background-color: #111827;
+            color: white;
+            border-bottom: 2px solid #4ade80;
+        }
+        .tab-content {
+            padding: 1rem 0;
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+
+        /* Style cho phần Lý thuyết */
+        .theory-content h2 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 1rem;
+            color: #4ade80;
+        }
+        .theory-content h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            color: #fcd34d;
+        }
+        .theory-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            color: #e5e7eb;
+        }
+        .theory-content th, .theory-content td {
+            border: 1px solid #374151;
+            padding: 5px 8px;
+            text-align: left;
+        }
+        .theory-content td:nth-child(2) {
+            font-style: italic;
+        }
+        .theory-content code, .theory-content .math-formula {
+            display: block;
+            background: #252525;
+            padding: 8px;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- CỘT 1: CONTROLS & GRAPH -->
+    <div id="controls-panel" class="min-w-[300px]">
+        <h1 class="text-2xl font-extrabold text-gray-100 border-b pb-2 border-gray-700">Mô Hình Dynamo</h1>
+        
+        <!-- Tab Navigation -->
+        <div class="flex border-b border-gray-700 -mb-4">
+            <button class="tab-button active" onclick="showTab('controls')">Điều Khiển</button>
+            <button class="tab-button" onclick="showTab('theory')">Kiến Thức</button>
+        </div>
+
+        <!-- Tab 1: Controls Content -->
+        <div id="controls-tab" class="tab-content flex flex-col gap-4">
+            <p class="text-sm text-gray-400">Điều chỉnh tốc độ và quan sát điện áp AC được tạo ra.</p>
+            
+            <!-- Thanh trượt tốc độ -->
+            <div>
+                <label for="speedSlider" class="text-gray-200 text-sm block mb-2 font-medium">Tốc độ Quay (<span id="speedValue">3.0</span>/10):</label>
+                <input type="range" id="speedSlider" min="0" max="10" step="0.5" value="3.0">
+            </div>
+            
+            <!-- Giá trị điện áp tức thời -->
+            <div class="voltage-display">Điện áp tức thời: <span id="voltageValue">0.00 V</span></div>
+            
+            <!-- Đồ thị điện áp -->
+            <div>
+                <h2 class="text-lg font-semibold text-gray-200 mb-2">Đồ thị Điện áp Ra</h2>
+                <canvas id="graphCanvas" class="graph-canvas" width="400" height="150"></canvas>
+            </div>
+            
+            <p class="text-xs text-gray-500 mt-auto pt-4 border-t border-gray-800">Sử dụng chuột trên cột bên phải để xoay và phóng to mô hình 3D.</p>
+        </div>
+
+        <!-- Tab 2: Theory Content -->
+        <div id="theory-tab" class="tab-content theory-content hidden overflow-y-auto">
+            <h2 class="text-xl font-bold text-gray-100 mb-2">Kiến Thức Cơ Bản về Máy Phát Điện (Dynamo/Generator)</h2>
+            <p class="text-gray-300">Máy phát điện xoay chiều (AC Generator) hay còn gọi là Dynamo hoạt động dựa trên nguyên lý cảm ứng điện từ để biến đổi cơ năng thành điện năng.</p>
+
+            <hr class="my-4 border-gray-700">
+
+            <h2>1. Nguyên Lý Làm Việc (Định luật Faraday)</h2>
+            <p class="text-gray-400">Nguyên lý cốt lõi là **Hiện tượng Cảm ứng Điện từ**, được mô tả bởi **Định luật Faraday**:</p>
+            <div class="math-formula">$$e = - \frac{d\Phi}{dt}$$</div>
+            <p class="text-gray-400">Trong máy phát điện, cơ năng (sự quay của Rotor) làm cho Từ thông ($\Phi$) xuyên qua cuộn dây thay đổi liên tục, tạo ra Suất Điện động Cảm ứng ($e$) - tức là điện áp xoay chiều (AC).</p>
+            
+            <hr class="my-4 border-gray-700">
+
+            <h2>2. Cấu Tạo Cơ Bản</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Thành phần</th>
+                        <th>Vai trò</th>
+                        <th>Chức năng Vật lý</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>**Rotor** (Phần quay)</td>
+                        <td>Tạo từ trường thay đổi</td>
+                        <td>Nam châm vĩnh cửu quay (các cực N, S).</td>
+                    </tr>
+                    <tr>
+                        <td>**Stator** (Phần đứng yên)</td>
+                        <td>Nơi sinh ra điện áp</td>
+                        <td>Cuộn dây (Armature) cố định, nằm giữa khe hở từ.</td>
+                    </tr>
+                    <tr>
+                        <td>Lõi Sắt</td>
+                        <td>Tăng cường từ thông</td>
+                        <td>Dẫn và tập trung đường sức từ qua cuộn dây.</td>
+                    </tr>
+                    <tr>
+                        <td>Vòng trượt/Chổi than</td>
+                        <td>Truyền điện ra ngoài</td>
+                        <td>Dùng để lấy điện áp AC ra mạch ngoài.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <hr class="my-4 border-gray-700">
+
+            <h2>3. Các Công Thức Giải Thích Hiện Tượng</h2>
+            <p class="text-gray-400">Suất điện động xoay chiều ($e$) sinh ra trong cuộn dây có $N$ vòng, diện tích $A$, quay trong từ trường đều $B$ với tốc độ góc $\omega$.</p>
+            
+            <h3>A. Từ thông xuyên qua cuộn dây ($\Phi$)</h3>
+            <div class="math-formula">$$\Phi = N B A \cos(\omega t + \varphi)$$</div>
+
+            <h3>B. Suất điện động tức thời ($e$)</h3>
+            <div class="math-formula">$$e = E_0 \sin(\omega t + \varphi)$$</div>
+
+            <h3>C. Giá trị Cực đại ($E_0$)</h3>
+            <p class="text-gray-400">Giá trị điện áp cao nhất (Biên độ), tỷ lệ thuận với tốc độ quay:</p>
+            <div class="math-formula">$$E_0 = N B A \omega$$</div>
+
+            <hr class="my-4 border-gray-700">
+
+            <h2>4. Lưu Ý Quan Trọng Khi Làm Bài Tập</h2>
+            <ul class="list-disc list-inside space-y-1 text-gray-400">
+                <li>**Đơn vị:** Luôn sử dụng hệ SI ($\text{m}^2$ cho diện tích $A$, $\text{rad/s}$ cho $\omega$).</li>
+                <li>**Tốc độ Góc ($\omega$):** Tốc độ góc ($\omega$) quyết định cả **Tần số** ($f = \omega / 2\pi$) và **Biên độ điện áp** ($E_0$). Khi tốc độ quay tăng, $E_0$ và $f$ đều tăng.</li>
+                <li>**Giá trị Hiệu dụng ($E$):** Đây là giá trị thường dùng trong thực tế (như 220V). Mối quan hệ:
+                <div class="math-formula">$$E = \frac{E_0}{\sqrt{2}}$$</div>
+                </li>
+            </ul>
+        </div>
+        
+    </div>
+
+    <!-- CỘT 2: 3D DYNAMO SIMULATION -->
+    <div id="dynamo-container" class="flex-grow">
+        <!-- Three.js renderer sẽ được thêm vào đây -->
+    </div>
+
+    <script>
+        // --- Tab Control Function ---
+        function showTab(tabId) {
+            document.getElementById('controls-tab').classList.add('hidden');
+            document.getElementById('theory-tab').classList.add('hidden');
+            
+            document.querySelector('.tab-button.active')?.classList.remove('active');
+
+            const activeTabContent = document.getElementById(tabId + '-tab');
+            activeTabContent.classList.remove('hidden');
+
+            const activeTabButton = document.querySelector(`.tab-button[onclick="showTab('${tabId}')"]`);
+            activeTabButton.classList.add('active');
+            
+            // Cập nhật lại kích thước graph khi chuyển sang tab controls
+            if (tabId === 'controls') {
+                onWindowResize(); 
+            }
+        }
+        
+        // --- THREE.JS & SIMULATION LOGIC ---
+
+        // Các biến toàn cục cho Three.js
+        let scene, camera, renderer, controls;
+        let rotorGroup; 
+        let lightBulb; 
+        
+        // Cài đặt cho đồ thị
+        let graphCanvas, graphCtx;
+        const VOLTAGE_HISTORY_LENGTH = 150; 
+        let voltageHistory = new Array(VOLTAGE_HISTORY_LENGTH).fill(0);
+
+        // Màu sắc và kích thước (như phiên bản trước)
+        const CORE_COLOR = 0x6b7280; 
+        const COIL_COLOR = 0xcc9900; 
+        const N_POLE_COLOR = 0xcc3333; 
+        const S_POLE_COLOR = 0x3366cc; 
+        const SHAFT_COLOR = 0x4a4a4a; 
+        
+        const LIGHT_ON_COLOR = 0xffcc00; 
+        const LIGHT_OFF_COLOR = 0x666600; 
+        const LIGHT_BASE_COLOR = 0xaaaaaa; 
+        const WIRE_RADIUS = 0.2; 
+
+        let ROTATION_SPEED = 0.03; 
+        const MAX_ROTATION_SPEED = 0.1; 
+        const VOLTAGE_MAX = 5; 
+
+        const CORE_BASE_WIDTH = 12; 
+        const CORE_BASE_DEPTH = 5; 
+        const COIL_LENGTH = CORE_BASE_WIDTH - 4; 
+        const COIL_RADIUS = CORE_BASE_DEPTH / 2 + 0.8; 
+        const NUM_COIL_TURNS = 18; 
+
+        // Định nghĩa lớp đường cong xoắn (Helix/Solenoid Curve)
+        class SolenoidCurve extends THREE.Curve {
+            constructor(coreLength, coilRadius, turns) {
+                super();
+                this.coreLength = coreLength;
+                this.coilRadius = coilRadius;
+                this.turns = turns;
+            }
+            getPoint(t, optionalTarget = new THREE.Vector3()) {
+                const point = optionalTarget;
+                const x = (t - 0.5) * this.coreLength * 0.9; 
+                const angle = 2 * Math.PI * this.turns * t;
+
+                const y = this.coilRadius * Math.sin(angle);
+                const z = this.coilRadius * Math.cos(angle);
+
+                return point.set(x, y, z);
+            }
+        }
+
+        function init() {
+            // --- 1. SETUP THREE.JS ---
+            
+            const dynamoContainer = document.getElementById('dynamo-container');
+
+            // Setup Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1f2937); 
+
+            // Setup Camera
+            const aspect = dynamoContainer.clientWidth / dynamoContainer.clientHeight;
+            camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+            camera.position.set(0, 5, 15); 
+
+            // Setup Renderer: Đặt kích thước theo container
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(dynamoContainer.clientWidth, dynamoContainer.clientHeight);
+            dynamoContainer.appendChild(renderer.domElement);
+
+            // Setup Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+            controls.minDistance = 2;
+            controls.maxDistance = 25;
+            controls.target.set(0, 3, 0); 
+
+            // Setup Lighting
+            const ambientLight = new THREE.AmbientLight(0x404040, 3); 
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8);
+            directionalLight.position.set(5, 10, 5);
+            scene.add(directionalLight);
+
+            // Create Dynamo Parts
+            createDynamoParts();
+            
+            // --- 2. SETUP GRAPH & CONTROLS ---
+
+            graphCanvas = document.getElementById('graphCanvas');
+            const controlsPanel = document.getElementById('controls-panel');
+            // Đặt chiều rộng graph canvas bằng chiều rộng controls panel trừ padding
+            graphCanvas.width = controlsPanel.clientWidth - 24 * 2; // 1.5rem padding * 2 = 48px
+            graphCtx = graphCanvas.getContext('2d');
+            
+            const speedSlider = document.getElementById('speedSlider');
+            const speedValueDisplay = document.getElementById('speedValue');
+            
+            speedSlider.addEventListener('input', (event) => {
+                const sliderValue = parseFloat(event.target.value);
+                // Chuyển đổi giá trị slider (0-10) thành tốc độ quay thực tế
+                ROTATION_SPEED = sliderValue / 10 * MAX_ROTATION_SPEED;
+                speedValueDisplay.innerText = sliderValue.toFixed(1);
+            });
+            // Thiết lập giá trị ban đầu
+            ROTATION_SPEED = parseFloat(speedSlider.value) / 10 * MAX_ROTATION_SPEED;
+            speedValueDisplay.innerText = parseFloat(speedSlider.value).toFixed(1);
+
+            // Event Listeners
+            window.addEventListener('resize', onWindowResize, false);
+            
+            // Đảm bảo tab Controls hiển thị khi khởi động
+            showTab('controls'); 
+
+            // Start animation loop
+            animate();
+        }
+
+        function createDynamoParts() {
+            // --- 1. STATOR (Iron Core and Coil) ---
+            createStator();
+
+            // --- 2. ROTOR (Shaft, Magnet, and Knob) ---
+            createRotorMechanism();
+            
+            // --- 3. Load (Light Bulb) ---
+            createLightBulb();
+        }
+
+        function createStator() {
+            const coreMaterial = new THREE.MeshPhongMaterial({ color: CORE_COLOR });
+
+            // IRON CORE (LÕI SẮT)
+            const CORE_BASE_HEIGHT = 1.5; 
+
+            // Base
+            const coreBaseGeometry = new THREE.BoxGeometry(CORE_BASE_WIDTH, CORE_BASE_HEIGHT, CORE_BASE_DEPTH);
+            const coreBase = new THREE.Mesh(coreBaseGeometry, coreMaterial);
+            coreBase.position.y = 0; 
+            scene.add(coreBase);
+
+            // Two vertical arms
+            const coreArmGeometry = new THREE.BoxGeometry(2.5, 7, CORE_BASE_DEPTH); 
+            const armOffset = CORE_BASE_WIDTH / 2 - 1.25; 
+
+            const coreArm1 = new THREE.Mesh(coreArmGeometry, coreMaterial);
+            coreArm1.position.set(-armOffset, 4.25, 0); 
+            scene.add(coreArm1);
+
+            const coreArm2 = new THREE.Mesh(coreArmGeometry, coreMaterial);
+            coreArm2.position.set(armOffset, 4.25, 0); 
+            scene.add(coreArm2);
+
+            // SOLENOID COIL (CUỘN DÂY)
+            const coilMaterial = new THREE.MeshPhongMaterial({ color: COIL_COLOR, side: THREE.DoubleSide });
+            
+            const solenoidCurve = new SolenoidCurve(COIL_LENGTH, COIL_RADIUS, NUM_COIL_TURNS);
+            const coilGeometry = new THREE.TubeGeometry(solenoidCurve, 100, WIRE_RADIUS, 8, false);
+            
+            const coil = new THREE.Mesh(coilGeometry, coilMaterial);
+            coil.position.y = 0; 
+            scene.add(coil);
+
+            // Coil end wire (decorative)
+            const endPoint = solenoidCurve.getPoint(1);
+            const wireEndGeometry = new THREE.CylinderGeometry(WIRE_RADIUS, WIRE_RADIUS, 5, 8);
+            const wireEnd = new THREE.Mesh(wireEndGeometry, coilMaterial);
+            
+            wireEnd.rotation.z = Math.PI / 2;
+            wireEnd.position.set(endPoint.x + 2.5, endPoint.y, endPoint.z);
+            scene.add(wireEnd);
+        }
+
+        function createRotorMechanism() {
+            const shaftMaterial = new THREE.MeshPhongMaterial({ color: SHAFT_COLOR });
+
+            // --- Tay quay (Knob) ---
+            const knobGeometry = new THREE.CylinderGeometry(1.5, 1.5, 0.5, 32);
+            const knob = new THREE.Mesh(knobGeometry, shaftMaterial);
+            knob.position.set(0, 8.5, 0); 
+            scene.add(knob);
+
+            // --- Trục dọc (Vertical Shaft) ---
+            const verticalShaftGeometry = new THREE.CylinderGeometry(0.2, 0.2, 8, 32);
+            const verticalShaft = new THREE.Mesh(verticalShaftGeometry, shaftMaterial);
+            verticalShaft.position.set(0, 4.5, 0); 
+            scene.add(verticalShaft);
+
+            // --- Nhóm Rotor (Nam châm và Trục ngang) ---
+            rotorGroup = new THREE.Group();
+            rotorGroup.position.y = 4.25; 
+            scene.add(rotorGroup);
+
+            // Trục ngang (Horizontal Shaft)
+            const horizontalShaftGeometry = new THREE.CylinderGeometry(0.3, 0.3, 5.5, 32);
+            const horizontalShaft = new THREE.Mesh(horizontalShaftGeometry, shaftMaterial);
+            horizontalShaft.rotation.z = Math.PI / 2; 
+            rotorGroup.add(horizontalShaft);
+
+            // Nam châm (N & S Pole)
+            const magnetLength = 1.5; 
+            const magnetHeight = 2.5;
+            const magnetDepth = 2.5;
+            const magnetGeometry = new THREE.BoxGeometry(magnetLength, magnetHeight, magnetDepth);
+            const magMaterialN = new THREE.MeshPhongMaterial({ color: N_POLE_COLOR });
+            const magMaterialS = new THREE.MeshPhongMaterial({ color: S_POLE_COLOR });
+
+            const magnetOffset = 2.25; 
+
+            // Cực Bắc (N Pole)
+            const magnetN = new THREE.Mesh(magnetGeometry, magMaterialN);
+            magnetN.position.x = magnetOffset; 
+            rotorGroup.add(magnetN);
+
+            // Cực Nam (S Pole)
+            const magnetS = new THREE.Mesh(magnetGeometry, magMaterialS);
+            magnetS.position.x = -magnetOffset; 
+            rotorGroup.add(magnetS);
+
+            // Text labels (N và S)
+            const loader = new THREE.FontLoader();
+            // Tải font từ thư viện Three.js
+            loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
+                const createLabel = (text, material, xOffset, zOffset) => {
+                    const textGeometry = new THREE.TextGeometry(text, { font: font, size: 1.5, height: 0.1, curveSegments: 12 });
+                    const textMesh = new THREE.Mesh(textGeometry, material);
+                    textMesh.geometry.computeBoundingBox();
+                    // Đặt tâm của chữ về vị trí 0, sau đó dịch chuyển
+                    textMesh.geometry.boundingBox.getCenter(textMesh.position).negate();
+                    textMesh.position.x += xOffset;
+                    textMesh.position.y -= 0.75;
+                    textMesh.position.z += zOffset;
+                    return textMesh;
+                };
+
+                const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                // Label N
+                rotorGroup.add(createLabel('N', textMaterial, magnetOffset, magnetDepth / 2 + 0.01));
+                // Label S
+                rotorGroup.add(createLabel('S', textMaterial, -magnetOffset, magnetDepth / 2 + 0.01));
+            });
+        }
+
+        function createLightBulb() {
+            const POS_X = CORE_BASE_WIDTH / 2 + 2.5; 
+            const POS_Y = 1.75; 
+            const POS_Z = 0;
+            const coilMaterial = new THREE.MeshPhongMaterial({ color: COIL_COLOR, side: THREE.DoubleSide });
+
+            // 1. Đế Bóng Đèn
+            const baseGeometry = new THREE.CylinderGeometry(0.5, 0.75, 1.5, 32);
+            const baseMaterial = new THREE.MeshPhongMaterial({ color: LIGHT_BASE_COLOR });
+            const lightBase = new THREE.Mesh(baseGeometry, baseMaterial);
+            lightBase.position.set(POS_X, POS_Y - 0.75, POS_Z);
+            scene.add(lightBase);
+
+            // 2. Bóng thủy tinh
+            const bulbGeometry = new THREE.SphereGeometry(1.2, 32, 16);
+            const bulbMaterial = new THREE.MeshBasicMaterial({ 
+                color: LIGHT_OFF_COLOR, 
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            lightBulb = new THREE.Mesh(bulbGeometry, bulbMaterial);
+            lightBulb.position.set(POS_X, POS_Y + 1.2, POS_Z);
+            scene.add(lightBulb);
+
+            // Nguồn sáng thực tế
+            const lightSource = new THREE.PointLight(LIGHT_ON_COLOR, 0, 80); 
+            lightSource.position.set(POS_X, POS_Y + 1.2, POS_Z);
+            lightBulb.userData.lightSource = lightSource; 
+            scene.add(lightSource);
+
+            // 3. Dây kết nối (Trang trí)
+            const wireEndGeometry = new THREE.CylinderGeometry(WIRE_RADIUS, WIRE_RADIUS, 5, 8);
+            
+            const wireToBulb = new THREE.Mesh(wireEndGeometry, coilMaterial);
+            wireToBulb.rotation.z = -Math.PI / 2;
+            wireToBulb.position.set(POS_X - 2.5, 0.75, 0); 
+            scene.add(wireToBulb);
+            
+            // 4. Đế sàn
+            const baseFloorGeometry = new THREE.BoxGeometry(3, 0.5, 3);
+            const baseFloorMaterial = new THREE.MeshPhongMaterial({ color: 0x444444 }); 
+            const baseFloor = new THREE.Mesh(baseFloorGeometry, baseFloorMaterial);
+            baseFloor.position.set(POS_X, -0.5, POS_Z);
+            scene.add(baseFloor);
+        }
+
+        function drawSineWaveGraph(currentVoltage) {
+            if (!graphCtx) return;
+
+            const W = graphCanvas.width;
+            const H = graphCanvas.height;
+            const originY = H / 2;
+            const amplitude = H / 2.5; 
+
+            // Dịch chuyển và thêm điểm mới vào lịch sử
+            voltageHistory.shift();
+            voltageHistory.push(currentVoltage);
+
+            // Xóa canvas
+            graphCtx.clearRect(0, 0, W, H);
+
+            // Vẽ đường 0V (Trục X)
+            graphCtx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            graphCtx.lineWidth = 1;
+            graphCtx.beginPath();
+            graphCtx.moveTo(0, originY);
+            graphCtx.lineTo(W, originY);
+            graphCtx.stroke();
+            
+            // Vẽ đồ thị hình sin
+            graphCtx.strokeStyle = '#fcd34d'; 
+            graphCtx.lineWidth = 2;
+            graphCtx.beginPath();
+
+            for (let i = 0; i < VOLTAGE_HISTORY_LENGTH; i++) {
+                const x = (i / VOLTAGE_HISTORY_LENGTH) * W;
+                // Chuẩn hóa điện áp (-5V đến 5V) về vị trí màn hình
+                const normalizedVoltage = voltageHistory[i] / VOLTAGE_MAX;
+                const y = originY - normalizedVoltage * amplitude;
+
+                if (i === 0) {
+                    graphCtx.moveTo(x, y);
+                } else {
+                    graphCtx.lineTo(x, y);
+                }
+            }
+            graphCtx.stroke();
+
+            // Vẽ nhãn trục Y
+            graphCtx.fillStyle = 'white';
+            graphCtx.font = '10px Inter';
+            graphCtx.textAlign = 'right';
+            graphCtx.fillText(`+${VOLTAGE_MAX}V`, 35, originY - amplitude - 5);
+            graphCtx.fillText('0V', 35, originY + 3);
+            graphCtx.fillText(`-${VOLTAGE_MAX}V`, 35, originY + amplitude + 10);
+            
+            graphCtx.textAlign = 'left';
+            graphCtx.fillText('Điện áp (V)', 5, 15);
+        }
+
+
+        function onWindowResize() {
+            const dynamoContainer = document.getElementById('dynamo-container');
+            const controlsPanel = document.getElementById('controls-panel');
+
+            // 1. Cột 3D: Cập nhật kích thước Renderer và Camera
+            if (dynamoContainer && renderer && camera) {
+                const width = dynamoContainer.clientWidth;
+                const height = dynamoContainer.clientHeight;
+                renderer.setSize(width, height);
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+            }
+            
+            // 2. Cột UI: Cập nhật kích thước Graph Canvas (chỉ khi tab controls đang mở)
+            if (graphCanvas && controlsPanel && !document.getElementById('controls-tab').classList.contains('hidden')) {
+                // Chiều rộng = Chiều rộng Panel - 2 lần Padding (1.5rem = 24px)
+                graphCanvas.width = controlsPanel.clientWidth - 24 * 2; 
+                // Cần vẽ lại đồ thị ngay lập tức khi thay đổi kích thước
+                drawSineWaveGraph(voltageHistory[voltageHistory.length - 1] || 0);
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Xoay Rotor
+            if (rotorGroup) {
+                 rotorGroup.rotation.y += ROTATION_SPEED;
+                 
+                 // Xoay tay quay
+                 scene.children.forEach(child => {
+                    if (child.geometry && child.geometry.type === 'CylinderGeometry' && child.position.y > 8) {
+                        child.rotation.y += ROTATION_SPEED * 2; 
+                    }
+                 });
+            }
+
+            // Tính toán Điện áp (Mô phỏng AC)
+            const angle = rotorGroup ? rotorGroup.rotation.y : 0;
+            // Biên độ cũng phụ thuộc vào tốc độ quay (Mô phỏng: quay càng nhanh, Vpk càng cao)
+            const currentMaxVoltage = VOLTAGE_MAX * (ROTATION_SPEED / MAX_ROTATION_SPEED);
+            const voltage = Math.sin(angle) * currentMaxVoltage; 
+            const absVoltage = Math.abs(voltage);
+            
+            // Cập nhật Bóng đèn
+            if (lightBulb) {
+                // Cường độ sáng tỷ lệ với điện áp
+                const intensityRatio = Math.pow(Math.max(0, absVoltage / currentMaxVoltage), 5); 
+                
+                // Cập nhật màu bóng đèn
+                const color = new THREE.Color(LIGHT_OFF_COLOR);
+                color.lerp(new THREE.Color(LIGHT_ON_COLOR), intensityRatio);
+                lightBulb.material.color.copy(color);
+
+                // Cập nhật nguồn sáng
+                const lightSource = lightBulb.userData.lightSource;
+                if (lightSource) {
+                    lightSource.intensity = intensityRatio * 15; 
+                }
+            }
+
+            // Cập nhật đồ thị hình sin (chỉ khi tab controls đang mở)
+            if (!document.getElementById('controls-tab').classList.contains('hidden')) {
+                drawSineWaveGraph(voltage);
+            }
+            
+            // Cập nhật giá trị hiển thị (UI)
+            document.getElementById('voltageValue').innerText = voltage.toFixed(2) + " V";
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

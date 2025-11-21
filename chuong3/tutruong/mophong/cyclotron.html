@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng Máy Xiclo-tron (Cyclotron)</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+
+    <style>
+        /* Custom styles to ensure canvas fits and general font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .canvas-container {
+            /* Đảm bảo canvas được căn giữa và có kích thước tối đa */
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        canvas {
+            border: 3px solid #3b82f6;
+            background-color: #e0f2fe;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        /* Style cho thanh trượt để dễ nhìn hơn */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #3b82f6;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #3b82f6;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-center mb-6 text-indigo-800">Máy XYCLOTRON</h1>
+
+        <!-- MAIN LAYOUT: 2 Columns on Desktop, Stacked on Mobile -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- CỘT 1: MÔ PHỎNG VÀ ĐIỀU KHIỂN (2/3 chiều rộng trên desktop) -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                <h2 class="text-2xl text-center font-bold text-gray-800 mb-4 border-b pb-2">Mô Phỏng Chuyển Động Hạt Proton</h2>
+                
+                <div class="canvas-container">
+                    <canvas id="cyclotronCanvas" width="500" height="500"></canvas>
+                </div>
+
+                <!-- Controls -->
+                <div class="controls grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg shadow-inner">
+                    <div class="control-group">
+                        <label for="initialVelocity" class="block text-sm font-semibold text-gray-700">Vận tốc $V$ (m/s)</label>
+                        <input type="range" id="initialVelocity" min="1" max="10" step="1" value="1" class="w-full">
+                        <span id="velValue" class="text-xs text-indigo-600 font-medium mt-1">1.0 x 10<sup>5</sup> m/s</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="deeVoltage" class="block text-sm font-semibold text-gray-700">Hiệu điện thế $U$ (Volt)</label>
+                        <input type="range" id="deeVoltage" min="1" max="10" step="1" value="1" class="w-full">
+                        <span id="voltValue" class="text-xs text-indigo-600 font-medium mt-1">1000 V</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="magneticField" class="block text-sm font-semibold text-gray-700">Từ trường $B$ (Tesla)</label>
+                        <input type="range" id="magneticField" min="0.5" max="3.0" step="0.1" value="0.5" class="w-full">
+                        <span id="magValue" class="text-xs text-indigo-600 font-medium mt-1">0.5 T</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="animationSpeed" class="block text-sm font-semibold text-gray-700">Tốc độ Mô (Bước tính)</label>
+                        <input type="range" id="animationSpeed" min="10" max="5000" step="10" value="100" class="w-full">
+                        <span id="speedValue" class="text-xs text-indigo-600 font-medium mt-1">100</span>
+                    </div>
+                </div>
+
+                <!-- Button and Message -->
+                <div class="flex flex-col items-center mt-6">
+                    <button onclick="startSimulation()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition duration-200">
+                        Bắt đầu/Chạy lại Mô phỏng
+                    </button>
+                    <div id="messageBox" class="mt-4 p-3 rounded-lg text-sm font-semibold w-full max-w-sm text-center bg-yellow-100 text-yellow-800">
+                        SẴN SÀNG
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats grid grid-cols-2 gap-4 mt-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                    <div class="text-sm text-gray-700">Khe hở Dee (d): <span class="font-bold text-blue-800">0.70 mm (Cố định)</span></div>
+                    <div class="text-sm text-gray-700">Vòng quay đã hoàn thành: <span id="numRevolutions" class="font-bold text-blue-800">0.00</span></div>
+                    <div class="text-sm text-gray-700">Năng lượng cuối: <span id="kineticEnergy" class="font-bold text-blue-800">0.00 eV</span></div>
+                    <div class="text-sm text-gray-700">Vận tốc cuối: <span id="finalVelocity" class="font-bold text-blue-800">0.00 m/s</span></div>
+                    <div class="text-sm text-gray-700">Bán kính cuối: <span id="finalRadius" class="font-bold text-blue-800">0 pixel</span></div>
+                </div>
+            </div>
+
+            <!-- CỘT 2: TÓM TẮT KIẾN THỨC (1/3 chiều rộng trên desktop) -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg border border-gray-200 h-fit">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2 text-green-700">Tóm Tắt Kiến Thức</h2>
+                <div class="space-y-4 text-gray-700 text-base">
+                    <p>Máy Xiclo-tron là một loại máy gia tốc hạt được phát minh bởi Ernest O. Lawrence và M. Stanley Livingston vào năm 1934. Nó được sử dụng để tăng tốc các hạt mang điện (như proton, deuteron) đến năng lượng cao.</p>
+
+                    <h3 class="text-lg font-semibold mt-4 text-green-600">1. Nguyên tắc hoạt động</h3>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li>**Từ trường $B$ (Đồng nhất, vuông góc):** Lực Lorentz $\vec{F_L}$ luôn vuông góc với vận tốc $\vec{v}$, buộc hạt chuyển động theo quỹ đạo tròn trong hai điện cực hình bán nguyệt rỗng (gọi là "Dee").</li>
+                        <li>**Điện trường $E$ (Xoay chiều):** Điện trường chỉ tồn tại trong khe hở hẹp giữa hai Dee. Điện trường này thay đổi chiều để luôn đẩy hạt đi nhanh hơn mỗi khi hạt đi qua khe hở.</li>
+                    </ul>
+                    [Image of Cyclotron principle diagram]
+
+                    <h3 class="text-lg font-semibold mt-4 text-green-600">2. Tần số Cyclotron (Cộng hưởng)</h3>
+                    <p>Để đảm bảo lực điện luôn đẩy hạt (tăng tốc), tần số của điện trường xoay chiều phải bằng tần số quay của hạt trong từ trường (tần số cyclotron $f_c$).</p>
+                    <p class="font-mono bg-gray-100 p-2 rounded">
+                        Tần số góc: $$\omega_c = \frac{qB}{m}$$
+                        Tần số: $$f_c = \frac{\omega_c}{2\pi} = \frac{qB}{2\pi m}$$
+                    </p>
+                    <p>Điều quan trọng là tần số $f_c$ không phụ thuộc vào bán kính quỹ đạo $R$ hay vận tốc $V$ của hạt (miễn là $V \ll c$). Đây là nguyên tắc cộng hưởng cho phép Xiclo-tron hoạt động.</p>
+
+                    <h3 class="text-lg font-semibold mt-4 text-green-600">3. Năng lượng Hạt Đạt Được</h3>
+                    <p>Mỗi lần đi qua khe hở, năng lượng của hạt tăng lên một lượng $\Delta E = qU$ (với $U$ là hiệu điện thế giữa hai Dee). Nếu hạt quay $N$ vòng (qua khe hở $2N$ lần), năng lượng cuối cùng là:</p>
+                    <p class="font-mono bg-gray-100 p-2 rounded">
+                        $$E_{cuối} = 2NqU$$
+                    </p>
+                    <p>Bán kính quỹ đạo lớn nhất ($R_{max}$) của hạt được xác định bởi kích thước của Dee. Năng lượng cực đại đạt được là:</p>
+                    <p class="font-mono bg-gray-100 p-2 rounded">
+                        $$E_{max} = \frac{q^2 B^2 R_{max}^2}{2m}$$
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CÁC HẰNG SỐ VẬT LÝ ---
+        const PROTON_MASS = 1.6726219e-27; // Khối lượng Proton (kg)
+        const PROTON_CHARGE = 1.602176634e-19; // Điện tích Proton (C)
+        const EV_TO_JOULE = 1.602176634e-19; // Đơn vị electron-volt (eV)
+
+        // --- CÀI ĐẶT MÔ PHỎNG VÀ VẼ ---
+        const canvas = document.getElementById('cyclotronCanvas');
+        if (!canvas) {
+            console.error("Lỗi: Không tìm thấy Canvas element với ID 'cyclotronCanvas'.");
+        }
+        const ctx = canvas ? canvas.getContext('2d') : null;
+        if (!ctx) {
+             console.error("Lỗi: Không thể lấy Context 2D từ Canvas.");
+        }
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const scaleFactor = 1e-4; // 1 pixel = 1e-4 mét.
+        const dt_physics_base = 1e-13; // BƯỚC THỜI GIAN VẬT LÝ CỰC NHỎ (giây)
+        const R_START_PIXELS = 1; // Vị trí bắt đầu tính theo pixel từ mép Dee
+        const R_START_METERS = R_START_PIXELS * scaleFactor; 
+
+        // --- CÀI ĐẶT VẼ QUỸ ĐẠO MƯỢT ---
+        let lastRecordX = 0; // Tọa độ X (pixel) của lần ghi quỹ đạo gần nhất
+        let lastRecordY = 0; // Tọa độ Y (pixel) của lần ghi quỹ đạo gần nhất
+        const MIN_VISUAL_DISTANCE = 3; // Khoảng cách tối thiểu (pixel) giữa các điểm ghi lại
+
+        // --- CÁC BIẾN CỦA HẠT PROTON ---
+        let proton = {
+            x: 0, 
+            y: 0, 
+            vx: 0, 
+            vy: 0, 
+            r: 3, 
+            trajectory: [], 
+        };
+
+        // --- CÁC THAM SỐ CỦA MÁY XICLO-TRON ---
+        let B_field = 0.5;         // Cường độ từ trường (Tesla)
+        let U_voltage = 1000;      // Hiệu điện thế khe hở (Volt)
+        const D_GAP_FIXED = 0.0007; // Khoảng cách khe hở cố định: 0.7 mm = 0.0007 m
+        let V_initial = 1e5;       // Vận tốc ban đầu (m/s)
+        let simulationIterations = 100; // Số lần lặp vật lý cơ sở trên mỗi khung hình vẽ
+        const MAX_RADIUS = 200;    // Bán kính tối đa của Dee (pixel)
+
+        // --- BIẾN ĐẾM VÒNG QUAY VÀ TRẠNG THÁI ---
+        let numHalfRevolutions = 0;
+        let lastDeeSign = -1; 
+        let wasInGapLastStep = false; 
+        let isExtracted = false; 
+
+        let totalTime = 0;
+        let animationFrameId;
+        let isRunning = false; // QUAN TRỌNG: Điều khiển trạng thái chạy
+        let finalEnergyEV = 0; 
+
+        // --- CÁC TÍNH TOÁN VẬT LÝ CƠ BẢN ---
+        let cyclotron_frequency;
+        
+        function updatePhysicsConstants() {
+            cyclotron_frequency = PROTON_CHARGE * B_field / PROTON_MASS;
+        }
+
+        // --- KHỞI TẠO VÀ CẬP NHẬT GIAO DIỆN ---
+        const velInput = document.getElementById('initialVelocity');
+        const voltInput = document.getElementById('deeVoltage');
+        const magInput = document.getElementById('magneticField');
+        const speedInput = document.getElementById('animationSpeed'); 
+
+        // Cập nhật giá trị hiển thị ban đầu
+        function updateDisplayValues() {
+            const V_value = parseFloat(velInput.value);
+            const U_value = parseFloat(voltInput.value);
+            const B_value = parseFloat(magInput.value);
+            
+            // Tính giá trị vật lý thực tế
+            const U_actual = U_value * 1000; // Volt
+
+            // Định dạng giá trị V (Sử dụng ký hiệu khoa học)
+            let V_display;
+            if (V_value === 10) {
+                // Hiển thị 1.0 x 10⁶ m/s
+                V_display = `1.0 &times; 10<sup>6</sup> m/s`;
+            } else {
+                // Hiển thị 1.0 x 10⁵ m/s, 5.0 x 10⁵ m/s, v.v.
+                V_display = `${V_value.toFixed(1)} &times; 10<sup>5</sup> m/s`;
+            }
+
+            document.getElementById('velValue').innerHTML = V_display;
+            document.getElementById('voltValue').textContent = U_actual.toFixed(0) + ' V';
+            document.getElementById('magValue').textContent = B_value.toFixed(1) + ' T';
+            document.getElementById('speedValue').textContent = speedInput.value;
+        }
+        
+        // --- LOGIC CẬP NHẬT THANH TRƯỢT (CHỈ CẬP NHẬT TRẠNG THÁI CHUẨN BỊ) ---
+        velInput.oninput = () => { updateDisplayValues(); prepareSimulation(false); };
+        voltInput.oninput = () => { updateDisplayValues(); prepareSimulation(false); };
+        magInput.oninput = () => { updateDisplayValues(); prepareSimulation(false); };
+        speedInput.oninput = () => {
+            updateDisplayValues();
+            // Cập nhật biến điều khiển tốc độ mô phỏng
+            simulationIterations = parseInt(speedInput.value); 
+        };
+
+        // Hàm CHUẨN BỊ mô phỏng (Tính toán lại hằng số và đặt lại vị trí hạt)
+        function prepareSimulation(isStarting = false) {
+            // Dừng animation nếu nó đang chạy
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            isRunning = false; // Đảm bảo trạng thái dừng
+
+            // Cập nhật tham số từ UI (áp dụng hệ số chuyển đổi đơn vị)
+            V_initial = parseFloat(velInput.value) * 1e5; // 1-10 -> 1e5-1e6 m/s
+            U_voltage = parseFloat(voltInput.value) * 1000; // 1-10 -> 1000-10000 V
+            B_field = parseFloat(magInput.value);
+            
+            updatePhysicsConstants();
+
+            // Tính bán kính ban đầu
+            const initialRadius = PROTON_MASS * V_initial / (PROTON_CHARGE * B_field);
+            
+            // Đặt hạt ở vị trí ban đầu (Dee trái)
+            // Đặt hơi lùi lại khỏi khe hở để đảm bảo bắt đầu trong Dee
+            proton.x = -(initialRadius + R_START_METERS); 
+            proton.y = 0;
+            proton.vx = 0;
+            proton.vy = V_initial; 
+
+            // Xử lý vị trí nếu bị đặt quá gần tâm
+            if (Math.abs(proton.x / scaleFactor) < R_START_PIXELS) {
+                 // Đảm bảo hạt không nằm ngay tại tâm, cho nó ra xa một chút
+                proton.x = -(R_START_PIXELS * scaleFactor);
+            }
+            
+            proton.trajectory = [];
+            lastRecordX = proton.x / scaleFactor;
+            lastRecordY = proton.y / scaleFactor;
+            proton.trajectory.push([lastRecordX, lastRecordY]);
+            
+            totalTime = 0;
+            isExtracted = false; 
+
+            // Reset biến đếm vòng quay
+            numHalfRevolutions = 0;
+            lastDeeSign = Math.sign(proton.x); 
+            wasInGapLastStep = false; 
+
+            // Cập nhật Stats và UI
+            updateStats(0.5 * PROTON_MASS * V_initial * V_initial, V_initial, 0);
+            
+            // Cập nhật thông báo dựa trên trạng thái
+            if (!isStarting) {
+                document.getElementById('messageBox').textContent = 'SẴN SÀNG: Điều chỉnh thông số thành công. Nhấn Bắt đầu để chạy.';
+                document.getElementById('messageBox').style.backgroundColor = '#dbeafe';
+                document.getElementById('messageBox').style.color = '#1e3a8a';
+            }
+            
+            // *** ĐẢM BẢO GỌI drawCyclotron() TRƯỚC KHI KẾT THÚC HÀM NÀY ***
+            drawCyclotron(); 
+            drawProton();
+        }
+
+        // Hàm BẮT ĐẦU mô phỏng (Gắn vào nút)
+        function startSimulation() {
+            // Nếu đang chạy, dừng và chuẩn bị lại trước khi bắt đầu
+            if (isRunning) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            
+            prepareSimulation(true); // Chuẩn bị mọi thứ
+            
+            // Bắt đầu chạy
+            isRunning = true; 
+            document.getElementById('messageBox').textContent = 'ĐANG MÔ PHỎNG...';
+            document.getElementById('messageBox').style.backgroundColor = '#fee2e2';
+            document.getElementById('messageBox').style.color = '#dc2626';
+            animate();
+        }
+
+
+        function drawCyclotron() {
+            if (!ctx) return; // Bảo vệ nếu context không hợp lệ
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Vẽ Vòng tròn tối đa (Bán kính tối đa) - ranh giới từ trường
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, MAX_RADIUS, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#9ca3af';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // 2. Vẽ Hai nửa bán cầu Dee (Điện cực D)
+            const halfGapPixels = (D_GAP_FIXED / scaleFactor) / 2;
+
+            // Dee 1 (Bên trái): x < 0
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, MAX_RADIUS, Math.PI / 2, 3 * Math.PI / 2, false);
+            ctx.lineTo(centerX - halfGapPixels, centerY);
+            ctx.closePath();
+            ctx.fillStyle = '#3b82f61a'; 
+            ctx.fill();
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Dee 2 (Bên phải): x > 0
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, MAX_RADIUS, 3 * Math.PI / 2, Math.PI / 2, false);
+            ctx.lineTo(centerX + halfGapPixels, centerY);
+            ctx.closePath();
+            ctx.fillStyle = '#10b9811a'; 
+            ctx.fill();
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // 3. Vẽ Khe hở (Gap) - Vùng điện trường
+            ctx.fillStyle = '#fef3c7'; 
+            ctx.fillRect(centerX - halfGapPixels, 0, halfGapPixels * 2, canvas.height);
+            ctx.strokeStyle = '#fbbf24';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(centerX - halfGapPixels, 0, halfGapPixels * 2, canvas.height);
+
+            // 4. Thể hiện điện thế xoay chiều trong khe hở
+            const phase = cyclotron_frequency * totalTime; 
+            const voltageSign = Math.sign(Math.sin(phase)); // Dấu của điện áp U tại thời điểm hiện tại
+            const polarityColor = voltageSign > 0 ? '#3b82f6' : '#10b981';
+            const polarityText = voltageSign > 0 ? "Dee Phải (+)" : "Dee Trái (+)";
+
+            ctx.font = "12px Inter";
+            ctx.fillStyle = polarityColor;
+            // Chỉ hiển thị cực tính khi mô phỏng đang chạy
+            if (isRunning) {
+                ctx.fillText(`Cực tính U: ${polarityText}`, centerX - 40, 20);
+            } else {
+                 ctx.fillText(`Khe hở d = 0.70 mm`, centerX - 40, 20);
+            }
+            
+        }
+
+        function drawProton() {
+            if (!ctx) return; // Bảo vệ nếu context không hợp lệ
+            
+            const drawX = centerX + proton.x / scaleFactor;
+            const drawY = centerY - proton.y / scaleFactor; 
+
+            // 1. Vẽ quỹ đạo
+            ctx.beginPath();
+            ctx.strokeStyle = isExtracted ? '#10b981' : '#7c3aed'; 
+            ctx.lineWidth = 1.5;
+            
+            // Đặt nét đứt cho quỹ đạo xoắn ốc (trừ khi hạt đã bị trích xuất)
+            if (!isExtracted) {
+                // Nét đứt: [5, 5]
+                ctx.setLineDash([5, 5]); 
+            } else {
+                // Nét liền khi hạt bay thẳng
+                ctx.setLineDash([]); 
+            }
+
+            // Bắt đầu vẽ từ điểm đầu tiên
+            if (proton.trajectory.length > 0) {
+                const [startX, startY] = proton.trajectory[0];
+                ctx.moveTo(centerX + startX, centerY - startY);
+            
+                // Vẽ các đoạn từ các điểm đã ghi
+                for (let i = 1; i < proton.trajectory.length; i++) {
+                    const [px, py] = proton.trajectory[i];
+                    ctx.lineTo(centerX + px, centerY - py);
+                }
+
+                // Nối đến vị trí hiện tại của hạt (làm đường đi trông mượt mà hơn)
+                ctx.lineTo(drawX, drawY);
+            }
+
+            ctx.stroke();
+
+            // QUAN TRỌNG: Reset về nét liền sau khi vẽ quỹ đạo xong
+            ctx.setLineDash([]); 
+
+            // 2. Vẽ hạt Proton
+            ctx.beginPath();
+            ctx.arc(drawX, drawY, proton.r, 0, 2 * Math.PI);
+            ctx.fillStyle = '#dc2626';
+            ctx.fill();
+            ctx.strokeStyle = '#991b1b';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
+        function updateStats(energyJoule, finalV, revolutions) {
+            const energyEV = energyJoule / EV_TO_JOULE;
+            finalEnergyEV = energyEV; 
+            document.getElementById('numRevolutions').textContent = (revolutions).toFixed(2);
+            document.getElementById('kineticEnergy').textContent = energyEV.toFixed(2) + ' eV';
+            document.getElementById('finalVelocity').textContent = (finalV).toPrecision(3) + ' m/s'; 
+            const finalR = Math.sqrt(proton.x * proton.x + proton.y * proton.y) / scaleFactor;
+            document.getElementById('finalRadius').textContent = finalR.toFixed(0) + ' pixel';
+        }
+        
+        // Hàm kiểm tra trích xuất và va chạm biên canvas
+        function checkExtractionAndBoundary() { 
+            const currentRadius = Math.sqrt(proton.x * proton.x + proton.y * proton.y) / scaleFactor;
+            
+            // 1. Kiểm tra giới hạn Dee (điểm trích xuất)
+            if (!isExtracted && currentRadius >= MAX_RADIUS) { 
+                isExtracted = true;
+                // Cập nhật thống kê lần cuối trước khi bay thẳng
+                const finalEnergy = 0.5 * PROTON_MASS * (proton.vx * proton.vx + proton.vy * proton.vy);
+                const finalV = Math.sqrt(proton.vx * proton.vx + proton.vy * proton.vy);
+                updateStats(finalEnergy, finalV, numHalfRevolutions / 2);
+
+                // Thông báo thay đổi trạng thái
+                document.getElementById('messageBox').textContent = `ĐÃ TRÍCH XUẤT: Proton thoát khỏi Dee. E = ${finalEnergyEV.toFixed(2)} eV.`;
+                document.getElementById('messageBox').style.backgroundColor = '#d1fae5';
+                document.getElementById('messageBox').style.color = '#065f46';
+            }
+
+            // 2. Kiểm tra va chạm với khung hình chữ nhật (biên canvas)
+            const drawX = centerX + proton.x / scaleFactor;
+            const drawY = centerY - proton.y / scaleFactor;
+            const protonR = proton.r; 
+            
+            const collision = (drawX <= protonR || drawX >= canvas.width - protonR || 
+                               drawY <= protonR || drawY >= canvas.height - protonR);
+            
+            // Dừng mô phỏng khi va chạm
+            if (collision) {
+                isRunning = false;
+                cancelAnimationFrame(animationFrameId);
+                
+                document.getElementById('messageBox').textContent = `VA CHẠM KHUNG: Mô phỏng DỪNG. E = ${finalEnergyEV.toFixed(2)} eV.`;
+                document.getElementById('messageBox').style.backgroundColor = '#fecaca';
+                document.getElementById('messageBox').style.color = '#991b1b';
+                
+                return true;
+            }
+
+
+            // 3. Giới hạn thời gian 
+            if (totalTime > 5e-5 && !isExtracted) { 
+                isRunning = false;
+                cancelAnimationFrame(animationFrameId);
+                document.getElementById('messageBox').textContent = 'GIỚI HẠN THỜI GIAN: Mô phỏng đã dừng (hạt chưa đạt bán kính tối đa).';
+                document.getElementById('messageBox').style.backgroundColor = '#fecaca';
+                document.getElementById('messageBox').style.color = '#991b1b';
+                return true;
+            }
+            return false;
+        }
+
+
+        // --- VÒNG LẶP MÔ PHỎNG CHÍNH ---
+        function animate() {
+            if (!isRunning) return;
+
+            // Lấy trực tiếp giá trị từ thanh trượt để làm số bước tính
+            let stepsPerFrame = simulationIterations; 
+            
+            // Chạy nhiều bước vật lý nhỏ trong 1 frame
+            for (let i = 0; i < stepsPerFrame; i++) {
+                updatePosition(dt_physics_base); 
+                totalTime += dt_physics_base;
+                
+                // Ghi lại quỹ đạo
+                recordTrajectoryPoint();
+            }
+
+            // Cập nhật thống kê
+            if (!isExtracted) {
+                updateStats(0.5 * PROTON_MASS * (proton.vx * proton.vx + proton.vy * proton.vy), 
+                            Math.sqrt(proton.vx * proton.vx + proton.vy * proton.vy), 
+                            numHalfRevolutions / 2);
+            }
+
+            drawCyclotron();
+            drawProton();
+
+            if (checkExtractionAndBoundary()) { 
+                return;
+            }
+
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        // Ghi lại điểm quỹ đạo nếu đã di chuyển đủ khoảng cách trên màn hình
+        function recordTrajectoryPoint() {
+            const drawX = proton.x / scaleFactor;
+            const drawY = proton.y / scaleFactor;
+            const distSq = (drawX - lastRecordX) * (drawX - lastRecordX) + (drawY - lastRecordY) * (drawY - lastRecordY);
+
+            if (distSq >= MIN_VISUAL_DISTANCE * MIN_VISUAL_DISTANCE) {
+                proton.trajectory.push([drawX, drawY]);
+                lastRecordX = drawX;
+                lastRecordY = drawY;
+            }
+        }
+
+
+        // Hàm cập nhật vị trí và vận tốc sau mỗi bước thời gian dt_step (Phương pháp Euler)
+        function updatePosition(dt_step) {
+            const halfGap = D_GAP_FIXED / 2;
+            
+            // Nếu hạt đã trích xuất, hạt bay thẳng
+            if (isExtracted) {
+                 proton.x += proton.vx * dt_step;
+                 proton.y += proton.vy * dt_step;
+                 return;
+            }
+
+            // --- TÍNH TOÁN LỰC ---
+            const isCurrentlyInGap = Math.abs(proton.x) <= halfGap;
+            
+            let ax_electric = 0;
+            // Lực Lorentz (Từ trường) - Lực này vuông góc với vận tốc và làm hạt quay
+            let ay_lorentz = -PROTON_CHARGE * proton.vx * B_field / PROTON_MASS;
+            let ax_lorentz = PROTON_CHARGE * proton.vy * B_field / PROTON_MASS;
+
+            if (isCurrentlyInGap) {
+                // --- TRONG KHE HỞ (GAP) ---
+                // Tần số Cyclotron (cộng hưởng)
+                const cyclotron_frequency = PROTON_CHARGE * B_field / PROTON_MASS; 
+                const phase = cyclotron_frequency * totalTime; 
+                const instantaneousVoltage = U_voltage * Math.sin(phase);
+                // Tính cường độ điện trường (chỉ theo hướng x)
+                const E_field_gap = instantaneousVoltage / D_GAP_FIXED; 
+                
+                // Gia tốc do lực điện
+                ax_electric += PROTON_CHARGE * E_field_gap / PROTON_MASS;
+            }
+            
+            // Cập nhật vận tốc
+            proton.vx += (ax_lorentz + ax_electric) * dt_step;
+            proton.vy += ay_lorentz * dt_step;
+            
+            // Cập nhật vị trí
+            proton.x += proton.vx * dt_step;
+            proton.y += proton.vy * dt_step;
+            
+            // --- LOGIC ĐẾM SỐ NỬA VÒNG QUAY ---
+            // Nửa vòng quay được tính khi hạt đi qua khe hở và chuyển sang Dee khác
+            if (!isCurrentlyInGap && wasInGapLastStep) { 
+                const currentDeeSign = Math.sign(proton.x);
+                if (currentDeeSign !== lastDeeSign) {
+                    numHalfRevolutions++;
+                    lastDeeSign = currentDeeSign;
+                }
+            }
+            wasInGapLastStep = isCurrentlyInGap; 
+        }
+
+        // Khởi tạo lần đầu để hiển thị trạng thái ban đầu
+        window.onload = function() {
+            if (!ctx) return; 
+
+            updateDisplayValues();
+            prepareSimulation(false); // Chuẩn bị nhưng không chạy, và vẽ ra
+        }
+    </script>
+</body>
+</html>
