@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng Phanh Điện Từ & Kiến Thức</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body { margin: 0; font-family: 'Inter', sans-serif; }
+        .main-content {
+            display: flex;
+            flex-wrap: wrap; 
+            gap: 1.5rem; /* Khoảng cách giữa các cột */
+            max-width: 7xl; 
+            margin-left: auto;
+            margin-right: auto;
+            padding: 1rem;
+        }
+        /* Wrapper cho Canvas và Controls */
+        .canvas-control-wrapper {
+            flex: 2; /* Chiếm 2 phần trong bố cục flex */
+            min-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem; /* Khoảng cách giữa canvas và control block */
+        }
+        #canvas-container {
+            width: 100%; /* Chiếm hết chiều rộng của wrapper */
+            height: 70vh; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            /* Thay đổi: Nền trắng cho canvas container */
+            background-color: #ffffff; 
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .info-column {
+            flex: 1; /* Cột thông tin chiếm 1 phần */
+            min-width: 300px; 
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        canvas { display: block; }
+    </style>
+</head>
+<body class="bg-gray-50 flex flex-col items-center min-h-screen py-8">
+
+    <!-- KHỐI TIÊU ĐỀ CHÍNH --><div class="max-w-4xl w-full bg-white p-6 rounded-xl shadow-2xl text-center mb-6">
+        <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Mô Phỏng Hệ Thống Phanh Điện Từ</h1>
+        <p class="text-gray-600 mb-0">Sử dụng chuột để xoay và quan sát mô hình.</p>
+    </div>
+
+    <!-- KHỐI NỘI DUNG CHÍNH (Mô phỏng, Điều khiển và Kiến thức) --><div class="main-content w-full max-w-7xl mb-6">
+        
+        <!-- CỘT 1: CANVAS VÀ ĐIỀU KHIỂN --><div class="canvas-control-wrapper">
+            
+            <div id="canvas-container">
+                <!-- Canvas và mô phỏng 3D sẽ nằm ở đây --></div>
+
+            <!-- KHỐI ĐIỀU KHIỂN (ĐÃ ĐƯỢC ĐẶT DƯỚI KHUNG CANVAS) --><div class="w-full bg-white p-4 rounded-xl shadow-2xl text-center">
+                <h2 class="text-lg font-bold text-gray-700 mb-3">Điều khiển mô phỏng</h2>
+                
+                <!-- Thanh trượt tốc độ (đã thu nhỏ) --><div class="flex items-center justify-center space-x-3 mb-3">
+                    <label for="speedSlider" class="font-medium text-gray-700 w-24 text-left text-sm">Tốc độ đĩa:</label>
+                    <input type="range" id="speedSlider" min="0" max="0.05" step="0.001" value="0.01" 
+                           class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    <span id="speedValue" class="font-bold text-indigo-600 w-12 text-right text-sm">0.01</span>
+                </div>
+
+                <!-- Nút Phanh (đã thu nhỏ) --><button id="brakeButton" 
+                        class="px-6 py-2 text-base bg-indigo-600 text-white font-bold rounded-lg shadow-md hover:bg-indigo-700 
+                               focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 
+                               transition-all duration-200 ease-in-out active:scale-95">
+                    Kích hoạt Phanh
+                </button>
+            </div>
+        </div>
+
+        <!-- CỘT 2: KIẾN THỨC CƠ BẢN --><div class="info-column">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Phanh Điện Từ (Eddy Current Brake)</h2>
+            <p class="text-gray-700 mb-3">Phanh điện từ là một hệ thống phanh **không tiếp xúc**, hoạt động dựa trên nguyên lý cảm ứng điện từ để tạo ra lực cản, làm chậm hoặc dừng chuyển động của một vật thể mà không cần ma sát vật lý.</p>
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">Nguyên lý hoạt động:</h3>
+            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                <li><span class="font-medium">1. Từ trường:</span> Nam châm (thường là nam châm điện) tạo ra một từ trường mạnh, xuyên qua một đĩa hoặc rô-to làm bằng vật liệu dẫn điện (như đồng, nhôm).</li>
+                <li><span class="font-medium">2. Dòng điện xoáy:</span> Khi đĩa quay trong từ trường này, sự thay đổi của từ thông xuyên qua đĩa sẽ cảm ứng ra các dòng điện khép kín bên trong đĩa, gọi là dòng điện xoáy (Eddy Currents).</li>
+                <li><span class="font-medium">3. Lực cản từ tính:</span> Theo định luật Lenz, các dòng điện xoáy này sẽ tạo ra một từ trường thứ cấp, tương tác với từ trường ban đầu của nam châm, sinh ra một lực cản (lực phanh) chống lại chuyển động quay của đĩa.</li>
+            </ul>
+            <h3 class="text-xl font-semibold text-gray-800 mt-4 mb-2">Ưu điểm:</h3>
+            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                <li>Không mài mòn, không bụi bẩn.</li>
+                <li>Hoạt động êm ái, ít tiếng ồn.</li>
+                <li>Tuổi thọ cao, ít cần bảo trì.</li>
+                <li>Hiệu quả ở tốc độ cao.</li>
+            </ul>
+            <p class="text-gray-700 mt-3">Phanh điện từ được ứng dụng rộng rãi trong tàu hỏa cao tốc, xe tải nặng, xe đạp tập thể dục, thiết bị công nghiệp...</p>
+        </div>
+    </div>
+
+    <!-- CHÚ THÍCH TRỤC TỌA ĐỘ --><div class="max-w-4xl w-full bg-white p-4 rounded-xl shadow-2xl mt-4 text-center text-sm text-gray-500">
+        Mô hình 3D: Trục tọa độ đã được khôi phục. Đĩa quay (tấm kim loại) trên mặt XZ. Hai khối nam châm đứng yên dọc trục Y.
+    </div>
+
+    <script>
+        // Các hằng số cho cấu hình
+        const CONTAINER_ID = 'canvas-container';
+        const AXIS_LENGTH = 3; 
+        const CAMERA_DISTANCE = 4; 
+        // Thay đổi: Màu nền của Renderer (Canvas) thành trắng
+        const RENDERER_COLOR = 0xffffff; 
+        
+        // Hằng số cho Đĩa Đặc (Solid Disc)
+        const DISC_RADIUS = 3;   
+        const DISC_HEIGHT = 0.1; 
+        
+        // Tốc độ được kiểm soát bởi thanh trượt
+        let TARGET_ROTATION_SPEED = 0.01; 
+        const BRAKE_DECELERATION = 0.0005; 
+        const ACCELERATION_RATE = 0.0002; 
+        
+        let currentDiscRotationSpeed = TARGET_ROTATION_SPEED;
+        let isBraking = false;
+        
+        // Hằng số cho Khối HCN (Rectangular Prisms)
+        const PRISM_WIDTH_X = 2; 
+        const PRISM_HEIGHT_Y = 0.2; 
+        const PRISM_DEPTH_Z = 0.5; 
+        const AIR_GAP = 0.05; 
+        const PRISM_Y_OFFSET = (DISC_HEIGHT / 2) + (PRISM_HEIGHT_Y / 2) + AIR_GAP; 
+        const PRISM_X_OFFSET = DISC_RADIUS - (PRISM_WIDTH_X / 2); 
+
+
+        let scene, camera, renderer, controls;
+        let container; 
+        let disc, redPrism, bluePrism;
+        let pointLightRed, pointLightBlue;
+        let fieldLinesGroup; 
+
+
+        // Hàm tạo đường sức từ
+        function createFieldLines() {
+            fieldLinesGroup = new THREE.Group();
+            
+            const lineMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xffff00, 
+                transparent: true, 
+                opacity: 0, 
+            });
+
+            const numLines = 20; 
+            const zStep = PRISM_DEPTH_Z / (numLines - 1); 
+
+            for (let i = 0; i < numLines; i++) {
+                const zOffset = -PRISM_DEPTH_Z / 2 + i * zStep;
+
+                const points = [
+                    new THREE.Vector3(PRISM_X_OFFSET, PRISM_Y_OFFSET, zOffset), 
+                    new THREE.Vector3(PRISM_X_OFFSET, 0, zOffset),             
+                    new THREE.Vector3(PRISM_X_OFFSET, -PRISM_Y_OFFSET, zOffset) 
+                ];
+                
+                const curve = new THREE.CatmullRomCurve3(points);
+                const tubeGeometry = new THREE.TubeGeometry(curve, 32, 0.08, 8, false); 
+                const tube = new THREE.Mesh(tubeGeometry, lineMaterial.clone()); 
+                fieldLinesGroup.add(tube);
+            }
+
+            scene.add(fieldLinesGroup);
+        }
+
+        function init() {
+            container = document.getElementById(CONTAINER_ID);
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(RENDERER_COLOR); // Áp dụng màu nền trắng
+            
+            // NOTE: Ambient light cần được điều chỉnh nếu nền sáng hơn, nhưng 0x404040 vẫn ổn.
+            const ambientLight = new THREE.AmbientLight(0x404040, 2); 
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(10, 10, 5);
+            scene.add(directionalLight);
+
+
+            camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000); 
+            camera.position.set(CAMERA_DISTANCE, CAMERA_DISTANCE, CAMERA_DISTANCE);
+            camera.lookAt(0, 0, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+
+            // TRỤC TỌA ĐỘ
+            const axesHelper = new THREE.AxesHelper(AXIS_LENGTH);
+            scene.add(axesHelper);
+
+            const discGeometry = new THREE.CylinderGeometry(
+                DISC_RADIUS, DISC_RADIUS, DISC_HEIGHT, 64
+            );
+            const discMaterial = new THREE.MeshStandardMaterial({
+                color: 0xCCCCCC, /* Màu xám sáng cho kim loại */
+                metalness: 0.8,  
+                roughness: 0.2,  
+                transparent: true,
+                opacity: 0.9,    
+                side: THREE.DoubleSide 
+            });
+            disc = new THREE.Mesh(discGeometry, discMaterial); 
+            scene.add(disc); 
+            
+            const dotGeometry = new THREE.SphereGeometry(0.1, 16, 16); 
+            // Màu đánh dấu đen sẽ nổi bật hơn trên nền sáng
+            const dotMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 }); 
+            const markerDot = new THREE.Mesh(dotGeometry, dotMaterial);
+            
+            markerDot.position.set(DISC_RADIUS, DISC_HEIGHT / 2 + 0.02, 0); 
+            disc.add(markerDot); 
+
+            const prismGeometry = new THREE.BoxGeometry(PRISM_WIDTH_X, PRISM_HEIGHT_Y, PRISM_DEPTH_Z);
+
+            const redMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.5, metalness: 0.5 });
+            redPrism = new THREE.Mesh(prismGeometry, redMaterial);
+            redPrism.position.set(PRISM_X_OFFSET, PRISM_Y_OFFSET, 0); 
+            scene.add(redPrism); 
+
+            const blueMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff, roughness: 0.5, metalness: 0.5 });
+            bluePrism = new THREE.Mesh(prismGeometry, blueMaterial);
+            bluePrism.position.set(PRISM_X_OFFSET, -PRISM_Y_OFFSET, 0); 
+            scene.add(bluePrism); 
+
+            pointLightRed = new THREE.PointLight(0xff0000, 0, 20); 
+            pointLightRed.position.copy(redPrism.position);
+            scene.add(pointLightRed); 
+
+            pointLightBlue = new THREE.PointLight(0x0000ff, 0, 20); 
+            pointLightBlue.position.copy(bluePrism.position);
+            scene.add(pointLightBlue); 
+            
+            createFieldLines();
+
+            window.addEventListener('resize', onWindowResize, false);
+
+            const speedSlider = document.getElementById('speedSlider');
+            const speedValue = document.getElementById('speedValue');
+            speedSlider.addEventListener('input', (event) => {
+                TARGET_ROTATION_SPEED = parseFloat(event.target.value);
+                speedValue.textContent = TARGET_ROTATION_SPEED.toFixed(3);
+            });
+            
+            const brakeButton = document.getElementById('brakeButton');
+            brakeButton.addEventListener('mousedown', () => { 
+                isBraking = true; 
+                brakeButton.classList.add('bg-red-700', 'shadow-lg');
+                brakeButton.classList.remove('bg-indigo-600', 'shadow-md');
+            });
+            brakeButton.addEventListener('mouseup', () => { 
+                isBraking = false; 
+                brakeButton.classList.add('bg-indigo-600', 'shadow-md');
+                brakeButton.classList.remove('bg-red-700', 'shadow-lg');
+            });
+            brakeButton.addEventListener('touchstart', (e) => { e.preventDefault(); isBraking = true; }); 
+            brakeButton.addEventListener('touchend', (e) => { e.preventDefault(); isBraking = false; }); 
+
+            animate();
+        }
+
+        function onWindowResize() {
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        }
+
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            controls.update(); 
+
+            if (isBraking) {
+                currentDiscRotationSpeed = Math.max(0, currentDiscRotationSpeed - BRAKE_DECELERATION);
+                
+                const intensity = Math.min(5, pointLightRed.intensity + 0.1);
+                pointLightRed.intensity = intensity;
+                pointLightBlue.intensity = intensity;
+                
+                if (fieldLinesGroup) {
+                    fieldLinesGroup.children.forEach(line => {
+                        line.material.opacity = intensity / 5; 
+                    });
+                }
+            } else {
+                if (currentDiscRotationSpeed < TARGET_ROTATION_SPEED) {
+                    currentDiscRotationSpeed = Math.min(TARGET_ROTATION_SPEED, currentDiscRotationSpeed + ACCELERATION_RATE);
+                } else if (currentDiscRotationSpeed > TARGET_ROTATION_SPEED) {
+                    currentDiscRotationSpeed = Math.max(TARGET_ROTATION_SPEED, currentDiscRotationSpeed - ACCELERATION_RATE);
+                }
+                
+                const intensity = Math.max(0, pointLightRed.intensity - 0.1);
+                pointLightRed.intensity = intensity;
+                pointLightBlue.intensity = intensity;
+                
+                if (fieldLinesGroup) {
+                    fieldLinesGroup.children.forEach(line => {
+                        line.material.opacity = intensity / 5;
+                    });
+                }
+            }
+
+            disc.rotation.y += currentDiscRotationSpeed;
+
+            renderer.render(scene, camera);
+        }
+
+        window.onload = init;
+
+    </script>
+</body>
+</html>
