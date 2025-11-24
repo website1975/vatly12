@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hướng Dẫn Tạo và Nhập Gemini API Key</title>
+    <style>
+        /* CSS Cơ bản */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f9;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #4285f4; /* Màu xanh Google */
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 40px;
+            background-color: #e8f0fe; /* Nền nhẹ cho mỗi bước */
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #4285f4;
+        }
+
+        .step-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4285f4;
+            margin-right: 20px;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .step-content h2 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.5em;
+        }
+
+        .step-content a {
+            color: #1a73e8;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .step-content a:hover {
+            text-decoration: underline;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border: 1px solid #ffeeba;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .code-box {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: Consolas, monospace;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h3>Hướng Dẫn Tạo và Nhập API Key (Mã Bản Quyền) cho lần đầu</h3>
+
+        <div class="warning">
+            ⚠️ **QUAN TRỌNG:** Key này là chìa khóa cá nhân của bạn. **Tuyệt đối không chia sẻ** Key này với người khác!
+        </div>
+
+        <!-- BƯỚC 1 -->
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h2>Truy Cập Trang Tạo Key</h2>
+                <p>Mở trình duyệt và truy cập vào trang quản lý Gemini API Key chính thức của Google:</p>
+                <p>
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank">
+                        https://aistudio.google.com/app/apikey
+                    </a>
+                </p>
+                <p>Bạn cần phải **Đăng nhập bằng tài khoản Google (Gmail)** của mình.</p>
+            </div>
+        </div>
+
+        <!-- BƯỚC 2 -->
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h2>Tạo API Key Mới</h2>
+                <p>Sau khi đăng nhập, bạn sẽ thấy trang quản lý Key:</p>
+                <p>
+                    Tìm và bấm vào nút **"Create API Key"** (Tạo API Key).
+                </p>
+                <p>Một chuỗi ký tự dài sẽ hiện ra. Đây chính là Key của bạn.</p>
+            </div>
+        </div>
+
+        <!-- BƯỚC 3 -->
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h2>Sao Chép Key</h2>
+                <p>Key mới được tạo sẽ chỉ hiển thị **một lần duy nhất**. Hãy thực hiện ngay:</p>
+                <ul>
+                    <li>Bấm vào nút **Sao chép** (thường là biểu tượng hai hình vuông lồng vào nhau).</li>
+                    <li>Hoặc, bôi đen toàn bộ chuỗi ký tự Key và nhấn tổ hợp phím **Ctrl + C** (trên Windows) hoặc **Cmd + C** (trên Mac).</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- BƯỚC 4 -->
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h2>Nhập Key vào Ứng Dụng [Tên Ứng Dụng Của Bạn]</h2>
+                <p>Bây giờ, quay trở lại ứng dụng của chúng ta:</p>
+                <ol>
+                    <li>Tìm đến ô nhập Key trong ứng dụng là biểu tượng <b>chìa khoá </b>trên góc phải màn hình.</li>
+                    <li>**Dán** chuỗi ký tự Key vừa sao chép vào ô đó (nhấn **Ctrl + V** hoặc **Cmd + V**).</li>
+                    <li>Bấm nút **"Lưu Key"** hoặc **"Kích hoạt"** trong ứng dụng.</li>
+                </ol>
+                <div class="code-box">
+                    **Ví dụ về Key (Đừng dùng Key này):** AIzaSyC123...abc-xyz...
+                </div>
+            </div>
+        </div>
+
+        <div class="warning">
+            ✅ **HOÀN TẤT:** Key của bạn đã được lưu an toàn trên máy của bạn. Bây giờ bạn có thể bắt đầu sử dụng đầy đủ các tính năng của ứng dụng!
+        </div>
+
+    </div>
+
+</body>
+</html>

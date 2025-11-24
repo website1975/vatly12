@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bài học Vật lý</title>
+<style>
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: #f5f5f5;
+  }
+
+  /* Panel trên */
+  .top-panel {
+    width: 100%;
+    height: 80px;
+    background: linear-gradient(135deg, #2196f3, #03a9f4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    box-sizing: border-box;
+    border: 1px solid red; /* để bạn dễ quan sát khung, có thể bỏ */
+  }
+
+  /* --- Phần trái: Tiêu đề --- */
+  .left {
+    flex: 0 0 15%; /* chiếm 1/4 panel */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .left .line1 {
+    font-family: "Brush Script MT", cursive;
+    font-size: 36px;
+    color: yellow;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+  }
+  .left .line2 {
+    font-family: "Brush Script MT", cursive;
+    font-size: 20px;
+    color: yellow;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+  }
+
+  /* --- Phần phải: Menu nút --- */
+  .right {
+    flex: 0 0 85%; /* chiếm 3/4 panel */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+  }
+
+  /* Nút */
+  .btn {
+    display: inline-block;
+    background: #ffffff;
+    color: #0078d7;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 2px solid #0078d7;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    transition: all 0.25s ease;
+    text-align: center;
+  }
+
+  .btn:hover {
+    background: #e3f2fd;
+    color: #005fa3;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+    transform: translateY(-2px);
+  }
+
+  /* Panel dưới */
+  iframe {
+    width: 100%;
+    height: calc(100vh - 80px);
+    border: none;
+    background-color: #ffffff;
+  }
+</style>
+</head>
+
+<body>
+
+<!-- Panel Top -->
+<div class="top-panel">
+  <div class="left">
+    <div class="line1">Trợ Lý Ảo</div>
+  </div>
+
+  <div class="right">
+    <a class="btn" href="hdkey.html" target="noi_dung">Hướng dẫn (Lần đầu)</a>
+    <a class="btn" href="https://trolyai.vercel.app/" target="noi_dung">Khám phá tại đây</a>
+  </div>
+</div>
+
+<!-- Panel Dưới -->
+<iframe name="noi_dung" src="hdkey.html"></iframe>
+
+</body>
+</html>
