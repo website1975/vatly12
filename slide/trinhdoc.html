@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trình Xem PDF Đơn Giản & Mềm Mại</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        .app-container {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background-color: #f3f4f6;
+        }
+        /* Phong cách cho iFrame: Bo tròn, đổ bóng */
+        #pdfIframe {
+            width: 100%;
+            height: 550px; /* Chiều cao cố định lớn hơn cho trải nghiệm xem tốt */
+            border: none; /* Loại bỏ đường viền mặc định của iframe */
+            border-radius: 1.5rem; /* Bo tròn lớn, tạo cảm giác mềm mại */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        /* Thẻ div chứa ngoài cùng cũng được bo tròn và đổ bóng */
+        .pdf-viewer-card {
+            background-color: white;
+            border-radius: 2rem; /* Bo tròn lớn cho cả container */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        /* Responsive height for smaller screens (tùy chọn) */
+        @media (max-width: 768px) {
+            #pdfIframe {
+                height: 600px;
+                border-radius: 1rem;
+            }
+            .pdf-viewer-card {
+                padding: 1rem;
+                border-radius: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="app-container p-4 md:p-10">
+
+    <div class="max-w-5xl mx-auto pdf-viewer-card">
+        
+        <!-- PHẦN MỚI: Ghi Cuống Sách GK và Bộ chọn Bài -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 p-4 bg-indigo-50 rounded-xl shadow-inner border border-indigo-200">
+            <h1 class="text-2xl md:text-3xl font-extrabold text-indigo-700 mb-4 md:mb-0 md:mr-6 text-center md:text-left flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V8a2 2 0 00-2-2h-5L9 4H4zm7 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+                Sách CTST 12 TRÌNH BÀY THEO AI
+            </h1>
+
+            <div class="w-full md:w-auto flex-shrink-0">
+                <label for="lessonSelector" class="block text-sm font-medium text-gray-700 mb-1">Chọn Bài Học:</label>
+                <select id="lessonSelector" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg shadow-md transition duration-150 ease-in-out bg-white">
+                    <!-- Options sẽ được thêm bằng JavaScript -->
+                </select>
+            </div>
+        </div>
+
+        <!-- Khung hiển thị PDF sử dụng IFRAME với phong cách bo tròn -->
+        <div id="pdf-container" class="overflow-hidden">
+            <iframe 
+                id="pdfIframe"
+                src="" 
+                title="Tài liệu PDF được nhúng"
+                frameborder="0"
+                loading="lazy"
+                class="hover:scale-[1.005]"
+            >
+                <p class="p-4 text-center text-gray-500">Trình duyệt của bạn không hỗ trợ hiển thị PDF nhúng.</p>
+            </iframe>
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+        // Dữ liệu mẫu: Tên bài học và URL PDF tương ứng
+        // **LƯU Ý:** Bạn hãy thay thế URL mẫu bằng đường dẫn PDF thực tế của bạn.
+        const bookData = [
+            { title: "--- Vui lòng chọn một bài học ---", url: "" },
+            { title: "Bài 1: Vật Lý Nhiệt - Thuyết động học phân tử",url: "Bai1.pdf" },
+            { title: "Bài 2: Nhiệt độ", url: "Bai2.pdf" },
+            { title: "Bài 3: Nội Năng", url: "Bai3.pdf" },
+            { title: "Bài 5: Thuyết động học phân tử", url:"Bai4.pdf" },
+            { title: "Bài 6: Định luật Boyle - Charles", url:"Bai5.pdf" },
+            { title: "Bài 7: Chất Khí Lý Tưởng", url:"Bai6.pdf" },
+            { title: "Bài 8: Động Năng, Áp suất", url:"Bai8.pdf" },
+            { title: "Bài 9: Từ Trường", url:"Bai9.pdf" },
+            { title: "Bài 10: Lực Từ Tác Dụng Lên Đoạn Dây", url:"Bai10.pdf" },
+            { title: "Bài 11: Từ thông - Hiện tượng cảm ứng điện từ", url:"Bai11.pdf" },
+	    { title: "Bài 12: Đại Cương Điện Xoay Chiều", url:"Bai12.pdf" },
+	    { title: "Bài 14: Hạt Nhân & Mô Hình Nguyên Tử", url:"Bai13.pdf" },
+            { title: "Bài 15: Năng Lượng Liên Kết", url:"Bai14.pdf" },
+            { title: "Bài 16: Phản Ứng Phân Hạch & Nhiệt Hạch", url:"Bai15.pdf" },
+        ];
+
+        function populateLessons() {
+            const selector = document.getElementById('lessonSelector');
+            
+            bookData.forEach((lesson, index) => {
+                const option = document.createElement('option');
+                option.value = lesson.url;
+                option.textContent = lesson.title;
+                // Đặt option đầu tiên là disabled/selected làm placeholder
+                if (index === 0) {
+                    option.disabled = true;
+                    option.selected = true;
+                }
+                selector.appendChild(option);
+            });
+            
+            // Tải bài học đầu tiên (nếu có) khi trang tải xong
+            if (bookData.length > 1) {
+                document.getElementById('pdfIframe').src = bookData[1].url;
+            }
+        }
+
+        function loadSelectedPdf() {
+            const selector = document.getElementById('lessonSelector');
+            const iframe = document.getElementById('pdfIframe');
+            const selectedUrl = selector.value;
+
+            if (selectedUrl) {
+                iframe.src = selectedUrl;
+                console.log('Đã tải PDF mới:', selectedUrl);
+            } else {
+                // Xử lý trường hợp chọn placeholder hoặc URL rỗng
+                iframe.src = '';
+                console.log('Không có URL PDF hợp lệ để tải.');
+            }
+        }
+
+        window.onload = function() {
+            populateLessons();
+            
+            // Gắn sự kiện lắng nghe sự thay đổi của Listbox
+            document.getElementById('lessonSelector').addEventListener('change', loadSelectedPdf);
+            
+            console.log('Trình xem PDF cho Sách GK đã sẵn sàng.');
+        };
+        
+    </script>
+</body>
+</html>
