@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng Khung Dây Với Lực Kế Treo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+     <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      // ...
+    };
+</script>
+    <!-- Thư viện điều khiển camera bằng chuột/cảm ứng --><script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #f0f4f8; }
+        canvas { display: block; }
+        #info {
+            position: absolute;
+            /* VỊ TRÍ: Đặt ở góc trên bên trái */
+            top: 10px; 
+            left: 10px; 
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #333;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 350px; 
+        }
+        #info strong { color: #007bff; }
+        .axis-x { color: #dc2626; font-weight: bold; }
+        .current-i-dark { color: #4a4a4a; font-weight: bold; } 
+        .force-f { color: #ec4899; font-weight: bold; }
+        .gauge-g { color: #5a189a; font-weight: bold; }
+        .calculation-box {
+            margin-top: 10px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .gauge-reading {
+            font-size: 20px;
+            color: #5a189a;
+            font-weight: 900;
+        }
+        #controls {
+            position: absolute;
+            /* ĐIỀU CHỈNH VỊ TRÍ MỚI: Góc dưới bên phải */
+            bottom: 10px; 
+            right: 10px; /* Căn lề phải */
+            left: auto; /* Bỏ căn lề trái */
+            transform: none; /* Bỏ transform */
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            /* Căn lề các thành phần con sang TRÁI (cho slider) */
+            align-items: flex-start; 
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .control-group {
+            margin-bottom: 15px;
+            /* Căn lề chữ sang TRÁI */
+            text-align: left; 
+            width: 300px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            /* Căn lề label sang TRÁI */
+            text-align: left;
+        }
+        input[type="range"] {
+            width: 100%;
+        }
+        #reverseBtn {
+            padding: 10px 25px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            box-shadow: 0 4px #0056b3;
+            transition: background-color 0.1s;
+        }
+        #reverseBtn:active {
+            box-shadow: 0 2px #0056b3;
+            transform: translateY(2px);
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <div id="info">
+	<div><strong style="display:block; text-align:center; font-size:28px;">Mô Phỏng Cân Lực Từ</strong></div>
+        <span class="axis-x">Trục X (Đỏ)</span>, <span class="current-i-dark">Dòng điện I (Xám Đậm)</span>, <span class="force-f">Lực F (Hồng)</span>.<br>
+        <br>
+        <strong>Thông số cố định:</strong>
+        <ul>
+            <li>Khối lượng khung dây ($m$): $0.2 \text{ kg}$</li>
+            <li>Chiều dài cạnh dưới ($L$): $0.2 \text{ m}$</li>
+            <li>Cảm ứng từ ($B$): $1.0 \text{ T}$</li>
+            <li>Gia tốc trọng trường ($g$): $9.8 \text{ m/s}^2$</li>
+        </ul>
+        <span id="currentStatus">Trạng thái: **Dòng điện ban đầu (Lực +Y)**</span>
+        
+        <div class="calculation-box">
+            <p><strong>Trọng lực Khung ($P$):</strong> <span id="weightValue">1.96</span> N</p>
+            <p><strong>Lực Lorentz ($F_L = B I L$):</strong> <span id="lorentzForceValue">0.0</span> N</p>
+            <p><strong>Số đọc Lực Kế ($T = P \pm F_L$):</strong> <span class="gauge-reading" id="tensionValue">1.96 N</span></p>
+        </div>
+    </div>
+    <div id="controls">
+        <div class="control-group">
+            <label for="currentSlider">Cường độ Dòng điện $|I|$ (Amperes): <span id="currentDisplay">0.0</span> A</label>
+            <input type="range" id="currentSlider" min="0" max="5" value="0.0" step="0.1" oninput="handleCurrentChange(this.value)">
+        </div>
+        <button id="reverseBtn" onclick="handleReverseCurrent()">Đảo chiều Dòng điện</button>
+    </div>
+
+    <script>
+        let scene, camera, renderer, controls;
+        let wireGroup = new THREE.Group(); 
+        let dynamicElementsGroup = new THREE.Group(); 
+        const container = document.getElementById('container');
+        
+        let isCurrentReversed = false;
+        
+        // --- THÔNG SỐ VẬT LÝ ---
+        const M_FRAME = 0.2; // kg
+        const L_SEGMENT = 0.2; // m (20 cm)
+        const G_ACCEL = 9.8; // m/s^2
+        const B_FIELD = 1.0; // Tesla
+        const P_WEIGHT = M_FRAME * G_ACCEL; // 1.96 N
+        
+        let currentI = 0.0; // Cường độ dòng điện (Amperes)
+
+        // --- THÔNG SỐ MÔ PHỎNG ---
+        // ĐÃ CẬP NHẬT: Tăng khoảng cách ban đầu từ 0.5 lên 1.0 để tăng độ thông thoáng (clearance)
+        const INITIAL_Y_OFFSET = 1.0; 
+        const MOVE_DISTANCE = 0.3; // Độ dịch chuyển hình học tối đa cho animation
+        const ANIMATION_SPEED = 0.05; 
+        
+        let targetY = 0; 
+        let currentY = 0; 
+        
+        // Định nghĩa kích thước chung
+        const YOKE_WIDTH_X = 3.0;
+        const ARM_HEIGHT_Y = 2.5;
+        const THICKNESS_Y = 0.5;
+        const DEPTH_Z = 4.0; 
+        const POLE_SIZE_X = 0.5;
+        const GAP_X = YOKE_WIDTH_X - 2 * POLE_SIZE_X; 
+        
+        const FRAME_HEIGHT_Y = ARM_HEIGHT_Y; 
+        const FRAME_WIDTH_Z = 4.0; 
+        
+        const MAGNET_Y_CENTER = THICKNESS_Y + FRAME_HEIGHT_Y / 2; // Vẫn giữ nguyên 1.75
+        
+        const Z_HALF_WIDTH = FRAME_WIDTH_Z / 2; 
+        const Z_LEFT = -Z_HALF_WIDTH; 
+        const Z_RIGHT = Z_HALF_WIDTH; 
+        
+        // Vị trí Y ban đầu của cạnh dưới khung dây: 0.5 (độ dày nam châm) + 1.0 (offset mới) = 1.5
+        const Y_START_BASE = THICKNESS_Y + INITIAL_Y_OFFSET; 
+        const Y_END_BASE = Y_START_BASE + FRAME_HEIGHT_Y;     
+
+        const GAUGE_STAND_HEIGHT = 5.0; 
+        const GAUGE_SCALE_Y = GAUGE_STAND_HEIGHT - 0.5; 
+
+        // ĐÃ THAY ĐỔI: Màu Dòng điện sang Xám Đậm
+        const WIRE_COLOR = 0x4a4a4a; 
+        const FORCE_COLOR = 0xec4899; 
+        const GAUGE_COLOR = 0x5a189a; 
+
+        // Khởi tạo vị trí ban đầu
+        targetY = MOVE_DISTANCE; 
+        currentY = MOVE_DISTANCE; 
+        
+        // === LOGIC TÍNH TOÁN LỰC VÀ HIỂN THỊ ===
+
+        // Tính toán lực Lorentz và lực căng dây (Tension)
+        function calculateTension() {
+            // Lực Lorentz F_L = B * I * L
+            const F_L = B_FIELD * currentI * L_SEGMENT;
+            let tension;
+            let forceDirection;
+
+            if (currentI === 0) {
+                // Không có dòng điện, lực căng = Trọng lực
+                tension = P_WEIGHT;
+                forceDirection = 0; // Không có lực từ
+            } else if (!isCurrentReversed) {
+                // Dòng điện ban đầu (Lực F_L hướng lên: +Y)
+                // Lực Kế = Trọng lực - Lực đẩy F_L (vì F_L ngược chiều P)
+                tension = P_WEIGHT - F_L;
+                forceDirection = 1; // Lực lên
+            } else {
+                // Dòng điện đảo chiều (Lực F_L hướng xuống: -Y)
+                // Lực Kế = Trọng lực + Lực kéo F_L (vì F_L cùng chiều P)
+                tension = P_WEIGHT + F_L;
+                forceDirection = -1; // Lực xuống
+            }
+
+            return { F_L, tension, forceDirection };
+        }
+
+        // Cập nhật hiển thị và kích hoạt animation
+        function updateAllDynamics() {
+            const { F_L, tension, forceDirection } = calculateTension();
+
+            // Cập nhật hiển thị giá trị
+            document.getElementById('weightValue').textContent = P_WEIGHT.toFixed(2);
+            document.getElementById('lorentzForceValue').textContent = F_L.toFixed(2);
+            document.getElementById('tensionValue').textContent = `${tension.toFixed(2)} N`;
+
+            // Cập nhật mũi tên và vị trí mục tiêu (chỉ khi có dòng điện)
+            if (currentI > 0) {
+                // Kích hoạt animation dịch chuyển 0.3 đơn vị theo hướng lực
+                if (forceDirection === 1) {
+                    targetY = MOVE_DISTANCE; // Lực lên -> Khung dây được kéo lên
+                } else if (forceDirection === -1) {
+                    targetY = -MOVE_DISTANCE; // Lực xuống -> Khung dây bị kéo xuống
+                }
+                updateArrows(isCurrentReversed);
+            } else {
+                // Nếu I = 0, đưa khung dây về vị trí cân bằng (0) và ẩn mũi tên
+                targetY = 0;
+                updateArrows(false); // Gọi updateArrows với I=0 để ẩn mũi tên
+                document.getElementById('currentStatus').innerHTML = 'Trạng thái: **Dòng điện TẮT (F_L = 0)**';
+            }
+        }
+
+        // Hàm tạo giá đỡ cố định và phần thang đo của lực kế
+        function createSupportFrameAndGaugeScale() {
+            const supportGroup = new THREE.Group();
+            
+            // 1. Vertical Supports (Giá đỡ dọc)
+            const supportGeometry = new THREE.BoxGeometry(0.2, GAUGE_STAND_HEIGHT, DEPTH_Z * 0.8);
+            const supportMaterial = new THREE.MeshPhongMaterial({ color: 0x444444 });
+            const support = new THREE.Mesh(supportGeometry, supportMaterial);
+            support.position.set(-YOKE_WIDTH_X / 2 - 0.2, GAUGE_STAND_HEIGHT / 2, 0); 
+            supportGroup.add(support);
+
+            // 2. Horizontal Top Bar (Thanh ngang trên cùng)
+            const barGeometry = new THREE.BoxGeometry(YOKE_WIDTH_X + 0.5, 0.2, 0.2);
+            const bar = new THREE.Mesh(barGeometry, supportMaterial);
+            bar.position.set(0, GAUGE_STAND_HEIGHT, 0); 
+            supportGroup.add(bar);
+
+            // 3. Force Gauge Scale (Thang đo - Phần cố định)
+            const scaleGeometry = new THREE.BoxGeometry(0.1, 1.0, 0.5); 
+            const scaleMaterial = new THREE.MeshPhongMaterial({ color: 0xcccccc });
+            const scale = new THREE.Mesh(scaleGeometry, scaleMaterial);
+            scale.position.set(0.2, GAUGE_SCALE_Y, 0); 
+            supportGroup.add(scale);
+
+            // Thêm vạch chia đơn giản (cho trực quan)
+            const lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+            for (let i = -5; i <= 5; i++) {
+                const geometry = new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(0.25, GAUGE_SCALE_Y + i * 0.1, 0.2), 
+                    new THREE.Vector3(0.15, GAUGE_SCALE_Y + i * 0.1, 0.2)
+                ]);
+                const line = new THREE.Line(geometry, lineMaterial);
+                supportGroup.add(line);
+            }
+            
+            scene.add(supportGroup);
+        }
+
+        // Hàm tạo mô hình nam châm chữ U (Vị trí thấp)
+        function createMagnet() {
+            const magnetGroup = new THREE.Group();
+
+            // 1. Bottom Yoke (Phần đáy)
+            const yokeGeometry = new THREE.BoxGeometry(YOKE_WIDTH_X, THICKNESS_Y, DEPTH_Z);
+            const yokeMaterial = new THREE.MeshPhongMaterial({ color: 0x888888 }); 
+            const yoke = new THREE.Mesh(yokeGeometry, yokeMaterial);
+            yoke.position.set(0, THICKNESS_Y / 2, 0); 
+            magnetGroup.add(yoke);
+
+            // 2. North Pole Arm (Cực Bắc - Màu Đỏ)
+            const nPoleGeometry = new THREE.BoxGeometry(POLE_SIZE_X, ARM_HEIGHT_Y, DEPTH_Z);
+            const nPoleMaterial = new THREE.MeshPhongMaterial({ color: 0xdc2626 }); 
+            const nPole = new THREE.Mesh(nPoleGeometry, nPoleMaterial);
+            nPole.position.set(
+                -(YOKE_WIDTH_X / 2 - POLE_SIZE_X / 2),
+                THICKNESS_Y + ARM_HEIGHT_Y / 2,
+                0
+            );
+            magnetGroup.add(nPole);
+
+            // 3. South Pole Arm (Cực Nam - Màu Xanh Dương)
+            const sPoleGeometry = new THREE.BoxGeometry(POLE_SIZE_X, ARM_HEIGHT_Y, DEPTH_Z);
+            const sPoleMaterial = new THREE.MeshPhongMaterial({ color: 0x2563eb }); 
+            const sPole = new THREE.Mesh(sPoleGeometry, sPoleMaterial);
+            sPole.position.set(
+                (YOKE_WIDTH_X / 2 - POLE_SIZE_X / 2),
+                THICKNESS_Y + ARM_HEIGHT_Y / 2,
+                0
+            );
+            magnetGroup.add(sPole);
+            
+            scene.add(magnetGroup);
+
+            // Thêm các đường sức từ (B) đơn giản từ N sang S (dọc trục X)
+            const arrowColor = 0x047857; // Xanh đậm cho B
+            const arrowLength = GAP_X * 0.8;
+            const arrowHeight = 0.1;
+            const fieldY = MAGNET_Y_CENTER + 0.5; 
+            
+            // Hàm tạo mũi tên B
+            const createBArrow = (zOffset) => {
+                const dir = new THREE.Vector3(1, 0, 0); // Hướng +X (N->S)
+                const origin = new THREE.Vector3(-arrowLength / 2, fieldY, zOffset);
+                const arrowHelper = new THREE.ArrowHelper(dir, origin, arrowLength, arrowColor, arrowHeight * 3, arrowHeight * 2);
+                scene.add(arrowHelper);
+            };
+
+            createBArrow(1.0); 
+            createBArrow(-1.0); 
+        }
+        
+        // Hàm tạo hình học khung dây và thanh đo (Phần di động)
+        function createStaticWireFrameGeometry() {
+            const WIRE_THICKNESS = 0.08; 
+            
+            // Định nghĩa các đỉnh (Vertices) dựa trên tọa độ GỐC
+            const points = [
+                new THREE.Vector3(0, Y_START_BASE, Z_LEFT),   
+                new THREE.Vector3(0, Y_END_BASE, Z_LEFT),     
+                new THREE.Vector3(0, Y_END_BASE, Z_RIGHT),    
+                new THREE.Vector3(0, Y_START_BASE, Z_RIGHT),  
+                new THREE.Vector3(0, Y_START_BASE, Z_LEFT)    
+            ];
+
+            // 1. Khung dây bằng TubeGeometry
+            const path = new THREE.CatmullRomCurve3(points);
+            const tubeGeometry = new THREE.TubeGeometry(path, 64, WIRE_THICKNESS, 8, false); 
+            const tubeMaterial = new THREE.MeshPhongMaterial({ color: WIRE_COLOR });
+            const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
+            wireGroup.add(tube);
+            
+            // 2. Moving Gauge Rod (Thanh đo di động)
+            const rodHeight = GAUGE_SCALE_Y - Y_END_BASE; 
+            const rodGeometry = new THREE.CylinderGeometry(0.05, 0.05, rodHeight, 8);
+            const rodMaterial = new THREE.MeshPhongMaterial({ color: GAUGE_COLOR });
+            const rod = new THREE.Mesh(rodGeometry, rodMaterial);
+            rod.name = "GaugeRod";
+            
+            const rodYCenter = Y_END_BASE + rodHeight / 2; 
+            rod.position.set(0, rodYCenter, 0); 
+            
+            wireGroup.add(rod);
+
+            scene.add(wireGroup);
+        }
+
+        // Hàm cập nhật các mũi tên (I và F) khi đảo chiều
+        function updateArrows(reversed) {
+            // Xóa các mũi tên cũ
+            while(dynamicElementsGroup.children.length > 0){
+                dynamicElementsGroup.remove(dynamicElementsGroup.children[0]);
+            }
+            
+            if (currentI === 0) {
+                // Không cần vẽ mũi tên nếu I = 0
+                wireGroup.remove(dynamicElementsGroup);
+                return;
+            }
+
+            const I_LENGTH = 0.8; 
+            // Cường độ mũi tên tỉ lệ với dòng điện
+            const forceMagnitude = 1.0 + (currentI / 5.0) * 0.5; // Tỉ lệ F
+            
+            const Y_START_RELATIVE = Y_START_BASE; 
+            const Y_END_RELATIVE = Y_END_BASE;
+
+            // ==========================================================
+            // LOGIC DÒNG ĐIỆN VÀ LỰC TỪ
+            // ==========================================================
+            let I_LEFT_DIR, I_RIGHT_DIR, I_BOTTOM_DIR;
+            let F_LEFT_DIR, F_RIGHT_DIR, F_BOTTOM_DIR;
+
+            if (reversed) {
+                // Đảo chiều: I đi xuống bên trái (-Y)
+                I_LEFT_DIR = new THREE.Vector3(0, -1, 0); 
+                I_RIGHT_DIR = new THREE.Vector3(0, 1, 0); 
+                I_BOTTOM_DIR = new THREE.Vector3(0, 0, 1); // +Z
+                
+                // Lực Bottom: I (+Z) x B (+X) = -Y (Hướng xuống)
+                F_LEFT_DIR = new THREE.Vector3(0, 0, 1); 
+                F_RIGHT_DIR = new THREE.Vector3(0, 0, -1);
+                F_BOTTOM_DIR = new THREE.Vector3(0, -1, 0);
+                
+                document.getElementById('currentStatus').innerHTML = 'Trạng thái: **Dòng điện ĐẢO CHIỀU (Lực -Y)**';
+            } else {
+                // Ban đầu: I đi lên bên trái (+Y)
+                I_LEFT_DIR = new THREE.Vector3(0, 1, 0); 
+                I_RIGHT_DIR = new THREE.Vector3(0, -1, 0); 
+                I_BOTTOM_DIR = new THREE.Vector3(0, 0, -1); // -Z
+
+                // Lực Bottom: I (-Z) x B (+X) = +Y (Hướng lên)
+                F_LEFT_DIR = new THREE.Vector3(0, 0, -1); 
+                F_RIGHT_DIR = new THREE.Vector3(0, 0, 1);
+                F_BOTTOM_DIR = new THREE.Vector3(0, 1, 0);
+                
+                document.getElementById('currentStatus').innerHTML = 'Trạng thái: **Dòng điện ban đầu (Lực +Y)**';
+            }
+            
+            // Màu mũi tên I được tính toán dựa trên độ sáng (Dark Gray)
+            const wireColorIntensity = WIRE_COLOR;
+
+
+            // ------------------ Mũi tên Dòng điện I ------------------
+            const X_OFFSET_I = 0.1; 
+            
+            const I1Origin = new THREE.Vector3(X_OFFSET_I, (Y_START_RELATIVE + Y_END_RELATIVE) / 2, Z_LEFT); 
+            const I1Arrow = new THREE.ArrowHelper(I_LEFT_DIR, I1Origin, I_LENGTH, wireColorIntensity, 0.3, 0.2);
+            dynamicElementsGroup.add(I1Arrow);
+            
+            const I2Origin = new THREE.Vector3(X_OFFSET_I, (Y_START_RELATIVE + Y_END_RELATIVE) / 2, Z_RIGHT);
+            const I2Arrow = new THREE.ArrowHelper(I_RIGHT_DIR, I2Origin, I_LENGTH, wireColorIntensity, 0.3, 0.2);
+            dynamicElementsGroup.add(I2Arrow);
+
+            // ------------------ Mũi tên Lực Từ F ------------------
+            const X_OFFSET_F_VERTICAL = -0.1; 
+            
+            // Lực từ tỉ lệ với I
+            const F1Origin = new THREE.Vector3(X_OFFSET_F_VERTICAL, (Y_START_RELATIVE + Y_END_RELATIVE) / 2, Z_LEFT + 0.5); 
+            const F1Arrow = new THREE.ArrowHelper(F_LEFT_DIR, F1Origin, forceMagnitude, FORCE_COLOR, 0.4, 0.3);
+            F1Arrow.line.material.linewidth = 5;
+            dynamicElementsGroup.add(F1Arrow); 
+
+            const F2Origin = new THREE.Vector3(X_OFFSET_F_VERTICAL, (Y_START_RELATIVE + Y_END_RELATIVE) / 2, Z_RIGHT - 0.5); 
+            const F2Arrow = new THREE.ArrowHelper(F_RIGHT_DIR, F2Origin, forceMagnitude, FORCE_COLOR, 0.4, 0.3);
+            F2Arrow.line.material.linewidth = 5;
+            dynamicElementsGroup.add(F2Arrow); 
+
+            // Lực F_BOTTOM 
+            const X_OFFSET_F_BOTTOM = 0.2;
+            const F_Bottom_Origin = new THREE.Vector3(X_OFFSET_F_BOTTOM, Y_START_RELATIVE, 0); 
+            const F_Bottom_Arrow = new THREE.ArrowHelper(F_BOTTOM_DIR, F_Bottom_Origin, 0.8, FORCE_COLOR, 0.3, 0.2);
+            F_Bottom_Arrow.line.material.linewidth = 5;
+            dynamicElementsGroup.add(F_Bottom_Arrow);
+
+            wireGroup.add(dynamicElementsGroup); 
+        }
+
+        // Hàm xử lý thay đổi cường độ dòng điện
+        window.handleCurrentChange = function(value) {
+            currentI = parseFloat(value);
+            document.getElementById('currentDisplay').textContent = currentI.toFixed(1);
+            updateAllDynamics();
+        }
+
+        // Hàm xử lý sự kiện nhấn nút đảo chiều
+        window.handleReverseCurrent = function() {
+            if (currentI > 0) {
+                isCurrentReversed = !isCurrentReversed;
+            }
+            updateAllDynamics();
+        }
+
+
+        // Hàm khởi tạo cảnh 3D
+        function init() {
+            // 1. Scene (Cảnh)
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf0f4f8);
+
+            // 2. Camera (Máy ảnh) 
+            const fov = 75; 
+            const aspect = window.innerWidth / window.innerHeight;
+            const near = 0.1;
+            const far = 1000;
+            camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+            
+            // ĐIỀU CHỈNH CAMERA
+            camera.position.set(4, 3, 6); 
+            camera.lookAt(0, MAGNET_Y_CENTER + 0.5, 0); 
+
+            // 3. Renderer (Bộ kết xuất)
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            // 4. Axes Helper 
+            const axesHelper = new THREE.AxesHelper(5); 
+            scene.add(axesHelper);
+
+            // 5. Grid Helper 
+            const gridHelper = new THREE.GridHelper(10, 10, 0xcccccc, 0xdddddd);
+            scene.add(gridHelper);
+
+            // 6. Lighting 
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+            directionalLight.position.set(5, 10, 7);
+            scene.add(directionalLight);
+
+            // === TẠO NAM CHÂM CHỮ U ===
+            createMagnet();
+
+            // === TẠO GIÁ ĐỠ VÀ THANG ĐO LỰC KẾ (Cố định) ===
+            createSupportFrameAndGaugeScale();
+            
+            // === TẠO KHUNG DÂY VÀ THANH ĐO DI ĐỘNG ===
+            createStaticWireFrameGeometry();
+            
+            // Thiết lập vị trí Y ban đầu và cập nhật hiển thị
+            updateAllDynamics();
+            wireGroup.position.y = targetY;
+            currentY = targetY;
+
+            // 7. Controls (Điều khiển)
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; 
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+            // Giới hạn zoom
+            controls.minDistance = 3.0; 
+            controls.maxDistance = 12.0; 
+            controls.target.set(0, MAGNET_Y_CENTER + 0.5, 0); // Đảm bảo mục tiêu nhìn là trung tâm
+
+            // Xử lý sự kiện thay đổi kích thước cửa sổ
+            window.addEventListener('resize', onWindowResize, false);
+        }
+
+        // Hàm xử lý thay đổi kích thước cửa sổ
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // Hàm vòng lặp hoạt ảnh (chứa logic di chuyển)
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Logic animation: Di chuyển khung dây từ từ đến vị trí targetY
+            if (Math.abs(currentY - targetY) > 0.005) {
+                // Di chuyển dần currentY về targetY
+                currentY += (targetY - currentY) * ANIMATION_SPEED;
+                wireGroup.position.y = currentY;
+            } else {
+                // Đảm bảo vị trí chính xác khi gần đạt tới
+                wireGroup.position.y = targetY;
+                currentY = targetY;
+            }
+
+            controls.update(); 
+            renderer.render(scene, camera);
+        }
+
+        // Bắt đầu khi trang được tải
+        window.onload = function() {
+            init();
+            animate();
+        };
+    </script>
+</body>
+</html>
