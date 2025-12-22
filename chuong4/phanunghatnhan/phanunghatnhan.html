@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phản ứng hạt nhân</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      }
+    };
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+
+        .tab-content { display: none; height: calc(100vh - 80px); }
+        .tab-content.active { display: block; }
+
+        .lesson-text {
+            font-size: 1.25rem; /* Chữ to rõ ràng */
+            line-height: 1.8;
+        }
+
+        .formula-box {
+            background: rgba(30, 41, 59, 0.7);
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #60a5fa;
+            margin: 1rem 0;
+        }
+
+        canvas { display: block; background: #020617; border-radius: 12px; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="overflow-hidden">
+
+    <!-- Top Navigation -->
+    <nav class="h-20 bg-slate-900 border-b border-slate-800 flex items-center px-8 gap-8">
+        <div class="flex h-full">
+            <button onclick="switchTab('theory')" id="btn-theory" class="px-6 h-full flex items-center gap-2 border-b-2 border-blue-500 text-blue-500 font-bold transition-all">
+                <i class="fa-solid fa-book"></i> NỘI DUNG BÀI HỌC
+            </button>
+            <button onclick="switchTab('simulation')" id="btn-sim" class="px-6 h-full flex items-center gap-2 border-b-2 border-transparent text-slate-400 font-bold hover:text-slate-200 transition-all">
+                <i class="fa-solid fa-atom"></i> MÔ PHỎNG VA CHẠM
+            </button>
+        </div>
+    </nav>
+
+    <!-- Tab 1: Nội dung bài học (Chữ to) -->
+    <div id="theory" class="tab-content active overflow-y-auto p-10">
+        <div class="max-w-4xl mx-auto lesson-text">
+            <h1 class="text-3xl font-extrabold text-white mb-5">PHẢN ỨNG PHÂN HẠCH, NHIỆT HẠCH VÀ ỨNG DỤNG</h1>
+            
+            <section class="mb-10">
+                <h2 class="text-2xl font-bold text-blue-400 border-b border-slate-700 pb-2 mb-4">I. KHÁI NIỆM & PHÂN LOẠI</h2>
+                <p>Phản ứng hạt nhân là mọi quá trình dẫn đến sự <strong>biến đổi của hạt nhân</strong>.</p>
+                <ul class="list-disc ml-8 space-y-2 mt-2">
+                    <li><span class="text-blue-300">Phản ứng tự phát:</span> Quá trình một hạt nhân không bền vững tự phân rã (phóng xạ).</li>
+                    <li><span class="text-blue-300">Phản ứng kích thích:</span> Quá trình các hạt nhân tương tác thông qua va chạm.</li>
+                </ul>
+                <div class="formula-box text-center">
+                    <sup>A1</sup><sub>Z1</sub>X + <sup>A2</sup><sub>Z2</sub>Y &rarr; <sup>A3</sup><sub>Z3</sub>C + <sup>A4</sup><sub>Z4</sub>D
+                </div>
+            </section>
+
+            <section class="mb-10">
+                <h2 class="text-2xl font-bold text-blue-400 border-b border-slate-700 pb-2 mb-4">II. CÁC ĐỊNH LUẬT BẢO TOÀN</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                        <p class="font-bold text-white">1. Bảo toàn Điện tích (Z)</p>
+                        <p class="text-slate-400">Z1 + Z2 = Z3 + Z4</p>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                        <p class="font-bold text-white">2. Bảo toàn số Nucleon (A)</p>
+                        <p class="text-slate-400">A1 + A2 = A3 + A4</p>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                        <p class="font-bold text-white">3. Bảo toàn Động lượng</p>
+                        <p class="text-slate-400">Tổng vectơ p trước = Tổng vectơ p sau</p>
+                        <p class="text-slate-400">$\vec{p_1}+\vec{p_2}=\vec{p_3}+\vec{p_4}$</p>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                        <p class="font-bold text-white">4. Bảo toàn Năng lượng</p>
+                        <p class="text-slate-400">Bảo toàn năng lượng toàn phần</p>
+                        <p class="text-slate-400">$K_X+K_Y+\Delta E=K_C+K_D$</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-10">
+                <h2 class="text-2xl font-bold text-blue-400 border-b border-slate-700 pb-2 mb-4">III. NĂNG LƯỢNG HẠT NHÂN</h2>
+                <p>Năng lượng tỏa ra/thu vào được tính theo hệ thức Einstein:</p>
+                <div class="formula-box text-center">$\Delta E$ = (m<sub>trước</sub> - m<sub>sau</sub>)c<sup>2</sup>=$(\Delta m_{sau}-\Delta m_{truoc})c^2=E_{lksau}-E_{lkT}$</div>
+                <p class="mt-4"><i class="fa-solid fa-caret-right text-blue-500"></i> Nếu <span class="text-green-400 font-bold">m<sub>trước</sub> > m<sub>sau</sub></span>: Phản ứng tỏa năng lượng.</p>
+                <p><i class="fa-solid fa-caret-right text-blue-500"></i> Nếu <span class="text-red-400 font-bold">m<sub>trước</sub> < m<sub>sau</sub></span>: Phản ứng thu năng lượng.</p>
+            </section>
+        </div>
+    </div>
+
+    <!-- Tab 2: Mô phỏng -->
+    <div id="simulation" class="tab-content p-6">
+        <div class="flex h-full gap-6">
+            <div class="w-80 flex flex-col gap-4">
+                <div class="glass-panel p-5 rounded-xl shadow-lg">
+                    <h3 class="font-bold text-blue-400 mb-3 uppercase text-xs tracking-widest">Chọn kịch bản</h3>
+                    <select id="expSelect" class="w-full bg-slate-900 border border-slate-700 p-2 rounded text-sm outline-none mb-4 text-white hover:border-blue-500 transition-colors">
+                        <option value="rutherford">Rutherford: α + N → O + p</option>
+                        <option value="chadwick">Chadwick: α + Be → C + n</option>
+                        <option value="cockcroft">Cockcroft: p + Li → 2α</option>
+                        <option value="fission">Phân hạch: n + U → Ba + Kr + 3n</option>
+                    </select>
+                    <p id="expDesc" class="text-[11px] text-slate-400 italic leading-relaxed">...</p>
+                </div>
+
+                <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-800 flex-grow flex flex-col items-center justify-center shadow-inner relative overflow-hidden">
+                    <div id="formulaDisplay" class="text-lg font-mono text-blue-400 font-bold mb-4 text-center z-10">...</div>
+                    <div id="gammaIndicator" class="hidden flex items-center gap-2 text-purple-400 animate-pulse z-10">
+                        <i class="fa-solid fa-bolt-lightning"></i>
+                        <span class="text-[10px] font-bold uppercase">Phát xạ Gamma (vài lần)</span>
+                    </div>
+                </div>
+
+                <button id="fireBtn" class="bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold text-white shadow-lg transition-all active:scale-95 uppercase tracking-widest text-sm">Kích hoạt bắn hạt</button>
+                <button id="resetBtn" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-xl font-bold text-slate-300 text-sm transition-colors">Thiết lập lại</button>
+            </div>
+
+            <div class="flex-grow relative bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
+                <canvas id="simCanvas"></canvas>
+                <div class="absolute top-4 right-6 text-[10px] text-slate-600 uppercase tracking-[0.2em] font-bold">Nuclear Simulation Engine v2.5</div>
+                <div id="collisionAlert" class="absolute inset-0 pointer-events-none bg-white/5 opacity-0 transition-opacity flex items-center justify-center">
+                    <div class="w-24 h-24 rounded-full border-4 border-white/20 animate-ping"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            if(tabId === 'simulation') resizeCanvas();
+        }
+
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const expSelect = document.getElementById('expSelect');
+        const fireBtn = document.getElementById('fireBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const formulaDisplay = document.getElementById('formulaDisplay');
+        const gammaIndicator = document.getElementById('gammaIndicator');
+        const expDesc = document.getElementById('expDesc');
+        const collisionAlert = document.getElementById('collisionAlert');
+
+        let width, height, time = 0, animationId, state = 'idle', particles = [], currentExpKey = 'rutherford';
+        let gammaWaves = [], gammaCount = 0;
+
+        const EXPERIMENTS = {
+            rutherford: {
+                title: "Thí nghiệm Rutherford (1919)",
+                desc: "Hạt Alpha bắn phá Nitơ-14 tạo ra Oxy-17 và Proton. Đây là ca biến đổi hạt nhân nhân tạo đầu tiên.",
+                initial: "α + N-14 → ?",
+                final: "α + N-14 → O-17 + p + γ",
+                proj: { label: "α", mass: 4, charge: 2, color: "#f59e0b", radius: 14 },
+                target: { label: "N-14", mass: 14, charge: 7, color: "#3b82f6", radius: 30 },
+                products: [
+                    { label: "O-17", mass: 17, charge: 8, color: "#10b981", radius: 34, vx: 0.2, vy: -0.1 },
+                    { label: "p", mass: 1, charge: 1, color: "#ef4444", radius: 8, vx: 4, vy: 1.2 }
+                ]
+            },
+            chadwick: {
+                title: "Thí nghiệm Chadwick (1932)",
+                desc: "Bắn phá Beli-9 bằng hạt Alpha tạo ra Cacbon-12 và giải phóng Neutron.",
+                initial: "α + Be-9 → ?",
+                final: "α + Be-9 → C-12 + n + γ",
+                proj: { label: "α", mass: 4, charge: 2, color: "#f59e0b", radius: 14 },
+                target: { label: "Be-9", mass: 9, charge: 4, color: "#a855f7", radius: 26 },
+                products: [
+                    { label: "C-12", mass: 12, charge: 6, color: "#64748b", radius: 30, vx: 0.3, vy: 0.1 },
+                    { label: "n", mass: 1, charge: 0, color: "#f8fafc", radius: 8, vx: 4.8, vy: -1 }
+                ]
+            },
+            cockcroft: {
+                title: "Cockcroft & Walton (1932)",
+                desc: "Dùng proton gia tốc bắn phá Lithium-7, tách hạt nhân thành hai hạt Alpha bằng nhau.",
+                initial: "p + Li-7 → ?",
+                final: "p + Li-7 → 2α + γ",
+                proj: { label: "p", mass: 1, charge: 1, color: "#ef4444", radius: 9 },
+                target: { label: "Li-7", mass: 7, charge: 3, color: "#ec4899", radius: 24 },
+                products: [
+                    { label: "α", mass: 4, charge: 2, color: "#f59e0b", radius: 14, vx: 3, vy: -1.5 },
+                    { label: "α", mass: 4, charge: 2, color: "#f59e0b", radius: 14, vx: 3, vy: 1.5 }
+                ]
+            },
+            fission: {
+                title: "Phản ứng Phân hạch",
+                desc: "Neutron chậm bắn phá U-235 tạo ra trạng thái không bền, vỡ thành các hạt nhân trung bình.",
+                initial: "n + U-235 → ?",
+                final: "n + U → Ba + Kr + 3n + γ",
+                proj: { label: "n", mass: 1, charge: 0, color: "#f8fafc", radius: 9 },
+                target: { label: "U-235", mass: 20, charge: 10, color: "#ef4444", radius: 42 },
+                products: [
+                    { label: "Ba", mass: 12, charge: 6, color: "#34d399", radius: 30, vx: -0.5, vy: -1.2 },
+                    { label: "Kr", mass: 8, charge: 4, color: "#fbbf24", radius: 26, vx: -0.2, vy: 1 },
+                    { label: "n", mass: 1, charge: 0, color: "#f8fafc", radius: 7, vx: 4, vy: 0.2 },
+                    { label: "n", mass: 1, charge: 0, color: "#f8fafc", radius: 7, vx: 3.8, vy: -0.5 },
+                    { label: "n", mass: 1, charge: 0, color: "#f8fafc", radius: 7, vx: 4.2, vy: 0.6 }
+                ]
+            }
+        };
+
+        class Nucleon {
+            constructor(parentRadius, isProton) {
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * (parentRadius * 0.72);
+                this.relX = Math.cos(angle) * dist;
+                this.relY = Math.sin(angle) * dist;
+                this.isProton = isProton;
+                this.size = parentRadius * 0.3;
+                this.offset = Math.random() * 100;
+            }
+            draw(px, py, t) {
+                const vx = Math.sin(t * 0.12 + this.offset) * 0.8;
+                const vy = Math.cos(t * 0.15 + this.offset) * 0.8;
+                const x = px + this.relX + vx;
+                const y = py + this.relY + vy;
+                
+                // Hiệu ứng hạt bóng bẩy (3D Glossy)
+                const grad = ctx.createRadialGradient(x - this.size*0.3, y - this.size*0.3, this.size*0.1, x, y, this.size);
+                if(this.isProton) {
+                    grad.addColorStop(0, '#ffa4a4'); // Highlight
+                    grad.addColorStop(0.4, '#ef4444'); // Base
+                    grad.addColorStop(1, '#991b1b'); // Shadow
+                } else {
+                    grad.addColorStop(0, '#f8fafc'); // Highlight
+                    grad.addColorStop(0.4, '#94a3b8'); // Base
+                    grad.addColorStop(1, '#334155'); // Shadow
+                }
+                
+                ctx.fillStyle = grad;
+                ctx.beginPath(); ctx.arc(x, y, this.size, 0, Math.PI * 2); ctx.fill();
+                
+                // Phản chiếu ánh sáng cực nhỏ
+                ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                ctx.beginPath(); ctx.arc(x - this.size*0.35, y - this.size*0.35, this.size*0.15, 0, 6.28); ctx.fill();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, cfg, vx = 0, vy = 0) {
+                this.x = x; this.y = y; this.radius = cfg.radius; this.color = cfg.color;
+                this.label = cfg.label; this.mass = cfg.mass; this.charge = cfg.charge;
+                this.vx = vx; this.vy = vy; this.nucleons = [];
+                for(let i=0; i<this.mass; i++) this.nucleons.push(new Nucleon(this.radius, i < this.charge));
+            }
+            draw() {
+                ctx.save();
+                // Glow mờ bên ngoài hạt nhân
+                const glow = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius * 2.2);
+                glow.addColorStop(0, this.color + '25');
+                glow.addColorStop(1, 'transparent');
+                ctx.fillStyle = glow;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius * 2.2, 0, Math.PI * 2); ctx.fill();
+                
+                this.nucleons.forEach(n => n.draw(this.x, this.y, time));
+                
+                ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = 'bold 9px Inter'; ctx.textAlign = 'center';
+                ctx.fillText(this.label, this.x, this.y - this.radius - 12);
+                ctx.restore();
+            }
+            update() { this.x += this.vx; this.y += this.vy; }
+        }
+
+        function createGamma(x, y) {
+            gammaWaves.push({ x, y, r: 2, opacity: 1 });
+            gammaCount++;
+        }
+
+        function drawGamma() {
+            gammaWaves.forEach((w, i) => {
+                ctx.strokeStyle = `rgba(168, 85, 247, ${w.opacity})`;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                for(let a=0; a<Math.PI*2; a+=0.25) {
+                    const wave = Math.sin(a * 14 + time * 0.4) * 4;
+                    const rx = w.x + Math.cos(a) * (w.r + wave);
+                    const ry = w.y + Math.sin(a) * (w.r + wave);
+                    if(a===0) ctx.moveTo(rx, ry); else ctx.lineTo(rx, ry);
+                }
+                ctx.closePath(); ctx.stroke();
+                w.r += 3.2; w.opacity -= 0.012;
+                if(w.opacity <= 0) gammaWaves.splice(i, 1);
+            });
+        }
+
+        function resizeCanvas() {
+            const c = canvas.parentElement;
+            width = canvas.width = c.clientWidth;
+            height = canvas.height = c.clientHeight;
+            initSim();
+        }
+
+        function initSim() {
+            cancelAnimationFrame(animationId);
+            state = 'idle'; time = 0; gammaWaves = []; gammaCount = 0;
+            const exp = EXPERIMENTS[currentExpKey];
+            formulaDisplay.innerText = exp.initial;
+            expDesc.innerText = exp.desc;
+            gammaIndicator.classList.add('hidden');
+            fireBtn.disabled = false;
+            collisionAlert.style.opacity = '0';
+            
+            const cy = height / 2;
+            particles = [
+                new Particle(width / 2 + 100, cy, exp.target), 
+                new Particle(150, cy, exp.proj)
+            ];
+            loop();
+        }
+
+        function loop() {
+            ctx.fillStyle = '#020617'; ctx.fillRect(0,0,width,height);
+            time++;
+            const exp = EXPERIMENTS[currentExpKey];
+
+            if (state === 'flying') {
+                const target = particles[0]; const proj = particles[1];
+                proj.update();
+                const dist = Math.sqrt((proj.x - target.x)**2 + (proj.y - target.y)**2);
+                if (dist < target.radius + proj.radius) {
+                    state = 'colliding';
+                    collisionAlert.style.opacity = '1';
+                    createGamma(proj.x, proj.y);
+                    particles = exp.products.map(p => new Particle(proj.x, proj.y, p, p.vx, p.vy));
+                    formulaDisplay.innerText = exp.final;
+                    gammaIndicator.classList.remove('hidden');
+                    setTimeout(() => collisionAlert.style.opacity = '0', 200);
+                }
+            }
+            
+            if (state === 'colliding') {
+                particles.forEach(p => p.update());
+                // Chỉ phát xạ gamma tối đa 3 lần (vòng sóng) như thực tế
+                if(time % 35 === 0 && gammaCount < 3) {
+                    createGamma(particles[0].x, particles[0].y);
+                }
+            }
+            
+            drawGamma();
+            particles.forEach(p => p.draw());
+            animationId = requestAnimationFrame(loop);
+        }
+
+        fireBtn.onclick = () => { if(state === 'idle') { particles[1].vx = 6.5; state = 'flying'; fireBtn.disabled = true; } };
+        resetBtn.onclick = initSim;
+        expSelect.onchange = (e) => { currentExpKey = e.target.value; initSim(); };
+        window.onload = resizeCanvas;
+        window.onresize = resizeCanvas;
+    </script>
+</body>
+</html>

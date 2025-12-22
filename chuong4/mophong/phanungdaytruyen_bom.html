@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô phỏng Phản ứng Phân hạch Dây chuyền</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        canvas {
+            touch-action: none;
+            background: radial-gradient(circle, #1a202c 0%, #000 100%);
+        }
+        .status-panel {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+        .neutron-launcher {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px;
+            height: 30px;
+            background: #4b5563;
+            border-radius: 0 4px 4px 0;
+            border: 2px solid #9ca3af;
+            box-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+        }
+        /* Tùy chỉnh thanh cuộn cho tab kiến thức */
+        .knowledge-base::-webkit-scrollbar {
+            width: 6px;
+        }
+        .knowledge-base::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="max-w-4xl w-full bg-gray-800 rounded-xl shadow-2xl overflow-hidden flex flex-col">
+        <!-- Chuyển đổi Tab -->
+        <div class="flex bg-gray-900 border-b border-gray-700">
+            <button id="tabSim" class="px-6 py-3 font-bold text-yellow-500 border-b-2 border-yellow-500 transition">Mô phỏng</button>
+            <button id="tabInfo" class="px-6 py-3 font-bold text-gray-400 hover:text-white transition">Kiến thức hạt nhân</button>
+        </div>
+
+        <!-- Nội dung Tab Mô phỏng -->
+        <div id="simContent" class="flex flex-col">
+            <div class="p-6 border-b border-gray-700">
+                <h1 class="text-2xl font-bold text-yellow-500 mb-2">Mô phỏng Bom Nguyên tử (Phân hạch dây chuyền)</h1>
+                <p class="text-gray-400 text-sm mb-4">
+                    Các hạt nhân $^{235}U$ được thu nhỏ và tạo hiệu ứng bóng. Nhấn "Bắt đầu" để kích hoạt chuỗi phản ứng.
+                </p>
+                <div class="flex flex-wrap gap-4 items-center">
+                    <button id="startBtn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-bold transition flex items-center gap-2">
+                        <span class="w-2 h-2 bg-blue-400 rounded-full animate-ping"></span> Bắt đầu Phản ứng
+                    </button>
+                    <button id="resetBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-bold transition">Đặt lại</button>
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm">Số hạt nhân:</label>
+                        <input type="range" id="atomCount" min="50" max="400" value="200" class="accent-yellow-500">
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative flex-grow">
+                <div class="neutron-launcher"></div>
+                <canvas id="simCanvas" class="w-full h-[500px]"></canvas>
+                
+                <div class="status-panel absolute top-4 left-4 p-4 rounded-lg border border-gray-600 pointer-events-none">
+                    <div class="text-sm font-mono">
+                        <p>Hạt nhân còn lại: <span id="remainingAtoms" class="text-yellow-400">0</span></p>
+                        <p>Hạt nhân đã phân hạch: <span id="fissionedAtoms" class="text-red-400">0</span></p>
+                        <p>Neutron tự do: <span id="freeNeutrons" class="text-blue-400">0</span></p>
+                        <p>Năng lượng giải phóng: <span id="energyReleased" class="text-green-400">0</span> MeV</p>
+                    </div>
+                </div>
+
+                <div id="explosionMsg" class="hidden absolute inset-0 flex items-center justify-center bg-black/60">
+                    <div class="text-center p-8 rounded-2xl bg-gray-900 border-2 border-red-500 shadow-[0_0_50px_rgba(239,68,68,0.5)]">
+                        <h2 class="text-4xl font-black text-red-500 mb-2 italic">BÙNG NỔ!</h2>
+                        <p class="text-xl">Phản ứng dây chuyền đã giải phóng năng lượng cực đại.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-4 bg-gray-900 grid grid-cols-3 text-center text-xs text-gray-400 border-t border-gray-700">
+                <div class="flex items-center justify-center gap-2">
+                    <div class="w-2 h-2 bg-blue-400 rounded-full shadow-[0_0_5px_#60a5fa]"></div> Neutron
+                </div>
+                <div class="flex items-center justify-center gap-2">
+                    <div class="w-3 h-3 bg-yellow-600 rounded-full border border-yellow-400 shadow-inner"></div> Hạt nhân $^{235}U$
+                </div>
+                <div class="flex items-center justify-center gap-2">
+                    <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_red]"></div> Năng lượng tỏa ra
+                </div>
+            </div>
+        </div>
+
+        <!-- Nội dung Tab Kiến thức (Ẩn mặc định) -->
+        <div id="infoContent" class="hidden p-8 knowledge-base overflow-y-auto max-h-[600px] bg-gray-800">
+            <h2 class="text-3xl font-bold text-yellow-500 mb-6">Cơ chế Phản ứng Phân hạch Dây chuyền</h2>
+            
+            <div class="space-y-6 text-gray-200">
+                <section>
+                    <h3 class="text-xl font-semibold text-blue-400 mb-2">1. Phân hạch là gì?</h3>
+                    <p>Phân hạch là quá trình một hạt nhân nặng (như Uranium-235 hoặc Plutonium-239) hấp thụ một neutron và trở nên không ổn định, sau đó vỡ ra thành hai hạt nhân nhẹ hơn kèm theo việc giải phóng một lượng năng lượng khổng lồ và các neutron mới.</p>
+                </section>
+
+                <section class="bg-gray-700/50 p-4 rounded-lg border-l-4 border-yellow-500">
+                    <h3 class="text-xl font-semibold text-yellow-500 mb-2">2. Phản ứng dây chuyền (Chain Reaction)</h3>
+                    <p>Mỗi lần phân hạch giải phóng trung bình 2.5 neutron. Nếu các neutron này tiếp tục va chạm và làm phân hạch các hạt nhân lân cận, quá trình sẽ lặp lại với tốc độ cấp số nhân. Trong bom nguyên tử, quá trình này diễn ra chỉ trong vài phần triệu giây.</p>
+                </section>
+
+                <section>
+                    <h3 class="text-xl font-semibold text-blue-400 mb-2">3. Khối lượng tới hạn (Critical Mass)</h3>
+                    <p>Để phản ứng dây chuyền tự duy trì, khối lượng nhiên liệu phải đủ lớn (khối lượng tới hạn). Nếu quá ít hạt nhân (dưới mức tới hạn), neutron sẽ thoát ra ngoài môi trường trước khi kịp gây ra phân hạch tiếp theo.</p>
+                    <ul class="list-disc ml-6 mt-2 text-gray-400 italic">
+                        <li><strong>Dưới tới hạn:</strong> Phản ứng tắt dần (như khi bạn chỉnh ít hạt nhân trong mô phỏng).</li>
+                        <li><strong>Trên tới hạn:</strong> Phản ứng bùng nổ (như khi chỉnh mật độ hạt nhân cao).</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-xl font-semibold text-green-400 mb-2">4. Năng lượng giải phóng</h3>
+                    <p>Mỗi hạt nhân $^{235}U$ phân hạch giải phóng khoảng <strong>200 MeV</strong> năng lượng. Mặc dù con số này nghe có vẻ nhỏ, nhưng trong 1 kg Uranium, tổng năng lượng giải phóng tương đương với việc đốt cháy hàng ngàn tấn than đá.</p>
+                </section>
+
+                <div class="p-4 bg-red-900/20 border border-red-900/50 rounded text-sm italic">
+                    Ghi chú mô phỏng: Các hạt nhân trong mô phỏng được lập trình để dao động tự do (li động) mô phỏng nhiệt độ thực tế, và hiệu ứng phát sáng đại diện cho bức xạ gamma và động năng của các mảnh vỡ.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const atomCountInput = document.getElementById('atomCount');
+        
+        // UI Navigation
+        const tabSim = document.getElementById('tabSim');
+        const tabInfo = document.getElementById('tabInfo');
+        const simContent = document.getElementById('simContent');
+        const infoContent = document.getElementById('infoContent');
+
+        tabSim.addEventListener('click', () => {
+            tabSim.classList.add('text-yellow-500', 'border-yellow-500');
+            tabInfo.classList.remove('text-white', 'border-b-2', 'border-white');
+            tabInfo.classList.add('text-gray-400');
+            simContent.classList.remove('hidden');
+            infoContent.classList.add('hidden');
+        });
+
+        tabInfo.addEventListener('click', () => {
+            tabInfo.classList.add('text-white', 'border-b-2', 'border-white');
+            tabInfo.classList.remove('text-gray-400');
+            tabSim.classList.remove('text-yellow-500', 'border-yellow-500');
+            simContent.classList.add('hidden');
+            infoContent.classList.remove('hidden');
+        });
+
+        const uiRemaining = document.getElementById('remainingAtoms');
+        const uiFissioned = document.getElementById('fissionedAtoms');
+        const uiNeutrons = document.getElementById('freeNeutrons');
+        const uiEnergy = document.getElementById('energyReleased');
+        const explosionMsg = document.getElementById('explosionMsg');
+
+        let atoms = [];
+        let neutrons = [];
+        let particles = [];
+        let energyFlashes = [];
+        let stats = { remaining: 0, fissioned: 0, neutrons: 0, energy: 0 };
+        let animationFrameId = null;
+
+        class Atom {
+            constructor(x, y) {
+                this.baseX = x;
+                this.baseY = y;
+                this.x = x;
+                this.y = y;
+                this.radius = 5.5;
+                this.isFissioned = false;
+                this.vibeX = Math.random() * Math.PI * 2;
+                this.vibeY = Math.random() * Math.PI * 2;
+                this.vibeSpeed = 0.03 + Math.random() * 0.04;
+                this.vibeAmp = 1.5 + Math.random() * 2;
+            }
+
+            update() {
+                if (this.isFissioned) return;
+                this.vibeX += this.vibeSpeed;
+                this.vibeY += this.vibeSpeed;
+                this.x = this.baseX + Math.sin(this.vibeX) * this.vibeAmp;
+                this.y = this.baseY + Math.cos(this.vibeY) * this.vibeAmp;
+            }
+
+            draw() {
+                if (this.isFissioned) return;
+                const grad = ctx.createRadialGradient(
+                    this.x - this.radius * 0.3, 
+                    this.y - this.radius * 0.3, 
+                    this.radius * 0.1, 
+                    this.x, 
+                    this.y, 
+                    this.radius
+                );
+                grad.addColorStop(0, '#fde047');
+                grad.addColorStop(0.4, '#ca8a04');
+                grad.addColorStop(1, '#422006');
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = grad;
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+                ctx.closePath();
+            }
+        }
+
+        class Neutron {
+            constructor(x, y, vx, vy, isPrimary = false) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.radius = isPrimary ? 3.5 : 1.8;
+                this.active = true;
+                this.isPrimary = isPrimary;
+                this.history = [];
+            }
+
+            update() {
+                if (this.isPrimary) {
+                    this.history.push({x: this.x, y: this.y});
+                    if (this.history.length > 8) this.history.shift();
+                }
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.active = false;
+                }
+            }
+
+            draw() {
+                if (this.isPrimary && this.history.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.history[0].x, this.history[0].y);
+                    for(let p of this.history) ctx.lineTo(p.x, p.y);
+                    ctx.strokeStyle = 'rgba(147, 197, 253, 0.5)';
+                    ctx.lineWidth = this.radius * 1.2;
+                    ctx.stroke();
+                }
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.isPrimary ? '#bfdbfe' : '#60a5fa';
+                ctx.shadowBlur = this.isPrimary ? 12 : 4;
+                ctx.shadowColor = '#60a5fa';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.closePath();
+            }
+        }
+
+        function init() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            atoms = [];
+            neutrons = [];
+            particles = [];
+            energyFlashes = [];
+            explosionMsg.classList.add('hidden');
+            const count = parseInt(atomCountInput.value);
+            for (let i = 0; i < count; i++) {
+                atoms.push(new Atom(
+                    Math.random() * (canvas.width - 100) + 50,
+                    Math.random() * (canvas.height - 80) + 40
+                ));
+            }
+            stats = { remaining: count, fissioned: 0, neutrons: 0, energy: 0 };
+            updateUI();
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            render();
+        }
+
+        function updateUI() {
+            uiRemaining.innerText = stats.remaining;
+            uiFissioned.innerText = stats.fissioned;
+            uiNeutrons.innerText = neutrons.length;
+            uiEnergy.innerText = stats.energy.toLocaleString();
+        }
+
+        function createFissionEffect(x, y) {
+            energyFlashes.push({ x, y, radius: 5, maxRadius: 35, alpha: 0.8 });
+            for (let i = 0; i < 12; i++) {
+                particles.push({
+                    x, y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    life: 30,
+                    color: i % 2 === 0 ? '#ff4d4d' : '#ffcc00'
+                });
+            }
+        }
+
+        function triggerFirstNeutron() {
+            if (neutrons.length > 0) return;
+            neutrons.push(new Neutron(5, canvas.height/2, 4.2, (Math.random() - 0.5) * 0.5, true));
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            atoms.forEach(atom => {
+                atom.update();
+                atom.draw();
+            });
+            for (let i = energyFlashes.length - 1; i >= 0; i--) {
+                let f = energyFlashes[i];
+                ctx.beginPath();
+                ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
+                let g = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.radius);
+                g.addColorStop(0, `rgba(255, 255, 255, ${f.alpha})`);
+                g.addColorStop(0.5, `rgba(255, 100, 0, ${f.alpha * 0.5})`);
+                g.addColorStop(1, `rgba(255, 0, 0, 0)`);
+                ctx.fillStyle = g;
+                ctx.fill();
+                f.radius += 2.5;
+                f.alpha -= 0.04;
+                if (f.alpha <= 0) energyFlashes.splice(i, 1);
+            }
+            for (let i = neutrons.length - 1; i >= 0; i--) {
+                let n = neutrons[i];
+                n.update();
+                n.draw();
+                for (let j = 0; j < atoms.length; j++) {
+                    let a = atoms[j];
+                    if (!a.isFissioned) {
+                        let dist = Math.hypot(n.x - a.x, n.y - a.y);
+                        if (dist < a.radius + n.radius) {
+                            a.isFissioned = true;
+                            n.active = false;
+                            stats.remaining--;
+                            stats.fissioned++;
+                            stats.energy += 200;
+                            createFissionEffect(a.x, a.y);
+                            let newNeutronCount = Math.floor(Math.random() * 2) + 2; 
+                            for (let k = 0; k < newNeutronCount; k++) {
+                                let angle = Math.random() * Math.PI * 2;
+                                let speed = 2.8 + Math.random() * 3;
+                                neutrons.push(new Neutron(a.x, a.y, Math.cos(angle) * speed, Math.sin(angle) * speed));
+                            }
+                            break;
+                        }
+                    }
+                }
+                if (!n.active) neutrons.splice(i, 1);
+            }
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.life / 30;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+            updateUI();
+            if (stats.fissioned > atomCountInput.value * 0.8) {
+                 explosionMsg.classList.remove('hidden');
+            }
+            animationFrameId = requestAnimationFrame(render);
+        }
+
+        startBtn.addEventListener('click', triggerFirstNeutron);
+        resetBtn.addEventListener('click', init);
+        atomCountInput.addEventListener('input', init);
+        init();
+        window.addEventListener('resize', () => {
+             if (animationFrameId) cancelAnimationFrame(animationFrameId);
+             init();
+        });
+    </script>
+</body>
+</html>

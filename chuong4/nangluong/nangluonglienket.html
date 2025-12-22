@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Năng lượng liên kết hạt nhân</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      }
+    };
+    </script>
+
+    <style>
+        body {
+            background-color: #020617;
+            color: #f8fafc;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            overflow: hidden; 
+        }
+        
+        .tab-content {
+            display: none;
+            height: calc(100vh - 64px); 
+            overflow-y: auto;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        #sim-container {
+            position: relative;
+            background: radial-gradient(circle at 70% 50%, #0f172a 0%, #020617 100%);
+            display: flex;
+            align-items: center;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        canvas {
+            touch-action: none;
+            cursor: crosshair;
+            display: block;
+        }
+
+        .energy-flash {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: white;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 2000;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-4px, 4px); }
+            75% { transform: translate(4px, -4px); }
+        }
+        .shake { animation: shake 0.1s; }
+        
+        .scroll-custom::-webkit-scrollbar { width: 8px; }
+        .scroll-custom::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        
+        .theory-card {
+            @apply bg-slate-900/50 border border-slate-800 rounded-3xl p-8 shadow-xl mb-10;
+        }
+
+        .reaction-chamber {
+            position: absolute;
+            border: 2px dashed rgba(59, 130, 246, 0.2);
+            border-radius: 50%;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .reaction-chamber::after {
+            content: 'VÙNG LỰC HẠT NHÂN';
+            position: absolute;
+            bottom: -35px;
+            font-size: 11px;
+            color: #64748b;
+            letter-spacing: 3px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        .formula-box {
+            @apply bg-slate-950/80 p-6 rounded-xl border border-blue-500/20 my-4 text-center font-mono shadow-inner;
+        }
+        
+        .tab-btn {
+            @apply px-6 py-4 text-sm font-bold uppercase tracking-widest transition-all border-b-2 border-transparent text-slate-500;
+        }
+        .tab-btn.active {
+            @apply border-blue-500 text-blue-400 bg-blue-500/5;
+        }
+
+        .chart-container {
+            @apply w-full bg-slate-950/50 rounded-xl p-4 border border-slate-800 my-6;
+        }
+        .dot-label {
+            font-size: 10px;
+            fill: #94a3b8;
+        }
+        .dot {
+            transition: all 0.3s;
+        }
+        .dot:hover {
+            fill: #fb923c;
+            r: 6;
+        }
+    </style>
+</head>
+<body>
+
+<div id="flash" class="energy-flash"></div>
+
+<nav class="h-16 border-b border-slate-800 bg-slate-950 flex items-center px-6 justify-between z-50 relative">
+    <div class="flex h-full" >
+        <button onclick="switchTab('sim')" id="btn-sim" class="tab-btn active">[Phòng Thí Nghiệm]</button>
+        <button onclick="switchTab('theory')" id="btn-theory" class="tab-btn">[Kiến thức Bài học]</button>
+    </div>
+</nav>
+
+<!-- TAB 1: MÔ PHỎNG -->
+<section id="tab-sim" class="tab-content active">
+    <div id="sim-container">
+        <canvas id="simCanvas"></canvas>
+        <div id="chamber-ui" class="reaction-chamber"></div>
+
+        <div id="controls-group" class="absolute top-6 left-6 flex flex-col gap-3 z-20">
+            <div class="flex gap-2">
+                <div class="bg-slate-900/90 backdrop-blur-md border border-slate-700 p-3 rounded-xl min-w-[90px] shadow-2xl">
+                    <p class="text-[9px] text-slate-500 uppercase font-black mb-1">Số khối A</p>
+                    <p id="stat-a" class="text-xl font-mono font-bold text-white leading-none">1</p>
+                </div>
+                <div class="bg-slate-900/90 backdrop-blur-md border border-slate-700 p-3 rounded-xl min-w-[130px] shadow-2xl">
+                    <p class="text-[9px] text-slate-500 uppercase font-black mb-1">Năng lượng LK</p>
+                    <p id="stat-energy" class="text-xl font-mono font-bold text-orange-400 leading-none">0 MeV</p>
+                </div>
+            </div>
+
+            <div class="flex gap-2 p-1.5 bg-slate-950/80 border border-slate-700 rounded-xl shadow-xl">
+                <button onclick="addParticle('proton')" class="flex-1 px-4 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 shadow-inner active:scale-95">
+                    + Proton
+                </button>
+                <button onclick="addParticle('neutron')" class="flex-1 px-4 py-3 bg-slate-600 hover:bg-slate-500 text-white rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 shadow-inner active:scale-95">
+                    n Neutron
+                </button>
+                <button onclick="resetSim()" class="px-3 py-3 bg-transparent hover:bg-slate-800 text-slate-400 hover:text-white rounded-lg text-[10px] font-medium transition-all">
+                    Reset
+                </button>
+            </div>
+            <p class="text-[10px] text-slate-500 italic mt-1 px-2">* Kéo thả các hạt vào vùng tâm để tạo liên kết</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- TAB 2: LÝ THUYẾT -->
+<section id="tab-theory" class="tab-content scroll-custom bg-slate-950">
+    <div class="max-w-4xl mx-auto px-6 py-12">
+        
+        <div class="text-center mb-16">
+            <h1 class="text-3xl md:text-3xl font-black text-white mb-4 tracking-tight uppercase italic">Lý thuyết Năng lượng liên kết</h1>
+            <div class="h-1.5 w-32 bg-gradient-to-r from-blue-600 to-emerald-600 mx-auto rounded-full"></div>
+        </div>
+
+        <!-- I. Einstein -->
+        <div class="theory-card">
+            <div class="flex items-center gap-4 mb-6">
+                <span class="bg-blue-600 text-white w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xl shadow-lg shadow-blue-500/20">I</span>
+                <h2 class="text-2xl font-bold text-white uppercase tracking-wide">Hệ thức Einstein</h2>
+            </div>
+            <p class="text-slate-300 leading-relaxed mb-4">Một vật có khối lượng $m$ luôn có năng lượng nghỉ $E$ tương ứng:</p>
+            <div class="formula-box">
+                <p class="text-3xl text-blue-400 font-bold mb-2">$$E = m \cdot c^2$$</p>
+            </div>
+            <p class="text-slate-400 text-sm italic">Trong đó $c \approx 3.10^8$ m/s là tốc độ ánh sáng trong chân không.</p>
+        </div>
+
+        <!-- II. Độ hụt khối & Năng lượng liên kết -->
+        <div class="theory-card">
+            <div class="flex items-center gap-4 mb-6">
+                <span class="bg-red-600 text-white w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xl shadow-lg shadow-red-500/20">II</span>
+                <h2 class="text-2xl font-bold text-white uppercase tracking-wide">Độ hụt khối & Năng lượng liên kết</h2>
+            </div>
+            
+            <!-- Độ hụt khối -->
+            <div class="mb-10">
+                <h3 class="text-xl font-bold text-emerald-400 mb-3 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-emerald-400 rounded-full"></span> 1. Độ hụt khối ($\Delta m$)
+                </h3>
+                <p class="text-slate-300 leading-relaxed mb-4">
+                    Khối lượng của một hạt nhân $m_{hn}$ luôn <b>nhỏ hơn</b> tổng khối lượng các nucleon $m_0$ tạo thành hạt nhân đó. Sự chênh lệch này được gọi là độ hụt khối:
+                </p>
+                <div class="formula-box bg-slate-900/80 border-emerald-500/30">
+                    <p class="text-2xl font-bold text-white">$$\Delta m = [Z \cdot m_p + (A - Z) \cdot m_n] - m_{hn}$$</p>
+                </div>
+                <ul class="text-slate-400 text-sm space-y-2 mt-4">
+                    <li>• $m_p$: Khối lượng 1 proton ($1,00728 \text{ u}$).</li>
+                    <li>• $m_n$: Khối lượng 1 neutron ($1,00866 \text{ u}$).</li>
+                </ul>
+            </div>
+
+            <!-- Năng lượng liên kết -->
+            <div>
+                <h3 class="text-xl font-bold text-orange-400 mb-3 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-orange-400 rounded-full"></span> 2. Năng lượng liên kết ($W_{lk}$)
+                </h3>
+                <p class="text-slate-300 leading-relaxed mb-4">
+                    Là năng lượng tối thiểu cần thiết để phá vỡ một hạt nhân thành các nucleon riêng rẽ, hoặc là năng lượng tỏa ra khi các nucleon kết hợp thành hạt nhân:
+                </p>
+                <div class="formula-box bg-slate-900/80 border-orange-500/30">
+                    <p class="text-3xl font-bold text-orange-400">$$W_{lk} = \Delta m \cdot c^2$$</p>
+                </div>
+                <p class="text-slate-400 text-sm mt-4">Năng lượng liên kết càng lớn, năng lượng cần để phá vỡ hạt nhân càng cao.</p>
+            </div>
+        </div>
+
+        <!-- III. Đồ thị & Độ bền vững -->
+        <div class="theory-card">
+            <div class="flex items-center gap-4 mb-6">
+                <span class="bg-orange-600 text-white w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xl shadow-lg shadow-orange-500/20">III</span>
+                <h2 class="text-2xl font-bold text-white uppercase tracking-wide">Năng lượng liên kết riêng & Độ bền vững</h2>
+            </div>
+            
+            <p class="text-slate-300 mb-6 leading-relaxed">
+                Độ bền vững của hạt nhân phụ thuộc vào <span class="text-orange-400 font-bold italic">Năng lượng liên kết riêng ($\varepsilon$)</span> - tức là năng lượng liên kết tính trên một nucleon:
+            </p>
+
+            <div class="formula-box mb-8">
+                <p class="text-3xl font-bold text-white">$$\varepsilon = \frac{W_{lk}}{A}$$</p>
+            </div>
+
+            <div class="chart-container">
+                <div class="text-xs text-slate-400 mb-4 font-bold flex justify-between">
+                    <span>$\varepsilon$ (MeV/nucleon)</span>
+                    <span class="text-emerald-400 italic">Vùng hạt nhân bền vững nhất</span>
+                </div>
+                <svg viewBox="0 0 500 250" class="w-full h-auto overflow-visible">
+                    <line x1="40" y1="210" x2="480" y2="210" stroke="#334155" stroke-width="2" /> 
+                    <line x1="40" y1="210" x2="40" y2="20" stroke="#334155" stroke-width="2" />  
+                    <text x="480" y="225" class="dot-label text-[10px]" text-anchor="end">Số khối A</text>
+                    <text x="35" y="215" class="dot-label" text-anchor="end">0</text>
+                    <text x="35" y="45" class="dot-label" text-anchor="end">8.8</text>
+                    <rect x="100" y="30" width="100" height="180" fill="rgba(16, 185, 129, 0.05)" />
+                    <path d="M 40 210 Q 60 80 80 50 T 150 40 L 250 45 L 450 65" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4" opacity="0.4" />
+                    <circle cx="50" cy="180" r="4" fill="#ef4444" class="dot" /> 
+                    <text x="55" y="175" class="dot-label fill-white font-bold">H^2</text>
+                    <circle cx="75" cy="70" r="4" fill="#ef4444" class="dot" /> 
+                    <text x="75" y="62" class="dot-label fill-white font-bold" text-anchor="middle">He^4</text>
+                    <circle cx="151" cy="40" r="5" fill="#10b881" class="dot" /> 
+                    <text x="151" y="32" class="dot-label fill-emerald-400 font-bold" text-anchor="middle">Fe^56</text>
+                    <circle cx="460" cy="65" r="4" fill="#f59e0b" class="dot" /> 
+                    <text x="460" y="58" class="dot-label fill-white font-bold" text-anchor="middle">U^238</text>
+                </svg>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-emerald-500/10 border border-emerald-500/20 p-5 rounded-2xl">
+                    <h4 class="text-emerald-400 font-bold mb-2">Hạt trung bình ($50 < A < 95$)</h4>
+                    <p class="text-sm text-slate-400">Có năng lượng liên kết riêng lớn nhất (xấp xỉ $8,8$ MeV/nucleon), bền vững nhất.</p>
+                </div>
+                <div class="bg-slate-800/50 border border-slate-700 p-5 rounded-2xl">
+                    <h4 class="text-slate-300 font-bold mb-2">Hạt nhẹ và hạt nặng</h4>
+                    <p class="text-sm text-slate-400">Có năng lượng liên kết riêng nhỏ hơn, do đó kém bền vững hơn.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script>
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('tab-' + tabId).classList.add('active');
+        document.getElementById('btn-' + tabId).classList.add('active');
+        if (tabId === 'sim') { resize(); }
+    }
+
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    const flashEl = document.getElementById('flash');
+    const chamberUI = document.getElementById('chamber-ui');
+    const EnergyConst = 931.5; 
+    const STRONG_FORCE_DISTANCE = 70; 
+    const NUCLEAR_POTENTIAL_STRENGTH = 0.015; // Lực giữ cụm hạt nhân ở tâm
+    
+    let nucleusCenter = { x: 0, y: 0 };
+    let nucleusRadius = 110; 
+    let particles = [];
+    let isDragging = false;
+    let draggedIdx = -1;
+
+    function resize() {
+        const container = document.getElementById('sim-container');
+        if (!container) return;
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+        nucleusCenter.x = canvas.width * 0.6; 
+        nucleusCenter.y = canvas.height / 2;
+        chamberUI.style.width = (nucleusRadius * 2) + 'px';
+        chamberUI.style.height = (nucleusRadius * 2) + 'px';
+        chamberUI.style.left = (nucleusCenter.x - nucleusRadius) + 'px';
+        chamberUI.style.top = (nucleusCenter.y - nucleusRadius) + 'px';
+    }
+    window.addEventListener('resize', resize);
+
+    class Particle {
+        constructor(type, x, y) {
+            this.type = type;
+            this.x = x;
+            this.y = y;
+            this.vx = (Math.random() - 0.5) * 2;
+            this.vy = (Math.random() - 0.5) * 2;
+            this.radius = 14;
+            this.isBound = false;
+        }
+        draw() {
+            ctx.save();
+            if (this.isBound) {
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.type === 'proton' ? '#ef4444' : '#94a3b8';
+            }
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            let grad = ctx.createRadialGradient(this.x-4, this.y-4, 2, this.x, this.y, this.radius);
+            if (this.type === 'proton') { 
+                grad.addColorStop(0, '#f87171'); grad.addColorStop(1, '#991b1b'); 
+            } else { 
+                grad.addColorStop(0, '#f1f5f9'); grad.addColorStop(1, '#334155'); 
+            }
+            ctx.fillStyle = grad; ctx.fill();
+            
+            // Symbol
+            ctx.fillStyle = 'white'; ctx.font = 'bold 12px Arial'; ctx.textAlign = 'center';
+            ctx.fillText(this.type === 'proton' ? '+' : 'n', this.x, this.y + 4);
+            ctx.restore();
+        }
+        update() {
+            if (draggedIdx === particles.indexOf(this)) return;
+
+            // Nếu đã liên kết, chịu lực giữ về tâm vùng hạt nhân
+            if (this.isBound) {
+                this.vx += (nucleusCenter.x - this.x) * NUCLEAR_POTENTIAL_STRENGTH;
+                this.vy += (nucleusCenter.y - this.y) * NUCLEAR_POTENTIAL_STRENGTH;
+                
+                // Rung động nhiệt nhẹ
+                this.vx += (Math.random() - 0.5) * 0.2;
+                this.vy += (Math.random() - 0.5) * 0.2;
+                
+                // Ma sát môi trường hạt nhân
+                this.vx *= 0.95;
+                this.vy *= 0.95;
+            } else {
+                // Hạt tự do chuyển động thẳng đều
+                this.vx *= 0.995;
+                this.vy *= 0.995;
+            }
+
+            this.x += this.vx;
+            this.y += this.vy;
+
+            // Va chạm biên
+            if (this.x < this.radius || this.x > canvas.width - this.radius) this.vx *= -0.8;
+            if (this.y < this.radius || this.y > canvas.height - this.radius) this.vy *= -0.8;
+        }
+    }
+
+    function addParticle(type) {
+        // Sinh ra ở phía trái màn hình
+        const spawnX = 400 + (Math.random() * 150);
+        const spawnY = canvas.height/2 + (Math.random() * 200 - 100);
+        particles.push(new Particle(type, spawnX, spawnY));
+    }
+
+    function resetSim() { 
+        particles = []; 
+        // Hạt đầu tiên không còn "bất động", nó sẽ tự do trôi nổi ở tâm
+        let first = new Particle('proton', nucleusCenter.x, nucleusCenter.y);
+        first.isBound = true;
+        particles.push(first);
+        updateStats(); 
+    }
+
+    function triggerFlash() {
+        flashEl.style.transition = 'none'; flashEl.style.opacity = '0.3';
+        document.body.classList.add('shake');
+        setTimeout(() => {
+            flashEl.style.transition = 'opacity 0.5s ease-out'; flashEl.style.opacity = '0';
+            setTimeout(() => document.body.classList.remove('shake'), 100);
+        }, 30);
+    }
+
+    function updateStats() {
+        const boundCount = particles.filter(p => p.isBound).length;
+        const deltaM = boundCount > 1 ? (boundCount - 1) * 0.0082 : 0; 
+        document.getElementById('stat-a').innerText = boundCount;
+        document.getElementById('stat-energy').innerText = Math.round(deltaM * EnergyConst) + " MeV";
+    }
+
+    canvas.onmousedown = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+        for(let i = particles.length - 1; i >= 0; i--) {
+            if (Math.hypot(particles[i].x - mx, particles[i].y - my) < particles[i].radius * 2) {
+                isDragging = true; draggedIdx = i; 
+                particles[i].isBound = false; // Khi cầm lên thì tạm thời mất liên kết
+                break;
+            }
+        }
+    };
+
+    window.onmousemove = (e) => {
+        if (isDragging && draggedIdx !== -1) {
+            const rect = canvas.getBoundingClientRect();
+            particles[draggedIdx].x = e.clientX - rect.left;
+            particles[draggedIdx].y = e.clientY - rect.top;
+            particles[draggedIdx].vx = 0;
+            particles[draggedIdx].vy = 0;
+        }
+    };
+
+    window.onmouseup = () => { isDragging = false; draggedIdx = -1; };
+
+    function animate() {
+        if (document.getElementById('tab-sim').classList.contains('active')) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Vẽ hào quang vùng hạt nhân
+            const g = ctx.createRadialGradient(nucleusCenter.x, nucleusCenter.y, 0, nucleusCenter.x, nucleusCenter.y, nucleusRadius * 1.5);
+            g.addColorStop(0, 'rgba(59, 130, 246, 0.1)'); g.addColorStop(1, 'rgba(2, 6, 23, 0)');
+            ctx.fillStyle = g; ctx.beginPath(); ctx.arc(nucleusCenter.x, nucleusCenter.y, nucleusRadius * 1.5, 0, Math.PI*2); ctx.fill();
+
+            // Tính toán tương tác
+            for (let i = 0; i < particles.length; i++) {
+                let p1 = particles[i];
+
+                // 1. Kiểm tra dính vào hạt nhân
+                let distToCenter = Math.hypot(p1.x - nucleusCenter.x, p1.y - nucleusCenter.y);
+                if (distToCenter < nucleusRadius && !p1.isBound && draggedIdx !== i) {
+                    p1.isBound = true;
+                    triggerFlash();
+                }
+
+                // 2. Tương tác giữa các hạt (Lực đẩy Coulomb và Lực hạt nhân mạnh)
+                for (let j = i + 1; j < particles.length; j++) {
+                    let p2 = particles[j];
+                    let dx = p2.x - p1.x;
+                    let dy = p2.y - p1.y;
+                    let dist = Math.hypot(dx, dy);
+                    let minDist = p1.radius + p2.radius;
+
+                    if (dist < STRONG_FORCE_DISTANCE) {
+                        let angle = Math.atan2(dy, dx);
+                        
+                        // Lực hạt nhân mạnh (hút khi ở gần, đẩy rất mạnh khi quá gần để không chồng lấn)
+                        let force = (minDist * 1.1 - dist) * 0.15;
+                        
+                        p1.vx -= Math.cos(angle) * force;
+                        p1.vy -= Math.sin(angle) * force;
+                        p2.vx += Math.cos(angle) * force;
+                        p2.vy += Math.sin(angle) * force;
+                    }
+                }
+                
+                p1.update();
+                p1.draw();
+            }
+            updateStats();
+        }
+        requestAnimationFrame(animate);
+    }
+
+    window.onload = () => { resize(); resetSim(); animate(); };
+</script>
+</body>
+</html>

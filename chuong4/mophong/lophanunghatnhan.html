@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="vi" style="background-color: #020617;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Mô phỏng & Kiến thức Lò phản ứng</title>
+    
+    <!-- CSS CRITICAL: Tải ngay lập tức để tránh trắng trang -->
+    <style>
+        /* Đảm bảo nền đen ngay lập tức */
+        html, body {
+            background-color: #020617 !important;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Khóa cuộn khi đang load */
+        }
+
+        #loadingScreen {
+            position: fixed;
+            inset: 0;
+            background: #020617;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.8s ease;
+        }
+
+        .loader-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+
+        .loader-ring {
+            position: absolute;
+            inset: 0;
+            border: 4px solid transparent;
+            border-radius: 50%;
+            animation: rotate var(--d) linear infinite;
+        }
+
+        .ring-1 { border-top-color: #3b82f6; --d: 1.5s; }
+        .ring-2 { inset: 15px; border-bottom-color: #60a5fa; --d: 1.2s; animation-direction: reverse; }
+        .ring-3 { inset: 30px; border-left-color: #93c5fd; --d: 0.8s; }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 40px;
+            font-size: 12px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #3b82f6;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.95); }
+        }
+    </style>
+
+    <!-- Các thư viện nặng được tải sau để không chặn việc hiển thị loading -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+     <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      }
+    };
+    </script>
+    <style>
+        body { 
+            color: #f8fafc; 
+            font-family: 'Inter', sans-serif; 
+            min-height: 100vh;
+        }
+        
+        canvas { 
+            border: 2px solid #334155; 
+            border-radius: 12px; 
+            background: radial-gradient(circle, #1e293b 0%, #020617 100%); 
+            touch-action: none; 
+            max-width: 100%;
+        }
+        
+        #audioOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.98);
+            display: none; 
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 900;
+            transition: opacity 0.5s ease;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .tab-btn.active {
+            border-bottom: 2px solid #3b82f6;
+            color: #3b82f6;
+        }
+
+        .knowledge-card {
+            background: #1e293b;
+            border-left: 4px solid #3b82f6;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 0.75rem 0.75rem 0;
+        }
+
+        .formula-box {
+            background: #0f172a;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #334155;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    
+    <!-- Màn hình chờ (Loading) xuất hiện ngay lập tức -->
+    <div id="loadingScreen">
+        <div class="loader-container">
+            <div class="loader-ring ring-1"></div>
+            <div class="loader-ring ring-2"></div>
+            <div class="loader-ring ring-3"></div>
+        </div>
+        <div class="loading-text">Khởi tạo dữ liệu...</div>
+    </div>
+
+    <!-- Màn hình kích hoạt âm thanh -->
+    <div id="audioOverlay">
+        <div class="text-center p-10 border border-blue-500/20 rounded-3xl bg-slate-900 shadow-2xl max-w-sm">
+            <div class="mb-6 flex justify-center">
+                <div class="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center animate-pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C11.923 3.663 13 4.109 13 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    </svg>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2 uppercase tracking-tight">Hệ thống sẵn sàng</h2>
+            <p class="text-slate-400 mb-8 text-sm">Kích hoạt để tải âm thanh và môi trường mô phỏng vật lý.</p>
+            <button id="startBtn" class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg transition-all uppercase tracking-widest">
+                Vào trung tâm điều khiển
+            </button>
+        </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto">
+        <nav class="flex space-x-8 mb-8 border-b border-slate-700">
+            <button onclick="switchTab('sim')" id="btn-sim" class="tab-btn active pb-4 text-sm font-bold uppercase tracking-widest transition-all">Mô phỏng trực quan</button>
+            <button onclick="switchTab('info')" id="btn-info" class="tab-btn pb-4 text-sm font-bold uppercase tracking-widest transition-all">Kiến thức hạt nhân</button>
+        </nav>
+
+        <div id="tab-sim" class="tab-content active">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div class="lg:col-span-1 space-y-4 bg-slate-800/50 backdrop-blur-md p-6 rounded-xl border border-slate-700 shadow-2xl h-fit">
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-slate-300 uppercase text-[11px] tracking-wider">Mật độ Uranium-235</label>
+                        <input type="range" id="uCount" min="20" max="150" value="70" class="w-full h-1.5 bg-slate-600 rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                        <p class="text-[10px] text-slate-500 uppercase font-bold mb-3 tracking-[0.2em]">Thông số lò</p>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-light">Neutron tự do:</span>
+                            <span id="neutronDisplay" class="font-mono text-yellow-400 text-xl font-bold">0</span>
+                        </div>
+                        <div id="kStatus" class="mt-4 text-center text-[11px] uppercase font-black py-2 rounded bg-slate-800 transition-all border border-slate-700 text-slate-400">Đang dừng</div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="pauseBtn" class="py-3 bg-slate-700 hover:bg-slate-600 rounded-lg font-bold uppercase text-[10px] tracking-widest transition-all">Tạm dừng</button>
+                        <button id="resetBtn" class="py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold uppercase text-[10px] tracking-widest transition-all">Mồi hạt</button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-2 pt-4">
+                        <span class="text-xs text-slate-400">Âm thanh:</span>
+                        <button id="muteBtn" class="bg-slate-700 px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-slate-600">Bật</button>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-3 relative group overflow-hidden rounded-xl">
+                    <canvas id="simCanvas" class="w-full h-[600px] shadow-2xl"></canvas>
+                    <div id="warningMsg" class="absolute top-6 left-1/2 -translate-x-1/2 hidden bg-red-600/90 backdrop-blur-sm text-white px-8 py-2 rounded-full text-xs font-black shadow-2xl border border-white/20 tracking-wider uppercase">
+                        Cảnh báo: Phản ứng dây chuyền mất kiểm soát
+                    </div>
+                    <div id="pauseIndicator" class="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] hidden pointer-events-none">
+                        <span class="text-4xl font-black text-white/50 border-4 border-white/30 px-8 py-4 rounded-2xl uppercase tracking-[1em]">Đã tạm dừng</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-info" class="tab-content max-w-4xl mx-auto py-4">
+            <h2 class="text-3xl font-bold text-blue-400 mb-8 border-l-4 border-blue-600 pl-4">Cơ sở Vật lý & Toán học</h2>
+            
+            <div class="knowledge-card">
+                <h3 class="text-xl font-bold text-white mb-2">1. Phản ứng phân hạch & Phương trình</h3>
+                <p class="text-slate-300 leading-relaxed mb-4">
+                    Phản ứng phân hạch xảy ra khi một neutron bắn phá hạt nhân Uranium-235, khiến nó vỡ thành hai mảnh nhẹ hơn và giải phóng năng lượng cùng neutron mới.
+                </p>
+                <div class="formula-box text-center text-lg">
+                    $ ^{1}_{0}n + ^{235}_{92}\text{U} \rightarrow ^{236}_{92}\text{U}^* \rightarrow ^{144}_{56}\text{Ba} + ^{89}_{36}\text{Kr} + 3(^{1}_{0}n) + 200 \text{ MeV} $
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-blue-400 font-bold mb-3">Hệ số nhân Neutron (k)</h3>
+                    <ul class="space-y-3 text-sm text-slate-300">
+                        <li><b class="text-green-400">k < 1 (Dưới hạn):</b> Phản ứng sẽ tắt dần.</li>
+                        <li><b class="text-yellow-400">k = 1 (Tới hạn):</b> Trạng thái ổn định duy trì.</li>
+                        <li><b class="text-red-400">k > 1 (Trên hạn):</b> Phản ứng bùng nổ mất kiểm soát.</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-blue-400 font-bold mb-3">Vai trò Thanh điều khiển</h3>
+                    <p class="text-sm text-slate-300">
+                        Làm bằng vật liệu hấp thụ neutron (như Boron). Hạ thanh xuống sẽ hấp thụ neutron để giảm $k$, kéo thanh lên sẽ để phản ứng tăng tốc.
+                    </p>
+                </div>
+            </div>
+
+            <div class="knowledge-card border-green-600">
+                <h3 class="text-xl font-bold text-white mb-2">2. Tính toán số hạt sau $n$ thế hệ</h3>
+                <p class="text-slate-300 leading-relaxed">
+                    Với tập số neutron ban đầu $N_0$ và hệ số nhân $k$, số lượng neutron $N_n$ sau $n$ chu kỳ phân hạch được tính theo cấp số nhân:
+                </p>
+                <div class="formula-box text-center text-2xl font-mono text-blue-400">
+                    $N_n = N_0 \cdot k^n$
+                </div>
+            </div>
+
+            <div class="knowledge-card border-yellow-500">
+                <h3 class="text-xl font-bold text-white mb-2">3. Năng lượng giải phóng</h3>
+                <p class="text-slate-300 leading-relaxed">
+                    Tổng năng lượng $E_{total}$ giải phóng tích lũy sau $n$ bước, với mỗi hạt phân hạch tỏa ra $\epsilon \approx 200 \text{ MeV}$:
+                </p>
+                <div class="formula-box text-center text-xl">
+                    $E_{total} = N_0 \cdot \epsilon \cdot \sum_{i=0}^{n-1} k^i = N_0 \cdot \epsilon \cdot \frac{k^n - 1}{k - 1}$
+                </div>
+                <p class="text-xs text-slate-400 mt-2">Dòng năng lượng này chính là nguồn nhiệt làm quay turbine phát điện.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const loadingScreen = document.getElementById('loadingScreen');
+        const audioOverlay = document.getElementById('audioOverlay');
+        const uCountInput = document.getElementById('uCount');
+        const neutronDisplay = document.getElementById('neutronDisplay');
+        const kStatus = document.getElementById('kStatus');
+        const warningMsg = document.getElementById('warningMsg');
+        const resetBtn = document.getElementById('resetBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const muteBtn = document.getElementById('muteBtn');
+        const startBtn = document.getElementById('startBtn');
+        const pauseIndicator = document.getElementById('pauseIndicator');
+
+        let atoms = [], neutrons = [], explosions = [];
+        let rodY = -400, targetRodY = -400, shakeAmount = 0;
+        let isPaused = false, isMuted = false;
+        let audioCtx;
+        const ROD_AREA_WIDTH = 350, ROD_HEIGHT = 480, NUM_RODS = 12;
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.add('active');
+            if(tabId === 'sim') {
+                 setTimeout(() => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }, 10);
+            }
+        }
+
+        // Logic ẩn loading khi mọi tài nguyên đã sẵn sàng
+        window.addEventListener('load', () => {
+            // Giải phóng khóa cuộn body
+            document.body.style.overflow = 'auto';
+            
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    audioOverlay.style.display = 'flex'; 
+                }, 800);
+            }, 1000); 
+        });
+
+        function initAudio() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playCollisionSound(x) {
+            if (!audioCtx || isMuted || audioCtx.state !== 'running') return;
+            const pan = (x / canvas.width) * 2 - 1;
+            const panner = audioCtx.createPanner();
+            panner.setPosition(pan, 0, 1);
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle'; 
+            osc.frequency.setValueAtTime(600 + Math.random() * 300, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.08);
+            osc.connect(gain); gain.connect(panner); panner.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.08);
+        }
+
+        class Explosion {
+            constructor(x, y) {
+                this.x = x; this.y = y; this.radius = 5; this.opacity = 1.0;
+                this.particles = Array.from({length: 8}, () => ({
+                    x: 0, y: 0, vx: (Math.random()-0.5)*8, vy: (Math.random()-0.5)*8, size: Math.random()*3+1
+                }));
+            }
+            update() { if(isPaused) return; this.radius += 2.5; this.opacity -= 0.05; this.particles.forEach(p => { p.x += p.vx; p.y += p.vy; }); }
+            draw() {
+                ctx.save(); ctx.globalAlpha = this.opacity;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2); ctx.fillStyle = 'rgba(253, 224, 71, 0.4)'; ctx.fill();
+                this.particles.forEach(p => { ctx.fillStyle = '#fb923c'; ctx.beginPath(); ctx.arc(this.x+p.x, this.y+p.y, p.size, 0, Math.PI*2); ctx.fill(); });
+                ctx.restore();
+            }
+        }
+
+        class Atom {
+            constructor() { this.reset(); }
+            reset() {
+                this.baseX = Math.random()*(canvas.width-100)+50;
+                this.baseY = Math.random()*(canvas.height-100)+50;
+                this.x = this.baseX; this.y = this.baseY;
+                this.radius = 8; this.active = true;
+            }
+            update() { if(!this.active || isPaused) return; this.x = this.baseX + (Math.random()-0.5)*2; this.y = this.baseY + (Math.random()-0.5)*2; }
+            draw() {
+                if(!this.active) return;
+                const grad = ctx.createRadialGradient(this.x, this.y, 1, this.x, this.y, this.radius);
+                grad.addColorStop(0, '#fdba74'); grad.addColorStop(1, '#431407');
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2); ctx.fillStyle = grad; ctx.fill();
+            }
+        }
+
+        class Neutron {
+            constructor(x, y, isNew = false) {
+                this.x = x; this.y = y;
+                const angle = Math.random()*Math.PI*2;
+                const speed = isNew ? 5.5 : 3.5;
+                this.vx = Math.cos(angle)*speed; this.vy = Math.sin(angle)*speed;
+                this.life = 400;
+            }
+            update() {
+                if(isPaused) return;
+                this.x += this.vx; this.y += this.vy; this.life--;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(this.x, this.y, 2, 0, Math.PI*2); ctx.fill();
+            }
+        }
+
+        function init() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            atoms = Array.from({length: parseInt(uCountInput.value)}, () => new Atom());
+            neutrons = []; explosions = [];
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if(!isPaused) {
+                for (let i = neutrons.length - 1; i >= 0; i--) {
+                    const n = neutrons[i];
+                    const startX = canvas.width/2 - ROD_AREA_WIDTH/2;
+                    if (n.x > startX && n.x < startX + ROD_AREA_WIDTH && n.y < rodY + ROD_HEIGHT) {
+                        neutrons.splice(i, 1); continue;
+                    }
+                    for (let a of atoms) {
+                        if (a.active && Math.hypot(n.x - a.x, n.y - a.y) < a.radius + 2) {
+                            a.active = false; explosions.push(new Explosion(a.x, a.y));
+                            playCollisionSound(a.x);
+                            shakeAmount = Math.min(shakeAmount + 4, 10);
+                            for (let k = 0; k < (Math.random() < 0.7 ? 2 : 3); k++) neutrons.push(new Neutron(a.x, a.y, true));
+                            neutrons.splice(i, 1);
+                            setTimeout(() => a.active = true, 5000);
+                            break;
+                        }
+                    }
+                    if (n.life <= 0) neutrons.splice(i, 1);
+                }
+
+                const count = neutrons.length;
+                neutronDisplay.innerText = count;
+                if (count > 60) {
+                    targetRodY = 0; warningMsg.classList.remove('hidden');
+                    kStatus.innerText = "NGUY HIỂM (k > 1)";
+                    kStatus.className = "mt-4 text-center text-[11px] uppercase font-black py-2 rounded bg-red-900 text-red-400 border border-red-500";
+                } else if (count > 0) {
+                    targetRodY = count > 20 ? -320 : -400; warningMsg.classList.add('hidden');
+                    kStatus.innerText = "ỔN ĐỊNH";
+                    kStatus.className = "mt-4 text-center text-[11px] uppercase font-black py-2 rounded bg-green-900/30 text-green-400 border border-green-500/30";
+                } else {
+                    kStatus.innerText = "ĐANG DỪNG";
+                    kStatus.className = "mt-4 text-center text-[11px] uppercase font-black py-2 rounded bg-slate-800 text-slate-400 border border-slate-700";
+                }
+                rodY += (targetRodY - rodY) * 0.1;
+                if (shakeAmount > 0) shakeAmount *= 0.9;
+                canvas.style.transform = `translate(${(Math.random()-0.5)*shakeAmount}px, ${(Math.random()-0.5)*shakeAmount}px)`;
+            }
+
+            atoms.forEach(a => { a.update(); a.draw(); });
+            explosions = explosions.filter(e => e.opacity > 0);
+            explosions.forEach(e => { e.update(); e.draw(); });
+            neutrons.forEach(n => { n.update(); n.draw(); });
+            
+            const startX = canvas.width/2 - ROD_AREA_WIDTH/2;
+            const rodGap = ROD_AREA_WIDTH / (NUM_RODS - 1);
+            ctx.fillStyle = '#1e293b'; ctx.fillRect(startX - 10, rodY - 15, ROD_AREA_WIDTH + 20, 15);
+            for(let i=0; i < NUM_RODS; i++) {
+                ctx.fillStyle = '#64748b'; ctx.fillRect(startX + i * rodGap - 2, rodY, 4, ROD_HEIGHT);
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        startBtn.onclick = () => { initAudio(); audioOverlay.style.display = 'none'; init(); };
+        pauseBtn.onclick = () => { isPaused = !isPaused; pauseIndicator.classList.toggle('hidden', !isPaused); };
+        resetBtn.onclick = () => neutrons.push(new Neutron(canvas.width/2, canvas.height/2));
+        muteBtn.onclick = () => { isMuted = !isMuted; muteBtn.innerText = isMuted ? "Tắt" : "Bật"; };
+        uCountInput.oninput = init;
+        
+        window.onresize = init;
+        animate();
+    </script>
+</body>
+</html>
