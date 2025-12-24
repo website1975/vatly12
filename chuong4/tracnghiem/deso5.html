@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc nghiệm Vật lý Hạt nhân - Đề Tổng Hợp</title>
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                enableMenu: false
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #f4f7f6;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; display: flex; gap: 15px; }
+        .quiz-content { flex: 1; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .sidebar { width: 280px; position: sticky; top: 20px; height: fit-content; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+        .section-title { background: var(--primary); color: white; padding: 10px; border-radius: 6px; margin-top: 40px; }
+        .q-card { border: 1px solid #eee; padding: 20px; margin-bottom: 25px; border-radius: 8px; }
+        .q-text { font-weight: bold; margin-bottom: 12px; display: block; color: var(--primary); }
+        
+        .level-badge { font-size: 0.8em; padding: 2px 8px; border-radius: 10px; margin-left: 10px; color: white; }
+        .level-0 { background: #95a5a6; } /* Biết */
+        .level-1 { background: #f39c12; } /* Hiểu */
+        .level-2 { background: #e67e22; } /* Vận dụng */
+
+        .option { display: block; padding: 10px; background: #f9f9f9; border: 1px solid #ddd; margin: 8px 0; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .option:hover { background: #eef2f7; border-color: var(--secondary); }
+        
+        .tf-row td { padding: 10px; border-bottom: 1px solid #eee; }
+        .short-input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; }
+
+        .nav-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 15px; }
+        .nav-btn { aspect-ratio: 1; border-radius: 4px; background: #eee; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #333; font-weight: bold; }
+        .nav-btn.active { background: var(--secondary); color: white; }
+        
+        .btn-submit { width: 100%; padding: 15px; background: var(--success); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .ans-box { display: none; margin-top: 15px; padding: 15px; border-radius: 6px; }
+        .correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .wrong { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="quiz-content">
+        <h1 style="text-align: center; color: var(--primary);">ĐỀ TRẮC NGHIỆM TỔNG HỢP HẠT NHÂN</h1>
+
+        <!-- PHẦN 1 -->
+        <h2 class="section-title">PHẦN 1: TRẮC NGHIỆM NHIỀU LỰA CHỌN (18 CÂU)</h2>
+        <div id="p1-container"></div>
+
+        <!-- PHẦN 2 -->
+        <h2 class="section-title">PHẦN 2: TRẮC NGHIỆM ĐÚNG/SAI (4 CÂU)</h2>
+        <div id="p2-container"></div>
+
+        <!-- PHẦN 3 -->
+        <h2 class="section-title">PHẦN 3: TRẢ LỜI NGẮN (6 CÂU)</h2>
+        <div id="p3-container"></div>
+    </div>
+
+    <div class="sidebar">
+        <div style="font-size: 1.5em; font-weight: bold; text-align: center; color: var(--error);" id="timer">45:00</div>
+        <div style="margin-top: 20px; font-weight: bold;">Câu hỏi:</div>
+        <div class="nav-grid" id="nav-grid"></div>
+        <button class="btn-submit" onclick="grade()">NỘP BÀI</button>
+        <div id="final-result" style="margin-top: 20px; text-align: center; font-weight: bold; font-size: 1.2em;"></div>
+    </div>
+</div>
+
+<script>
+    const data = [
+        // Phần 1: 18 câu MCQ (0: Biết, 1: Hiểu, 2: Vận dụng)
+        { type: 'mcq', level: 0, q: "Hạt nhân có cấu tạo gồm các hạt nào sau đây?", a: ["Proton và Electron", "Proton và Neutron", "Neutron và Electron", "Chỉ có Proton"], c: 1 },
+        { type: 'mcq', level: 0, q: "Đại lượng nào sau đây đặc trưng cho mức độ bền vững của hạt nhân?", a: ["Năng lượng liên kết", "Độ hụt khối", "Năng lượng liên kết riêng", "Số khối A"], c: 2 },
+        { type: 'mcq', level: 0, q: "Tia phóng xạ nào không bị lệch trong điện trường và từ trường?", a: ["Tia $\\alpha$", "Tia $\\beta^-$", "Tia $\\gamma$", "Tia $\\beta^+$"], c: 2 },
+        { type: 'mcq', level: 0, q: "Trong phản ứng hạt nhân, số nucleon được bảo toàn nghĩa là:", a: ["Số proton không đổi", "Số neutron không đổi", "Tổng số (Z+N) không đổi", "Khối lượng nghỉ không đổi"], c: 2 },
+        { type: 'mcq', level: 0, q: "Đơn vị khối lượng nguyên tử $u$ được tính bằng:", a: ["Khối lượng 1 nguyên tử H", "1/12 khối lượng nguyên tử $^{12}C$", "Khối lượng 1 hạt proton", "Khối lượng 1 hạt neutron"], c: 1 },
+        { type: 'mcq', level: 0, q: "Chu kỳ bán rã là khoảng thời gian để:", a: ["Một nửa số hạt nhân bị phân rã", "Tất cả hạt nhân bị phân rã", "Hạt nhân bắt đầu phóng xạ", "Khối lượng hạt nhân tăng gấp đôi"], c: 0 },
+        
+        { type: 'mcq', level: 1, q: "Hạt nhân $^{238}_{92}U$ có bao nhiêu neutron?", a: ["92", "238", "146", "330"], c: 2 },
+        { type: 'mcq', level: 1, q: "Mối liên hệ giữa năng lượng nghỉ $E$ và khối lượng $m$ theo Anh-xtanh là:", a: ["$E = mc^2$", "$E = m/c^2$", "$E = \sqrt{mc}$", "$E = m^2c$"], c: 0 },
+        { type: 'mcq', level: 1, q: "Sau phóng xạ $\\alpha$, hạt nhân con so với hạt nhân mẹ có vị trí như thế nào trong bảng tuần hoàn?", a: ["Lùi 2 ô", "Tiến 2 ô", "Lùi 1 ô", "Tiến 1 ô"], c: 0 },
+        { type: 'mcq', level: 1, q: "Lực hạt nhân có đặc điểm nào sau đây?", a: ["Là lực tĩnh điện", "Có tầm tác dụng rất lớn", "Chỉ tác dụng trong phạm vi kích thước hạt nhân", "Tỉ lệ thuận với tích điện tích"], c: 2 },
+        { type: 'mcq', level: 1, q: "Năng lượng liên kết riêng của hạt nhân $^{4}_{2}He$ là 7,07 MeV/nucleon. Năng lượng liên kết của nó là:", a: ["7,07 MeV", "14,14 MeV", "28,28 MeV", "3,53 MeV"], c: 2 },
+        { type: 'mcq', level: 1, q: "Hạt nhân bền vững nhất thường có số khối $A$ nằm trong khoảng nào?", a: ["$A < 20$", "$50 < A < 80$", "$A > 200$", "Mọi giá trị A"], c: 1 },
+
+        { type: 'mcq', level: 2, q: "Cho khối lượng $m_p=1,0073u$; $m_n=1,0087u$; $m_{\alpha}=4,0015u$. Độ hụt khối của hạt $\alpha$ là:", a: ["0,0305u", "0,0503u", "0,0205u", "0,0350u"], c: 0 },
+        { type: 'mcq', level: 2, q: "Một chất phóng xạ có chu kỳ $T$. Sau thời gian $t = 3T$, tỉ lệ số hạt nhân đã bị phân rã là:", a: ["12,5%", "87,5%", "25%", "75%"], c: 1 },
+        { type: 'mcq', level: 2, q: "Hạt nhân $^{210}_{84}Po$ đứng yên phóng xạ $\\alpha$ tạo thành hạt nhân X. Động năng của hạt $\alpha$ và X tỉ lệ nghịch với:", a: ["Số Z của chúng", "Số neutron của chúng", "Khối lượng của chúng", "Vận tốc của chúng"], c: 2 },
+        { type: 'mcq', level: 2, q: "Trong phản ứng nhiệt hạch kết hợp hai hạt nhân nhẹ, năng lượng tỏa ra là do:", a: ["Tổng khối lượng nghỉ sau lớn hơn trước", "Tổng độ hụt khối sau lớn hơn trước", "Sự tiêu hao điện tích", "Sự tăng số nucleon"], c: 1 },
+        { type: 'mcq', level: 2, q: "Một nguồn phóng xạ sau 2 giờ độ phóng xạ giảm đi 4 lần. Chu kỳ bán rã của nó là:", a: ["30 phút", "1 giờ", "2 giờ", "4 giờ"], correct: 1, c: 1 },
+        { type: 'mcq', level: 2, q: "Đơn vị $1u$ tương ứng với mức năng lượng nghỉ xấp xỉ:", a: ["931,5 MeV", "9,315 MeV", "931,5 J", "1,6.10^{-19} J"], c: 0 },
+
+        // Phần 2: Đúng/Sai (4 câu)
+        { 
+            type: 'tf', q: "Câu 1: Về hiện tượng phóng xạ hạt nhân:", 
+            opts: ["Phóng xạ là quá trình phân rã tự phát của hạt nhân không bền vững.", "Tốc độ phóng xạ phụ thuộc vào áp suất và nhiệt độ môi trường.", "Tia $\\beta^-$ thực chất là dòng các electron.", "Trong phóng xạ $\\alpha$, số khối của hạt nhân con giảm 4 đơn vị."], 
+            c: [true, false, true, true] 
+        },
+        { 
+            type: 'tf', q: "Câu 2: Về bài toán va chạm hạt nhân:", 
+            opts: ["Động lượng của hệ hạt được bảo toàn trong mọi phản ứng hạt nhân.", "Động năng của hệ luôn được bảo toàn.", "Nếu hạt đạn bắn vào hạt nhân đứng yên, các hạt sinh ra luôn bay cùng hướng.", "Phản ứng tỏa năng lượng khi tổng khối lượng nghỉ trước lớn hơn sau."], 
+            c: [true, false, false, true] 
+        },
+        { 
+            type: 'tf', q: "Câu 3: Về năng lượng hạt nhân:", 
+            opts: ["Năng lượng liên kết là năng lượng cần thiết để phá vỡ hạt nhân thành các nucleon riêng lẻ.", "Hạt nhân có năng lượng liên kết càng lớn thì càng bền vững.", "Phản ứng phân hạch là sự kết hợp của hai hạt nhân nhẹ.", "Độ hụt khối $\\Delta m$ càng lớn thì năng lượng liên kết càng lớn."], 
+            c: [true, false, false, true] 
+        },
+        { 
+            type: 'tf', q: "Câu 4: Về phương pháp xác định tuổi bằng Carbon-14:", 
+            opts: ["Carbon-14 là đồng vị phóng xạ có trong mọi cơ thể sống.", "Khi sinh vật chết đi, hàm lượng C-14 trong cơ thể tăng dần theo thời gian.", "Chu kỳ bán rã của C-14 khoảng 5730 năm.", "Phương pháp này dùng để xác định tuổi của các cổ vật có nguồn gốc hữu cơ."], 
+            c: [true, false, true, true] 
+        },
+
+        // Phần 3: Trả lời ngắn (6 câu)
+        { type: 'short', q: "Hạt nhân $^{210}_{84}Po$ có bao nhiêu proton?", c: "84" },
+        { type: 'short', q: "Tính năng lượng tỏa ra (MeV) của phản ứng nếu độ hụt khối tổng cộng sau phản ứng tăng thêm $0,02u$. (Lấy $1u = 931,5 \\text{ MeV}/c^2$)", c: "18.63" },
+        { type: 'short', q: "Một mẫu gỗ cổ có độ phóng xạ bằng $1/8$ mẫu gỗ tươi cùng loại. Biết chu kỳ C-14 là 5730 năm. Tuổi mẫu gỗ là bao nhiêu năm?", c: "17190" },
+        { type: 'short', q: "Hạt nhân $^{A}_{Z}X$ phóng xạ $\\beta^-$ tạo ra hạt nhân con $^{14}_{7}N$. Số khối A của X là bao nhiêu?", c: "14" },
+        { type: 'short', q: "Tính tỉ số giữa năng lượng liên kết riêng của hạt A so với hạt B nếu hạt A bền vững hơn hạt B. (Nhập '>' hoặc '<' hoặc '=')", c: ">" },
+        { type: 'short', q: "Trong phản ứng nhiệt hạch: $D + T \\rightarrow \alpha + n$. Hạt n là hạt gì?", c: "neutron" }
+    ];
+
+    function render() {
+        const containers = {
+            mcq: document.getElementById('p1-container'),
+            tf: document.getElementById('p2-container'),
+            short: document.getElementById('p3-container')
+        };
+        const nav = document.getElementById('nav-grid');
+
+        data.forEach((item, i) => {
+            // Nav
+            const btn = document.createElement('a');
+            btn.className = 'nav-btn';
+            btn.innerText = i + 1;
+            btn.href = `#q-${i}`;
+            btn.id = `nav-${i}`;
+            nav.appendChild(btn);
+
+            // Card
+            const div = document.createElement('div');
+            div.className = 'q-card';
+            div.id = `q-${i}`;
+            
+            let html = `<span class="q-text">Câu ${i+1}: ${item.q}`;
+            if(item.type === 'mcq') html += `<span class="level-badge level-${item.level}">${item.level===0?'Biết':item.level===1?'Hiểu':'Vận dụng'}</span>`;
+            html += `</span>`;
+
+            if(item.type === 'mcq') {
+                item.a.forEach((ans, idx) => {
+                    html += `<label class="option"><input type="radio" name="q${i}" value="${idx}" onchange="mark(${i})"> ${String.fromCharCode(65+idx)}. ${ans}</label>`;
+                });
+            } else if(item.type === 'tf') {
+                html += `<table class="tf-table">`;
+                item.opts.forEach((o, idx) => {
+                    html += `<tr class="tf-row"><td>${o}</td>
+                        <td><label><input type="radio" name="q${i}_${idx}" value="true" onchange="mark(${i})"> Đ</label></td>
+                        <td><label><input type="radio" name="q${i}_${idx}" value="false" onchange="mark(${i})"> S</label></td></tr>`;
+                });
+                html += `</table>`;
+            } else {
+                html += `<input type="text" class="short-input" name="q${i}" placeholder="Nhập đáp án..." oninput="mark(${i})">`;
+            }
+
+            html += `<div id="res-${i}" class="ans-box"></div>`;
+            div.innerHTML = html;
+            containers[item.type].appendChild(div);
+        });
+
+        if(window.MathJax) MathJax.typesetPromise();
+    }
+
+    function mark(i) {
+        document.getElementById(`nav-${i}`).classList.add('active');
+    }
+
+    function grade() {
+        let score = 0;
+        data.forEach((item, i) => {
+            const res = document.getElementById(`res-${i}`);
+            res.style.display = 'block';
+            let correct = false;
+
+            if(item.type === 'mcq') {
+                const sel = document.querySelector(`input[name="q${i}"]:checked`);
+                if(sel && parseInt(sel.value) === item.c) correct = true;
+                res.innerHTML = `Đáp án: ${String.fromCharCode(65+item.c)}`;
+            } else if(item.type === 'tf') {
+                let sub = 0;
+                item.opts.forEach((_, idx) => {
+                    const sel = document.querySelector(`input[name="q${i}_${idx}"]:checked`);
+                    if(sel && (sel.value === 'true') === item.c[idx]) sub++;
+                });
+                if(sub === 4) correct = true;
+                res.innerHTML = `Đáp án: ` + item.c.map(v=>v?'Đ':'S').join(' | ');
+            } else {
+                const val = document.querySelector(`input[name="q${i}"]`).value.trim().toLowerCase();
+                if(val.includes(item.c.toLowerCase())) correct = true;
+                res.innerHTML = `Đáp án: ${item.c}`;
+            }
+
+            if(correct) { score++; res.className = 'ans-box correct'; }
+            else { res.className = 'ans-box wrong'; }
+        });
+
+        document.getElementById('final-result').innerHTML = `Điểm: ${(score/28*10).toFixed(2)} / 10<br>(${score}/28 câu đúng)`;
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        if(window.MathJax) MathJax.typesetPromise();
+    }
+
+    let time = 45 * 60;
+    setInterval(() => {
+        if(time <= 0) return;
+        time--;
+        let m = Math.floor(time/60);
+        let s = time%60;
+        document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`;
+    }, 1000);
+
+    window.onload = render;
+</script>
+
+</body>
+</html>

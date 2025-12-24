@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc nghiệm Hạt nhân - Fix Mathjax</title>
+    
+    <!-- Cấu hình MathJax trước khi nạp script -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                enableMenu: false
+            },
+            startup: {
+                ready: () => {
+                    console.log('MathJax is ready!');
+                    MathJax.startup.defaultReady();
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --blue: #3498db;
+            --green: #27ae60;
+            --red: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f4f7f9;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .wrapper {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .main-content {
+            flex: 1;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .sidebar {
+            width: 280px;
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .timer {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--red);
+            text-align: center;
+            border: 2px solid var(--red);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .nav-item {
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eee;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            color: #333;
+            font-size: 13px;
+        }
+
+        .nav-item.done { background: var(--blue); color: white; }
+        .nav-item:hover { background: #ddd; }
+
+        .question-box {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            scroll-margin-top: 30px;
+        }
+
+        .q-text { font-weight: bold; font-size: 1.1em; margin-bottom: 15px; display: block; color: var(--primary); }
+
+        .options label {
+            display: block;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .options label:hover { background: #f0f7ff; border-color: var(--blue); }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .btn-group { display: flex; flex-direction: column; gap: 10px; }
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-submit { background: var(--green); color: white; }
+        .btn-submit:hover { background: #219150; }
+        .btn-reset { background: #95a5a6; color: white; }
+
+        .result-box {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        .correct { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+        .wrong { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+
+        @media (max-width: 768px) {
+            .wrapper { flex-direction: column; }
+            .sidebar { width: auto; position: static; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="main-content">
+        <h2 style="text-align: center; color: var(--primary);">LUYỆN TẬP VẬT LÝ HẠT NHÂN</h2>
+        <div id="quiz-container">Đang tải câu hỏi...</div>
+    </div>
+
+    <div class="sidebar">
+        <div class="timer" id="timer">45:00</div>
+        <div style="margin-bottom: 10px; font-weight: bold;">Tiến độ: <span id="count">0</span>/28</div>
+        <div class="nav-grid" id="nav-grid"></div>
+        
+        <div class="btn-group">
+            <button class="btn-submit" onclick="submitQuiz()">NỘP BÀI</button>
+            <button class="btn-reset" onclick="resetQuiz()">LÀM MỚI</button>
+        </div>
+        <div id="final-score" style="margin-top: 20px; font-size: 1.2em; font-weight: bold; text-align: center;"></div>
+    </div>
+</div>
+
+<script>
+    const data = [
+        { type: 'mcq', q: "Hạt nhân $^{235}_{92}U$ có cấu tạo gồm:", a: ["92 prôtôn và 235 nêutrôn", "92 prôtôn và 143 nêutrôn", "235 prôtôn và 92 nêutrôn", "143 prôtôn và 92 nêutrôn"], c: 1 },
+        { type: 'mcq', q: "Năng lượng liên kết riêng của một hạt nhân được tính bằng công thức:", a: ["$\\frac{W_{lk}}{A}$", "$\\frac{W_{lk}}{Z}$", "$\\Delta m \\cdot c^2$", "$W_{lk} \\cdot A$"], c: 0 },
+        { type: 'mcq', q: "Đại lượng nào sau đây không được bảo toàn trong phản ứng hạt nhân?", a: ["Số khối $A$", "Số nêutrôn", "Điện tích", "Năng lượng toàn phần"], c: 1 },
+        { type: 'mcq', q: "Tia phóng xạ nào bản chất là dòng hạt êlectron?", a: ["Tia $\\alpha$", "Tia $\\beta^-$", "Tia $\\gamma$", "Tia $\\beta^+$"], c: 1 },
+        { type: 'mcq', q: "Công thức liên hệ khối lượng và năng lượng của Anh-xtanh là:", a: ["$E = mc$", "$E = \\frac{m}{c^2}$", "$E = mc^2$", "$E = m^2c$"], c: 2 },
+        { type: 'mcq', q: "Lực hạt nhân chỉ có tác dụng trong phạm vi kích thước hạt nhân khoảng:", a: ["$10^{-10} \\text{ m}$", "$10^{-15} \\text{ m}$", "$10^{-8} \\text{ m}$", "Vô hạn"], c: 1 },
+        { type: 'mcq', q: "Hạt nhân Hêli ($^{4}_{2}He$) còn được gọi là tia:", a: ["Tia $\\alpha$", "Tia $\\beta^-$", "Tia $\\gamma$", "Tia nêutrôn"], c: 0 },
+        { type: 'mcq', q: "Trong phân rã $\\beta^+$, hạt nhân con so với hạt nhân mẹ ở vị trí nào trong bảng tuần hoàn?", a: ["Lùi 1 ô", "Tiến 1 ô", "Lùi 2 ô", "Tiến 2 ô"], c: 0 },
+        { type: 'mcq', q: "Đơn vị khối lượng nguyên tử $u$ có giá trị xấp xỉ bằng:", a: ["$931,5 \\text{ MeV/c}$", "$931,5 \\text{ MeV/c}^2$", "$9,315 \\text{ MeV/c}^2$", "$931,5 \\text{ MeV}$"], c: 1 },
+        { type: 'mcq', q: "Phản ứng nhiệt hạch là phản ứng tỏa năng lượng xảy ra khi:", a: ["Bắn phá hạt nhân nặng bằng nêutrôn", "Kết hợp hai hạt nhân rất nhẹ", "Hạt nhân tự phát ra tia alpha", "Hạt nhân bị vỡ thành các mảnh"], c: 1 },
+        { type: 'mcq', q: "Độ hụt khối $\\Delta m$ của hạt nhân $^{A}_{Z}X$ được tính bởi:", a: ["$Z \\cdot m_p + (A-Z)m_n - m_X$", "$m_X - Z \\cdot m_p - (A-Z)m_n$", "$Z \\cdot m_p - (A-Z)m_n + m_X$", "$Z \\cdot m_p + (A-Z)m_n + m_X$"], c: 0 },
+        { type: 'mcq', q: "Chu kỳ bán rã $T$ và hằng số phóng xạ $\\lambda$ liên hệ qua công thức:", a: ["$T = \\frac{\\ln 2}{\\lambda}$", "$T = \\frac{\\lambda}{\\ln 2}$", "$T = \\lambda \\cdot \\ln 2$", "$T = \\frac{1}{\\lambda}$"], c: 0 },
+        { type: 'mcq', q: "Hạt nhân càng bền vững khi có:", a: ["Năng lượng liên kết lớn", "Độ hụt khối nhỏ", "Năng lượng liên kết riêng lớn", "Số khối $A$ rất lớn"], c: 2 },
+        { type: 'mcq', q: "Tia $\\gamma$ có đặc điểm nào sau đây?", a: ["Mang điện tích dương", "Bị lệch mạnh trong điện trường", "Là sóng điện từ bước sóng cực ngắn", "Là dòng các hạt prôtôn"], c: 2 },
+        { type: 'mcq', q: "Trong phản ứng phân hạch hạt nhân $^{235}U$, nêutrôn đóng vai trò:", a: ["Làm nhiên liệu", "Hạt đạn kích thích", "Sản phẩm của phản ứng", "Chất xúc tác"], c: 1 },
+        { type: 'mcq', q: "Đơn vị của độ phóng xạ $H$ là:", a: ["MeV", "Jun (J)", "Béc-cơ-ren (Bq)", "Đơn vị $u$"], c: 2 },
+        { type: 'mcq', q: "Hạt nhân $^{14}_{6}C$ phóng xạ $\\beta^-$ tạo ra hạt nhân con là:", a: ["$^{14}_{7}N$", "$^{14}_{5}B$", "$^{10}_{4}Be$", "$^{14}_{8}O$"], c: 0 },
+        { type: 'mcq', q: "Sau khoảng thời gian $t = 2T$, lượng chất phóng xạ còn lại so với ban đầu là:", a: ["50%", "75%", "25%", "12,5%"], c: 2 },
+
+        { 
+            type: 'tf', 
+            q: "Phát biểu đúng/sai về định luật bảo toàn trong phản ứng hạt nhân:", 
+            opts: ["Số nucleon (số khối A) được bảo toàn.", "Tổng số nêutrôn luôn được bảo toàn.", "Tổng điện tích (số Z) được bảo toàn.", "Tổng khối lượng nghỉ được bảo toàn."], 
+            c: [true, false, true, false] 
+        },
+        { 
+            type: 'tf', 
+            q: "Đặc điểm của sự phóng xạ:", 
+            opts: ["Là quá trình tự phát, không điều khiển được.", "Tia $\\alpha$ đâm xuyên mạnh hơn tia $\\gamma$.", "Tia $\\beta^-$ lệch về phía bản dương của tụ điện.", "Tốc độ phân rã phụ thuộc vào nhiệt độ."], 
+            c: [true, false, true, false] 
+        },
+        { 
+            type: 'tf', 
+            q: "Về năng lượng và độ bền hạt nhân:", 
+            opts: ["Nhiệt hạch cần nhiệt độ hàng chục triệu độ.", "Hạt nhân có năng lượng liên kết riêng lớn thì bền.", "Phân hạch là phản ứng thu năng lượng.", "Hạt nhân sắt ($Fe$) thuộc nhóm bền vững nhất."], 
+            c: [true, true, false, true] 
+        },
+        { 
+            type: 'tf', 
+            q: "Về cấu tạo hạt nhân:", 
+            opts: ["Kích thước hạt nhân lớn hơn nguyên tử.", "Hầu hết khối lượng nguyên tử nằm ở hạt nhân.", "Lực hạt nhân là lực tương tác mạnh.", "Đồng vị là các hạt có cùng số nêutrôn."], 
+            c: [false, true, true, false] 
+        },
+
+        { type: 'short', q: "Tính năng lượng nghỉ (MeV) của hạt có khối lượng $1u$. Biết $1u = 931,5 \\text{ MeV/c}^2$.", c: "931.5" },
+        { type: 'short', q: "Hạt nhân $^{210}_{84}Po$ phóng xạ $\\alpha$ biến thành hạt nhân X. Số proton của X là?", c: "82" },
+        { type: 'short', q: "Sau 3 chu kỳ bán rã, tỉ số giữa số hạt còn lại và số hạt ban đầu là (viết phân số 1/x)?", c: "1/8" },
+        { type: 'short', q: "Hạt pôzitron ký hiệu là $e$ kèm dấu gì (+ hay -)?", c: "+" },
+        { type: 'short', q: "Để xảy ra nhiệt hạch, nhiệt độ cần đạt khoảng bao nhiêu triệu độ (điền số)?", c: "100" },
+        { type: 'short', q: "Hạt nhân có 2 proton và 2 neutron là nguyên tố gì?", c: "Heli" }
+    ];
+
+    const quizContainer = document.getElementById('quiz-container');
+    const navGrid = document.getElementById('nav-grid');
+    let timeLeft = 45 * 60;
+
+    function renderQuiz() {
+        quizContainer.innerHTML = '';
+        data.forEach((item, i) => {
+            // Tạo nút điều hướng
+            const btn = document.createElement('a');
+            btn.className = 'nav-item';
+            btn.innerText = i + 1;
+            btn.href = `#q-${i}`;
+            btn.id = `nav-${i}`;
+            btn.onclick = (e) => {
+                e.preventDefault();
+                document.getElementById(`q-${i}`).scrollIntoView({ behavior: 'smooth' });
+            };
+            navGrid.appendChild(btn);
+
+            // Tạo khung câu hỏi
+            const div = document.createElement('div');
+            div.className = 'question-box';
+            div.id = `q-${i}`;
+            let html = `<span class="q-text">Câu ${i+1}: ${item.q}</span>`;
+
+            if(item.type === 'mcq') {
+                html += `<div class="options">`;
+                item.a.forEach((opt, idx) => {
+                    html += `<label><input type="radio" name="q${i}" value="${idx}" onchange="markAsDone(${i})"> ${String.fromCharCode(65+idx)}. ${opt}</label>`;
+                });
+                html += `</div>`;
+            } else if(item.type === 'tf') {
+                html += `<table>`;
+                item.opts.forEach((o, idx) => {
+                    html += `<tr><td>${o}</td>
+                        <td width="60"><label style="margin:0; border:none; background:none"><input type="radio" name="q${i}_${idx}" value="true" onchange="markAsDone(${i})"> Đ</label></td>
+                        <td width="60"><label style="margin:0; border:none; background:none"><input type="radio" name="q${i}_${idx}" value="false" onchange="markAsDone(${i})"> S</label></td></tr>`;
+                });
+                html += `</table>`;
+            } else {
+                html += `<input type="text" name="q${i}" placeholder="Đáp án của bạn..." oninput="markAsDone(${i})">`;
+            }
+
+            html += `<div id="res-${i}" class="result-box"></div>`;
+            div.innerHTML = html;
+            quizContainer.appendChild(div);
+        });
+
+        // QUAN TRỌNG: Ép MathJax quét lại toàn bộ công thức vừa tạo
+        if (window.MathJax && MathJax.typesetPromise) {
+            MathJax.typesetPromise();
+        }
+    }
+
+    function markAsDone(i) {
+        document.getElementById(`nav-${i}`).classList.add('done');
+        document.getElementById('count').innerText = document.querySelectorAll('.nav-item.done').length;
+    }
+
+    function startTimer() {
+        const timerEl = document.getElementById('timer');
+        const interval = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            timerEl.innerText = `${m}:${s < 10 ? '0'+s : s}`;
+            if(timeLeft <= 0) {
+                clearInterval(interval);
+                submitQuiz();
+            }
+            timeLeft--;
+        }, 1000);
+    }
+
+    function submitQuiz() {
+        let score = 0;
+        data.forEach((item, i) => {
+            const resBox = document.getElementById(`res-${i}`);
+            resBox.style.display = 'block';
+            let isCorrect = false;
+
+            if(item.type === 'mcq') {
+                const sel = document.querySelector(`input[name="q${i}"]:checked`);
+                if(sel && parseInt(sel.value) === item.c) isCorrect = true;
+                resBox.innerHTML = `<b>Đúng: ${String.fromCharCode(65 + item.c)}</b>`;
+            } else if(item.type === 'tf') {
+                let subMatch = 0;
+                item.opts.forEach((_, idx) => {
+                    const sel = document.querySelector(`input[name="q${i}_${idx}"]:checked`);
+                    if(sel && (sel.value === 'true') === item.c[idx]) subMatch++;
+                });
+                if(subMatch === 4) isCorrect = true;
+                resBox.innerHTML = `<b>Đáp án:</b> ` + item.c.map(v=>v?'Đ':'S').join(' | ');
+            } else {
+                const val = document.querySelector(`input[name="q${i}"]`).value.trim().toLowerCase();
+                if(val.includes(item.c.toLowerCase())) isCorrect = true;
+                resBox.innerHTML = `<b>Đáp án đúng:</b> ${item.c}`;
+            }
+
+            if(isCorrect) {
+                score++;
+                resBox.className = 'result-box correct';
+            } else {
+                resBox.className = 'result-box wrong';
+            }
+        });
+        
+        document.getElementById('final-score').innerHTML = `Điểm của bạn: ${(score/28*10).toFixed(2)}<br>(${score}/28 câu đúng)`;
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        
+        // Vẽ lại công thức trong phần kết quả
+        if (window.MathJax) MathJax.typesetPromise();
+    }
+
+    function resetQuiz() {
+        if(confirm("Xóa hết kết quả và làm lại?")) location.reload();
+    }
+
+    window.onload = () => {
+        renderQuiz();
+        startTimer();
+    };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn tập Vật lý Hạt nhân - Có lời giải</title>
+    
+    <!-- KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <!-- KaTeX JS -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMath()"></script>
+
+    <style>
+        :root {
+            --primary: #2c3e50; --secondary: #3498db; --success: #27ae60;
+            --danger: #e74c3c; --warning: #f1c40f; --light: #f8f9fa;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background: #eaeff2; margin: 0; padding-bottom: 50px; }
+        header { background: var(--primary); color: white; text-align: center; padding: 20px 0; margin-bottom: 20px; }
+        .container { max-width: 850px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
+        .quiz-header { display: flex; justify-content: space-between; background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; position: sticky; top: 10px; z-index: 10; border: 1px solid #bbdefb; }
+        #timer { font-weight: bold; color: var(--danger); font-size: 1.2rem; }
+
+        .nav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 8px; margin-bottom: 20px; }
+        .nav-btn { height: 40px; border: 1px solid #ccc; background: white; cursor: pointer; border-radius: 4px; transition: 0.2s; }
+        .nav-btn.active { border: 2px solid var(--primary); font-weight: bold; }
+        .nav-btn.answered { background: #d1ecf1; }
+        .nav-btn.correct { background: var(--success); color: white; border: none; }
+        .nav-btn.wrong { background: var(--danger); color: white; border: none; }
+
+        .question-card { display: none; }
+        .question-card.active { display: block; }
+        .question-text { font-size: 1.15rem; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
+        
+        .options-list { list-style: none; padding: 0; }
+        .option-item { padding: 12px 15px; border: 1px solid #dee2e6; margin-bottom: 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; }
+        .option-item:hover { background: #f1f8ff; }
+        .option-item input { margin-right: 12px; transform: scale(1.2); }
+
+        /* Đúng/Sai */
+        .tf-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .tf-row { border-bottom: 1px solid #eee; }
+        .tf-row td { padding: 10px; }
+        
+        /* Giải thích */
+        .solution-box { display: none; background: #f0fdf4; border-left: 5px solid var(--success); padding: 15px; margin-top: 20px; border-radius: 4px; }
+        .correct-ans { color: var(--success); font-weight: bold; }
+        .wrong-ans { color: var(--danger); font-weight: bold; }
+
+        .btn-group { display: flex; justify-content: space-between; margin-top: 25px; border-top: 1px solid #eee; padding-top: 20px; }
+        .btn { padding: 10px 25px; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; }
+        .btn-prev { background: #6c757d; color: white; }
+        .btn-next { background: var(--secondary); color: white; }
+        .btn-submit { background: var(--success); color: white; width: 100%; margin-top: 20px; font-size: 1.1rem; }
+        
+        #result-summary { display: none; text-align: center; margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="result-summary">
+        <h2 id="score-display"></h2>
+        <p>Học sinh vui lòng xem lại lời giải từng câu bên dưới.</p>
+    </div>
+
+    <div class="quiz-header">
+        <div id="q-progress">Câu hỏi: 1/15 (Cấu tạo - Năng lượng LK - Phản ứng hạt nhân)</div>
+        <div id="timer">25:00</div>
+    </div>
+
+    <div class="nav-grid" id="nav-grid"></div>
+
+    <div id="quiz-container"></div>
+
+    <div class="btn-group" id="controls">
+        <button class="btn btn-prev" onclick="move(-1)">Câu trước</button>
+        <button class="btn btn-next" onclick="move(1)">Câu tiếp theo</button>
+    </div>
+
+    <button id="submit-all" class="btn btn-submit" onclick="submitQuiz()">NỘP BÀI KẾT THÚC</button>
+</div>
+
+<script>
+    const questions = [
+        // PHẦN 1: 10 CÂU TRẮC NGHIỆM
+        {
+            type: "mcq",
+            q: "Kí hiệu của một hạt nhân nguyên tử là $ _{13}^{27}Al $. Số neutron có trong hạt nhân này là:",
+            options: ["13", "27", "14", "40"],
+            ans: 2,
+            sol: "Số neutron $ N = A - Z = 27 - 13 = 14 $. Đáp án C."
+        },
+        {
+            type: "mcq",
+            q: "Năng lượng liên kết riêng là năng lượng liên kết tính trên:",
+            options: ["Một neutron", "Một proton", "Một nucleon", "Toàn bộ hạt nhân"],
+            ans: 2,
+            sol: "Theo định nghĩa, năng lượng liên kết riêng $ \varepsilon = \frac{W_{lk}}{A} $, là NL liên kết tính trên một nucleon."
+        },
+        {
+            type: "mcq",
+            q: "Hạt nhân có năng lượng liên kết riêng càng lớn thì:",
+            options: ["Càng dễ bị phá vỡ", "Càng bền vững", "Khối lượng càng lớn", "NL liên kết càng nhỏ"],
+            ans: 1,
+            sol: "Năng lượng liên kết riêng đặc trưng cho mức độ bền vững của hạt nhân. Càng lớn thì càng bền."
+        },
+        {
+            type: "mcq",
+            q: "Đại lượng $ \\Delta m = [Z.m_p + (A-Z)m_n] - m_X $ được gọi là:",
+            options: ["Khối lượng hạt nhân", "Độ hụt khối", "Năng lượng liên kết", "Số khối"],
+            ans: 1,
+            sol: "Đây là công thức tính độ hụt khối của hạt nhân."
+        },
+        {
+            type: "mcq",
+            q: "Cho 1u = 931,5 MeV/c². Một hạt nhân có độ hụt khối 0,1u thì năng lượng liên kết là:",
+            options: ["9,315 MeV", "931,5 MeV", "93,15 MeV", "0,9315 MeV"],
+            ans: 2,
+            sol: "$ W_{lk} = \\Delta m \\codt c^2 = 0,1u \\codt c^2 = 0,1 \\codt 931,5 = 93,15 \\text{ MeV} $."
+        },
+        {
+            type: "mcq",
+            q: "Hạt nhân nào sau đây có năng lượng liên kết riêng lớn nhất (bền vững nhất)?",
+            options: ["$ _{1}^{2}H $", "$ _{2}^{4}He $", "$ _{26}^{56}Fe $", "$ _{92}^{235}U $"],
+            ans: 2,
+            sol: "Các hạt nhân ở giữa bảng tuần hoàn (số khối A từ 50 đến 80) bền vững nhất. Sắt (Fe) là điển hình."
+        },
+        {
+            type: "mcq",
+            q: "Đơn vị khối lượng nguyên tử u bằng:",
+            options: ["Khối lượng hạt proton", "Khối lượng hạt neutron", "1/12 khối lượng nguyên tử $ _{6}^{12}C $", "Khối lượng nguyên tử $ _{1}^{1}H $"],
+            ans: 2,
+            sol: "Định nghĩa đơn vị u dựa trên đồng vị Cacbon 12."
+        },
+        {
+            type: "mcq",
+            q: "Lực hạt nhân chỉ có tác dụng khi khoảng cách giữa hai nucleon:",
+            options: ["Rất lớn", "Bằng bán kính nguyên tử", "Bằng hoặc nhỏ hơn kích thước hạt nhân ($10^{-15}m$)", "Lớn hơn kích thước hạt nhân"],
+            ans: 2,
+            sol: "Lực hạt nhân là lực tương tác mạnh, có tầm tác dụng cực ngắn (tương đương kích thước hạt nhân)."
+        },
+        {
+            type: "mcq",
+            q: "Tính năng lượng liên kết riêng của $ _{2}^{4}He $. Biết $ m_{He}=4,0015u, m_p=1,0073u, m_n=1,0087u, 1u=931,5 MeV/c^2 $.",
+            options: ["7,1 MeV/nucleon", "28,4 MeV/nucleon", "14,2 MeV/nucleon", "5,5 MeV/nucleon"],
+            ans: 0,
+            sol: "$ \\Delta m = 2.1,0073 + 2.1,0087 - 4,0015 = 0,0305u $. $ W_{lk} = 0,0305 \\codt 931,5 = 28,41 \\text{ MeV} $. $ \varepsilon = 28,41 / 4 \approx 7,1 \\text{ MeV/nucleon} $."
+        },
+        {
+            type: "mcq",
+            q: "Hạt nhân $ _{6}^{14}C $ và $ _{7}^{14}N $ có cùng:",
+            options: ["Số proton", "Số neutron", "Số khối", "Năng lượng liên kết riêng"],
+            ans: 2,
+            sol: "Cả hai đều có số khối A = 14 (gọi là các hạt đồng trọng)."
+        },
+
+        // PHẦN 2: ĐÚNG SAI
+        {
+            type: "tf",
+            q: "Xét các phát biểu về năng lượng liên kết và độ bền vững hạt nhân:",
+            options: [
+                "a) Hạt nhân có năng lượng liên kết càng lớn thì càng bền vững.",
+                "b) Độ hụt khối của một hạt nhân luôn là một số dương.",
+                "c) Các đồng vị của cùng một nguyên tố có số neutron giống nhau.",
+                "d) Khi các nucleon kết hợp thành hạt nhân thì khối lượng hệ giảm đi."
+            ],
+            ans: [false, true, false, true],
+            sol: "a) Sai, phải là NL liên kết riêng. b) Đúng. c) Sai, khác số neutron. d) Đúng, phần giảm đi là độ hụt khối tỏa ra dưới dạng năng lượng."
+        },
+        {
+            type: "tf",
+            q: "Cho hạt nhân $ _{3}^{7}Li $ có $ m_{Li}=7,0144u, m_p=1,0073u, m_n=1,0087u, 1u=931,5 MeV/c^2 $:",
+            options: [
+                "a) Hạt nhân Li có 3 proton và 4 neutron.",
+                "b) Độ hụt khối của hạt nhân Li là 0,0423u.",
+                "c) Năng lượng liên kết của Li là khoảng 39,4 MeV.",
+                "d) Năng lượng liên kết riêng của Li nhỏ hơn của hạt Heli (7,1 MeV/nu)."
+            ],
+            ans: [true, true, true, true],
+            sol: "a) Z=3, N=7-3=4 (Đ). b) $ \\Delta m = 3.1,0073 + 4.1,0087 - 7,0144 = 0,0423u $ (Đ). c) $ W_{lk} = 0,0423 \\codt 931.5 \approx 39,4 \\text{ MeV} $ (Đ). d) $ \\varepsilon = 39,4/7 \approx 5,6 < 7,1 $ (Đ)."
+        },
+
+        // PHẦN 3: TRẢ LỜI NGẮN
+        {
+            type: "short",
+            q: "Tính năng lượng liên kết riêng của hạt nhân $ _{92}^{235}U $ theo đơn vị MeV/nucleon. Biết $ W_{lk} = 1784 \\text{ MeV} $. (Làm tròn đến 1 chữ số thập phân)",
+            ans: "7.6",
+            sol: "$ \\varepsilon = \frac{1784}{235} \approx 7,591... \rightarrow 7,6 \\text{ MeV/nucleon} $."
+        },
+        {
+            type: "short",
+            q: "Biết khối lượng của hạt nhân $ _{1}^{2}H $ là $ 2,0136u $. Tính độ hụt khối $ \\Delta m $ của hạt nhân này theo đơn vị u. Biết $ m_p = 1,0073u, m_n = 1,0087u $.",
+            ans: "0.0024",
+            sol: "$ \\Delta m = (1,0073 + 1,0087) - 2,0136 = 0,0024u $."
+        },
+        {
+            type: "short",
+            q: "Một hạt nhân $ _{26}^{56}Fe $ có năng lượng liên kết riêng là $ 8,8 \\text{ MeV/nucleon} $. Tính tổng năng lượng liên kết $ W_{lk} $ của hạt nhân này theo MeV.",
+            ans: "492.8",
+            sol: "$ W_{lk} = \\varepsilon \\codt A = 8,8 \\codt 56 = 492,8 \\text{ MeV} $."
+        }
+    ];
+
+    let currentIdx = 0;
+    let userAns = new Array(questions.length).fill(null);
+    let isSubmitted = false;
+    let timeLeft = 25 * 60;
+
+    function renderMath() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false}
+            ],
+            throwOnError : false
+        });
+    }
+
+    function init() {
+        const grid = document.getElementById('nav-grid');
+        const container = document.getElementById('quiz-container');
+        
+        questions.forEach((q, i) => {
+            // Nav button
+            const btn = document.createElement('button');
+            btn.className = 'nav-btn';
+            btn.id = `nav-${i}`;
+            btn.innerText = i + 1;
+            btn.onclick = () => jump(i);
+            grid.appendChild(btn);
+
+            // Card
+            const card = document.createElement('div');
+            card.className = `question-card ${i === 0 ? 'active' : ''}`;
+            card.id = `card-${i}`;
+            
+            let content = `<div class="question-text">${q.q}</div>`;
+            
+            if (q.type === 'mcq') {
+                content += `<div class="options-list">`;
+                q.options.forEach((opt, oi) => {
+                    content += `
+                        <label class="option-item" id="label-${i}-${oi}">
+                            <input type="radio" name="q${i}" onchange="saveMCQ(${i}, ${oi})">
+                            <span>${String.fromCharCode(65+oi)}. ${opt}</span>
+                        </label>`;
+                });
+                content += `</div>`;
+            } else if (q.type === 'tf') {
+                userAns[i] = [null, null, null, null];
+                content += `<table class="tf-table">`;
+                q.options.forEach((opt, oi) => {
+                    content += `
+                        <tr class="tf-row">
+                            <td>${opt}</td>
+                            <td width="100">
+                                <input type="radio" name="q${i}_${oi}" onchange="saveTF(${i}, ${oi}, true)"> Đ 
+                                <input type="radio" name="q${i}_${oi}" onchange="saveTF(${i}, ${oi}, false)"> S
+                            </td>
+                        </tr>`;
+                });
+                content += `</table>`;
+            } else {
+                content += `<input type="text" class="option-item" style="width:100%" placeholder="Nhập đáp án số..." onchange="saveShort(${i}, this.value)">`;
+            }
+
+            content += `<div class="solution-box" id="sol-${i}">
+                <div id="feedback-${i}"></div>
+                <hr>
+                <strong>Giải thích:</strong> ${q.sol}
+            </div>`;
+
+            card.innerHTML = content;
+            container.appendChild(card);
+        });
+        startTimer();
+        renderMath();
+    }
+
+    function jump(i) {
+        document.querySelector('.question-card.active').classList.remove('active');
+        document.getElementById(`card-${i}`).classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`nav-${i}`).classList.add('active');
+        currentIdx = i;
+        document.getElementById('q-progress').innerText = `Câu hỏi: ${i+1}/${questions.length}(Cấu tạo - Năng lượng LK - Phản ứng hạt nhân)`;
+    }
+
+    function move(step) {
+        let n = currentIdx + step;
+        if (n >= 0 && n < questions.length) jump(n);
+    }
+
+    function saveMCQ(qi, oi) { if(!isSubmitted) { userAns[qi] = oi; updateNav(); } }
+    function saveTF(qi, oi, val) { if(!isSubmitted) { userAns[qi][oi] = val; updateNav(); } }
+    function saveShort(qi, val) { if(!isSubmitted) { userAns[qi] = val.trim(); updateNav(); } }
+
+    function updateNav() {
+        questions.forEach((q, i) => {
+            const btn = document.getElementById(`nav-${i}`);
+            if (userAns[i] !== null && userAns[i] !== undefined) {
+                if (q.type === 'tf') {
+                    if (userAns[i].every(v => v !== null)) btn.classList.add('answered');
+                } else if (userAns[i] !== "") {
+                    btn.classList.add('answered');
+                }
+            }
+        });
+    }
+
+    function startTimer() {
+        const timerObj = document.getElementById('timer');
+        const interval = setInterval(() => {
+            if (isSubmitted) { clearInterval(interval); return; }
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            timerObj.innerText = `${m}:${s < 10 ? '0'+s : s}`;
+            if (timeLeft <= 0) { clearInterval(interval); submitQuiz(); }
+            timeLeft--;
+        }, 1000);
+    }
+
+    function submitQuiz() {
+        if (!isSubmitted && !confirm("Bạn muốn nộp bài?")) return;
+        isSubmitted = true;
+        let score = 0;
+
+        questions.forEach((q, i) => {
+            const solBox = document.getElementById(`sol-${i}`);
+            const feedback = document.getElementById(`feedback-${i}`);
+            const navBtn = document.getElementById(`nav-${i}`);
+            solBox.style.display = 'block';
+
+            let isCorrect = false;
+
+            if (q.type === 'mcq') {
+                if (userAns[i] === q.ans) { score += 1; isCorrect = true; }
+                feedback.innerHTML = userAns[i] === q.ans ? '<span class="correct-ans">ĐÚNG</span>' : `<span class="wrong-ans">SAI (Đáp án đúng: ${String.fromCharCode(65+q.ans)})</span>`;
+            } else if (q.type === 'tf') {
+                let subCorrect = 0;
+                q.ans.forEach((a, ai) => { if(userAns[i] && userAns[i][ai] === a) subCorrect++; });
+                score += (subCorrect * 0.25);
+                isCorrect = subCorrect === 4;
+                feedback.innerHTML = `Đúng ${subCorrect}/4 ý.`;
+            } else {
+                if (userAns[i] == q.ans) { score += 1; isCorrect = true; }
+                feedback.innerHTML = userAns[i] == q.ans ? '<span class="correct-ans">ĐÚNG</span>' : `<span class="wrong-ans">SAI (Đáp án đúng: ${q.ans})</span>`;
+            }
+
+            navBtn.classList.remove('answered');
+            navBtn.classList.add(isCorrect ? 'correct' : 'wrong');
+        });
+
+        document.getElementById('result-summary').style.display = 'block';
+        document.getElementById('score-display').innerText = `Kết quả: ${score.toFixed(2)} / 15`;
+        document.getElementById('submit-all').style.display = 'none';
+        window.scrollTo(0,0);
+        renderMath();
+    }
+
+    window.onload = init;
+</script>
+
+</body>
+</html>
