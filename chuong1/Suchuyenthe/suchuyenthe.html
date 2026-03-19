@@ -12,15 +12,20 @@
         body { font-family: 'Inter', sans-serif; background-color: #f4f7f9; color: #2d3748; }
         .brand-bg { background-color: #1a202c; }
         .brand-text { color: #1a202c; }
-        .accent-red { color: #e53e3e; }
+        .accent-red { color: #e53e3e; font-weight: bold; }
         .qa-card { background-color: #ebf8ff; transition: all 0.3s ease; border: 1px solid #bee3f8; }
-        .section-underline { border-bottom: 4px solid #1a202c; width: fit-content; margin-bottom: 1.5rem; }
-        .math-block { background: #fff; padding: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; margin: 1rem 0; }
+        .section-underline { border-bottom: 4px solid #1a202c; width: fit-content; margin-bottom: 1.5rem; padding-bottom: 4px; }
         
         /* Animation Container Styles */
-        .canvas-container { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; position: relative; min-height: 200px; }
+        .canvas-container { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; position: relative; min-height: 250px; }
         canvas { display: block; width: 100%; height: 100%; }
-        .label-overlay { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; z-index: 10; }
+        
+        /* Quiz Styles */
+        .quiz-option { cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+        .quiz-option:hover { background-color: #edf2f7; }
+        .quiz-option.selected { border-color: #1a202c; background-color: #ebf8ff; }
+
+        .legend { position: absolute; bottom: 10px; right: 10px; background: rgba(255,255,255,0.8); padding: 5px 10px; border-radius: 5px; font-size: 11px; pointer-events: none; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -49,15 +54,15 @@
             <div class="bg-white p-8 rounded-xl shadow-md border-l-8 border-[#1a202c] space-y-6">
                 <div class="flex items-start">
                     <span class="brand-bg text-white font-bold rounded-full h-8 w-8 flex items-center justify-center mr-4 flex-shrink-0">1</span>
-                    <p class="text-lg">Các chất được cấu tạo từ các hạt riêng biệt gọi là <strong class="accent-red">phân tử</strong> (bao gồm cả nguyên tử, ion).</p>
+                    <p class="text-lg">Các chất được cấu tạo từ các hạt riêng biệt gọi là <span class="accent-red">phân tử</span> (bao gồm cả nguyên tử, ion).</p>
                 </div>
                 <div class="flex items-start">
                     <span class="brand-bg text-white font-bold rounded-full h-8 w-8 flex items-center justify-center mr-4 flex-shrink-0">2</span>
-                    <p class="text-lg">Các phân tử <strong class="accent-red">chuyển động không ngừng</strong>. Nhiệt độ của vật càng cao thì tốc độ chuyển động trung bình của các phân tử càng lớn.</p>
+                    <p class="text-lg">Các phân tử <span class="accent-red">chuyển động không ngừng</span>. Nhiệt độ của vật càng cao thì tốc độ chuyển động trung bình của các phân tử càng lớn.</p>
                 </div>
                 <div class="flex items-start">
                     <span class="brand-bg text-white font-bold rounded-full h-8 w-8 flex items-center justify-center mr-4 flex-shrink-0">3</span>
-                    <p class="text-lg">Giữa các phân tử có <strong class="accent-red">lực tương tác</strong> (hút và đẩy).</p>
+                    <p class="text-lg">Giữa các phân tử có <span class="accent-red">lực tương tác</span> (hút và đẩy) gọi là lực liên kết phân tử.</p>
                 </div>
             </div>
         </section>
@@ -65,17 +70,25 @@
         <!-- II. Chuyển động Brown -->
         <section class="mb-12">
             <h2 class="text-2xl font-bold brand-text section-underline uppercase">II. Chuyển động Brown</h2>
+            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
                 <div class="bg-white p-6 rounded-xl shadow border border-gray-100">
                     <h3 class="font-bold brand-text mb-3 border-b pb-2">1. Giới thiệu thí nghiệm</h3>
-                    <p class="text-gray-700 mb-3">Năm 1827, Robert Brown đã quan sát hạt phấn hoa trong nước và thấy chúng chuyển động hỗn độn.</p>
-                    <div class="bg-gray-50 p-3 rounded italic text-sm border-l-4 border-gray-300">
-                        <strong>Mô phỏng:</strong> Hạt to (phấn hoa) bị các hạt nhỏ (phân tử nước) va chạm liên tục từ nhiều phía không cân bằng, làm nó di chuyển hỗn loạn.
-                    </div>
+                    <p class="text-gray-700 mb-4 leading-relaxed">
+                        Năm 1827, nhà bác học <strong>Robert Brown</strong> quan sát hạt phấn hoa trong nước bằng kính hiển vi và thấy chúng chuyển động hỗn độn, dích dắc không ngừng.
+                    </p>
+                    <h3 class="font-bold brand-text mb-3 border-b pb-2">2. Mô tả quỹ đạo</h3>
+                    <p class="text-gray-700 leading-relaxed italic">
+                        Quỹ đạo hạt phấn hoa là đường gấp khúc không theo quy luật, gây ra bởi <span class="accent-red">sự va chạm không cân bằng</span> của các phân tử nước chuyển động nhiệt.
+                    </p>
                 </div>
-                <div class="canvas-container h-64 shadow-inner border-2 border-dashed border-gray-300">
-                    <div class="label-overlay">Mô phỏng chuyển động Brown</div>
+                <div class="canvas-container shadow-inner border-2 border-slate-200">
                     <canvas id="brownianCanvas"></canvas>
+                    <div class="legend">
+                        <div><span style="color: #ecc94b">●</span> Hạt phấn hoa</div>
+                        <div><span style="color: #3182ce">●</span> Phân tử nước</div>
+                        <div><span style="color: #1a202c">→</span> Lực đẩy khi va chạm</div>
+                    </div>
                 </div>
             </div>
 
@@ -85,7 +98,7 @@
                     <span id="icon-brownQA" class="text-2xl">▼</span>
                 </div>
                 <div id="brownQA" class="hidden mt-4 text-gray-700 pt-4 border-t border-blue-200 leading-relaxed">
-                    Vì hạt phấn hoa chuyển động hỗn loạn không ngừng do va chạm với các phân tử nước. Điều này gián tiếp chứng minh các phân tử nước cũng đang chuyển động hỗn loạn và không bao giờ dừng lại.
+                    Vì hạt phấn hoa chuyển động hỗn loạn do va chạm với các phân tử nước. Điều này gián tiếp chứng minh các phân tử nước cũng đang chuyển động hỗn loạn không ngừng. Nếu phân tử nước đứng yên, hạt phấn hoa sẽ không di chuyển.
                 </div>
             </div>
         </section>
@@ -96,28 +109,28 @@
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                 <!-- Thể Rắn -->
-                <div class="bg-white p-4 rounded-2xl shadow-lg border-t-8 border-blue-800">
-                    <div class="canvas-container h-40 mb-4 bg-blue-50">
+                <div class="bg-white p-4 rounded-2xl shadow-lg border-t-8 border-slate-800">
+                    <div class="canvas-container h-44 mb-4 bg-slate-50">
                         <canvas id="solidCanvas"></canvas>
                     </div>
-                    <h3 class="text-center font-bold text-xl mb-2 text-blue-900">THỂ RẮN</h3>
-                    <p class="text-xs text-center text-gray-600 italic">Dao động tại chỗ quanh VTCB xác định.</p>
+                    <h3 class="text-center font-bold text-xl mb-2 brand-text">THỂ RẮN</h3>
+                    <p class="text-sm text-center text-gray-600 italic">Chặt chẽ, dao động tại chỗ.</p>
                 </div>
                 <!-- Thể Lỏng -->
-                <div class="bg-white p-4 rounded-2xl shadow-lg border-t-8 border-cyan-500">
-                    <div class="canvas-container h-40 mb-4 bg-cyan-50">
+                <div class="bg-white p-4 rounded-2xl shadow-lg border-t-8 border-slate-600">
+                    <div class="canvas-container h-44 mb-4 bg-slate-50">
                         <canvas id="liquidCanvas"></canvas>
                     </div>
-                    <h3 class="text-center font-bold text-xl mb-2 text-cyan-700">THỂ LỎNG</h3>
-                    <p class="text-xs text-center text-gray-600 italic">Dao động quanh VTCB có thể di chuyển.</p>
+                    <h3 class="text-center font-bold text-xl mb-2 brand-text">THỂ LỎNG</h3>
+                    <p class="text-sm text-center text-gray-600 italic">Kém chặt chẽ, trượt lên nhau.</p>
                 </div>
                 <!-- Thể Khí -->
-                <div class="bg-white p-4 rounded-2xl shadow-lg border-t-8 border-orange-400">
-                    <div class="canvas-container h-40 mb-4 bg-orange-50">
+                <div class="bg-white p-4 rounded-2xl shadow-lg border-t-8 border-slate-400">
+                    <div class="canvas-container h-44 mb-4 bg-slate-50">
                         <canvas id="gasCanvas"></canvas>
                     </div>
-                    <h3 class="text-center font-bold text-xl mb-2 text-orange-700">THỂ KHÍ</h3>
-                    <p class="text-xs text-center text-gray-600 italic">Chuyển động hoàn toàn hỗn độn.</p>
+                    <h3 class="text-center font-bold text-xl mb-2 brand-text">THỂ KHÍ</h3>
+                    <p class="text-sm text-center text-gray-600 italic">Tự do, hỗn độn hoàn toàn.</p>
                 </div>
             </div>
 
@@ -127,29 +140,29 @@
                     <thead class="bg-gray-100 brand-text font-bold">
                         <tr>
                             <th class="p-4 border-b">Đặc điểm</th>
-                            <th class="p-4 border-b border-l">Thể Khí</th>
-                            <th class="p-4 border-b border-l">Thể Lỏng</th>
                             <th class="p-4 border-b border-l">Thể Rắn</th>
+                            <th class="p-4 border-b border-l">Thể Lỏng</th>
+                            <th class="p-4 border-b border-l">Thể Khí</th>
                         </tr>
                     </thead>
                     <tbody class="text-sm">
                         <tr class="border-b">
                             <td class="p-4 font-bold brand-text">Khoảng cách</td>
-                            <td class="p-4 border-l">Rất lớn</td>
-                            <td class="p-4 border-l">Lớn</td>
                             <td class="p-4 border-l">Rất nhỏ</td>
+                            <td class="p-4 border-l">Lớn hơn thể rắn</td>
+                            <td class="p-4 border-l">Rất lớn</td>
                         </tr>
                         <tr class="border-b">
                             <td class="p-4 font-bold brand-text">Lực liên kết</td>
-                            <td class="p-4 border-l">Rất yếu</td>
-                            <td class="p-4 border-l">Yếu</td>
                             <td class="p-4 border-l">Rất mạnh</td>
+                            <td class="p-4 border-l">Đủ mạnh để giữ thể tích</td>
+                            <td class="p-4 border-l">Rất yếu</td>
                         </tr>
                         <tr class="border-b">
-                            <td class="p-4 font-bold brand-text">Thể tích/Hình dạng</td>
-                            <td class="p-4 border-l">Không xác định</td>
-                            <td class="p-4 border-l">Thể tích xác định</td>
-                            <td class="p-4 border-l">Xác định hoàn toàn</td>
+                            <td class="p-4 font-bold brand-text">Chuyển động</td>
+                            <td class="p-4 border-l italic">Dao động quanh VTCB cố định</td>
+                            <td class="p-4 border-l italic">Dao động quanh VTCB di động</td>
+                            <td class="p-4 border-l italic">Hoàn toàn hỗn loạn</td>
                         </tr>
                     </tbody>
                 </table>
@@ -159,137 +172,244 @@
         <!-- IV. Sự chuyển thể -->
         <section class="mb-12">
             <h2 class="text-2xl font-bold brand-text section-underline uppercase">IV. Sự chuyển thể</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-xl shadow-sm border">
+            <div class="bg-white p-8 rounded-xl shadow-sm border space-y-6">
                 <div>
-                    <h3 class="font-bold mb-4 brand-text">Chu trình chuyển thể</h3>
-                    <div class="flex justify-between items-center text-sm font-bold">
-                        <div class="text-center">
-                            <div class="bg-blue-100 p-3 rounded-lg mb-1">RẮN</div>
-                            <div class="text-[10px] text-blue-600">Nóng chảy &downarrow;</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="bg-cyan-100 p-3 rounded-lg mb-1">LỎNG</div>
-                            <div class="text-[10px] text-cyan-600">Hóa hơi &downarrow;</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="bg-orange-100 p-3 rounded-lg mb-1">KHÍ</div>
-                            <div class="text-[10px] text-orange-600">Ngưng tụ &uparrow;</div>
-                        </div>
+                    <h3 class="font-bold mb-2 brand-text text-lg">1. Khái niệm sự chuyển thể</h3>
+                    <p class="text-gray-700">Vật chất có thể chuyển từ thể này sang thể khác dưới tác dụng của nhiệt độ và áp suất.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold mb-2 brand-text text-lg">2. Giải thích bằng mô hình động học</h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        Khi cung cấp nhiệt năng, tốc độ chuyển động phân tử tăng, phá vỡ lực liên kết phân tử dẫn đến sự thay đổi cấu trúc sắp xếp.
+                    </p>
+                    <div class="mt-4 p-4 bg-gray-50 rounded border-l-4 border-slate-800 italic">
+                        Công thức liên quan: $\Delta U = A + Q$ (Định luật 1 nhiệt động lực học)
                     </div>
                 </div>
-                <div class="flex items-center">
-                    <p class="text-gray-700 italic border-l-4 border-orange-400 pl-4">
-                        "Khi nhận nhiệt, các phân tử chuyển động nhanh hơn, thắng được lực liên kết và thay đổi cấu trúc sắp xếp, dẫn đến sự chuyển thể."
-                    </p>
+                <div class="qa-card p-6 rounded-xl cursor-pointer" onclick="toggleQA('changeQA')">
+                    <div class="flex justify-between items-center">
+                        <p class="font-bold brand-text italic">? Tại sao khi nóng chảy nhiệt độ không tăng?</p>
+                        <span id="icon-changeQA">▼</span>
+                    </div>
+                    <div id="changeQA" class="hidden mt-4 text-gray-700 pt-4 border-t border-blue-200">
+                        Năng lượng nhiệt lúc này không dùng để tăng động năng (nhiệt độ) mà dùng để phá vỡ các liên kết trong cấu trúc tinh thể của chất rắn.
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- V. Củng cố -->
+        <!-- V. Củng cố và Bài tập -->
         <section class="mb-20">
-            <h2 class="text-2xl font-bold brand-text section-underline uppercase">V. Tổng kết</h2>
-            <div class="bg-gray-800 text-white p-8 rounded-2xl shadow-xl">
-                <p class="mb-4">1. Các chất cấu tạo từ các phân tử riêng biệt.</p>
-                <p class="mb-4">2. Các phân tử chuyển động hỗn loạn không ngừng.</p>
-                <p>3. Nhiệt độ càng cao, tốc độ chuyển động trung bình của phân tử càng lớn.</p>
+            <h2 class="text-2xl font-bold brand-text section-underline uppercase">V. Tổng kết & Bài tập</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="p-6 bg-green-50 rounded-xl border border-green-200">
+                    <h4 class="font-bold text-green-800 mb-2">✅ Em đã học</h4>
+                    <p class="text-sm">Cấu tạo chất, chuyển động Brown và sự khác biệt giữa 3 thể rắn - lỏng - khí.</p>
+                </div>
+                <div class="p-6 bg-purple-50 rounded-xl border border-purple-200">
+                    <h4 class="font-bold text-purple-800 mb-2">🚀 Em có thể</h4>
+                    <p class="text-sm">Giải thích cơ chế chuyển thể của các chất trong tự nhiên dựa trên lực liên kết.</p>
+                </div>
+                <div class="p-6 bg-amber-50 rounded-xl border border-amber-200">
+                    <h4 class="font-bold text-amber-800 mb-2">💡 Em có biết</h4>
+                    <p class="text-sm">Ở nhiệt độ hàng triệu độ, chất tồn tại ở thể Plasma (hạt nhân và electron tách rời).</p>
+                </div>
+            </div>
+
+            <!-- Quiz Section -->
+            <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
+                <h3 class="text-xl font-bold mb-6 brand-text flex items-center">
+                    <span class="mr-2">📝</span> BÀI TẬP TRẮC NGHIỆM CỦNG CỐ
+                </h3>
+                
+                <div id="quizContainer" class="space-y-8">
+                    <!-- Q1 -->
+                    <div class="quiz-item" data-correct="1">
+                        <p class="font-bold mb-4">Câu 1 (Nhận biết): Các chất được cấu tạo từ các hạt riêng biệt gọi là gì?</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 0)">A. Tế bào</div>
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 1)">B. Phân tử</div>
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 2)">C. Vi khuẩn</div>
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 3)">D. Điện tử</div>
+                        </div>
+                    </div>
+                    <!-- Q2 -->
+                    <div class="quiz-item" data-correct="2">
+                        <p class="font-bold mb-4">Câu 2 (Nhận biết): Chuyển động Brown là chuyển động của:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 0)">A. Các phân tử nước</div>
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 1)">B. Các nguyên tử khí</div>
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 2)">C. Các hạt nhỏ trong chất lỏng/khí</div>
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 3)">D. Các phân tử chất rắn</div>
+                        </div>
+                    </div>
+                    <!-- Q3 -->
+                    <div class="quiz-item" data-correct="0">
+                        <p class="font-bold mb-4">Câu 3 (Thông hiểu): Khi nhiệt độ tăng, chuyển động của các phân tử:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 0)">A. Nhanh lên</div>
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 1)">B. Chậm lại</div>
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 2)">C. Không đổi</div>
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 3)">D. Dừng hẳn</div>
+                        </div>
+                    </div>
+                    <!-- Q4 -->
+                    <div class="quiz-item" data-correct="3">
+                        <p class="font-bold mb-4">Câu 4 (Thông hiểu): Đặc điểm nào sau đây thuộc về thể rắn?</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 0)">A. Lực liên kết rất yếu</div>
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 1)">B. Không có hình dạng xác định</div>
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 2)">C. Khoảng cách phân tử rất lớn</div>
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 3)">D. Có hình dạng & thể tích xác định</div>
+                        </div>
+                    </div>
+                    <!-- Q5 -->
+                    <div class="quiz-item" data-correct="1">
+                        <p class="font-bold mb-4">Câu 5 (Vận dụng): Tại sao chất lỏng có thể chảy được?</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 0)">A. Do phân tử đứng yên</div>
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 1)">B. Do phân tử trượt được lên nhau</div>
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 2)">C. Do lực liên kết quá mạnh</div>
+                            <div class="quiz-option p-3 rounded-lg border bg-gray-50" onclick="selectOption(this, 3)">D. Do khoảng cách phân tử rất nhỏ</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="checkQuiz()" class="mt-10 w-full brand-bg text-white font-bold py-4 rounded-xl hover:opacity-90 transition shadow-lg uppercase tracking-widest">
+                    Xác nhận đáp án
+                </button>
+
+                <div id="quizResult" class="hidden mt-8 p-6 rounded-xl border-2"></div>
             </div>
         </section>
     </div>
 
     <script>
+        // Toggle Q&A
         function toggleQA(id) {
             const el = document.getElementById(id);
             const icon = document.getElementById('icon-' + id);
-            if (el) {
-                el.classList.toggle('hidden');
-                if (icon) icon.innerText = el.classList.contains('hidden') ? '▼' : '▲';
-            }
+            el.classList.toggle('hidden');
+            icon.innerText = el.classList.contains('hidden') ? '▼' : '▲';
         }
 
+        // Quiz Logic
+        function selectOption(el, index) {
+            const parent = el.closest('.quiz-item');
+            parent.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
+            el.classList.add('selected');
+            parent.dataset.selected = index;
+        }
+
+        function checkQuiz() {
+            const items = document.querySelectorAll('.quiz-item');
+            let score = 0;
+            let report = '<h4 class="font-bold text-lg mb-4">KẾT QUẢ CHI TIẾT:</h4><ul class="space-y-2">';
+            
+            items.forEach((item, i) => {
+                const selected = item.dataset.selected;
+                const correct = item.dataset.correct;
+                const isCorrect = selected === correct;
+                if(isCorrect) score++;
+                
+                report += `<li>Câu ${i+1}: ${isCorrect ? '<span class="text-green-600 font-bold">Đúng</span>' : '<span class="text-red-600 font-bold">Sai</span>'} - Đáp án đúng: ${String.fromCharCode(65 + parseInt(correct))}</li>`;
+            });
+            report += '</ul>';
+
+            const resultDiv = document.getElementById('quizResult');
+            resultDiv.classList.remove('hidden');
+            resultDiv.className = `mt-8 p-6 rounded-xl border-2 ${score === 5 ? 'bg-green-50 border-green-200' : 'bg-blue-50 border-blue-200'}`;
+            resultDiv.innerHTML = `<p class="text-2xl font-bold mb-2 brand-text">Bạn đúng ${score}/5 câu!</p>${report}`;
+            
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Animations Logic
         function initAnimations() {
-            // --- BROWNIAN MOTION IMPROVED ---
+            // Brown Motion với Hiệu ứng Đẩy Phấn Hoa
             const bCanvas = document.getElementById('brownianCanvas');
             const bCtx = bCanvas.getContext('2d');
-            let bWidth, bHeight;
+            let bw, bh;
             
-            function resizeBrownian() {
-                bWidth = bCanvas.offsetWidth;
-                bHeight = bCanvas.offsetHeight;
-                bCanvas.width = bWidth;
-                bCanvas.height = bHeight;
-                // Re-center pollen on resize
-                pollen.x = bWidth / 2;
-                pollen.y = bHeight / 2;
-                pollen.history = [];
+            function resize() {
+                bw = bCanvas.width = bCanvas.offsetWidth;
+                bh = bCanvas.height = bCanvas.offsetHeight;
             }
+            resize();
 
-            let pollen = { x: 0, y: 0, r: 10, vx: 0, vy: 0, history: [] };
-            let waterMolecules = [];
-            
-            function setupBrownian() {
-                resizeBrownian();
-                waterMolecules = [];
-                for(let i=0; i<40; i++) {
-                    waterMolecules.push({
-                        x: Math.random() * bWidth,
-                        y: Math.random() * bHeight,
-                        vx: (Math.random() - 0.5) * 6,
-                        vy: (Math.random() - 0.5) * 6
-                    });
-                }
-            }
+            let pollen = { x: 100, y: 100, r: 15, vx: 0, vy: 0, path: [] };
+            let water = Array.from({length: 30}, () => ({
+                x: Math.random()*400, y: Math.random()*300, vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12
+            }));
+            let collisionArrows = []; // Để hiển thị lực đẩy
 
             function drawBrownian() {
-                bCtx.fillStyle = "#fff";
-                bCtx.fillRect(0, 0, bWidth, bHeight);
-                
+                bCtx.fillStyle = "white";
+                bCtx.fillRect(0,0,bw,bh);
+
                 // Draw Path
+                bCtx.strokeStyle = "#edf2f7";
+                bCtx.lineWidth = 1;
                 bCtx.beginPath();
-                bCtx.strokeStyle = "#e2e8f0";
-                bCtx.lineWidth = 2;
-                pollen.history.forEach((p, i) => {
-                    if(i===0) bCtx.moveTo(p.x, p.y);
-                    else bCtx.lineTo(p.x, p.y);
-                });
+                pollen.path.forEach((pt, i) => i === 0 ? bCtx.moveTo(pt.x, pt.y) : bCtx.lineTo(pt.x, pt.y));
                 bCtx.stroke();
 
-                // Move Water Molecules
-                waterMolecules.forEach(m => {
+                // Draw Water & Collisions
+                water.forEach(m => {
                     m.x += m.vx; m.y += m.vy;
-                    if(m.x < 0 || m.x > bWidth) m.vx *= -1;
-                    if(m.y < 0 || m.y > bHeight) m.vy *= -1;
-
-                    // Collision with Pollen (Lực va chạm mạnh hơn)
-                    let dx = m.x - pollen.x;
-                    let dy = m.y - pollen.y;
+                    if(m.x<0 || m.x>bw) m.vx *= -1;
+                    if(m.y<0 || m.y>bh) m.vy *= -1;
+                    
+                    let dx = m.x - pollen.x, dy = m.y - pollen.y;
                     let dist = Math.sqrt(dx*dx + dy*dy);
                     if(dist < pollen.r + 2) {
-                        pollen.vx += m.vx * 0.4; // Chuyển giao động lượng
-                        pollen.vy += m.vy * 0.4;
-                        m.vx *= -1; m.vy *= -1;
-                    }
+                        // Tác động lực đẩy
+                        pollen.vx += m.vx * 0.45;
+                        pollen.vy += m.vy * 0.45;
+                        
+                        // Tạo hiệu ứng mũi tên đẩy
+                        collisionArrows.push({
+                            x: pollen.x, y: pollen.y,
+                            vx: m.vx, vy: m.vy,
+                            life: 15
+                        });
 
+                        m.vx *= -1.2; m.vy *= -1.2; // Bật ngược lại
+                    }
                     bCtx.fillStyle = "#3182ce";
-                    bCtx.beginPath(); bCtx.arc(m.x, m.y, 2, 0, Math.PI*2); bCtx.fill();
+                    bCtx.beginPath(); bCtx.arc(m.x, m.y, 2.5, 0, Math.PI*2); bCtx.fill();
                 });
 
-                // Apply pollen movement with friction
-                pollen.x += pollen.vx;
-                pollen.y += pollen.vy;
-                pollen.vx *= 0.95; // Friction to slow down
-                pollen.vy *= 0.95;
+                // Update Pollen
+                pollen.x += pollen.vx; pollen.y += pollen.vy;
+                pollen.vx *= 0.92; pollen.vy *= 0.92; // Ma sát nước
 
-                // Border check for pollen
-                if(pollen.x < pollen.r) { pollen.x = pollen.r; pollen.vx *= -1; }
-                if(pollen.x > bWidth - pollen.r) { pollen.x = bWidth - pollen.r; pollen.vx *= -1; }
-                if(pollen.y < pollen.r) { pollen.y = pollen.r; pollen.vy *= -1; }
-                if(pollen.y > bHeight - pollen.r) { pollen.y = bHeight - pollen.r; pollen.vy *= -1; }
+                if(pollen.x<pollen.r || pollen.x>bw-pollen.r) pollen.vx *= -1;
+                if(pollen.y<pollen.r || pollen.y>bh-pollen.r) pollen.vy *= -1;
 
-                // Save history
-                if(frameCount % 10 === 0) {
-                    pollen.history.push({x: pollen.x, y: pollen.y});
-                    if(pollen.history.length > 40) pollen.history.shift();
-                }
+                if(Math.random() > 0.8) pollen.path.push({x: pollen.x, y: pollen.y});
+                if(pollen.path.length > 40) pollen.path.shift();
+
+                // Draw Collisions Arrows
+                collisionArrows = collisionArrows.filter(a => a.life > 0);
+                collisionArrows.forEach(a => {
+                    bCtx.strokeStyle = `rgba(26, 32, 44, ${a.life / 15})`;
+                    bCtx.lineWidth = 2;
+                    let headlen = 5;
+                    let angle = Math.atan2(a.vy, a.vx);
+                    let endX = a.x + a.vx * 3;
+                    let endY = a.y + a.vy * 3;
+                    
+                    bCtx.beginPath();
+                    bCtx.moveTo(a.x, a.y);
+                    bCtx.lineTo(endX, endY);
+                    bCtx.lineTo(endX - headlen * Math.cos(angle - Math.PI / 6), endY - headlen * Math.sin(angle - Math.PI / 6));
+                    bCtx.moveTo(endX, endY);
+                    bCtx.lineTo(endX - headlen * Math.cos(angle + Math.PI / 6), endY - headlen * Math.sin(angle + Math.PI / 6));
+                    bCtx.stroke();
+                    a.life--;
+                });
 
                 // Draw Pollen
                 bCtx.fillStyle = "#ecc94b";
@@ -297,55 +417,42 @@
                 bCtx.lineWidth = 2;
                 bCtx.beginPath(); bCtx.arc(pollen.x, pollen.y, pollen.r, 0, Math.PI*2); bCtx.fill(); bCtx.stroke();
 
-                frameCount++;
                 requestAnimationFrame(drawBrownian);
             }
-
-            let frameCount = 0;
-            setupBrownian();
-            window.addEventListener('resize', setupBrownian);
             drawBrownian();
 
-            // --- 3 STATES ---
+            // States
             function setupState(id, type) {
-                const canvas = document.getElementById(id);
-                const ctx = canvas.getContext('2d');
-                let w = canvas.width = 300, h = canvas.height = 160;
+                const c = document.getElementById(id);
+                const ctx = c.getContext('2d');
+                let w = c.width = 200, h = c.height = 160;
                 let atoms = [];
-                
-                if(type === 'solid') {
-                    for(let i=0; i<6; i++) for(let j=0; j<4; j++) {
-                        atoms.push({ ox: 75+i*30, oy: 35+j*30, x:0, y:0 });
-                    }
-                } else if(type === 'liquid') {
-                    for(let i=0; i<30; i++) {
-                        atoms.push({ x: Math.random()*w, y: Math.random()*h, vx: (Math.random()-0.5)*1.5, vy: (Math.random()-0.5)*1.5 });
-                    }
+                if(type==='solid') {
+                    for(let i=0; i<5; i++) for(let j=0; j<4; j++) atoms.push({ox: 45+i*28, oy: 35+j*28});
+                } else if(type==='liquid') {
+                    for(let i=0; i<25; i++) atoms.push({x: Math.random()*w, y: Math.random()*h, vx: (Math.random()-0.5)*2, vy: (Math.random()-0.5)*2});
                 } else {
-                    for(let i=0; i<15; i++) {
-                        atoms.push({ x: Math.random()*w, y: Math.random()*h, vx: (Math.random()-0.5)*6, vy: (Math.random()-0.5)*6 });
-                    }
+                    for(let i=0; i<12; i++) atoms.push({x: Math.random()*w, y: Math.random()*h, vx: (Math.random()-0.5)*7, vy: (Math.random()-0.5)*7});
                 }
 
                 function anim() {
                     ctx.clearRect(0,0,w,h);
-                    ctx.fillStyle = type==='solid' ? '#2c5282' : (type==='liquid' ? '#0bc5ea' : '#ed8936');
+                    ctx.fillStyle = "#1a202c";
                     atoms.forEach(a => {
                         if(type==='solid') {
-                            a.x = a.ox + Math.sin(Date.now()*0.01 + a.ox)*1.5;
-                            a.y = a.oy + Math.cos(Date.now()*0.01 + a.oy)*1.5;
+                            let x = a.ox + Math.sin(Date.now()*0.01 + a.ox)*2;
+                            let y = a.oy + Math.cos(Date.now()*0.01 + a.oy)*2;
+                            ctx.beginPath(); ctx.arc(x, y, 7, 0, Math.PI*2); ctx.fill();
                         } else {
-                            a.x += a.vx; a.y += a.vy;
-                            if(a.x<5 || a.x>w-5) a.vx *= -1;
-                            if(a.y<5 || a.y>h-5) a.vy *= -1;
+                            a.x+=a.vx; a.y+=a.vy;
+                            if(a.x<5 || a.x>w-5) a.vx*=-1; if(a.y<5 || a.y>h-5) a.vy*=-1;
+                            ctx.beginPath(); ctx.arc(a.x, a.y, 6, 0, Math.PI*2); ctx.fill();
                         }
-                        ctx.beginPath(); ctx.arc(a.x, a.y, 6, 0, Math.PI*2); ctx.fill();
                     });
                     requestAnimationFrame(anim);
                 }
                 anim();
             }
-
             setupState('solidCanvas', 'solid');
             setupState('liquidCanvas', 'liquid');
             setupState('gasCanvas', 'gas');
