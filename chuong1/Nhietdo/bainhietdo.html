@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 2: THANG NHIỆT ĐỘ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <style>
+        :root {
+            --primary: #1e40af;
+            --secondary: #3b82f6;
+            --accent: #f59e0b;
+            --bg-slate: #f8fafc;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-slate);
+            color: #1e293b;
+            scroll-behavior: smooth;
+        }
+        h1, h2, h3 {
+            font-family: 'Lexend', sans-serif;
+        }
+        /* Đồng nhất bo góc và đổ bóng cho header giống section-card */
+        .header-card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 20px -5px rgba(0,0,0,0.05);
+            border: 1px solid #f1f5f9;
+        }
+        .section-card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 20px -5px rgba(0,0,0,0.05);
+            border: 1px solid #f1f5f9;
+        }
+        .section-header {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2);
+        }
+        .highlight-box {
+            background: linear-gradient(to right, #eff6ff, #ffffff);
+            border-left: 5px solid var(--secondary);
+            border-radius: 0.5rem;
+        }
+        .formula-box {
+            background: #f8fafc;
+            border: 1px dashed var(--secondary);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        /* QUIZ STYLES */
+        .quiz-option {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            color: #475569;
+        }
+        .quiz-option:hover {
+            border-color: var(--secondary);
+            background: #f0f9ff;
+            transform: translateX(4px);
+        }
+        .quiz-option.selected {
+            border-color: var(--primary);
+            background: #eff6ff;
+            color: var(--primary);
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(30, 64, 175, 0.1);
+        }
+        .option-prefix {
+            background: #f1f5f9;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+        .quiz-option.selected .option-prefix {
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Progress Bar -->
+    <div class="fixed top-0 left-0 w-full h-1 bg-slate-200 z-50">
+        <div id="scrollProgress" class="h-full bg-blue-600 w-0 transition-all duration-100"></div>
+    </div>
+
+    <!-- Hero Header - Cập nhật khung trắng rộng bằng nội dung bên dưới -->
+    <header class="pt-12">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="header-card p-8 md:p-12 text-left relative z-10 overflow-hidden">
+                <!-- Background Decoration -->
+                <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-blue-50 rounded-full opacity-50 z-0"></div>
+                
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="bg-blue-800 text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-md shadow-blue-200">Chương 1: Vật Lý Nhiệt</span>
+                    </div>
+                    <h1 class="text-4xl md:text-4xl lg:text-5xl font-extrabold text-slate-800 mb-5 leading-tight uppercase">
+                        <span class="text-blue-600">Thang Nhiệt Độ</span>
+                    </h1>
+                    <p class="text-lg text-slate-600 max-w-2xl leading-relaxed">
+                        Tìm hiểu về trạng thái cân bằng nhiệt, các loại nhiệt kế phổ biến và nguyên lý đo lường nhiệt độ trong hệ SI.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 py-12">
+
+        <!-- Mục 1 -->
+        <section class="section-card p-8 mb-12" id="muc-1">
+            <div class="section-header">
+                <i class="fas fa-balance-scale"></i>
+                <h2 class="text-xl font-bold uppercase tracking-wide">1. Trạng thái cân bằng nhiệt</h2>
+            </div>
+            <div class="space-y-4 text-slate-700">
+                <p>Trạng thái cân bằng nhiệt là trạng thái mà hai vật khi tiếp xúc nhau không còn trao đổi nhiệt lượng ròng cho nhau nữa, dẫn đến nhiệt độ của chúng bằng nhau.</p>
+                <div class="highlight-box p-5 my-6">
+                    <h4 class="text-blue-800 font-bold mb-2"><i class="fas fa-info-circle mr-2"></i>Nguyên lý 0 của nhiệt động lực học:</h4>
+                    <p class="italic text-slate-800 font-medium leading-relaxed text-lg">
+                        "Nếu vật A cân bằng nhiệt với vật C và vật B cũng cân bằng nhiệt với vật C, thì vật A và vật B cân bằng nhiệt với nhau."
+                    </p>
+                </div>
+                <div class="p-4 bg-amber-50 rounded-xl border border-amber-100">
+                    <p><span class="font-bold text-amber-700"><i class="fas fa-lightbulb mr-2"></i>Hệ quả:</span> Tất cả các vật ở trạng thái cân bằng nhiệt với nhau đều có chung một đại lượng vật lí gọi là <strong>Nhiệt độ</strong>.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mục 2 -->
+        <section class="section-card p-8 mb-12" id="muc-2">
+            <div class="section-header">
+                <i class="fas fa-thermometer-half"></i>
+                <h2 class="text-xl font-bold uppercase tracking-wide">2. Thang nhiệt độ Celsius</h2>
+            </div>
+            <div class="space-y-4 text-slate-700">
+                <p>Được đề xuất bởi Anders Celsius năm 1742, đây là thang đo nhiệt độ phổ biến nhất trong đời sống hằng ngày.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+                    <div class="p-4 bg-blue-50 rounded-xl border border-blue-100 flex items-center gap-4">
+                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 shadow-sm">
+                            <i class="fas fa-snowflake fa-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs uppercase font-bold text-blue-500">Nhiệt độ đóng băng</p>
+                            <p class="text-xl font-bold text-slate-800">$0^\circ\text{C}$</p>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-red-50 rounded-xl border border-red-100 flex items-center gap-4">
+                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-red-600 shadow-sm">
+                            <i class="fas fa-fire fa-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs uppercase font-bold text-red-500">Nhiệt độ sôi (nước)</p>
+                            <p class="text-xl font-bold text-slate-800">$100^\circ\text{C}$</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mục 3 -->
+        <section class="section-card p-8 mb-12" id="muc-3">
+            <div class="section-header">
+                <i class="fas fa-atom"></i>
+                <h2 class="text-xl font-bold uppercase tracking-wide">3. Thang nhiệt độ Kelvin</h2>
+            </div>
+            <div class="space-y-4 text-slate-700">
+                <p>Trong hệ SI, đơn vị của nhiệt độ là <strong>Kelvin (K)</strong>. Thang đo này bắt đầu từ độ không tuyệt đối.</p>
+                <div class="formula-box">
+                    <h4 class="text-slate-500 uppercase text-xs font-bold mb-3 tracking-widest">Công thức chuyển đổi</h4>
+                    <p class="text-3xl font-extrabold text-blue-800">
+                        $T(K) = t(^\circ\text{C}) + 273,15$
+                    </p>
+                </div>
+                <ul class="space-y-3">
+                    <li class="flex items-start gap-3">
+                        <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                        <span><strong>Độ không tuyệt đối (0 K):</strong> Là nhiệt độ thấp nhất lý thuyết, tại đó mọi chuyển động nhiệt của phân tử ngừng lại.</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Mục 4 -->
+        <section class="section-card p-8 mb-12" id="muc-4">
+            <div class="section-header">
+                <i class="fas fa-tools"></i>
+                <h2 class="text-xl font-bold uppercase tracking-wide">4. Các loại nhiệt kế</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-slate-700">
+                <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex gap-4">
+                    <div class="w-10 h-10 shrink-0 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-vial"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800">Nhiệt kế chất lỏng</h3>
+                        <p class="text-sm">Sự nở vì nhiệt của chất lỏng.</p>
+                    </div>
+                </div>
+                <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex gap-4">
+                    <div class="w-10 h-10 shrink-0 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800">Nhiệt kế điện trở</h3>
+                        <p class="text-sm">Sự thay đổi điện trở của kim loại.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section class="section-card overflow-hidden shadow-xl border-t-4 border-t-blue-600 mb-12">
+            <div class="p-8">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
+                        <i class="fas fa-tasks text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800 mb-0.5">Luyện Tập Nhanh</h2>
+                        <p class="text-slate-500 text-sm">Củng cố kiến thức vừa học</p>
+                    </div>
+                </div>
+
+                <div id="quiz-container">
+                    <div class="mb-8">
+                        <div class="flex justify-between items-end mb-4">
+                            <span id="quiz-progress" class="text-blue-600 font-bold uppercase tracking-widest text-xs">Câu hỏi 1/3</span>
+                            <div class="h-2 w-32 bg-slate-100 rounded-full overflow-hidden">
+                                <div id="quiz-bar" class="h-full bg-blue-600 transition-all duration-300 w-1/3"></div>
+                            </div>
+                        </div>
+                        <p id="question-text" class="text-xl font-bold text-slate-800 leading-relaxed min-h-[4rem]">Đang tải câu hỏi...</p>
+                    </div>
+
+                    <div id="options-container" class="grid grid-cols-1 gap-4 mb-8">
+                        <!-- Options injected by JS -->
+                    </div>
+
+                    <div class="flex justify-between items-center pt-6 border-t border-slate-100">
+                        <button id="prev-btn" onclick="prevQuestion()" class="text-slate-400 hover:text-blue-600 transition font-bold flex items-center gap-2 px-4 py-2">
+                            <i class="fas fa-chevron-left"></i> Câu trước
+                        </button>
+                        <button id="next-btn" onclick="handleNext()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-blue-100 transition-all active:scale-95">
+                            Tiếp theo <i class="fas fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="result-screen" class="hidden text-center py-12">
+                    <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-check text-3xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold text-slate-800 mb-2">Hoàn thành!</h3>
+                    <p class="text-slate-500 mb-8">Số câu trả lời đúng: <span id="final-score" class="text-blue-600 text-2xl font-black">0/3</span></p>
+                    <button onclick="restartQuiz()" class="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-slate-800 transition-colors shadow-lg">
+                        Làm lại bài tập
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-12 text-center mt-12">
+        <p class="text-slate-400 text-sm">© HỆ THỐNG BÀI HỌC SÁCH KNTT</p>
+    </footer>
+
+    <script>
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("scrollProgress").style.width = scrolled + "%";
+        });
+
+        const quizData = [
+            {
+                question: "Độ không tuyệt đối ($0\text{ K}$) tương ứng với bao nhiêu độ Celsius?",
+                options: ["$0^0{C}$", "$100^0 C$", "$-273,15^0 C$", "$273,15^0 C$"],
+                correct: 2
+            },
+            {
+                question: "Hai vật ở trạng thái cân bằng nhiệt với nhau thì chắc chắn có cùng:",
+                options: ["Nội năng", "Khối lượng", "Nhiệt năng", "Nhiệt độ"],
+                correct: 3
+            },
+            {
+                question: "Một vật có nhiệt độ $27^\circ\text{C}$, nhiệt độ của nó trong thang Kelvin là:",
+                options: ["273 K", "300,15 K", "246,15 K", "327 K"],
+                correct: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let userAnswers = new Array(quizData.length).fill(null);
+
+        function renderQuestion() {
+            const q = quizData[currentQuestion];
+            document.getElementById('question-text').innerHTML = q.question;
+            document.getElementById('quiz-progress').innerText = `Câu hỏi ${currentQuestion + 1}/${quizData.length}`;
+            document.getElementById('quiz-bar').style.width = `${((currentQuestion + 1) / quizData.length) * 100}%`;
+            
+            const optionsHtml = q.options.map((opt, index) => `
+                <div onclick="selectOption(${index})" id="opt-${index}" class="quiz-option p-4 rounded-2xl flex items-center ${userAnswers[currentQuestion] === index ? 'selected' : ''}">
+                    <span class="option-prefix w-10 h-10 rounded-xl flex items-center justify-center font-bold mr-4 shrink-0">${String.fromCharCode(65 + index)}</span>
+                    <span class="text-lg">${opt}</span>
+                </div>
+            `).join('');
+            
+            document.getElementById('options-container').innerHTML = optionsHtml;
+            document.getElementById('next-btn').innerHTML = currentQuestion === quizData.length - 1 ? "Xem kết quả <i class='fas fa-check-circle ml-2'></i>" : "Tiếp theo <i class='fas fa-chevron-right ml-1'></i>";
+            
+            if (window.MathJax) MathJax.typeset();
+        }
+
+        function selectOption(index) {
+            userAnswers[currentQuestion] = index;
+            document.querySelectorAll('.quiz-option').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`opt-${index}`).classList.add('selected');
+        }
+
+        function handleNext() {
+            if (userAnswers[currentQuestion] === null) {
+                alert("Vui lòng chọn một đáp án!");
+                return;
+            }
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+            }
+        }
+
+        function showResults() {
+            let score = 0;
+            userAnswers.forEach((ans, i) => { if(ans === quizData[i].correct) score++; });
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = `${score}/${quizData.length}`;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            userAnswers = new Array(quizData.length).fill(null);
+            document.getElementById('quiz-container').classList.remove('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            renderQuestion();
+        }
+
+        window.onload = renderQuestion;
+    </script>
+</body>
+</html>
