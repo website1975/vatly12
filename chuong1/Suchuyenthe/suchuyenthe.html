@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 1: Cấu trúc của chất. Sự chuyển thể - Vật lí 12</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e40af;
+            --secondary: #3b82f6;
+            --accent: #f59e0b;
+            --bg-slate: #f8fafc;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-slate);
+            color: #1e293b;
+            scroll-behavior: smooth;
+        }
+        h1, h2, h3 {
+            font-family: 'Lexend', sans-serif;
+        }
+        .sidebar-link:hover {
+            background-color: #e2e8f0;
+            color: var(--primary);
+        }
+        .content-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .nav-active {
+            border-right: 4px solid var(--primary);
+            background: #eff6ff;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .sticky-sidebar {
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+        .sim-canvas {
+            background: #ffffff;
+            border-radius: 16px;
+            width: 100%;
+            height: 180px;
+            border: 1px solid #e2e8f0;
+        }
+        .bg-icon-fade {
+            position: absolute;
+            right: -20px;
+            top: -20px;
+            font-size: 240px;
+            color: var(--primary);
+            opacity: 0.06;
+            transform: rotate(-15deg);
+            pointer-events: none;
+        }
+        .quiz-option {
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 2px solid #f1f5f9;
+        }
+        .quiz-option:hover:not(.locked) {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        .correct {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #166534 !important;
+        }
+        .wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        .explanation {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased text-slate-800">
+
+    <main class="max-w-7xl mx-auto px-4 py-12 lg:flex gap-8">
+        
+        <aside class="hidden lg:block w-72 flex-shrink-0">
+            <div class="sticky-sidebar space-y-4">
+                <div class="p-5 bg-white rounded-3xl shadow-sm border border-slate-200">
+                    <h4 class="font-bold text-slate-900 mb-4 px-2 uppercase text-[10px] tracking-[0.2em] text-blue-800">Mục lục bài học</h4>
+                    <nav class="flex flex-col gap-1">
+                        <a href="#intro" class="sidebar-link px-3 py-2.5 rounded-xl text-sm transition nav-active">Mở đầu</a>
+                        <a href="#section1" class="sidebar-link px-3 py-2.5 rounded-xl text-sm transition">I. Mô hình động học phân tử</a>
+                        <a href="#section2" class="sidebar-link px-3 py-2.5 rounded-xl text-sm transition">II. Cấu trúc các thể</a>
+                        <a href="#section3" class="sidebar-link px-3 py-2.5 rounded-xl text-sm transition">III. Sự chuyển thể</a>
+                        <a href="#exercises" class="sidebar-link px-3 py-2.5 rounded-xl text-sm transition text-orange-600 font-bold">IV. Bài tập rèn luyện</a>
+                    </nav>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex-grow space-y-12">
+            
+            <section id="intro" class="relative overflow-hidden rounded-[32px] bg-white p-8 lg:p-14 border border-slate-200 shadow-sm bg-gradient-to-br from-blue-50 to-white">
+                <i class="fa-solid fa-temperature-three-quarters bg-icon-fade"></i>
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="bg-blue-800 text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-md shadow-blue-200">Chương 1: Vật Lý Nhiệt</span>
+                    </div>
+                    <h1 class="text-4xl lg:text-6xl font-extrabold text-slate-900 mb-6 leading-[1.15]">Cấu trúc của chất.<br><span class="text-blue-800">Sự chuyển thể</span></h1>
+                    <p class="text-lg text-slate-600 leading-relaxed max-w-2xl font-medium opacity-90">
+                        Khám phá bản chất của vật chất thông qua cái nhìn vi mô. Hiểu rõ cách các phân tử tương tác để giải thích mọi hiện tượng nhiệt trong đời sống.
+                    </p>
+                </div>
+            </section>
+
+            <section id="section1" class="space-y-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="bg-blue-800 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg">
+                        <i class="fa-solid fa-1"></i>
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-slate-900">Mô hình động học phân tử</h2>
+                </div>
+
+                <div class="content-card p-8 space-y-6">
+                    <h3 class="text-xl font-bold text-blue-900 border-l-4 border-blue-800 pl-4">1. Các nội dung cốt lõi</h3>
+                    <ul class="space-y-5 text-slate-700 leading-relaxed">
+                        <li class="flex gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-microscope text-blue-800 text-xs"></i></div>
+                            <span>Các chất được cấu tạo từ các hạt riêng biệt gọi là <strong>phân tử</strong>. Kích thước phân tử vô cùng nhỏ, khoảng \(10^{-10} m\).</span>
+                        </li>
+                        <li class="flex gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-fire-flame-curved text-blue-800 text-xs"></i></div>
+                            <span>Các phân tử chuyển động <strong>hỗn loạn không ngừng</strong>. Chuyển động này càng nhanh thì nhiệt độ của vật càng cao.</span>
+                        </li>
+                        <li class="flex gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-magnet text-blue-800 text-xs"></i></div>
+                            <span>Giữa các phân tử có <strong>lực tương tác</strong>. Lực này có thể là lực hút hoặc lực đẩy tùy thuộc vào khoảng cách giữa chúng.</span>
+                        </li>
+                    </ul>
+
+                    <div class="bg-blue-900 p-8 rounded-[32px] text-white relative overflow-hidden">
+                        <div class="relative z-10 flex flex-col lg:flex-row gap-8 items-center">
+                            <div class="lg:w-1/2 space-y-4">
+                                <h4 class="text-xl font-bold text-blue-200 uppercase tracking-widest text-sm">Thí nghiệm Brown</h4>
+                                <p class="text-sm leading-relaxed opacity-90">
+                                    Quan sát hạt phấn hoa (màu vàng) chuyển động hỗn loạn do va chạm không ngừng từ các phân tử nước (hạt nhỏ màu xám). Đây là bằng chứng trực tiếp cho chuyển động nhiệt.
+                                </p>
+                            </div>
+                            <div class="lg:w-1/2 w-full">
+                                <canvas id="brownianCanvas" class="sim-canvas !bg-slate-950 border-blue-700"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section2" class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="bg-blue-800 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg">
+                        <i class="fa-solid fa-2 text-xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-slate-900">Cấu trúc các thể chất</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="content-card p-6 border-t-8 border-blue-800 group transition-all hover:-translate-y-2">
+                        <h4 class="font-bold text-center text-blue-900 mb-4 text-sm uppercase">Thể Rắn</h4>
+                        <canvas id="solidCanvas" class="sim-canvas !h-[130px] mb-4"></canvas>
+                        <div class="bg-blue-50 p-4 rounded-xl text-[11px] space-y-2">
+                            <p><strong>Cấu trúc:</strong> Các hạt xếp khít nhau theo một trật tự xác định.</p>
+                            <p><strong>Lực:</strong> Rất mạnh, hạt chỉ dao động quanh vị trí cân bằng cố định.</p>
+                        </div>
+                    </div>
+                    <div class="content-card p-6 border-t-8 border-blue-500 group transition-all hover:-translate-y-2">
+                        <h4 class="font-bold text-center text-blue-600 mb-4 text-sm uppercase">Thể Lỏng</h4>
+                        <canvas id="liquidCanvas" class="sim-canvas !h-[130px] mb-4"></canvas>
+                        <div class="bg-sky-50 p-4 rounded-xl text-[11px] space-y-2">
+                            <p><strong>Cấu trúc:</strong> Khoảng cách lớn hơn rắn, trật tự kém hơn.</p>
+                            <p><strong>Chuyển động:</strong> Các hạt có thể trượt lên nhau linh hoạt.</p>
+                        </div>
+                    </div>
+                    <div class="content-card p-6 border-t-8 border-slate-400 group transition-all hover:-translate-y-2">
+                        <h4 class="font-bold text-center text-slate-600 mb-4 text-sm uppercase">Thể Khí</h4>
+                        <canvas id="gasCanvas" class="sim-canvas !h-[130px] mb-4"></canvas>
+                        <div class="bg-slate-50 p-4 rounded-xl text-[11px] space-y-2">
+                            <p><strong>Cấu trúc:</strong> Khoảng cách cực lớn, không có hình dạng xác định.</p>
+                            <p><strong>Chuyển động:</strong> Tự do hoàn toàn, chiếm toàn bộ bình chứa.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section3" class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="bg-blue-800 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg">
+                        <i class="fa-solid fa-3"></i>
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-slate-900">Quá trình chuyển thể</h2>
+                </div>
+                <div class="content-card p-8 lg:p-12 text-center bg-gradient-to-r from-blue-50 via-white to-blue-50">
+                    <p class="text-slate-600 mb-10 max-w-xl mx-auto italic text-sm">Sự thay đổi trạng thái liên quan đến việc sắp xếp lại cấu trúc phân tử dưới tác động của nhiệt.</p>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="p-4 bg-white rounded-2xl shadow-sm border border-blue-100">
+                            <div class="text-2xl mb-2">🔥</div>
+                            <div class="font-bold text-sm text-blue-900">Nóng chảy</div>
+                            <div class="text-[10px] text-slate-400 uppercase tracking-tighter">Rắn &rarr; Lỏng</div>
+                        </div>
+                        <div class="p-4 bg-white rounded-2xl shadow-sm border border-blue-100">
+                            <div class="text-2xl mb-2">❄️</div>
+                            <div class="font-bold text-sm text-blue-900">Đông đặc</div>
+                            <div class="text-[10px] text-slate-400 uppercase tracking-tighter">Lỏng &rarr; Rắn</div>
+                        </div>
+                        <div class="p-4 bg-white rounded-2xl shadow-sm border border-blue-100">
+                            <div class="text-2xl mb-2">💨</div>
+                            <div class="font-bold text-sm text-blue-900">Hóa hơi</div>
+                            <div class="text-[10px] text-slate-400 uppercase tracking-tighter">Lỏng &rarr; Khí</div>
+                        </div>
+                        <div class="p-4 bg-white rounded-2xl shadow-sm border border-blue-100">
+                            <div class="text-2xl mb-2">💧</div>
+                            <div class="font-bold text-sm text-blue-900">Ngưng tụ</div>
+                            <div class="text-[10px] text-slate-400 uppercase tracking-tighter">Khí &rarr; Lỏng</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="exercises" class="space-y-8 pb-32">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+                    <h2 class="text-2xl font-extrabold text-slate-900">Bài tập rèn luyện</h2>
+                    <span class="text-orange-600 font-bold text-sm">Nhấn để xem đáp án tức thì</span>
+                </div>
+
+                <div class="content-card p-8" id="q1">
+                    <span class="inline-block px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-full mb-4 uppercase">Nhận biết</span>
+                    <p class="font-bold text-slate-900 mb-6 leading-relaxed">Câu 1: Theo mô hình động học phân tử, lực tương tác giữa các phân tử chất khí ở điều kiện thường có đặc điểm gì?</p>
+                    <div class="grid gap-3">
+                        <button class="quiz-option p-4 rounded-2xl text-left text-sm" onclick="handleQuiz('q1', this, false, 'Sai rồi! Ở chất khí, khoảng cách phân tử rất lớn nên lực liên kết rất yếu.')">A. Rất mạnh, giữ các phân tử ở vị trí xác định.</button>
+                        <button class="quiz-option p-4 rounded-2xl text-left text-sm" onclick="handleQuiz('q1', this, true, 'Chính xác! Vì khoảng cách phân tử chất khí rất lớn nên lực tương tác rất yếu, chỉ đáng kể khi va chạm.')">B. Rất yếu, các phân tử chuyển động hỗn loạn không ngừng.</button>
+                        <button class="quiz-option p-4 rounded-2xl text-left text-sm" onclick="handleQuiz('q1', this, false, 'Chưa đúng. Lực đẩy chỉ chiếm ưu thế khi các phân tử ở rất gần nhau.')">C. Luôn là lực đẩy khiến chúng tránh xa nhau.</button>
+                        <button class="quiz-option p-4 rounded-2xl text-left text-sm" onclick="handleQuiz('q1', this, false, 'Sai. Lực tương tác phân tử không phụ thuộc vào trọng lượng bình.')">D. Phụ thuộc vào trọng lượng của bình chứa.</button>
+                    </div>
+                    <div class="explanation mt-6 p-4 bg-blue-50 rounded-2xl border-l-4 border-blue-800 text-sm text-blue-900 font-medium"></div>
+                </div>
+
+                <div class="content-card p-8" id="q2">
+                    <span class="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-full mb-4 uppercase">Thông hiểu</span>
+                    <p class="font-bold text-slate-900 mb-6 leading-relaxed">Câu 2: Tại sao khi nhiệt độ tăng thì quá trình hòa tan đường trong nước lại xảy ra nhanh hơn?</p>
+                    <div class="grid gap-3">
+                        <button class="quiz-option p-4 rounded-2xl text-left text-sm" onclick="handleQuiz('q2', this, false, 'Nhiệt độ không làm thay đổi kích thước phân tử đường.')">A. Vì nhiệt độ làm các phân tử đường nở to ra.</button>
+                        <button class="quiz-option p-4 rounded-2xl text-left text-sm" onclick="handleQuiz('q2', this, true, 'Chính xác! Nhiệt độ tăng làm tốc độ chuyển động nhiệt tăng, va chạm mạnh hơn.')">B. Vì các phân tử nước chuyển động nhanh hơn, va chạm mạnh hơn vào khối đường.</button>
+                        <button class="quiz-option p-4 rounded-2xl text-left text-sm" onclick="handleQuiz('q2', this, false, 'Nước ở nhiệt độ cao không nặng thêm.')">C. Vì nước nóng nặng hơn nước lạnh nên ép đường tan nhanh.</button>
+                    </div>
+                    <div class="explanation mt-6 p-4 bg-blue-50 rounded-2xl border-l-4 border-blue-800 text-sm text-blue-900 font-medium"></div>
+                </div>
+
+                <div class="content-card p-8" id="q3">
+                    <span class="inline-block px-3 py-1 bg-red-100 text-red-700 text-[10px] font-bold rounded-full mb-4 uppercase">Vận dụng</span>
+                    <p class="font-bold text-slate-900 mb-6 leading-relaxed">Câu 3: Trong quá trình nước đang sôi, dù ta tiếp tục đun mạnh thì nhiệt độ của nước vẫn không thay đổi. Năng lượng cung cấp lúc này dùng để làm gì?</p>
+                    <div class="grid gap-3">
+                        <button class="quiz-option p-4 rounded-2xl text-left text-sm" onclick="handleQuiz('q3', this, false, 'Sai. Nếu tăng động năng thì nhiệt độ phải tăng.')">A. Tăng động năng của các phân tử nước.</button>
+                        <button class="quiz-option p-4 rounded-2xl text-left text-sm" onclick="handleQuiz('q3', this, true, 'Rất tốt! Nhiệt lượng này dùng để phá vỡ lực liên kết để chuyển trạng thái.')">B. Phá vỡ liên kết phân tử để chuyển từ thể lỏng sang thể hơi.</button>
+                        <button class="quiz-option p-4 rounded-2xl text-left text-sm" onclick="handleQuiz('q3', this, false, 'Sai. Phân tử nước H2O vẫn giữ nguyên cấu trúc hóa học.')">C. Phân hủy phân tử nước thành khí Hidro và Oxy.</button>
+                    </div>
+                    <div class="explanation mt-6 p-4 bg-blue-50 rounded-2xl border-l-4 border-blue-800 text-sm text-blue-900 font-medium"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        function handleQuiz(qId, btn, isCorrect, text) {
+            const container = document.getElementById(qId);
+            const options = container.querySelectorAll('.quiz-option');
+            const exp = container.querySelector('.explanation');
+            options.forEach(opt => {
+                opt.classList.add('locked');
+                opt.style.pointerEvents = 'none';
+            });
+            if(isCorrect) {
+                btn.classList.add('correct');
+                exp.innerHTML = `<i class="fa-solid fa-circle-check mr-2"></i> ${text}`;
+            } else {
+                btn.classList.add('wrong');
+                exp.innerHTML = `<i class="fa-solid fa-circle-xmark mr-2 text-red-600"></i> ${text}`;
+            }
+            exp.style.display = 'block';
+        }
+
+        const setupCanvas = (id) => {
+            const canvas = document.getElementById(id);
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            return { ctx, width: rect.width, height: rect.height };
+        };
+
+        const initBrownian = () => {
+            const { ctx, width, height } = setupCanvas('brownianCanvas');
+            let water = Array.from({ length: 40 }, () => ({
+                x: Math.random() * width, y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 6, vy: (Math.random() - 0.5) * 6
+            }));
+            // Hạt phấn hoa: Tăng kích thước và độ bám khung hình
+            let pollen = { x: width/2, y: height/2, vx: 0, vy: 0, r: 15 };
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                // Vẽ phân tử nước
+                ctx.fillStyle = '#475569';
+                water.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 2 || p.x > width - 2) p.vx *= -1;
+                    if (p.y < 2 || p.y > height - 2) p.vy *= -1;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI*2); ctx.fill();
+
+                    const dx = p.x - pollen.x;
+                    const dy = p.y - pollen.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < pollen.r + 2) {
+                        // Cú hích từ phân tử nước
+                        pollen.vx -= dx * 0.2; pollen.vy -= dy * 0.2;
+                    }
+                });
+
+                // Ma sát để hạt không văng quá nhanh
+                pollen.vx *= 0.92; pollen.vy *= 0.92;
+                
+                // Giới hạn tốc độ tối đa
+                const maxV = 3;
+                pollen.vx = Math.max(-maxV, Math.min(maxV, pollen.vx));
+                pollen.vy = Math.max(-maxV, Math.min(maxV, pollen.vy));
+
+                pollen.x += pollen.vx; pollen.y += pollen.vy;
+
+                // Giữ hạt phấn hoa trong biên
+                if(pollen.x < pollen.r) { pollen.x = pollen.r; pollen.vx *= -1; }
+                if(pollen.x > width - pollen.r) { pollen.x = width - pollen.r; pollen.vx *= -1; }
+                if(pollen.y < pollen.r) { pollen.y = pollen.r; pollen.vy *= -1; }
+                if(pollen.y > height - pollen.r) { pollen.y = height - pollen.r; pollen.vy *= -1; }
+                
+                // Vẽ hạt phấn hoa rực rỡ hơn
+                ctx.shadowBlur = 15; ctx.shadowColor = '#facc15';
+                ctx.fillStyle = '#facc15'; ctx.beginPath(); ctx.arc(pollen.x, pollen.y, pollen.r, 0, Math.PI*2); ctx.fill();
+                ctx.shadowBlur = 0;
+                
+                requestAnimationFrame(animate);
+            }
+            animate();
+        };
+
+        const initSolid = () => {
+            const { ctx, width, height } = setupCanvas('solidCanvas');
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                ctx.fillStyle = '#1e40af';
+                for(let i=0; i<4; i++) {
+                    for(let j=0; j<5; j++) {
+                        const vib = (Math.random()-0.5)*1.8;
+                        ctx.beginPath(); ctx.arc(width/2 - 50 + j*25 + vib, height/2 - 40 + i*25 + vib, 6, 0, Math.PI*2); ctx.fill();
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+            animate();
+        };
+
+        const initLiquid = () => {
+            const { ctx, width, height } = setupCanvas('liquidCanvas');
+            let m = Array.from({ length: 30 }, () => ({
+                x: Math.random()*width, y: Math.random()*(height-30)+15,
+                vx: (Math.random()-0.5)*1.2, vy: (Math.random()-0.5)*1.2
+            }));
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                ctx.fillStyle = '#0ea5e9';
+                m.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if(p.x < 8 || p.x > width-8) p.vx *= -1;
+                    if(p.y < 35 || p.y > height-8) p.vy *= -1;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, 8, 0, Math.PI*2); ctx.fill();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        };
+
+        const initGas = () => {
+            const { ctx, width, height } = setupCanvas('gasCanvas');
+            let m = Array.from({ length: 12 }, () => ({
+                x: Math.random()*width, y: Math.random()*height,
+                vx: (Math.random()-0.5)*8, vy: (Math.random()-0.5)*8
+            }));
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                ctx.fillStyle = '#94a3b8';
+                m.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if(p.x < 4 || p.x > width-4) p.vx *= -1;
+                    if(p.y < 4 || p.y > height-4) p.vy *= -1;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fill();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        };
+
+        window.onload = () => {
+            initBrownian(); initSolid(); initLiquid(); initGas();
+        };
+    </script>
+</body>
+</html>
