@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vật lý 12 - Bài 4: Nhiệt dung riêng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f7f9;
+            color: #2d3748;
+        }
+        .bg-dark-blue {
+            background-color: #1a202c;
+        }
+        .chapter-header {
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            font-size: 2rem;
+        }
+        .lesson-title {
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 4rem;
+        }
+        .intro-box {
+            border: 1px solid #000;
+            padding: 1.5rem;
+            background-color: #fff;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+        .section-card {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        .section-header {
+            color: #1a202c;
+            border-bottom: 4px solid #1a202c;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 1.25rem;
+        }
+        .question-box {
+            background-color: #edf2f7;
+            border-left: 5px solid #2b6cb0;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .answer-box {
+            background-color: #f0fff4;
+            border-left: 5px solid #38a169;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            display: none;
+            border-radius: 4px;
+        }
+        .btn-view {
+            background-color: #1a202c;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            border: none;
+        }
+        .btn-view:hover {
+            background-color: #2d3748;
+            transform: translateY(-1px);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        th, td {
+            border: 1px solid #cbd5e0;
+            padding: 0.75rem;
+            text-align: center;
+        }
+        th {
+            background-color: #e2e8f0;
+            font-weight: bold;
+        }
+        .formula-box {
+            background-color: #f8fafc;
+            border: 1px dashed #1a202c;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Header Section -->
+        <header>
+            <div class="chapter-header bg-dark-blue">
+                CHƯƠNG 1: VẬT LÝ NHIỆT
+            </div>
+            <div class="lesson-title bg-dark-blue">
+                BÀI 4: NHIỆT DUNG RIÊNG
+            </div>
+        </header>
+
+        <!-- Lời dẫn -->
+        <div class="intro-box">
+            "Nhiệt lượng cần để làm nóng 1 kg nước lên thêm $1^\circ C$ khác với nhiệt lượng cần để làm nóng 1 kg rượu lên thêm $1^\circ C$. Đại lượng vật lý nào có thể dùng để mô tả sự khác biệt như trên của các chất khác nhau?"
+        </div>
+
+        <!-- I. Khái niệm -->
+        <section class="section-card">
+            <h2 class="section-header">I. KHÁI NIỆM</h2>
+            
+            <h3 class="font-bold text-lg mb-2">1. Hệ thức tính nhiệt lượng</h3>
+            <p class="mb-4">Nhiệt lượng $Q$ cần cung cấp cho vật để làm nó nóng lên phụ thuộc vào: khối lượng ($m$), độ tăng nhiệt độ ($\Delta T$) và tính chất của chất làm vật.</p>
+            
+            <p class="font-bold text-sm text-gray-600 uppercase mb-2 text-center">Bảng 4.1. Giá trị gần đúng nhiệt dung riêng của một số chất</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Chất</th>
+                        <th>Nhiệt dung riêng (J/kg.K)</th>
+                        <th>Chất</th>
+                        <th>Nhiệt dung riêng (J/kg.K)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Nước</td>
+                        <td>4 200</td>
+                        <td>Đất</td>
+                        <td>800</td>
+                    </tr>
+                    <tr>
+                        <td>Nước đá</td>
+                        <td>2 100</td>
+                        <td>Sắt</td>
+                        <td>440</td>
+                    </tr>
+                    <tr>
+                        <td>Không khí</td>
+                        <td>1 000</td>
+                        <td>Đồng</td>
+                        <td>380</td>
+                    </tr>
+                    <tr>
+                        <td>Thủy tinh</td>
+                        <td>840</td>
+                        <td>Chì</td>
+                        <td>130</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="question-box">
+                <p><strong>Câu hỏi:</strong> Hãy tìm ví dụ trong đời sống để minh họa cho việc nhiệt lượng phụ thuộc vào tính chất của chất?</p>
+                <button class="btn-view mt-2" onclick="toggleAnswer('q1-ans')">Nhấn xem trả lời</button>
+                <div id="q1-ans" class="answer-box">
+                    Vào mùa hè, cùng dưới ánh nắng mặt trời, cát ở bãi biển nóng lên rất nhanh (nhiệt dung riêng nhỏ), trong khi nước biển nóng lên chậm hơn nhiều (nhiệt dung riêng lớn).
+                </div>
+            </div>
+
+            <div class="mt-6 p-6 bg-blue-900 text-white rounded-lg">
+                <h4 class="font-bold text-lg mb-2 uppercase">Kết luận</h4>
+                <div class="formula-box text-black">
+                    <p class="text-2xl">$$Q = mc\Delta T$$</p>
+                </div>
+                <p class="mt-2">Trong đó:</p>
+                <ul class="list-disc ml-8 text-sm space-y-1">
+                    <li><strong>$Q$:</strong> Nhiệt lượng vật thu vào (J).</li>
+                    <li><strong>$m$:</strong> Khối lượng của vật (kg).</li>
+                    <li><strong>$c$:</strong> Nhiệt dung riêng của chất làm vật (J/kg.K).</li>
+                    <li><strong>$\Delta T = T_2 - T_1$:</strong> Độ tăng nhiệt độ ($K$ hoặc $^\circ C$).</li>
+                </ul>
+            </div>
+
+            <div class="mt-10">
+                <h3 class="font-bold text-lg mb-2">2. Định nghĩa nhiệt dung riêng</h3>
+                <p class="bg-gray-100 p-4 border-l-4 border-black italic">
+                    "Nhiệt dung riêng của một chất là nhiệt lượng cần truyền cho 1 kg chất đó để làm cho nhiệt độ của nó tăng thêm $1^\circ C$ (hoặc 1 K)."
+                </p>
+
+                <div class="mt-6 space-y-4">
+                    <div class="question-box">
+                        <p><strong>Câu hỏi 1:</strong> Ý nghĩa của con số $c_{nước} = 4200$ J/kg.K là gì?</p>
+                        <button class="btn-view mt-2" onclick="toggleAnswer('q2-1')">Nhấn xem trả lời</button>
+                        <div id="q2-1" class="answer-box">
+                            Nghĩa là muốn làm cho 1 kg nước nóng thêm $1^\circ C$ thì cần cung cấp một nhiệt lượng là 4200 Jun.
+                        </div>
+                    </div>
+
+                    <div class="question-box">
+                        <p><strong>Câu hỏi 2:</strong> Tại sao đơn vị nhiệt dung riêng lại là J/kg.K?</p>
+                        <button class="btn-view mt-2" onclick="toggleAnswer('q2-2')">Nhấn xem trả lời</button>
+                        <div id="q2-2" class="answer-box">
+                            Từ công thức $c = \frac{Q}{m\Delta T}$, đơn vị sẽ là đơn vị của năng lượng (J) chia cho tích đơn vị khối lượng (kg) và nhiệt độ (K).
+                        </div>
+                    </div>
+
+                    <div class="question-box">
+                        <p><strong>Câu hỏi 3:</strong> Tại sao các chất lỏng trong bộ tản nhiệt ô tô thường dùng nước?</p>
+                        <button class="btn-view mt-2" onclick="toggleAnswer('q2-3')">Nhấn xem trả lời</button>
+                        <div id="q2-3" class="answer-box">
+                            Vì nước có nhiệt dung riêng rất lớn, có khả năng hấp thụ nhiều nhiệt lượng từ động cơ mà nhiệt độ của nước không tăng lên quá cao.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- II. Thực hành -->
+        <section class="section-card">
+            <h2 class="section-header">II. THỰC HÀNH ĐO NHIỆT DUNG RIÊNG</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+                <div>
+                    <h3 class="font-bold text-blue-900">1. Mục đích</h3>
+                    <p class="text-sm">Xác định giá trị nhiệt dung riêng của một chất (ví dụ: nước) bằng thực nghiệm.</p>
+                    
+                    <h3 class="font-bold text-blue-900 mt-4">2. Dụng cụ</h3>
+                    <ul class="list-disc ml-5 text-sm">
+                        <li>Bình nhiệt lượng kế có dây nung.</li>
+                        <li>Nguồn điện, biến thế nguồn.</li>
+                        <li>Nhiệt kế, cân điện tử.</li>
+                        <li>Đồng hồ bấm giây, Watt kế (hoặc Ampe kế và Vol kế).</li>
+                    </ul>
+                </div>
+                <div class="bg-gray-100 flex items-center justify-center border-2 border-dashed rounded-lg p-4">
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500 mb-2">[Sơ đồ mạch điện đo nhiệt dung riêng]</p>
+                        <svg width="150" height="100" viewBox="0 0 100 60" class="mx-auto">
+                            <rect x="20" y="10" width="60" height="40" fill="none" stroke="black" stroke-width="2"/>
+                            <path d="M40 30 Q 50 20, 60 30 T 80 30" fill="none" stroke="red" stroke-width="2"/>
+                            <text x="35" y="55" font-size="8">Bình nhiệt lượng</text>
+                        </svg>
+                        <p class="text-[10px] mt-2 italic text-blue-700 font-bold">Hình 4.2. Sơ đồ thực nghiệm</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="font-bold text-blue-900">3. Thiết kế phương án</h3>
+            <div class="question-box">
+                <p><strong>Câu hỏi:</strong> Trong thí nghiệm, nhiệt lượng do dây nung tỏa ra được tính bằng công thức nào nếu dùng Watt kế?</p>
+                <button class="btn-view mt-2" onclick="toggleAnswer('q-tp')">Nhấn xem trả lời đúng</button>
+                <div id="q-tp" class="answer-box">
+                    Nhiệt lượng tỏa ra trên dây nung: $Q = P \cdot \tau$ (Với $P$ là công suất ghi trên Watt kế, $\tau$ là thời gian nung).
+                </div>
+            </div>
+
+            <h3 class="font-bold text-blue-900 mt-6">4. Tiến hành thí nghiệm</h3>
+            <ol class="list-decimal ml-5 text-sm space-y-1">
+                <li>Cân khối lượng nước $m_n$ đổ vào bình.</li>
+                <li>Đo nhiệt độ ban đầu $T_1$.</li>
+                <li>Bật nguồn điện, bấm giờ. Sau thời gian $\tau$, đo nhiệt độ $T_2$.</li>
+                <li>Ghi lại công suất $P$ của dòng điện.</li>
+            </ol>
+
+            <h3 class="font-bold text-blue-900 mt-6">5. Kết quả</h3>
+            <div class="flex flex-col md:flex-row gap-4 items-center mt-2">
+                <div class="flex-1">
+                    <p class="text-sm">Từ định luật bảo toàn năng lượng: $P\tau = m_n c_n (T_2 - T_1) + Q_{hp}$</p>
+                    <p class="text-sm mt-2 font-bold text-red-700">Công thức tính c:</p>
+                    <div class="formula-box text-blue-900 py-2">
+                        $$c_n = \frac{P \cdot \tau}{m_n \cdot \Delta T}$$
+                    </div>
+                    <p class="text-xs italic text-gray-500">(Bỏ qua nhiệt lượng làm nóng bình và nhiệt lượng hao phí)</p>
+                </div>
+                <div class="w-full md:w-1/3 border p-2 rounded bg-white">
+                    <p class="text-[10px] text-center font-bold">Đồ thị $T$ theo $\tau$</p>
+                    <svg viewBox="0 0 100 60" class="w-full h-auto">
+                        <line x1="10" y1="50" x2="90" y2="50" stroke="black" stroke-width="1"/>
+                        <line x1="10" y1="50" x2="10" y2="10" stroke="black" stroke-width="1"/>
+                        <line x1="10" y1="45" x2="80" y2="15" stroke="red" stroke-width="1.5"/>
+                        <text x="90" y="55" font-size="5">t(s)</text>
+                        <text x="2" y="10" font-size="5">T(K)</text>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- III. Củng cố -->
+        <section class="section-card">
+            <h2 class="section-header">III. CỦNG CỐ</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <p class="font-bold text-green-800 uppercase text-xs">Em đã học</p>
+                    <ul class="list-disc ml-5 text-xs space-y-1 mt-2">
+                        <li>Công thức $Q = mc\Delta T$.</li>
+                        <li>Định nghĩa và đơn vị nhiệt dung riêng (J/kg.K).</li>
+                        <li>Cách đo nhiệt dung riêng bằng thực nghiệm.</li>
+                    </ul>
+                </div>
+                <div class="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                    <p class="font-bold text-orange-800 uppercase text-xs">Em có thể</p>
+                    <ul class="list-disc ml-5 text-xs space-y-1 mt-2">
+                        <li>Xác định nhiệt dung riêng của một chất bất kỳ.</li>
+                        <li>Giải thích vì sao nước biển thay đổi nhiệt độ chậm hơn đất liền.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-blue-50 p-4 border rounded mb-8">
+                <h4 class="font-bold text-blue-800">💡 Em có biết?</h4>
+                <p class="text-sm mt-1">Nước có nhiệt dung riêng lớn nhất trong các chất lỏng thông thường ($4200$ J/kg.K). Điều này giúp Trái Đất điều hòa nhiệt độ, bảo vệ sự sống khỏi những thay đổi nhiệt độ đột ngột của Mặt Trời.</p>
+            </div>
+
+            <!-- Bài tập -->
+            <div class="quiz-container">
+                <h3 class="font-bold text-lg mb-4 border-l-4 border-dark-blue pl-3 uppercase">Bài tập củng cố</h3>
+                <form id="quizForm" class="space-y-6">
+                    <div class="quiz-item">
+                        <p class="font-bold">1. Đơn vị của nhiệt dung riêng là:</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q1" value="A"> A. J/kg</label>
+                            <label class="block"><input type="radio" name="q1" value="B" id="q1b"> B. J/kg.K</label>
+                            <label class="block"><input type="radio" name="q1" value="C"> C. J/K</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <p class="font-bold">2. Cần nhiệt lượng bao nhiêu để làm 2kg nước tăng thêm $10^\circ C$?</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q2" value="A" id="q2a"> A. 84 000 J</label>
+                            <label class="block"><input type="radio" name="q2" value="B"> B. 42 000 J</label>
+                            <label class="block"><input type="radio" name="q2" value="C"> C. 8 400 J</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <p class="font-bold">3. Hai vật cùng khối lượng, cùng nhận nhiệt lượng. Vật nào có $c$ lớn hơn sẽ:</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q3" value="A"> A. Nóng lên nhanh hơn</label>
+                            <label class="block"><input type="radio" name="q3" value="B" id="q3b"> B. Nóng lên chậm hơn</label>
+                            <label class="block"><input type="radio" name="q3" value="C"> C. Có nhiệt độ không đổi</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <p class="font-bold">4. Đại lượng nào phụ thuộc vào bản chất của chất làm vật?</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q4" value="A"> A. Khối lượng $m$</label>
+                            <label class="block"><input type="radio" name="q4" value="B" id="q4b"> B. Nhiệt dung riêng $c$</label>
+                            <label class="block"><input type="radio" name="q4" value="C"> C. Độ tăng nhiệt độ $\Delta T$</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <p class="font-bold">5. Trong thí nghiệm đo $c$, nếu bỏ qua nhiệt lượng hao phí thì nhiệt lượng dây nung cung cấp bằng:</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q5" value="A" id="q5a"> A. Nhiệt lượng nước thu vào</label>
+                            <label class="block"><input type="radio" name="q5" value="B"> B. Công suất nguồn điện</label>
+                            <label class="block"><input type="radio" name="q5" value="C"> C. Nội năng ban đầu của nước</label>
+                        </div>
+                    </div>
+
+                    <button type="button" class="bg-dark-blue text-white w-full py-3 rounded-lg font-bold mt-4 hover:opacity-90" onclick="checkQuiz()">NỘP BÀI</button>
+                </form>
+                <div id="quizResult" class="mt-4 font-bold text-center"></div>
+            </div>
+        </section>
+
+        <footer class="text-center text-gray-500 text-sm mt-8 pb-8">
+            © 2024 - Tài liệu học tập Vật Lý 12 - Bài 4: Nhiệt dung riêng
+        </footer>
+    </div>
+
+    <script>
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === "block") {
+                el.style.display = "none";
+            } else {
+                el.style.display = "block";
+            }
+        }
+
+        function checkQuiz() {
+            const answers = {
+                q1: document.getElementById('q1b').checked,
+                q2: document.getElementById('q2a').checked,
+                q3: document.getElementById('q3b').checked,
+                q4: document.getElementById('q4b').checked,
+                q5: document.getElementById('q5a').checked
+            };
+            
+            let score = 0;
+            for (let key in answers) {
+                if (answers[key]) score++;
+            }
+
+            const resDiv = document.getElementById('quizResult');
+            resDiv.innerHTML = `Kết quả: ${score}/5 câu đúng. <br> <span class="text-sm text-gray-500 font-normal">Đáp án: 1B, 2A, 3B, 4B, 5A. <br> Lời giải Câu 2: Q = 2 * 4200 * 10 = 84000 J.</span>`;
+            
+            if (score === 5) {
+                resDiv.className = "mt-4 font-bold text-center text-green-600 p-4 bg-green-50 rounded";
+            } else {
+                resDiv.className = "mt-4 font-bold text-center text-red-600 p-4 bg-red-50 rounded";
+            }
+        }
+
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            }
+        };
+    </script>
+</body>
+</html>
