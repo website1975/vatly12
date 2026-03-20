@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vật Lý 12 - Bài 3: Nhiệt độ. Thang nhiệt độ – Nhiệt kế</title>
+    <title>Vật lý 12 - Bài 3: Nhiệt độ. Thang nhiệt độ – Nhiệt kế</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         body {
-            background-color: #f4f7f9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #2d3748;
+            line-height: 1.6;
+            background-color: #f4f7f9;
         }
         .bg-dark-blue {
             background-color: #1a202c; 
         }
-
         .chapter-header {
             color: white;
             padding: 1rem;
@@ -30,42 +29,36 @@
             border-radius: 8px;
             margin-bottom: 1.5rem;
             text-transform: uppercase;
+            font-weight: bold;
         }
-
-        .header-box {
-            background-color: #1a202c;
-            color: white;
-            padding: 1rem;
-            text-align: center;
+        .intro-box {
+            border: 2px solid #1a202c;
+            padding: 1.5rem;
+            background-color: #fff;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            font-style: italic;
         }
-        .section-header {
-            border-bottom: 4px solid #1a202c;
+        .section-card {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        .section-title {
+            color: #1a202c;
+            border-bottom: 3px solid #1a202c;
             display: inline-block;
             margin-bottom: 1.5rem;
-            padding-bottom: 0.2rem;
-            color: #1a202c;
             font-weight: bold;
             text-transform: uppercase;
         }
-        .content-card {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-        .intro-box {
-            border: 1px solid #cbd5e0;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            background-color: white;
-            font-style: italic;
-        }
         .question-box {
             background-color: #edf2f7;
-            border-left: 5px solid #2b6cb0;
+            border-left: 5px solid #1a202c;
             padding: 1rem;
-            margin-top: 1rem;
+            margin: 1rem 0;
             border-radius: 4px;
         }
         .answer-box {
@@ -76,347 +69,316 @@
             display: none;
             border-radius: 4px;
         }
-        .btn-dark {
+        .btn-view {
             background-color: #1a202c;
             color: white;
             padding: 0.5rem 1rem;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 0.9rem;
             transition: background 0.3s;
         }
-        .btn-dark:hover {
+        .btn-view:hover {
             background-color: #2d3748;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 1rem 0;
+            margin: 1.5rem 0;
         }
         th, td {
             border: 1px solid #cbd5e0;
-            padding: 0.75rem;
+            padding: 1rem;
             text-align: center;
         }
         th {
             background-color: #e2e8f0;
-        }
-        .quiz-container {
-            margin-top: 2rem;
-        }
-        .quiz-item {
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        #quiz-result {
             font-weight: bold;
-            margin-top: 1rem;
-            padding: 1rem;
-            border-radius: 8px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background-color: #ebf4ff;
+            color: #2b6cb0;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: bold;
         }
     </style>
 </head>
+<body class="p-4 md:p-8">
 
-<body class="p-4 md:p-8 max-w-5xl mx-auto">
-    <!-- Header Section -->
-    <header class="mb-8">
-        <div class="bg-dark-blue chapter-header">
-            <h2 class="text-xl font-bold">CHƯƠNG 1: VẬT LÝ NHIỆT</h2>
-        </div>
-        <div class="bg-dark-blue lesson-title">
-            <h1 class="text-3xl font-extrabold tracking-tight">Bài 1: Cấu trúc của chất. Sự chuyển thể</h1>
-        </div>
-    </header>
+    <div class="max-w-4xl mx-auto">
+        <!-- Header Section -->
+        <header>
+            <div class="chapter-header bg-dark-blue">
+                CHƯƠNG 1: VẬT LÝ NHIỆT
+            </div>
+            <div class="lesson-title bg-dark-blue">
+                BÀI 3: NHIỆT ĐỘ. THANG NHIỆT ĐỘ – NHIỆT KẾ
+            </div>
+        </header>
 
-    <div class="max-w-4xl mx-auto px-4">
-        
-        <!-- Intro Box -->
+        <!-- Intro -->
         <div class="intro-box">
-            Làm thế nào để nhận biết được sự truyền nhiệt năng giữa các vật? Ví dụ, làm thế nào để nhận biết: "Vật nào là vật truyền nhiệt năng, vật nào là vật nhận nhiệt năng; sự truyền nhiệt năng đã dừng lại hay còn đang tiếp tục;...?"
+            "Làm thế nào để nhận biết được sự truyền nhiệt năng giữa các vật? Ví dụ, làm thế nào để nhận biết: Vật nào là vật truyền nhiệt năng, vật nào là vật nhận nhiệt năng; sự truyền nhiệt năng đã dừng lại hay còn đang tiếp tục;...?"
         </div>
 
-        <!-- Section I -->
-        <section id="phan-1">
-            <h2 class="section-header text-2xl">I. Khái niệm nhiệt độ</h2>
-            <div class="content-card">
-                <p class="mb-4">Nhiệt độ là số đo độ "nóng", "lạnh" của một vật. Thí nghiệm sau đây giúp ta hiểu rõ hơn về chiều truyền nhiệt năng.</p>
-                
-                <h3 class="font-bold text-lg mb-2">Thí nghiệm sự truyền nhiệt năng</h3>
-                <div class="flex flex-col md:flex-row gap-6 mb-4">
-                    <div class="flex-1">
-                        <p><strong>Chuẩn bị:</strong></p>
-                        <ul class="list-disc ml-6 mb-2">
-                            <li>Cốc nhôm (1) đựng 200mL nước ở \(30^\circ C\).</li>
-                            <li>Bình cách nhiệt (2) đựng 500mL nước ở \(60^\circ C\).</li>
+        <!-- I. Khái niệm -->
+        <section class="section-card">
+            <h2 class="section-title text-xl">I. KHÁI NIỆM NHIỆT ĐỘ</h2>
+            <p class="mb-4">Nhiệt độ là số đo độ "nóng", "lạnh" của một vật. Thí nghiệm dưới đây giúp ta nhận biết chiều truyền nhiệt năng.</p>
+            
+            <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
+                <h3 class="font-bold mb-4 flex items-center">🔬 THÍ NGHIỆM SỰ TRUYỀN NHIỆT NĂNG</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <p class="font-bold text-sm text-gray-600 uppercase mb-2">Chuẩn bị:</p>
+                        <ul class="list-disc ml-5 text-sm space-y-1">
+                            <li>Cốc nhôm (1) đựng 200 mL nước ở $30^\circ C$.</li>
+                            <li>Bình cách nhiệt (2) đựng 500 mL nước ở $60^\circ C$.</li>
                             <li>Hai nhiệt kế (3).</li>
                         </ul>
                     </div>
-                    <div class="flex-1 bg-gray-100 p-4 rounded flex items-center justify-center italic text-sm text-gray-500">
-                    <img src="h1.png"></img>
+                    <div>
+                        <p class="font-bold text-sm text-gray-600 uppercase mb-2">Tiến hành:</p>
+                        <p class="text-sm">Đặt cốc nhôm vào bình cách nhiệt. Quan sát sự thay đổi số chỉ nhiệt kế cho đến khi chúng bằng nhau.</p>
                     </div>
                 </div>
+            </div>
 
-                <p><strong>Tiến hành:</strong> Đặt cốc nhôm vào bình cách nhiệt. Quan sát sự thay đổi nhiệt độ cho đến khi hai nhiệt độ bằng nhau.</p>
-
-                <div class="question-box">
-                    <strong>Câu hỏi:</strong> Tại sao có thể biết nước trong bình truyền nhiệt năng cho nước trong cốc?
-                    <button class="ml-2 text-blue-600 underline text-sm" onclick="toggleAnswer('ans1')">Xem lời giải</button>
-                    <div id="ans1" class="answer-box">
-                        Vì nhiệt độ của nước trong bình giảm đi (mất bớt nhiệt năng) và nhiệt độ của nước trong cốc tăng lên (nhận thêm nhiệt năng).
-                    </div>
+            <div class="question-box">
+                <p><strong>Câu hỏi:</strong> Tại sao có thể biết nước trong bình truyền nhiệt năng cho nước trong cốc?</p>
+                <button class="btn-view mt-2" onclick="toggleAnswer('ans1')">Nhấn xem trả lời</button>
+                <div id="ans1" class="answer-box">
+                    Vì nhiệt độ nước trong bình giảm (mất nhiệt năng) và nhiệt độ nước trong cốc tăng (nhận nhiệt năng).
                 </div>
+            </div>
 
-                <div class="mt-6 p-4 border-l-4 border-yellow-500 bg-yellow-50">
-                    <h4 class="font-bold">Kết luận:</h4>
-                    <p>Nhiệt độ cho biết trạng thái cân bằng nhiệt của các vật và chiều truyền nhiệt năng. Nhiệt năng luôn tự truyền từ vật có nhiệt độ cao sang vật có nhiệt độ thấp hơn.</p>
-                </div>
+            <div class="mt-8 p-6 bg-blue-900 text-white rounded-lg">
+                <h4 class="font-bold text-lg mb-2 uppercase">Kết luận</h4>
+                <ul class="list-disc ml-5 space-y-2">
+                    <li>Nhiệt độ cho biết trạng thái cân bằng nhiệt và chiều truyền nhiệt.</li>
+                    <li>Nhiệt năng tự truyền từ vật có <strong>nhiệt độ cao hơn</strong> sang vật có <strong>nhiệt độ thấp hơn</strong>.</li>
+                </ul>
             </div>
         </section>
 
-        <!-- Section II -->
-        <section id="phan-2">
-            <h2 class="section-header text-2xl">II. Thang nhiệt độ - Nhiệt kế</h2>
+        <!-- II. Thang nhiệt độ -->
+        <section class="section-card">
+            <h2 class="section-title text-xl">II. THANG NHIỆT ĐỘ – NHIỆT KẾ</h2>
             
             <!-- 1. Celsius -->
-            <div class="content-card">
-                <h3 class="font-bold text-xl text-blue-900 mb-2">1. Thang Celsius (\(^\circ C\))</h3>
-                <p>Được sử dụng phổ biến nhất trong đời sống hằng ngày.</p>
-                <ul class="list-disc ml-6 mb-4">
-                    <li><strong>Mốc 1:</strong> Nhiệt độ đóng băng của nước tinh khiết (\(0^\circ C\)).</li>
-                    <li><strong>Mốc 2:</strong> Nhiệt độ sôi của nước tinh khiết (\(100^\circ C\)).</li>
-                </ul>
-                <button class="btn-dark text-sm" onclick="toggleAnswer('history-c')">Tìm hiểu sự ra đời</button>
-                <div id="history-c" class="answer-box italic">
-                    Năm 1742, nhà thiên văn học người Thụy Điển Anders Celsius đã đề xuất thang nhiệt độ chia khoảng cách giữa nhiệt độ đông đặc và nhiệt độ sôi của nước thành 100 phần bằng nhau.
+            <div class="mb-8">
+                <h3 class="font-bold text-lg text-blue-900">1. Thang Celsius ($^\circ C$)</h3>
+                <p class="text-sm text-gray-600 mb-3 italic">Hai mốc quan trọng:</p>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <span class="badge">Nước đá đang tan: 0 $^\circ C$</span>
+                    <span class="badge">Nước đang sôi: 100 $^\circ C$</span>
+                </div>
+                <button class="btn-view" onclick="toggleAnswer('hist-c')">Sự ra đời (Nhấn xem)</button>
+                <div id="hist-c" class="answer-box italic">
+                    Được đề xuất bởi Anders Celsius năm 1742. Ban đầu ông chọn 0 độ là điểm sôi và 100 độ là điểm đóng băng, sau đó được đảo ngược lại như hiện nay.
                 </div>
             </div>
 
             <!-- 2. Kelvin -->
-            <div class="content-card">
-                <h3 class="font-bold text-xl text-blue-900 mb-2">2. Thang Kelvin (K)</h3>
-                <p>Sử dụng trong khoa học, gọi là thang nhiệt độ tuyệt đối.</p>
-                <ul class="list-disc ml-6 mb-4">
-                    <li><strong>Mốc 1:</strong> Độ không tuyệt đối (0 K) - nhiệt độ thấp nhất lý thuyết.</li>
-                    <li><strong>Mốc 2:</strong> Nhiệt độ điểm ba của nước (\(273,16 K\)).</li>
-                </ul>
-                <button class="btn-dark text-sm" onclick="toggleAnswer('history-k')">Tìm hiểu sự ra đời</button>
-                <div id="history-k" class="answer-box italic">
-                    Năm 1848, ông William Thomson (sau này là Nam tước Kelvin) đề xuất thang nhiệt độ dựa trên các nguyên lý nhiệt động lực học, không phụ thuộc vào tính chất của bất kỳ chất cụ thể nào.
+            <div class="mb-8">
+                <h3 class="font-bold text-lg text-blue-900">2. Thang Kelvin (K)</h3>
+                <p class="text-sm text-gray-600 mb-3 italic">Hai mốc quan trọng:</p>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <span class="badge">Độ không tuyệt đối: 0 K</span>
+                    <span class="badge">Điểm ba của nước: 273,16 K</span>
+                </div>
+                <button class="btn-view" onclick="toggleAnswer('hist-k')">Sự ra đời (Nhấn xem)</button>
+                <div id="hist-k" class="answer-box italic">
+                    Đề xuất bởi Lord Kelvin năm 1848. Đây là thang đo tuyệt đối vì nó không phụ thuộc vào tính chất của bất kỳ chất nào cụ thể.
                 </div>
             </div>
 
             <!-- 3. Fahrenheit -->
-            <div class="content-card">
-                <h3 class="font-bold text-xl text-blue-900 mb-2">3. Thang Fahrenheit (\(^\circ F\))</h3>
-                <p>Thường dùng ở Mỹ và một số quốc gia nói tiếng Anh.</p>
-                <ul class="list-disc ml-6 mb-4">
-                    <li><strong>Mốc 1:</strong> Nhiệt độ đóng băng của nước tinh khiết (\(32^\circ F\)).</li>
-                    <li><strong>Mốc 2:</strong> Nhiệt độ sôi của nước tinh khiết (\(212^\circ F\)).</li>
-                </ul>
-                <button class="btn-dark text-sm" onclick="toggleAnswer('history-f')">Tìm hiểu sự ra đời</button>
-                <div id="history-f" class="answer-box italic">
-                    Năm 1724, nhà vật lý người Đức Gabriel Fahrenheit đã đề xuất thang nhiệt độ này dựa trên các mốc nhiệt độ của hỗn hợp nước đá, muối và cơ thể người.
+            <div class="mb-8">
+                <h3 class="font-bold text-lg text-blue-900">3. Thang Fahrenheit ($^\circ F$)</h3>
+                <p class="text-sm text-gray-600 mb-3 italic">Hai mốc quan trọng:</p>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <span class="badge">Nước đá đang tan: 32 $^\circ F$</span>
+                    <span class="badge">Nước đang sôi: 212 $^\circ F$</span>
+                </div>
+                <button class="btn-view" onclick="toggleAnswer('hist-f')">Sự ra đời (Nhấn xem)</button>
+                <div id="hist-f" class="answer-box italic">
+                    Xây dựng bởi Gabriel Fahrenheit năm 1714. Thang đo này vẫn được sử dụng phổ biến tại Hoa Kỳ.
                 </div>
             </div>
 
             <!-- 4. Chuyển đổi -->
-            <div class="content-card">
-                <h3 class="font-bold text-xl text-blue-900 mb-4">4. Cách chuyển giá trị các thang nhiệt độ</h3>
-                
-                <div class="mb-6">
-                    <h4 class="font-bold text-gray-700">a. Giữa Celsius và Kelvin:</h4>
-                    <div class="bg-gray-800 text-white p-4 rounded text-center text-xl my-2">
-                        \(T(K) = t(^\circ C) + 273,15\)
+            <div class="mt-10">
+                <h3 class="font-bold text-lg text-blue-900 mb-4">4. Cách chuyển giá trị các thang nhiệt độ</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
+                        <p class="text-sm font-bold uppercase text-gray-500 mb-2">Celsius $\leftrightarrow$ Kelvin</p>
+                        <p class="text-xl font-mono">$$T(K) = t(^\circ C) + 273,15$$</p>
                     </div>
-                    <p class="text-sm italic">Trong các bài toán phổ thông, thường lấy làm tròn là + 273.</p>
-                </div>
-
-                <div class="mb-6">
-                    <h4 class="font-bold text-gray-700">b. Giữa Celsius và Fahrenheit:</h4>
-                    <div class="bg-gray-800 text-white p-4 rounded text-center text-xl my-2">
-                        \(t(^\circ F) = 32 + 1,8 \cdot t(^\circ C)\)
+                    <div class="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
+                        <p class="text-sm font-bold uppercase text-gray-500 mb-2">Celsius $\leftrightarrow$ Fahrenheit</p>
+                        <p class="text-xl font-mono">$$t(^\circ F) = 32 + 1,8 \cdot t(^\circ C)$$</p>
                     </div>
                 </div>
 
                 <div class="question-box">
-                    <strong>Câu hỏi luyện tập:</strong> Một vật có nhiệt độ \(25^\circ C\), hãy đổi sang Kelvin và Fahrenheit.
-                    <button class="ml-2 text-blue-600 underline text-sm" onclick="toggleAnswer('ans-conv')">Xem đáp án</button>
+                    <p><strong>Câu hỏi:</strong> Nhiệt độ cơ thể người bình thường là $37^\circ C$. Hãy đổi sang K và $^\circ F$.</p>
+                    <button class="btn-view mt-2" onclick="toggleAnswer('ans-conv')">Nhấn xem đáp án</button>
                     <div id="ans-conv" class="answer-box">
-                        - Kelvin: \(T = 25 + 273,15 = 298,15 K\). <br>
-                        - Fahrenheit: \(t = 32 + 1,8 \times 25 = 77^\circ F\).
-                    </div>
-                </div>
-
-                <div class="mt-6 bg-blue-50 p-4 border rounded">
-                    <button class="font-bold text-blue-800 flex items-center" onclick="toggleAnswer('didyouknow1')">
-                        💡 Em có biết? (Nhấn để xem)
-                    </button>
-                    <div id="didyouknow1" class="hidden mt-2 text-sm text-blue-900">
-                        Nhiệt độ thấp nhất mà con người từng tạo ra được trong phòng thí nghiệm chỉ cao hơn độ không tuyệt đối vài phần tỉ độ. Tại nhiệt độ này, các tính chất kỳ lạ của vật chất như siêu dẫn và siêu lỏng xuất hiện.
+                        - Thang Kelvin: $37 + 273,15 = 310,15 K$ <br>
+                        - Thang Fahrenheit: $32 + 1,8 \times 37 = 98,6^\circ F$
                     </div>
                 </div>
             </div>
 
             <!-- 5. Nhiệt kế -->
-            <div class="content-card">
-                <h3 class="font-bold text-xl text-blue-900 mb-2">5. Nhiệt kế</h3>
-                <p>Nhiệt kế là thiết bị đo nhiệt độ dựa trên một số tính chất vật lý phụ thuộc vào nhiệt độ (sự nở vì nhiệt, điện trở, bức xạ hồng ngoại...).</p>
-                
+            <div class="mt-10">
+                <h3 class="font-bold text-lg text-blue-900 mb-4">5. Nhiệt kế</h3>
                 <table>
                     <thead>
                         <tr>
                             <th>Loại nhiệt kế</th>
-                            <th>Nguyên lý hoạt động</th>
+                            <th>Nguyên lý</th>
                             <th>Ứng dụng</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Nhiệt kế chất lỏng</td>
-                            <td>Sự nở vì nhiệt của rượu hoặc thủy ngân</td>
-                            <td>Đo nhiệt độ cơ thể, thời tiết</td>
+                            <td>Chất lỏng</td>
+                            <td>Sự nở vì nhiệt</td>
+                            <td>Y tế, thời tiết</td>
                         </tr>
                         <tr>
-                            <td>Nhiệt kế điện trở</td>
-                            <td>Sự thay đổi điện trở theo nhiệt độ</td>
-                            <td>Đo nhiệt độ chính xác trong công nghiệp</td>
+                            <td>Điện tử</td>
+                            <td>Thay đổi điện trở</td>
+                            <td>Công nghiệp, chính xác</td>
                         </tr>
                         <tr>
-                            <td>Nhiệt kế hồng ngoại</td>
-                            <td>Bức xạ nhiệt của các vật</td>
-                            <td>Đo không tiếp xúc, đo trán</td>
+                            <td>Hồng ngoại</td>
+                            <td>Bức xạ nhiệt</td>
+                            <td>Đo trán, đo từ xa</td>
                         </tr>
                     </tbody>
                 </table>
-
-                <div class="mt-4 bg-blue-50 p-4 border rounded">
-                    <button class="font-bold text-blue-800 flex items-center" onclick="toggleAnswer('didyouknow2')">
-                        💡 Em có biết? (Nhấn để xem)
-                    </button>
-                    <div id="didyouknow2" class="hidden mt-2 text-sm text-blue-900">
-                        Nhiệt kế thủy ngân hiện nay đang dần được thay thế bởi nhiệt kế điện tử hoặc nhiệt kế rượu vì thủy ngân là kim loại rất độc hại nếu nhiệt kế bị vỡ.
+                <div class="bg-blue-50 p-4 border rounded mt-4">
+                    <button class="font-bold text-blue-800" onclick="toggleAnswer('know-extra')">💡 Em có biết? (Nhấn xem)</button>
+                    <div id="know-extra" class="hidden mt-2 text-sm text-blue-900">
+                        Nhiệt độ của tâm Mặt Trời khoảng 15 triệu Kelvin, trong khi độ không tuyệt đối là giới hạn dưới của nhiệt độ mà không vật nào có thể đạt tới được.
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Section III -->
-        <section id="phan-3">
-            <h2 class="section-header text-2xl">III. Củng cố</h2>
-            <div class="content-card">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="p-4 bg-green-50 border border-green-200 rounded">
-                        <h4 class="font-bold text-green-800">Em đã học</h4>
-                        <ul class="list-disc ml-4 text-sm">
-                            <li>Nhiệt độ cho biết trạng thái cân bằng nhiệt.</li>
-                            <li>Chiều truyền nhiệt: Cao sang Thấp.</li>
-                            <li>Các thang nhiệt độ: C, K, F.</li>
-                            <li>Nhiệt kế đo dựa trên tính chất vật lý.</li>
-                        </ul>
-                    </div>
-                    <div class="p-4 bg-purple-50 border border-purple-200 rounded">
-                        <h4 class="font-bold text-purple-800">Em có thể</h4>
-                        <ul class="list-disc ml-4 text-sm">
-                            <li>Giải thích hiện tượng truyền nhiệt trong đời sống.</li>
-                            <li>Đổi nhiệt độ qua lại giữa các thang đo.</li>
-                            <li>Lựa chọn nhiệt kế phù hợp cho mục đích đo.</li>
-                        </ul>
-                    </div>
+        <!-- III. Củng cố -->
+        <section class="section-card">
+            <h2 class="section-title text-xl">III. CỦNG CỐ</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                    <p class="font-bold text-green-800 uppercase text-sm mb-2">Em đã học</p>
+                    <ul class="list-disc ml-5 text-sm space-y-1">
+                        <li>Cân bằng nhiệt và chiều truyền nhiệt.</li>
+                        <li>Các thang đo nhiệt độ C, K, F.</li>
+                        <li>Cách sử dụng các loại nhiệt kế.</li>
+                    </ul>
                 </div>
-
-                <div class="quiz-container">
-                    <h3 class="font-bold text-xl my-4">Bài tập vận dụng</h3>
-                    
-                    <form id="quizForm">
-                        <div class="quiz-item">
-                            <p class="font-medium">1. Đơn vị đo nhiệt độ trong hệ SI là gì?</p>
-                            <label class="block ml-4 mt-1"><input type="radio" name="q1" value="A"> A. Độ Celsius (\(^\circ C\))</label>
-                            <label class="block ml-4"><input type="radio" name="q1" value="B"> B. Độ Fahrenheit (\(^\circ F\))</label>
-                            <label class="block ml-4"><input type="radio" name="q1" value="C"> C. Kelvin (K)</label>
-                        </div>
-
-                        <div class="quiz-item">
-                            <p class="font-medium">2. Nhiệt độ \(37^\circ C\) tương ứng với bao nhiêu độ Fahrenheit?</p>
-                            <label class="block ml-4 mt-1"><input type="radio" name="q2" value="A"> A. \(98,6^\circ F\)</label>
-                            <label class="block ml-4"><input type="radio" name="q2" value="B"> B. \(32^\circ F\)</label>
-                            <label class="block ml-4"><input type="radio" name="q2" value="C"> C. \(100^\circ F\)</label>
-                        </div>
-
-                        <div class="quiz-item">
-                            <p class="font-medium">3. Hai vật tiếp xúc nhau mà không có sự truyền nhiệt năng thì:</p>
-                            <label class="block ml-4 mt-1"><input type="radio" name="q3" value="A"> A. Chúng có khối lượng bằng nhau</label>
-                            <label class="block ml-4"><input type="radio" name="q3" value="B"> B. Chúng có nhiệt độ bằng nhau</label>
-                            <label class="block ml-4"><input type="radio" name="q3" value="C"> C. Chúng có nhiệt năng bằng nhau</label>
-                        </div>
-
-                        <div class="quiz-item">
-                            <p class="font-medium">4. Công thức đúng để đổi từ \(^\circ C\) sang K là:</p>
-                            <label class="block ml-4 mt-1"><input type="radio" name="q4" value="A"> A. \(T = t + 273\)</label>
-                            <label class="block ml-4"><input type="radio" name="q4" value="B"> B. \(T = t - 273\)</label>
-                            <label class="block ml-4"><input type="radio" name="q4" value="C"> C. \(T = 273 - t\)</label>
-                        </div>
-
-                        <div class="quiz-item">
-                            <p class="font-medium">5. Độ không tuyệt đối tương ứng với:</p>
-                            <label class="block ml-4 mt-1"><input type="radio" name="q5" value="A"> A. \(0^\circ C\)</label>
-                            <label class="block ml-4"><input type="radio" name="q5" value="B"> B. \(273 K\)</label>
-                            <label class="block ml-4"><input type="radio" name="q5" value="C"> C. \(-273,15^\circ C\)</label>
-                        </div>
-
-                        <button type="button" class="btn-dark w-full mt-4 font-bold" onclick="checkQuiz()">NỘP BÀI</button>
-                    </form>
-                    
-                    <div id="quiz-result" class="hidden"></div>
+                <div class="p-4 bg-orange-50 rounded-lg border border-orange-200">
+                    <p class="font-bold text-orange-800 uppercase text-sm mb-2">Em có thể</p>
+                    <ul class="list-disc ml-5 text-sm space-y-1">
+                        <li>Giải thích hiện tượng truyền nhiệt.</li>
+                        <li>Đổi đơn vị nhiệt độ thành thạo.</li>
+                    </ul>
                 </div>
             </div>
+
+            <div class="quiz-container">
+                <h3 class="font-bold text-lg mb-4 border-l-4 border-dark-blue pl-3 uppercase">Bài tập trắc nghiệm</h3>
+                <div class="space-y-6">
+                    <div class="quiz-item">
+                        <p class="font-bold">1. Nhiệt độ là đại lượng đặc trưng cho:</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q1" id="q1a"> A. Nội năng của vật</label>
+                            <label class="block"><input type="radio" name="q1" id="correct1"> B. Trạng thái cân bằng nhiệt</label>
+                            <label class="block"><input type="radio" name="q1" id="q1c"> C. Khối lượng của vật</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <p class="font-bold">2. Công thức chuyển đổi từ Celsius sang Kelvin là:</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q2" id="q2a"> A. $T = t - 273$</label>
+                            <label class="block"><input type="radio" name="q2" id="correct2"> B. $T = t + 273$</label>
+                            <label class="block"><input type="radio" name="q2" id="q2c"> C. $T = t + 32$</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <p class="font-bold">3. Đơn vị nhiệt độ trong hệ SI là:</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q3" id="correct3"> A. Kelvin (K)</label>
+                            <label class="block"><input type="radio" name="q3" id="q3b"> B. Độ Celsius ($^\circ C$)</label>
+                            <label class="block"><input type="radio" name="q3" id="q3c"> C. Độ Fahrenheit ($^\circ F$)</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <p class="font-bold">4. Ở nhiệt độ nào thì số chỉ trên thang Celsius và Fahrenheit bằng nhau?</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q4" id="correct4"> A. -40</label>
+                            <label class="block"><input type="radio" name="q4" id="q4b"> B. 0</label>
+                            <label class="block"><input type="radio" name="q4" id="q4c"> C. 100</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <p class="font-bold">5. Thang nhiệt độ tuyệt đối có giá trị thấp nhất là:</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q5" id="correct5"> A. 0 K</label>
+                            <label class="block"><input type="radio" name="q5" id="q5b"> B. -273 K</label>
+                            <label class="block"><input type="radio" name="q5" id="q5c"> C. 273 K</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="bg-dark-blue text-white w-full py-3 rounded-lg font-bold mt-8 hover:opacity-90" onclick="checkQuiz()">NỘP BÀI</button>
+                <div id="quizResult" class="mt-4 font-bold text-center"></div>
+            </div>
         </section>
+
+        <footer class="text-center text-gray-500 text-sm mt-8 pb-8">
+            © 2024 - Tài liệu học tập Vật Lý 12
+        </footer>
     </div>
 
     <script>
-        // Toggle answer visibility
         function toggleAnswer(id) {
             const el = document.getElementById(id);
-            if (el.style.display === "block") {
-                el.style.display = "none";
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
             } else {
-                el.style.display = "block";
+                el.style.display = (el.style.display === "block") ? "none" : "block";
             }
         }
 
-        // Check quiz results
         function checkQuiz() {
-            const answers = {
-                q1: "C",
-                q2: "A",
-                q3: "B",
-                q4: "A",
-                q5: "C"
-            };
-            
-            let score = 0;
-            const form = document.getElementById('quizForm');
-            const total = Object.keys(answers).length;
-            
-            for (let q in answers) {
-                const selected = form.querySelector(`input[name="${q}"]:checked`);
-                if (selected && selected.value === answers[q]) {
-                    score++;
-                }
-            }
-            
-            const resultDiv = document.getElementById('quiz-result');
-            resultDiv.classList.remove('hidden');
-            
-            if (score === total) {
-                resultDiv.style.backgroundColor = "#f0fff4";
-                resultDiv.style.color = "#2f855a";
-                resultDiv.innerHTML = `Tuyệt vời! Bạn đúng ${score}/${total} câu. Bạn đã nắm vững bài học.`;
-            } else {
-                resultDiv.style.backgroundColor = "#fff5f5";
-                resultDiv.style.color = "#c53030";
-                resultDiv.innerHTML = `Bạn đạt ${score}/${total} điểm. Hãy xem lại các phần nội dung chưa kỹ nhé!`;
-            }
+            const results = [
+                document.getElementById('correct1').checked,
+                document.getElementById('correct2').checked,
+                document.getElementById('correct3').checked,
+                document.getElementById('correct4').checked,
+                document.getElementById('correct5').checked
+            ];
+            const score = results.filter(r => r).length;
+            const resDiv = document.getElementById('quizResult');
+            resDiv.innerHTML = `Kết quả: ${score}/5 câu đúng. <br> <span class="text-sm text-gray-500 font-normal">Đáp án đúng: 1B, 2B, 3A, 4A, 5A</span>`;
+            resDiv.className = score === 5 ? "mt-4 font-bold text-center text-green-600" : "mt-4 font-bold text-center text-red-600";
         }
+
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+        };
     </script>
 </body>
 </html>
