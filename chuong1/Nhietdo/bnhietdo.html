@@ -142,7 +142,7 @@
                         <p class="font-bold text-sm text-gray-600 uppercase mb-2">Chuẩn bị:</p>
                         <ul class="list-disc ml-5 text-sm space-y-1">
                             <li>Cốc nhôm (1) đựng 200 mL nước ở \(30^\circ C\).</li>
-                            <li>Bình cách nhiệt (2) đựng 500 mL nước ở $60^\circ C$.</li>
+                            <li>Bình cách nhiệt (2) đựng 500 mL nước ở \(60^\circ C\).</li>
                             <li>Hai nhiệt kế (3).</li>
                         </ul>
                     </div>
@@ -179,8 +179,8 @@
                 <h3 class="font-bold text-lg text-blue-900">1. Thang Celsius (\(^\circ C)\)</h3>
                 <p class="text-sm text-gray-600 mb-3 italic">Hai mốc quan trọng:</p>
                 <div class="flex flex-wrap gap-2 mb-3">
-                    <span class="badge">Nước đá đang tan: 0 $^\circ C$</span>
-                    <span class="badge">Nước đang sôi: 100 $^\circ C$</span>
+                    <span class="badge">Nước đá đang tan: 0 \(^\circ C\)</span>
+                    <span class="badge">Nước đang sôi: 100 \(^\circ C\)</span>
                 </div>
                 <button class="btn-view" onclick="toggleAnswer('hist-c')">Sự ra đời (Nhấn xem)</button>
                 <div id="hist-c" class="answer-box italic">
@@ -204,11 +204,11 @@
 
             <!-- 3. Fahrenheit -->
             <div class="mb-8">
-                <h3 class="font-bold text-lg text-blue-900">3. Thang Fahrenheit ($^\circ F$)</h3>
+                <h3 class="font-bold text-lg text-blue-900">3. Thang Fahrenheit (\(^\circ F\))</h3>
                 <p class="text-sm text-gray-600 mb-3 italic">Hai mốc quan trọng:</p>
                 <div class="flex flex-wrap gap-2 mb-3">
-                    <span class="badge">Nước đá đang tan: 32 $^\circ F$</span>
-                    <span class="badge">Nước đang sôi: 212 $^\circ F$</span>
+                    <span class="badge">Nước đá đang tan: 32 \(^\circ F\)</span>
+                    <span class="badge">Nước đang sôi: 212 ^\cir\(c F\)</span>
                 </div>
                 <button class="btn-view" onclick="toggleAnswer('hist-f')">Sự ra đời (Nhấn xem)</button>
                 <div id="hist-f" class="answer-box italic">
@@ -221,21 +221,21 @@
                 <h3 class="font-bold text-lg text-blue-900 mb-4">4. Cách chuyển giá trị các thang nhiệt độ</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div class="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
-                        <p class="text-sm font-bold uppercase text-gray-500 mb-2">Celsius $\leftrightarrow$ Kelvin</p>
-                        <p class="text-xl font-mono">$$T(K) = t(^\circ C) + 273,15$$</p>
+                        <p class="text-sm font-bold uppercase text-gray-500 mb-2">Celsius \(\leftrightarrow\) Kelvin</p>
+                        <p class="text-xl font-mono">\(T(K) = t(^\circ C) + 273,15\)</p>
                     </div>
                     <div class="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
-                        <p class="text-sm font-bold uppercase text-gray-500 mb-2">Celsius $\leftrightarrow$ Fahrenheit</p>
-                        <p class="text-xl font-mono">$$t(^\circ F) = 32 + 1,8 \cdot t(^\circ C)$$</p>
+                        <p class="text-sm font-bold uppercase text-gray-500 mb-2">Celsius \(\leftrightarrow\) Fahrenheit</p>
+                        <p class="text-xl font-mono">\(t(^\circ F) = 32 + 1,8 \cdot t(^\circ C)\)</p>
                     </div>
                 </div>
 
                 <div class="question-box">
-                    <p><strong>Câu hỏi:</strong> Nhiệt độ cơ thể người bình thường là $37^\circ C$. Hãy đổi sang K và $^\circ F$.</p>
+                    <p><strong>Câu hỏi:</strong> Nhiệt độ cơ thể người bình thường là \(37^\circ C\). Hãy đổi sang K và \(^\circ F\).</p>
                     <button class="btn-view mt-2" onclick="toggleAnswer('ans-conv')">Nhấn xem đáp án</button>
                     <div id="ans-conv" class="answer-box">
-                        - Thang Kelvin: $37 + 273,15 = 310,15 K$ <br>
-                        - Thang Fahrenheit: $32 + 1,8 \times 37 = 98,6^\circ F$
+                        - Thang Kelvin: \(37 + 273,15 = 310,15 K\) <br>
+                        - Thang Fahrenheit: \(32 + 1,8 \times 37 = 98,6^\circ F\)
                     </div>
                 </div>
             </div>
@@ -314,9 +314,9 @@
                     <div class="quiz-item">
                         <p class="font-bold">2. Công thức chuyển đổi từ Celsius sang Kelvin là:</p>
                         <div class="ml-4 mt-2">
-                            <label class="block"><input type="radio" name="q2" id="q2a"> A. $T = t - 273$</label>
-                            <label class="block"><input type="radio" name="q2" id="correct2"> B. $T = t + 273$</label>
-                            <label class="block"><input type="radio" name="q2" id="q2c"> C. $T = t + 32$</label>
+                            <label class="block"><input type="radio" name="q2" id="q2a"> A. \(T = t - 273\)</label>
+                            <label class="block"><input type="radio" name="q2" id="correct2"> B. \(T = t + 273\)</label>
+                            <label class="block"><input type="radio" name="q2" id="q2c"> C. \(T = t + 32\)</label>
                         </div>
                     </div>
 
@@ -324,8 +324,8 @@
                         <p class="font-bold">3. Đơn vị nhiệt độ trong hệ SI là:</p>
                         <div class="ml-4 mt-2">
                             <label class="block"><input type="radio" name="q3" id="correct3"> A. Kelvin (K)</label>
-                            <label class="block"><input type="radio" name="q3" id="q3b"> B. Độ Celsius ($^\circ C$)</label>
-                            <label class="block"><input type="radio" name="q3" id="q3c"> C. Độ Fahrenheit ($^\circ F$)</label>
+                            <label class="block"><input type="radio" name="q3" id="q3b"> B. Độ Celsius (\(^\circ C\))</label>
+                            <label class="block"><input type="radio" name="q3" id="q3c"> C. Độ Fahrenheit (\(^\circ F\))</label>
                         </div>
                     </div>
 
