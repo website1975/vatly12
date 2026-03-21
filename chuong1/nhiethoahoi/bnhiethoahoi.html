@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vật Lý 12 - Nhiệt Hoá Hơi Riêng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2d3748;
+        }
+        .header-bg { background-color: #1a202c; }
+        .rounded-12 { border-radius: 12px; }
+        .section-header {
+            border-bottom: 4px solid #1a202c;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+        .answer-box { display: none; }
+        table, th, td {
+            border: 1px solid #cbd5e0;
+            border-collapse: collapse;
+        }
+        th { background-color: #e2e8f0; }
+        .formula-box {
+            border: 2px solid #1a202c;
+            background-color: #fff;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <header class="max-w-4xl mx-auto mb-8 shadow-lg overflow-hidden rounded-12">
+        <div class="header-bg text-white py-2 px-6 text-sm uppercase tracking-widest text-center">
+            Chương 1: Vật Lý Nhiệt
+        </div>
+        <div class="header-bg text-white py-6 px-6 text-3xl font-bold text-center border-t border-gray-700">
+            BÀI 6: NHIỆT HOÁ HƠI RIÊNG
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto space-y-8">
+
+        <section class="bg-white p-6 rounded-12 shadow-md border border-gray-300 italic">
+            Khi nước bắt đầu sôi, phải tiếp tục cung cấp nhiệt lượng cho nước để nước tiếp tục sôi (hoá hơi). 
+            Làm thế nào để xác định được độ lớn của nhiệt lượng làm hoá hơi hoàn toàn một lượng nước ở nhiệt độ không đổi?
+        </section>
+
+        <section class="bg-white p-8 rounded-12 shadow-md">
+            <h2 class="section-header text-xl font-bold">I. KHÁI NIỆM NHIỆT HOÁ HƠI RIÊNG</h2>
+            
+            <div class="mt-4 space-y-4">
+                <h3 class="font-bold">1. Hệ thức tính nhiệt lượng</h3>
+                <p>Nhiệt lượng cung cấp cho một lượng chất lỏng hoá hơi ở nhiệt độ không đổi phụ thuộc vào khối lượng và bản chất của chất lỏng.</p>
+                
+                <div class="overflow-x-auto">
+                    <p class="mb-2 font-semibold text-center text-sm">Bảng 6.1. Giá trị gần đúng của nhiệt hoá hơi ở nhiệt độ sôi (áp suất tiêu chuẩn)</p>
+                    <table class="w-full text-center">
+                        <thead>
+                            <tr>
+                                <th class="p-2">Chất</th>
+                                <th class="p-2">Nhiệt độ sôi (\(^\circ C\))</th>
+                                <th class="p-2">Nhiệt hoá hơi riêng (\(J/kg\))</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="p-2">Nước</td><td class="p-2">100</td><td class="p-2">\(2,26.10^6\)</td></tr>
+                            <tr><td class="p-2">Rượu</td><td class="p-2">78</td><td class="p-2">\(8,57.10^5\)</td></tr>
+                            <tr><td class="p-2">Thuỷ ngân</td><td class="p-2">357</td><td class="p-2">\(2,85.10^5\)</td></tr>
+                            <tr><td class="p-2">Ether</td><td class="p-2">34,5</td><td class="p-2">\(0,40.10^6\)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>Hệ thức tính nhiệt lượng cần cung cấp để hoá hơi hoàn toàn khối lượng \(m\) ở nhiệt độ sôi:</p>
+                <div class="formula-box rounded-12 my-6">
+                    \( Q = L \cdot m \)
+                </div>
+                <ul class="list-disc ml-8 text-sm space-y-1">
+                    <li><strong>Q</strong>: Nhiệt lượng cần truyền cho chất lỏng (\(J\)).</li>
+                    <li><strong>L</strong>: Nhiệt hoá hơi riêng của chất lỏng (\(J/kg\)).</li>
+                    <li><strong>m</strong>: Khối lượng chất lỏng (\(kg\)).</li>
+                </ul>
+
+                <h3 class="font-bold mt-6">2. Định nghĩa nhiệt hoá hơi riêng</h3>
+                <div class="bg-yellow-50 p-4 border-l-4 border-yellow-400 italic">
+                    Nhiệt hoá hơi riêng của một chất lỏng là nhiệt lượng cần để làm cho một kilôgam chất lỏng đó hoá hơi hoàn toàn ở nhiệt độ xác định.
+                </div>
+
+                <div class="mt-4">
+                    <button onclick="toggleAnswer('note1')" class="text-blue-700 font-bold hover:underline">
+                        ▶ PHẦN LƯU Ý (Nhấn để xem)
+                    </button>
+                    <div id="note1" class="answer-box mt-2 p-4 bg-gray-50 border rounded text-sm">
+                        Chất lỏng có thể hoá hơi ở các nhiệt độ khác nhau. Thường thì nhiệt hoá hơi riêng của một chất <strong>tăng khi nhiệt độ giảm</strong>. 
+                        Ví dụ: Nước ở \(100^\circ C\) có \(L = 2,26.10^6 J/kg\), nhưng ở \(50^\circ C\) là \(2,39.10^6 J/kg\).
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 space-y-4">
+                <h3 class="font-bold text-blue-900 underline">Câu hỏi thảo luận</h3>
+                
+                <div class="bg-blue-50 p-4 border-l-4 border-blue-800 rounded">
+                    <p><strong>Câu 1:</strong> Tính nhiệt lượng cần thiết để làm cho 10 kg nước ở \(25^\circ C\) chuyển hoàn toàn thành hơi ở \(100^\circ C\).</p>
+                    <button onclick="toggleAnswer('ans_q1')" class="mt-2 bg-blue-800 text-white px-3 py-1 rounded text-sm">Xem lời giải</button>
+                    <div id="ans_q1" class="answer-box mt-3 p-4 bg-green-50 border border-green-200 rounded">
+                        - Nhiệt lượng tăng từ \(25^\circ C\) lên \(100^\circ C\): \(Q_1 = m \cdot c \cdot \Delta t = 10 \cdot 4200 \cdot (100 - 25) = 3.150.000 J\).<br>
+                        - Nhiệt lượng để hoá hơi ở \(100^\circ C\): \(Q_2 = L \cdot m = 2,26.10^6 \cdot 10 = 22.600.000 J\).<br>
+                        - Tổng nhiệt lượng: \(Q = Q_1 + Q_2 = 25.750.000 J = 25,75 MJ\).
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 p-4 border-l-4 border-blue-800 rounded">
+                    <p><strong>Câu 2:</strong> Một vận động viên dùng hết 11 000 kJ năng lượng. Khoảng 80% năng lượng này chuyển thành nhiệt thải ra qua sự bay hơi của nước. Tính lượng nước thoát ra (Lít)? Cho \(L = 2,45.10^6 J/kg\).</p>
+                    <button onclick="toggleAnswer('ans_q2')" class="mt-2 bg-blue-800 text-white px-3 py-1 rounded text-sm">Xem lời giải</button>
+                    <div id="ans_q2" class="answer-box mt-3 p-4 bg-green-50 border border-green-200 rounded">
+                        - Nhiệt lượng dùng để bay hơi nước: \(Q = 11.000.000 \cdot 0,8 = 8.800.000 J\).<br>
+                        - Khối lượng nước: \(m = Q / L = 8.800.000 / 2,45.10^6 \approx 3,59 kg\).<br>
+                        - Vậy khoảng <strong>3,59 lít</strong> nước đã thoát ra.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white p-8 rounded-12 shadow-md">
+            <h2 class="section-header text-xl font-bold uppercase">II. THỰC HÀNH ĐO NHIỆT HOÁ HƠI RIÊNG CỦA NƯỚC</h2>
+            
+            <div class="space-y-4">
+                <p><strong>1. Mục đích:</strong> Xác định nhiệt hoá hơi riêng của nước ở nhiệt độ sôi (\(100^\circ C\)).</p>
+                <p><strong>2. Dụng cụ:</strong> Nhiệt lượng kế, oát kế, cân điện tử, dây điện trở, nguồn điện, nước nóng.</p>
+                <div class="h-48 bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center rounded-12">
+                    <span class="text-gray-500">[Hình 4.1: Sơ đồ lắp đặt dụng cụ đo nhiệt hoá hơi]</span>
+                </div>
+
+                <p><strong>3. Thiết kế phương án:</strong></p>
+                <div class="space-y-3">
+                    <div class="bg-blue-50 p-4 border-l-4 border-blue-800 rounded">
+                        <p class="text-sm italic">Học sinh thảo luận trả lời 5 câu hỏi thiết kế (Nhấn để xem đáp án tổng hợp)</p>
+                        <button onclick="toggleAnswer('ans_exp')" class="mt-2 bg-blue-800 text-white px-3 py-1 rounded text-sm">Xem trả lời câu hỏi 1-5</button>
+                        <div id="ans_exp" class="answer-box mt-3 p-4 bg-green-50 border border-green-200 rounded text-sm">
+                            1. Cần đo: Công suất \(P\), thời gian \(\tau\), và độ giảm khối lượng \(\Delta m\).<br>
+                            2. Nhiệt lượng lấy từ dòng điện qua dây điện trở.<br>
+                            3. Xác định qua công thức \(Q = P \cdot \tau\).<br>
+                            4. Các bước: Đổ nước sôi -> Cân m -> Đun sôi -> Theo dõi m theo thời gian.<br>
+                            5. Chú ý an toàn điện và tránh bị bỏng nước sôi.
+                        </div>
+                    </div>
+                </div>
+
+                <p><strong>4. Tiến hành thí nghiệm:</strong> Đun sôi nước, sau mỗi 2 phút ghi lại công suất và khối lượng còn lại trong bình.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-center">
+                            <thead>
+                                <tr><th>\(\tau(s)\)</th><th>\(P(W)\)</th><th>\(m(kg)\)</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>0</td><td>0</td><td>0,1200</td></tr>
+                                <tr><td>240</td><td>15,19</td><td>0,1184</td></tr>
+                                <tr><td>480</td><td>15,23</td><td>0,1170</td></tr>
+                                <tr><td>720</td><td>15,21</td><td>0,1152</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="h-40 bg-gray-100 border border-gray-300 flex items-center justify-center rounded">
+                        [Khung đồ thị m theo \(\tau\)]
+                    </div>
+                </div>
+
+                <p><strong>5. Kết quả:</strong> Công thức tính thực nghiệm:</p>
+                <div class="formula-box rounded-12">
+                    \( L = \frac{\overline{P}(\tau_Q - \tau_P)}{m_P - m_Q} \)
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white p-8 rounded-12 shadow-md">
+            <h2 class="section-header text-xl font-bold uppercase">III. CỦNG CỐ</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="p-4 bg-blue-900 text-white rounded-12 shadow">
+                    <h4 class="font-bold border-b mb-2">Em đã học</h4>
+                    <p class="text-xs">Công thức \(Q = Lm\). Định nghĩa và đơn vị \(J/kg\) của nhiệt hoá hơi riêng.</p>
+                </div>
+                <div class="p-4 bg-blue-700 text-white rounded-12 shadow">
+                    <h4 class="font-bold border-b mb-2">Em có thể</h4>
+                    <p class="text-xs">Tự đo \(L\) của nước và giải thích các thiết bị làm lạnh, nồi hấp y tế.</p>
+                </div>
+                <div class="p-4 bg-blue-500 text-white rounded-12 shadow">
+                    <h4 class="font-bold border-b mb-2">Em có biết</h4>
+                    <p class="text-xs">Nhiệt hoá hơi gọi là "ẩn nhiệt" vì truyền nhiệt nhưng không làm thay đổi nhiệt độ.</p>
+                </div>
+            </div>
+
+            <div id="quiz" class="space-y-6">
+                <h3 class="text-xl font-bold text-center underline">BÀI TẬP TRẮC NGHIỆM</h3>
+                
+                <div class="quiz-item">
+                    <p class="font-semibold">Câu 1: Đơn vị của nhiệt hoá hơi riêng là gì?</p>
+                    <div class="ml-4 space-y-1">
+                        <label class="block"><input type="radio" name="q1" value="wrong"> J/kg.K</label>
+                        <label class="block"><input type="radio" name="q1" value="correct"> J/kg</label>
+                        <label class="block"><input type="radio" name="q1" value="wrong"> J</label>
+                    </div>
+                </div>
+
+                <div class="quiz-item">
+                    <p class="font-semibold">Câu 2: Khi nhiệt độ giảm, nhiệt hoá hơi riêng của một chất thường:</p>
+                    <div class="ml-4 space-y-1">
+                        <label class="block"><input type="radio" name="q2" value="correct"> Tăng lên</label>
+                        <label class="block"><input type="radio" name="q2" value="wrong"> Giảm đi</label>
+                        <label class="block"><input type="radio" name="q2" value="wrong"> Không đổi</label>
+                    </div>
+                </div>
+
+                <div class="quiz-item">
+                    <p class="font-semibold">Câu 3: Công thức nào sau đây dùng để tính nhiệt lượng hoá hơi?</p>
+                    <div class="ml-4 space-y-1">
+                        <label class="block"><input type="radio" name="q3" value="wrong"> Q = mc\(\Delta\)t</label>
+                        <label class="block"><input type="radio" name="q3" value="wrong"> Q = mq</label>
+                        <label class="block"><input type="radio" name="q3" value="correct"> Q = Lm</label>
+                    </div>
+                </div>
+
+                <div class="quiz-item">
+                    <p class="font-semibold">Câu 4: Nhiệt hoá hơi riêng của nước ở 100°C là \(2,26.10^6 J/kg\). Nhiệt lượng để hoá hơi 2kg nước là:</p>
+                    <div class="ml-4 space-y-1">
+                        <label class="block"><input type="radio" name="q4" value="correct"> \(4,52.10^6 J\)</label>
+                        <label class="block"><input type="radio" name="q4" value="wrong"> \(2,26.10^6 J\)</label>
+                        <label class="block"><input type="radio" name="q4" value="wrong"> \(1,13.10^6 J\)</label>
+                    </div>
+                </div>
+
+                <div class="quiz-item">
+                    <p class="font-semibold">Câu 5: Tại sao nhiệt hoá hơi được gọi là ẩn nhiệt?</p>
+                    <div class="ml-4 space-y-1">
+                        <label class="block"><input type="radio" name="q5" value="wrong"> Vì nó không thể đo được</label>
+                        <label class="block"><input type="radio" name="q5" value="correct"> Vì quá trình này không làm thay đổi nhiệt độ</label>
+                        <label class="block"><input type="radio" name="q5" value="wrong"> Vì nó bị ẩn trong bình nhiệt lượng kế</label>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button onclick="checkQuiz()" class="bg-gray-900 text-white px-8 py-3 rounded-12 font-bold hover:bg-black transition">NỘP BÀI</button>
+                    <p id="quizResult" class="mt-4 font-bold text-lg"></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center mt-12 text-gray-500 text-sm">
+        &copy; 2026 Bài giảng Vật Lý 12 - Kết nối tri thức
+    </footer>
+
+    <script>
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === "block") {
+                el.style.display = "none";
+            } else {
+                el.style.display = "block";
+            }
+        }
+
+        function checkQuiz() {
+            const questions = ['q1', 'q2', 'q3', 'q4', 'q5'];
+            let score = 0;
+            questions.forEach(q => {
+                const selected = document.querySelector(`input[name="${q}"]:checked`);
+                if (selected && selected.value === 'correct') {
+                    score++;
+                }
+            });
+
+            const resultEl = document.getElementById('quizResult');
+            resultEl.innerText = `Kết quả: ${score}/${questions.length} câu đúng.`;
+            
+            if (score === questions.length) {
+                resultEl.style.color = "green";
+                resultEl.innerText += " Tuyệt vời! Bạn đã nắm vững bài học.";
+            } else {
+                resultEl.style.color = "red";
+                resultEl.innerText += " Bạn hãy kiểm tra lại các câu sai nhé.";
+            }
+        }
+    </script>
+</body>
+</html>
