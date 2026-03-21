@@ -11,6 +11,7 @@
             line-height: 1.6;
             background-color: #f4f7f9;
         }
+        .header-primary { background-color: #1a202c; }
         /* Màu xanh đen đồng nhất cho các tiêu đề chính */
         .bg-dark-blue {
             background-color: #1a202c; 
@@ -91,15 +92,14 @@
 <body class="p-4 md:p-8 max-w-4xl mx-auto">
 
     <!-- Tiêu đề chương -->
-    <div class="chapter-header bg-dark-blue">
-        <h1 class="text-xl font-bold uppercase">Chương 1: Vật lý nhiệt</h1>
-    </div>
-
-    <!-- Tiêu đề bài -->
-    <div class="lesson-title bg-dark-blue">
-        <h2 class="text-2xl font-extrabold">BÀI 2: NỘI NĂNG. ĐỊNH LUẬT I CỦA NHIỆT ĐỘNG LỰC HỌC</h2>
-    </div>
-
+      <header class="max-w-5xl mx-auto mb-8 shadow-lg overflow-hidden rounded-12">
+        <div class="header-primary text-white py-3 px-6 text-center text-sm font-semibold tracking-widest uppercase">
+            Chương 1: Vật Lý Nhiệt
+        </div>
+        <div class="header-primary text-white py-6 px-6 text-center border-t border-gray-700">
+            <h1 class="text-3xl font-bold">BÀI 2: NỘI NĂNG. ĐỊNH LUẬT I CỦA NHIỆT ĐỘNG LỰC HỌC</h1>
+        </div>
+    </header>
     <!-- Lời dẫn -->
     <div class="intro-box">
         <strong>Lời dẫn:</strong>
