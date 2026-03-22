@@ -45,12 +45,15 @@
             transition: opacity 0.2s;
         }
         .btn-navy:hover { opacity: 0.9; }
-        canvas {
-            background: #fff;
-            border: 1px solid #ccc;
+        .image-placeholder {
+            background-color: #e2e8f0;
+            border: 2px dashed #cbd5e0;
             border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
             width: 100%;
-            height: 300px;
         }
         table { width: 100%; border-collapse: collapse; }
         th, td { border: 1px solid #cbd5e0; padding: 12px; text-align: center; }
@@ -85,19 +88,20 @@
             <h3 class="font-bold text-xl mb-4">1. Chuyển động Brown trong chất khí</h3>
             <p class="mb-4">Chuyển động Brown không chỉ xảy ra trong chất lỏng mà xảy ra cả trong chất khí. Hình 8.1 vẽ sơ đồ thí nghiệm dùng để quan sát chuyển động Brown trong chất khí.</p>
 
-            <!-- Simulation and Image Grid -->
+            <!-- Grid: Hình ảnh thay cho mô phỏng -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div class="flex flex-col">
-                    <span class="text-sm font-semibold mb-1 text-center">Mô phỏng chuyển động hạt khói (Brown)</span>
-                    <canvas id="brownianCanvas"></canvas>
-                    <div class="mt-2 text-center">
-                        <button onclick="resetBrownian()" class="text-xs bg-gray-200 px-2 py-1 rounded">Đặt lại mô phỏng</button>
+                    <span class="text-sm font-semibold mb-1 text-center">Hình 8.2: Quỹ đạo chuyển động của hạt khói</span>
+                    <div class="image-placeholder">
+                        <div class="text-center p-4">
+                            <p class="text-gray-500 font-bold"></p>
+                            <p class="text-xs text-gray-400 mt-2">(Vị trí chèn hình ảnh quỹ đạo dích dắc của hạt khói)</p>
+                        </div>
                     </div>
                 </div>
                 <div class="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 p-4">
                     <p class="text-gray-500 mb-2 font-bold">[Sơ đồ thí nghiệm Hình 8.1]</p>
                     <svg width="200" height="200" viewBox="0 0 200 200">
-                        <!-- Đơn giản hóa sơ đồ thí nghiệm -->
                         <rect x="80" y="20" width="40" height="100" fill="#ddd" stroke="#333" />
                         <rect x="70" y="120" width="60" height="10" fill="#555" />
                         <circle cx="100" cy="150" r="30" fill="none" stroke="#333" stroke-width="2"/>
@@ -329,15 +333,10 @@
         // Toggle Answer Function
         function toggleAnswer(id) {
             const el = document.getElementById(id);
-            if (el.style.display === "block" || el.classList.contains('block')) {
-                el.style.display = "none";
-                el.classList.add('hidden');
-                el.classList.remove('block');
-            } else {
-                el.style.display = "block";
-                el.classList.remove('hidden');
-                el.classList.add('block');
-            }
+            if (!el) return;
+            const isHidden = window.getComputedStyle(el).display === "none";
+            el.style.display = isHidden ? "block" : "none";
+            el.classList.toggle('hidden', !isHidden);
         }
 
         // Quiz Logic
@@ -352,7 +351,6 @@
         function checkQuiz() {
             let score = 0;
             const total = 5;
-            let feedback = "";
             
             for (let i = 1; i <= total; i++) {
                 const selected = document.querySelector(`input[name="q${i}"]:checked`);
@@ -363,101 +361,13 @@
 
             const resultDisplay = document.getElementById('quizResult');
             if (score === total) {
-                resultDisplay.style.color = "#059669"; // Green-600
+                resultDisplay.style.color = "#059669";
                 resultDisplay.innerText = `Chúc mừng! Bạn đúng tuyệt đối: ${score}/${total}`;
             } else {
-                resultDisplay.style.color = "#dc2626"; // Red-600
+                resultDisplay.style.color = "#dc2626";
                 resultDisplay.innerText = `Kết quả của bạn: ${score}/${total}. Hãy thử lại những câu sai nhé!`;
             }
         }
-
-        // Brownian Motion Simulation
-        const canvas = document.getElementById('brownianCanvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        let smokeParticle = { x: 0, y: 0, path: [] };
-
-        function initBrownian() {
-            particles = [];
-            // Create invisible gas molecules
-            for(let i=0; i<40; i++){
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    vx: (Math.random() - 0.5) * 6,
-                    vy: (Math.random() - 0.5) * 6
-                });
-            }
-            // The visible smoke particle
-            smokeParticle = {
-                x: canvas.width / 2,
-                y: canvas.height / 2,
-                path: [{x: canvas.width / 2, y: canvas.height / 2}]
-            };
-        }
-
-        function resetBrownian() {
-            initBrownian();
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw path of smoke particle
-            ctx.beginPath();
-            ctx.strokeStyle = "#3b82f6";
-            ctx.lineWidth = 1;
-            if(smokeParticle.path.length > 0) {
-                ctx.moveTo(smokeParticle.path[0].x, smokeParticle.path[0].y);
-                for(let p of smokeParticle.path) ctx.lineTo(p.x, p.y);
-            }
-            ctx.stroke();
-
-            // Draw gas particles (very faint)
-            ctx.fillStyle = "rgba(100, 100, 100, 0.2)";
-            particles.forEach(p => {
-                p.x += p.vx;
-                p.y += p.vy;
-                if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
-                if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Collision with smoke particle
-                let dx = p.x - smokeParticle.x;
-                let dy = p.y - smokeParticle.y;
-                let dist = Math.sqrt(dx*dx + dy*dy);
-                if(dist < 10) {
-                    smokeParticle.x += p.vx * 0.8;
-                    smokeParticle.y += p.vy * 0.8;
-                    smokeParticle.path.push({x: smokeParticle.x, y: smokeParticle.y});
-                    if(smokeParticle.path.length > 100) smokeParticle.path.shift();
-                }
-            });
-
-            // Keep smoke particle in bounds
-            if(smokeParticle.x < 10) smokeParticle.x = 10;
-            if(smokeParticle.x > canvas.width - 10) smokeParticle.x = canvas.width - 10;
-            if(smokeParticle.y < 10) smokeParticle.y = 10;
-            if(smokeParticle.y > canvas.height - 10) smokeParticle.y = canvas.height - 10;
-
-            // Draw smoke particle
-            ctx.fillStyle = "#1e3a8a";
-            ctx.beginPath();
-            ctx.arc(smokeParticle.x, smokeParticle.y, 6, 0, Math.PI * 2);
-            ctx.fill();
-
-            requestAnimationFrame(draw);
-        }
-
-        window.onload = () => {
-            // Resize canvas to container
-            canvas.width = canvas.offsetWidth;
-            canvas.height = 300;
-            initBrownian();
-            draw();
-        };
     </script>
 </body>
 </html>
