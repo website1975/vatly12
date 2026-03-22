@@ -3,390 +3,374 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vật lý 12 - Bài 3: Nhiệt độ. Thang nhiệt độ – Nhiệt kế</title>
+    <title>Bài 8: Mô hình động học phân tử chất khí</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
             background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2d3748;
         }
-		.header-primary { background-color: #1a202c; }
-		.rounded-12 { border-radius: 12px; }
-        .bg-dark-blue {
-            background-color: #1a202c; 
+        .header-navy {
+            background-color: #000080;
         }
-        .chapter-header {
-            color: white;
-            padding: 1rem;
-            text-align: center;
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-			font-size: 1.4rem; /* Đây là cỡ 3xl */
-    		text-transform: none; 
-			           
-        }
-        .lesson-title {
-            color: white;
-            padding: 1.5rem;
-            text-align: center;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            text-transform: uppercase;
-            font-weight: bold;
-			font-size: 1.875rem; /* Đây là cỡ 3xl */
-    		text-transform: none; 
-			
-        }
-        .intro-box {
-            border: 2px solid #1a202c;
-            padding: 1.5rem;
-            background-color: #fff;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            font-style: italic;
-        }
-        .section-card {
-            background-color: #fff;
-            padding: 2rem;
+        .rounded-12px {
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
         }
-        .section-title {
-            color: #1a202c;
-            border-bottom: 3px solid #1a202c;
+        .section-header {
+            color: #000080;
+            border-bottom: 4px solid #000080;
             display: inline-block;
-            margin-bottom: 1.5rem;
-            font-weight: bold;
+            margin-bottom: 1rem;
             text-transform: uppercase;
+            font-weight: bold;
         }
         .question-box {
             background-color: #edf2f7;
-            border-left: 5px solid #1a202c;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 4px;
+            border-left: 4px solid #000080;
         }
         .answer-box {
             background-color: #f0fff4;
-            border-left: 5px solid #38a169;
-            padding: 1rem;
-            margin-top: 0.5rem;
             display: none;
-            border-radius: 4px;
         }
-        .btn-view {
-            background-color: #1a202c;
+        .btn-navy {
+            background-color: #000080;
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background 0.3s;
+            transition: all 0.3s;
         }
-        .btn-view:hover {
-            background-color: #2d3748;
+        .btn-navy:hover {
+            background-color: #000066;
+            transform: translateY(-1px);
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1.5rem 0;
-        }
-        th, td {
+        table, th, td {
             border: 1px solid #cbd5e0;
-            padding: 1rem;
-            text-align: center;
         }
         th {
             background-color: #e2e8f0;
-            font-weight: bold;
-        }
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            background-color: #ebf4ff;
-            color: #2b6cb0;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: bold;
         }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <div class="max-w-4xl mx-auto">
-        <!-- Header Section -->
-        <header class="max-w-5xl mx-auto mb-8 shadow-lg overflow-hidden rounded-12">
-        	<div class="header-primary text-white py-3 px-6 text-center text-sm font-semibold tracking-widest uppercase">
-            CHƯƠNG 1: VẬT LÝ NHIỆT
-        	</div>
-            <div class="header-primary text-white py-6 px-6 text-center border-t border-gray-700">
-                <h1 class="text-3xl font-bold"> BÀI 3: NHIỆT ĐỘ. THANG NHIỆT ĐỘ – NHIỆT KẾ </h1>
-            </div>
-        </header>
-
-        <!-- Intro -->
-        <div class="intro-box">
-            "Làm thế nào để nhận biết được sự truyền nhiệt năng giữa các vật? Ví dụ, làm thế nào để nhận biết: Vật nào là vật truyền nhiệt năng, vật nào là vật nhận nhiệt năng; sự truyền nhiệt năng đã dừng lại hay còn đang tiếp tục;...?"
+    <!-- Header Section -->
+    <header class="max-w-5xl mx-auto mb-8">
+        <div class="header-navy text-white py-2 px-6 rounded-t-lg text-center text-sm font-semibold">
+            CHƯƠNG II: KHÍ LÝ TƯỞNG
         </div>
+        <div class="header-navy text-white py-6 px-6 rounded-b-lg text-center shadow-lg">
+            <h1 class="text-2xl md:text-3xl font-bold uppercase">Bài 8: MÔ HÌNH ĐỘNG HỌC PHÂN TỬ CHẤT KHÍ</h1>
+        </div>
+    </header>
 
-        <!-- I. Khái niệm -->
-        <section class="section-card">
-            <h2 class="section-title text-xl">I. KHÁI NIỆM NHIỆT ĐỘ</h2>
-            <p class="mb-4">Nhiệt độ là số đo độ "nóng", "lạnh" của một vật. Thí nghiệm dưới đây giúp ta nhận biết chiều truyền nhiệt năng.</p>
-            
-            <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
-                <h3 class="font-bold mb-4 flex items-center">🔬 THÍ NGHIỆM SỰ TRUYỀN NHIỆT NĂNG</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                        <p class="font-bold text-sm text-gray-600 uppercase mb-2">Chuẩn bị:</p>
-                        <ul class="list-disc ml-5 text-sm space-y-1">
-                            <li>Cốc nhôm (1) đựng 200 mL nước ở \(30^\circ C\).</li>
-                            <li>Bình cách nhiệt (2) đựng 500 mL nước ở \(60^\circ C\).</li>
-                            <li>Hai nhiệt kế (3).</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <p class="font-bold text-sm text-gray-600 uppercase mb-2">Tiến hành:</p>
-                        <p class="text-sm">Đặt cốc nhôm vào bình cách nhiệt. Quan sát sự thay đổi số chỉ nhiệt kế cho đến khi chúng bằng nhau.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="question-box">
-                <p><strong>Câu hỏi:</strong> Tại sao có thể biết nước trong bình truyền nhiệt năng cho nước trong cốc?</p>
-                <button class="btn-view mt-2" onclick="toggleAnswer('ans1')">Nhấn xem trả lời</button>
-                <div id="ans1" class="answer-box">
-                    Vì nhiệt độ nước trong bình giảm (mất nhiệt năng) và nhiệt độ nước trong cốc tăng (nhận nhiệt năng).
-                </div>
-            </div>
-
-            <div class="mt-8 p-6 bg-blue-900 text-white rounded-lg">
-                <h4 class="font-bold text-lg mb-2 uppercase">Kết luận</h4>
-                <ul class="list-disc ml-5 space-y-2">
-                    <li>Nhiệt độ cho biết trạng thái cân bằng nhiệt và chiều truyền nhiệt.</li>
-                    <li>Nhiệt năng tự truyền từ vật có <strong>nhiệt độ cao hơn</strong> sang vật có <strong>nhiệt độ thấp hơn</strong>.</li>
-                </ul>
-            </div>
+    <main class="max-w-5xl mx-auto space-y-8">
+        
+        <!-- Intro Box -->
+        <section class="bg-white p-6 rounded-12px shadow-md border border-gray-200">
+            <p class="italic text-gray-700">
+                Khi học môn Khoa học tự nhiên ở lớp 6, các em đã biết một số tính chất đặc biệt của chất ở thể khí so với chất ở thể lỏng và thể rắn. Tại sao chất ở thể khí lại có một số tính chất vật lí khác chính chất đó ở các thể khác?
+            </p>
         </section>
 
-        <!-- II. Thang nhiệt độ -->
-        <section class="section-card">
-            <h2 class="section-title text-xl">II. THANG NHIỆT ĐỘ – NHIỆT KẾ</h2>
+        <!-- I. Chuyển động và tương tác -->
+        <section class="bg-white p-6 rounded-12px shadow-md">
+            <h2 class="section-header text-xl">I. CHUYỂN ĐỘNG VÀ TƯƠNG TÁC CỦA CÁC PHÂN TỬ KHÍ</h2>
             
-            <!-- 1. Celsius -->
-            <div class="mb-8">
-                <h3 class="font-bold text-lg text-blue-900">1. Thang Celsius (\(^\circ C)\)</h3>
-                <p class="text-sm text-gray-600 mb-3 italic">Hai mốc quan trọng:</p>
-                <div class="flex flex-wrap gap-2 mb-3">
-                    <span class="badge">Nước đá đang tan: 0 \(^\circ C\)</span>
-                    <span class="badge">Nước đang sôi: 100 \(^\circ C\)</span>
-                </div>
-                <button class="btn-view" onclick="toggleAnswer('hist-c')">Sự ra đời (Nhấn xem)</button>
-                <div id="hist-c" class="answer-box italic">
-                    Được đề xuất bởi Anders Celsius năm 1742. Ban đầu ông chọn 0 độ là điểm sôi và 100 độ là điểm đóng băng, sau đó được đảo ngược lại như hiện nay.
-                </div>
-            </div>
-
-            <!-- 2. Kelvin -->
-            <div class="mb-8">
-                <h3 class="font-bold text-lg text-blue-900">2. Thang Kelvin (K)</h3>
-                <p class="text-sm text-gray-600 mb-3 italic">Hai mốc quan trọng:</p>
-                <div class="flex flex-wrap gap-2 mb-3">
-                    <span class="badge">Độ không tuyệt đối: 0 K</span>
-                    <span class="badge">Điểm ba của nước: 273,16 K</span>
-                </div>
-                <button class="btn-view" onclick="toggleAnswer('hist-k')">Sự ra đời (Nhấn xem)</button>
-                <div id="hist-k" class="answer-box italic">
-                    Đề xuất bởi Lord Kelvin năm 1848. Đây là thang đo tuyệt đối vì nó không phụ thuộc vào tính chất của bất kỳ chất nào cụ thể.
-                </div>
-            </div>
-
-            <!-- 3. Fahrenheit -->
-            <div class="mb-8">
-                <h3 class="font-bold text-lg text-blue-900">3. Thang Fahrenheit (\(^\circ F\))</h3>
-                <p class="text-sm text-gray-600 mb-3 italic">Hai mốc quan trọng:</p>
-                <div class="flex flex-wrap gap-2 mb-3">
-                    <span class="badge">Nước đá đang tan: 32 \(^\circ F\)</span>
-                    <span class="badge">Nước đang sôi: 212 ^\cir\(c F\)</span>
-                </div>
-                <button class="btn-view" onclick="toggleAnswer('hist-f')">Sự ra đời (Nhấn xem)</button>
-                <div id="hist-f" class="answer-box italic">
-                    Xây dựng bởi Gabriel Fahrenheit năm 1714. Thang đo này vẫn được sử dụng phổ biến tại Hoa Kỳ.
-                </div>
-            </div>
-
-            <!-- 4. Chuyển đổi -->
-            <div class="mt-10">
-                <h3 class="font-bold text-lg text-blue-900 mb-4">4. Cách chuyển giá trị các thang nhiệt độ</h3>
+            <div class="mb-6">
+                <h3 class="font-bold text-lg mb-4">1. Chuyển động Brown trong chất khí</h3>
+                <p class="mb-4">Chuyển động Brown không chỉ xảy ra trong chất lỏng mà xảy ra cả trong chất khí. Dưới đây là sơ đồ thí nghiệm quan sát chuyển động của các hạt khói trong không khí.</p>
+                
+                <!-- Hình ảnh thí nghiệm -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div class="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
-                        <p class="text-sm font-bold uppercase text-gray-500 mb-2">Celsius \(\leftrightarrow\) Kelvin</p>
-                        <p class="text-xl font-mono">\(T(K) = t(^\circ C) + 273,15\)</p>
+                    <div class="border-2 border-dashed border-gray-300 p-4 flex flex-col items-center justify-center bg-gray-50 rounded-lg">
+                        <div class="w-full h-48 bg-blue-100 flex items-center justify-center rounded mb-2">
+                            <span class="text-gray-500 font-medium">[Hình 8.1: Sơ đồ thí nghiệm kính hiển vi quan sát khói]</span>
+                        </div>
+                        <p class="text-sm italic text-center text-gray-600 font-semibold">Hình 8.1. Sơ đồ thí nghiệm quan sát chuyển động Brown</p>
                     </div>
-                    <div class="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
-                        <p class="text-sm font-bold uppercase text-gray-500 mb-2">Celsius \(\leftrightarrow\) Fahrenheit</p>
-                        <p class="text-xl font-mono">\(t(^\circ F) = 32 + 1,8 \cdot t(^\circ C)\)</p>
+                    <div class="border-2 border-dashed border-gray-300 p-4 flex flex-col items-center justify-center bg-gray-50 rounded-lg">
+                        <div class="w-full h-48 bg-blue-100 flex items-center justify-center rounded mb-2 overflow-hidden">
+                            <!-- SVG Minh họa đường ziczac -->
+                            <svg viewBox="0 0 100 100" class="w-full h-full stroke-blue-600 stroke-2 fill-none">
+                                <polyline points="10,80 30,20 50,70 80,10 90,50 60,30 40,90 20,40" />
+                            </svg>
+                        </div>
+                        <p class="text-sm italic text-center text-gray-600 font-semibold">Hình 8.2. Quỹ đạo chuyển động của hạt khói</p>
                     </div>
                 </div>
 
-                <div class="question-box">
-                    <p><strong>Câu hỏi:</strong> Nhiệt độ cơ thể người bình thường là \(37^\circ C\). Hãy đổi sang K và \(^\circ F\).</p>
-                    <button class="btn-view mt-2" onclick="toggleAnswer('ans-conv')">Nhấn xem đáp án</button>
-                    <div id="ans-conv" class="answer-box">
-                        - Thang Kelvin: \(37 + 273,15 = 310,15 K\) <br>
-                        - Thang Fahrenheit: \(32 + 1,8 \times 37 = 98,6^\circ F\)
+                <!-- Thảo luận 1 -->
+                <div class="space-y-4">
+                    <div class="question-box p-4 rounded">
+                        <p class="font-semibold">Câu hỏi 1: Dựa vào Hình 8.1, hãy mô tả thí nghiệm dùng để quan sát chuyển động Brown trong không khí.</p>
+                        <button onclick="toggleAnswer('ans1')" class="mt-2 text-sm text-blue-800 underline font-medium">Xem phương án trả lời</button>
+                        <div id="ans1" class="answer-box p-3 mt-2 rounded border border-green-200 text-gray-800">
+                            Thí nghiệm sử dụng một ống thủy tinh chứa đầy khói, đậy nắp kính. Chiếu ánh sáng vào ống khói và quan sát qua kính hiển vi. Dưới kính hiển vi, ta thấy các hạt khói nhỏ li ti hiện ra như những điểm sáng chuyển động hỗn độn.
+                        </div>
                     </div>
+
+                    <div class="question-box p-4 rounded">
+                        <p class="font-semibold">Câu hỏi 2: Hãy dựa vào quỹ đạo chuyển động của hạt khói (Hình 8.2) để chứng tỏ rằng các phân tử không khí chuyển động hỗn loạn, không ngừng.</p>
+                        <button onclick="toggleAnswer('ans2')" class="mt-2 text-sm text-blue-800 underline font-medium">Xem phương án trả lời</button>
+                        <div id="ans2" class="answer-box p-3 mt-2 rounded border border-green-200 text-gray-800">
+                            Hạt khói có quỹ đạo là những đường gấp khúc ziczac bất kỳ. Điều này chứng tỏ nó bị các phân tử không khí (vốn quá nhỏ để nhìn thấy) va chạm vào từ mọi phía một cách không cân bằng. Sự va chạm hỗn loạn này đẩy hạt khói đi theo các hướng ngẫu nhiên, chứng tỏ các phân tử khí chuyển động hỗn loạn, không ngừng.
+                        </div>
+                    </div>
+
+                    <div class="question-box p-4 rounded">
+                        <p class="font-semibold">Câu hỏi 3: Khi quan sát tia nắng mặt trời qua cửa sổ, ta thấy các hạt bụi chuyển động. Chuyển động này có phải là chuyển động Brown không? Tại sao?</p>
+                        <button onclick="toggleAnswer('ans3')" class="mt-2 text-sm text-blue-800 underline font-medium">Xem phương án trả lời</button>
+                        <div id="ans3" class="answer-box p-3 mt-2 rounded border border-green-200 text-gray-800">
+                            Không hẳn. Các hạt bụi nhìn thấy được bằng mắt thường thường có kích thước khá lớn, chuyển động của chúng chủ yếu do các dòng đối lưu của không khí thổi đi. Chuyển động Brown chỉ quan sát được rõ rệt với các hạt có kích thước cực nhỏ (như hạt khói) dưới kính hiển vi.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-400">
+                    <h4 class="font-bold mb-2">Kết luận từ thí nghiệm:</h4>
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li>Chất khí được cấu tạo từ các phân tử chuyển động hỗn loạn, không ngừng.</li>
+                        <li>Nhiệt độ của khí càng cao thì tốc độ chuyển động hỗn loạn của các phân tử khí càng lớn.</li>
+                        <li>Các phân tử không ngừng va chạm với nhau và với thành bình làm tốc độ của chúng thay đổi liên tục.</li>
+                    </ul>
+                </div>
+
+                <div class="mt-4 p-4 bg-blue-50 rounded">
+                    <h4 class="font-bold">Giải thích khái niệm tốc độ trung bình:</h4>
+                    <p>Vì các phân tử có tốc độ khác nhau và thay đổi liên tục do va chạm, ta sử dụng tốc độ trung bình \(\overline{v}\) để mô tả trạng thái của khối khí:</p>
+                    <p class="text-center font-bold my-2">\[ \overline{v} = \frac{v_1 + v_2 + ... + v_n}{n} \]</p>
+                    <p class="text-sm italic">Ví dụ: Ở điều kiện tiêu chuẩn, phân tử oxygen có tốc độ trung bình khoảng \(400 \, m/s\).</p>
                 </div>
             </div>
 
-            <!-- 5. Nhiệt kế -->
+            <!-- 2. Tương tác -->
             <div class="mt-10">
-                <h3 class="font-bold text-lg text-blue-900 mb-4">5. Nhiệt kế</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Loại nhiệt kế</th>
-                            <th>Nguyên lý</th>
-                            <th>Ứng dụng</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Chất lỏng</td>
-                            <td>Sự nở vì nhiệt</td>
-                            <td>Y tế, thời tiết</td>
-                        </tr>
-                        <tr>
-                            <td>Điện tử</td>
-                            <td>Thay đổi điện trở</td>
-                            <td>Công nghiệp, chính xác</td>
-                        </tr>
-                        <tr>
-                            <td>Hồng ngoại</td>
-                            <td>Bức xạ nhiệt</td>
-                            <td>Đo trán, đo từ xa</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="bg-blue-50 p-4 border rounded mt-4">
-                    <button class="font-bold text-blue-800" onclick="toggleAnswer('know-extra')">💡 Em có biết? (Nhấn xem)</button>
-                    <div id="know-extra" class="hidden mt-2 text-sm text-blue-900">
-                        Nhiệt độ của tâm Mặt Trời khoảng 15 triệu Kelvin, trong khi độ không tuyệt đối là giới hạn dưới của nhiệt độ mà không vật nào có thể đạt tới được.
+                <h3 class="font-bold text-lg mb-4">2. Tương tác giữa các phân tử khí</h3>
+                <p class="mb-4">Giữa các phân tử khí cũng có lực đẩy và lực hút (gọi chung là lực liên kết). Tuy nhiên, khoảng cách giữa các phân tử khí rất lớn so với kích thước của chúng, nên lực liên kết này <strong>rất yếu</strong> so với ở thể lỏng và rắn.</p>
+                
+                <div class="space-y-4">
+                    <div class="question-box p-4 rounded">
+                        <p class="font-semibold">Câu 1: Nêu các hiện tượng thực tế chứng tỏ lực liên kết phân tử khí rất yếu.</p>
+                        <button onclick="toggleAnswer('ans4')" class="mt-2 text-sm text-blue-800 underline font-medium">Xem trả lời</button>
+                        <div id="ans4" class="answer-box p-3 mt-2 rounded border border-green-200 text-gray-800">
+                            Các hiện tượng: Chất khí luôn tự động lan tỏa chiếm đầy toàn bộ thể tích bình chứa; ta có thể dễ dàng đi xuyên qua không khí; chất khí cực kỳ dễ nén so với chất lỏng và rắn.
+                        </div>
+                    </div>
+                    <div class="question-box p-4 rounded">
+                        <p class="font-semibold">Câu 2: Dựa vào khối lượng riêng để chứng tỏ khoảng cách giữa các phân tử khí rất lớn.</p>
+                        <button onclick="toggleAnswer('ans5')" class="mt-2 text-sm text-blue-800 underline font-medium">Xem trả lời</button>
+                        <div id="ans5" class="answer-box p-3 mt-2 rounded border border-green-200 text-gray-800">
+                            Ở cùng nhiệt độ và áp suất, khối lượng riêng của nước đá là \(917 \, kg/m^3\), nước lỏng là \(1000 \, kg/m^3\), trong khi hơi nước chỉ khoảng \(0,6 \, kg/m^3\). Khối lượng riêng của khí nhỏ hơn hàng nghìn lần chứng tỏ các phân tử khí ở rất xa nhau.
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- III. Củng cố -->
-        <section class="section-card">
-            <h2 class="section-title text-xl">III. CỦNG CỐ</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                <div class="p-4 bg-green-50 rounded-lg border border-green-200">
-                    <p class="font-bold text-green-800 uppercase text-sm mb-2">Em đã học</p>
-                    <ul class="list-disc ml-5 text-sm space-y-1">
-                        <li>Cân bằng nhiệt và chiều truyền nhiệt.</li>
-                        <li>Các thang đo nhiệt độ C, K, F.</li>
-                        <li>Cách sử dụng các loại nhiệt kế.</li>
-                    </ul>
-                </div>
-                <div class="p-4 bg-orange-50 rounded-lg border border-orange-200">
-                    <p class="font-bold text-orange-800 uppercase text-sm mb-2">Em có thể</p>
-                    <ul class="list-disc ml-5 text-sm space-y-1">
-                        <li>Giải thích hiện tượng truyền nhiệt.</li>
-                        <li>Đổi đơn vị nhiệt độ thành thạo.</li>
-                    </ul>
-                </div>
+        <!-- II. Mô hình động học phân tử -->
+        <section class="bg-white p-6 rounded-12px shadow-md">
+            <h2 class="section-header text-xl">II. MÔ HÌNH ĐỘNG HỌC PHÂN TỬ CHẤT KHÍ</h2>
+            <div class="bg-blue-50 p-6 rounded-lg border border-blue-200 mb-6">
+                <ol class="list-decimal ml-5 space-y-3 font-medium">
+                    <li>Chất khí được cấu tạo từ các phân tử có kích thước rất nhỏ so với khoảng cách giữa chúng.</li>
+                    <li>Các phân tử khí chuyển động hỗn loạn, không ngừng. Chuyển động này càng nhanh thì nhiệt độ của khí càng cao.</li>
+                    <li>Khi chuyển động hỗn loạn, các phân tử khí va chạm với nhau và với thành bình. Khi va chạm với thành bình, các phân tử khí tác dụng lực, gây <strong>áp suất</strong> lên thành bình.</li>
+                </ol>
             </div>
 
-            <div class="quiz-container">
-                <h3 class="font-bold text-lg mb-4 border-l-4 border-dark-blue pl-3 uppercase">Bài tập trắc nghiệm</h3>
-                <div class="space-y-6">
-                    <div class="quiz-item">
-                        <p class="font-bold">1. Nhiệt độ là đại lượng đặc trưng cho:</p>
-                        <div class="ml-4 mt-2">
-                            <label class="block"><input type="radio" name="q1" id="q1a"> A. Nội năng của vật</label>
-                            <label class="block"><input type="radio" name="q1" id="correct1"> B. Trạng thái cân bằng nhiệt</label>
-                            <label class="block"><input type="radio" name="q1" id="q1c"> C. Khối lượng của vật</label>
-                        </div>
-                    </div>
-
-                    <div class="quiz-item">
-                        <p class="font-bold">2. Công thức chuyển đổi từ Celsius sang Kelvin là:</p>
-                        <div class="ml-4 mt-2">
-                            <label class="block"><input type="radio" name="q2" id="q2a"> A. \(T = t - 273\)</label>
-                            <label class="block"><input type="radio" name="q2" id="correct2"> B. \(T = t + 273\)</label>
-                            <label class="block"><input type="radio" name="q2" id="q2c"> C. \(T = t + 32\)</label>
-                        </div>
-                    </div>
-
-                    <div class="quiz-item">
-                        <p class="font-bold">3. Đơn vị nhiệt độ trong hệ SI là:</p>
-                        <div class="ml-4 mt-2">
-                            <label class="block"><input type="radio" name="q3" id="correct3"> A. Kelvin (K)</label>
-                            <label class="block"><input type="radio" name="q3" id="q3b"> B. Độ Celsius (\(^\circ C\))</label>
-                            <label class="block"><input type="radio" name="q3" id="q3c"> C. Độ Fahrenheit (\(^\circ F\))</label>
-                        </div>
-                    </div>
-
-                    <div class="quiz-item">
-                        <p class="font-bold">4. Ở nhiệt độ nào thì số chỉ trên thang Celsius và Fahrenheit bằng nhau?</p>
-                        <div class="ml-4 mt-2">
-                            <label class="block"><input type="radio" name="q4" id="correct4"> A. -40</label>
-                            <label class="block"><input type="radio" name="q4" id="q4b"> B. 0</label>
-                            <label class="block"><input type="radio" name="q4" id="q4c"> C. 100</label>
-                        </div>
-                    </div>
-
-                    <div class="quiz-item">
-                        <p class="font-bold">5. Thang nhiệt độ tuyệt đối có giá trị thấp nhất là:</p>
-                        <div class="ml-4 mt-2">
-                            <label class="block"><input type="radio" name="q5" id="correct5"> A. 0 K</label>
-                            <label class="block"><input type="radio" name="q5" id="q5b"> B. -273 K</label>
-                            <label class="block"><input type="radio" name="q5" id="q5c"> C. 273 K</label>
-                        </div>
-                    </div>
+            <div class="mt-6">
+                <p class="font-bold mb-4">Thảo luận: Hãy hoàn thành bảng cơ sở thực tế của mô hình:</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-center">
+                        <thead>
+                            <tr>
+                                <th class="p-2">STT</th>
+                                <th class="p-2">Mô hình động học phân tử chất khí</th>
+                                <th class="p-2">Các thí nghiệm và hiện tượng thực tế</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="p-2">1</td>
+                                <td class="p-2">Phân tử khí chuyển động hỗn loạn, không ngừng.</td>
+                                <td class="p-2">Chuyển động Brown trong không khí.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">2</td>
+                                <td class="p-2">Kích thước phân tử khí rất nhỏ so với khoảng cách giữa chúng.</td>
+                                <td class="p-2">
+                                    <button onclick="toggleAnswer('tbl1')" class="text-blue-600 font-bold">[Nhấn để mở]</button>
+                                    <div id="tbl1" class="hidden text-sm italic py-2">Khối lượng riêng của chất khí rất nhỏ so với chất lỏng/rắn; tính dễ nén của chất khí.</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">3</td>
+                                <td class="p-2">Khi chuyển động các phân tử va chạm với nhau và với thành bình.</td>
+                                <td class="p-2">
+                                    <button onclick="toggleAnswer('tbl2')" class="text-blue-600 font-bold">[Nhấn để mở]</button>
+                                    <div id="tbl2" class="hidden text-sm italic py-2">Chất khí gây áp suất lên thành bình (bơm căng lốp xe, bóng bay).</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-
-                <button class="bg-dark-blue text-white w-full py-3 rounded-lg font-bold mt-8 hover:opacity-90" onclick="checkQuiz()">NỘP BÀI</button>
-                <div id="quizResult" class="mt-4 font-bold text-center"></div>
             </div>
         </section>
 
-        <footer class="text-center text-gray-500 text-sm mt-8 pb-8">
-            © 2024 - Tài liệu học tập Vật Lý 12
-        </footer>
-    </div>
+        <!-- III. Khí lý tưởng -->
+        <section class="bg-white p-6 rounded-12px shadow-md">
+            <h2 class="section-header text-xl">III. KHÍ LÝ TƯỞNG</h2>
+            <p class="mb-4 text-justify">Khí lí tưởng là một mô hình đơn giản hóa để nghiên cứu chất khí, dựa trên các đặc điểm:</p>
+            <ul class="list-disc ml-8 mb-6 space-y-2">
+                <li>Các phân tử khí được coi là các <strong>chất điểm</strong> (có khối lượng nhưng thể tích không đáng kể).</li>
+                <li><strong>Không tương tác</strong> với nhau khi chưa va chạm (lực liên kết coi bằng 0).</li>
+                <li>Các va chạm giữa các phân tử và với thành bình là <strong>va chạm hoàn toàn đàn hồi</strong>.</li>
+            </ul>
+
+            <div class="question-box p-4 rounded">
+                <p class="font-semibold italic">Thảo luận: Hãy dùng mô hình động học phân tử chất khí để chứng tỏ với một khối lượng khí xác định, nếu giảm thể tích bình và giữ nguyên nhiệt độ thì áp suất tăng.</p>
+                <button onclick="toggleAnswer('ans6')" class="mt-2 text-sm text-blue-800 underline font-medium">Xem lời giải</button>
+                <div id="ans6" class="answer-box p-3 mt-2 rounded border border-green-200 text-gray-800">
+                    Khi giảm thể tích bình (giữ nguyên số phân tử và nhiệt độ), mật độ phân tử (số phân tử trên một đơn vị thể tích) sẽ tăng lên. Do nhiệt độ không đổi, tốc độ trung bình của các phân tử không đổi. Tuy nhiên, vì mật độ dày hơn, số lần va chạm của các phân tử vào một đơn vị diện tích thành bình trong một đơn vị thời gian sẽ tăng lên \(\rightarrow\) Tổng lực tác dụng tăng \(\rightarrow\) Áp suất tăng. 
+                    <br><strong>Ví dụ:</strong> Dùng tay nén pittông của ống tiêm (bịt đầu), ta thấy càng nén thể tích càng nhỏ thì tay càng cảm nhận lực đẩy ngược lại mạnh hơn.
+                </div>
+            </div>
+        </section>
+
+        <!-- IV. Củng cố -->
+        <section class="bg-white p-6 rounded-12px shadow-md">
+            <h2 class="section-header text-xl">IV. CỦNG CỐ</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h3 class="font-bold text-navy-800 border-b mb-2">EM ĐÃ HỌC</h3>
+                    <ul class="list-disc ml-5 text-sm space-y-1">
+                        <li>Cấu tạo chất khí từ các phân tử nhỏ, cách xa nhau.</li>
+                        <li>Chuyển động hỗn loạn tỷ lệ thuận với nhiệt độ.</li>
+                        <li>Va chạm gây ra áp suất.</li>
+                    </ul>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h3 class="font-bold text-navy-800 border-b mb-2">EM CÓ THỂ</h3>
+                    <p class="text-sm">Giải thích các hiện tượng thực tế: tại sao khí chiếm hết bình, tại sao lốp xe căng, sự thay đổi áp suất theo nhiệt độ và thể tích...</p>
+                </div>
+            </div>
+
+            <!-- Quiz Section -->
+            <div class="mt-10">
+                <h3 class="text-xl font-bold mb-6 text-center text-blue-900">BÀI TẬP TRẮC NGHIỆM CỦNG CỐ</h3>
+                <div id="quiz-container" class="space-y-6">
+                    <!-- Câu 1 -->
+                    <div class="quiz-item">
+                        <p class="font-semibold">Câu 1: Chuyển động Brown của các hạt khói trong không khí chứng tỏ điều gì?</p>
+                        <div class="ml-4 mt-2 space-y-1">
+                            <label class="block"><input type="radio" name="q1" value="a"> A. Các hạt khói tự chuyển động.</label>
+                            <label class="block"><input type="radio" name="q1" value="b"> B. Các phân tử không khí chuyển động hỗn loạn, không ngừng.</label>
+                            <label class="block"><input type="radio" name="q1" value="c"> C. Không khí có tính đàn hồi mạnh.</label>
+                            <label class="block"><input type="radio" name="q1" value="d"> D. Nhiệt độ của hạt khói rất cao.</label>
+                        </div>
+                    </div>
+
+                    <!-- Câu 2 -->
+                    <div class="quiz-item">
+                        <p class="font-semibold">Câu 2: Khi nhiệt độ của khối khí tăng lên thì:</p>
+                        <div class="ml-4 mt-2 space-y-1">
+                            <label class="block"><input type="radio" name="q2" value="a"> A. Tốc độ trung bình phân tử tăng.</label>
+                            <label class="block"><input type="radio" name="q2" value="b"> B. Kích thước phân tử tăng.</label>
+                            <label class="block"><input type="radio" name="q2" value="c"> C. Số lượng phân tử tăng.</label>
+                            <label class="block"><input type="radio" name="q2" value="d"> D. Khoảng cách phân tử giảm.</label>
+                        </div>
+                    </div>
+
+                    <!-- Câu 3 -->
+                    <div class="quiz-item">
+                        <p class="font-semibold">Câu 3: Áp suất của chất khí lên thành bình được gây ra bởi:</p>
+                        <div class="ml-4 mt-2 space-y-1">
+                            <label class="block"><input type="radio" name="q3" value="a"> A. Lực hút của thành bình lên phân tử.</label>
+                            <label class="block"><input type="radio" name="q3" value="b"> B. Trọng lượng của các phân tử khí.</label>
+                            <label class="block"><input type="radio" name="q3" value="c"> C. Va chạm của các phân tử khí lên thành bình.</label>
+                            <label class="block"><input type="radio" name="q3" value="d"> D. Kích thước phân tử quá lớn.</label>
+                        </div>
+                    </div>
+
+                    <!-- Câu 4 -->
+                    <div class="quiz-item">
+                        <p class="font-semibold">Câu 4: Đặc điểm nào sau đây KHÔNG phải của khí lí tưởng?</p>
+                        <div class="ml-4 mt-2 space-y-1">
+                            <label class="block"><input type="radio" name="q4" value="a"> A. Phân tử coi là chất điểm.</label>
+                            <label class="block"><input type="radio" name="q4" value="b"> B. Lực tương tác coi như bằng 0 khi chưa va chạm.</label>
+                            <label class="block"><input type="radio" name="q4" value="c"> C. Các va chạm là hoàn toàn đàn hồi.</label>
+                            <label class="block"><input type="radio" name="q4" value="d"> D. Các phân tử luôn đứng yên khi nhiệt độ thấp.</label>
+                        </div>
+                    </div>
+
+                    <!-- Câu 5 -->
+                    <div class="quiz-item">
+                        <p class="font-semibold">Câu 5: Công thức tính tốc độ trung bình của n phân tử khí là:</p>
+                        <div class="ml-4 mt-2 space-y-1">
+                            <label class="block"><input type="radio" name="q5" value="a"> A. \(\overline{v} = v_1 + v_2 + ... + v_n\)</label>
+                            <label class="block"><input type="radio" name="q5" value="b"> B. \(\overline{v} = (v_1 + v_2 + ... + v_n) / n\)</label>
+                            <label class="block"><input type="radio" name="q5" value="c"> C. \(\overline{v} = \sqrt{v_1^2 + ... + v_n^2}\)</label>
+                            <label class="block"><input type="radio" name="q5" value="d"> D. \(\overline{v} = n / (v_1 + ... + v_n)\)</label>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-8">
+                        <button onclick="checkQuiz()" class="btn-navy px-8 py-3 rounded-lg font-bold shadow-md uppercase">NỘP BÀI</button>
+                    </div>
+                    
+                    <div id="quiz-result" class="mt-4 text-center font-bold text-lg hidden"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="max-w-5xl mx-auto mt-12 mb-8 text-center text-gray-500 text-sm">
+        &copy; 2024 Học liệu Vật lí 12 - Kết nối tri thức với cuộc sống
+    </footer>
 
     <script>
         function toggleAnswer(id) {
-            const el = document.getElementById(id);
-            if (el.classList.contains('hidden')) {
-                el.classList.remove('hidden');
+            const element = document.getElementById(id);
+            if (element.style.display === "block") {
+                element.style.display = "none";
             } else {
-                el.style.display = (el.style.display === "block") ? "none" : "block";
+                element.style.display = "block";
             }
         }
 
         function checkQuiz() {
-            const results = [
-                document.getElementById('correct1').checked,
-                document.getElementById('correct2').checked,
-                document.getElementById('correct3').checked,
-                document.getElementById('correct4').checked,
-                document.getElementById('correct5').checked
-            ];
-            const score = results.filter(r => r).length;
-            const resDiv = document.getElementById('quizResult');
-            resDiv.innerHTML = `Kết quả: ${score}/5 câu đúng. <br> <span class="text-sm text-gray-500 font-normal">Đáp án đúng: 1B, 2B, 3A, 4A, 5A</span>`;
-            resDiv.className = score === 5 ? "mt-4 font-bold text-center text-green-600" : "mt-4 font-bold text-center text-red-600";
-        }
+            const answers = {
+                q1: "b",
+                q2: "a",
+                q3: "c",
+                q4: "d",
+                q5: "b"
+            };
 
-        window.MathJax = {
-            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
-        };
+            let score = 0;
+            let total = 5;
+            let resultContainer = document.getElementById('quiz-result');
+
+            for (let i = 1; i <= total; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected && selected.value === answers[`q${i}`]) {
+                    score++;
+                }
+            }
+
+            resultContainer.classList.remove('hidden');
+            if (score === total) {
+                resultContainer.innerHTML = `<span class="text-green-600">Tuyệt vời! Bạn đúng ${score}/${total} câu.</span>`;
+            } else if (score >= 3) {
+                resultContainer.innerHTML = `<span class="text-blue-600">Khá tốt! Bạn đúng ${score}/${total} câu. Hãy ôn tập lại các câu sai.</span>`;
+            } else {
+                resultContainer.innerHTML = `<span class="text-red-600">Bạn đúng ${score}/${total} câu. Cần đọc kỹ lại bài học nhé!</span>`;
+            }
+            
+            // Cuộn đến kết quả
+            resultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     </script>
 </body>
 </html>
