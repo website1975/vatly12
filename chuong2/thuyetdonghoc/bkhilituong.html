@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 8: Mô hình động học phân tử chất khí</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        .navy-bg { background-color: #000080; }
+        .navy-text { color: #000080; }
+        .rounded-12px { border-radius: 12px; }
+        .section-header {
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 4px solid #000080;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding-bottom: 4px;
+        }
+        .question-box {
+            background-color: #edf2f7;
+            border-left: 5px solid #000080;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .answer-box {
+            background-color: #f0fff4;
+            border: 1px dashed #48bb78;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .btn-navy {
+            background-color: #000080;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: opacity 0.2s;
+        }
+        .btn-navy:hover { opacity: 0.9; }
+        canvas {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            width: 100%;
+            height: 300px;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #cbd5e0; padding: 12px; text-align: center; }
+        th { background-color: #e2e8f0; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Header Section -->
+    <header class="max-w-5xl mx-auto mb-8">
+        <div class="navy-bg text-white text-center py-2 text-lg font-semibold rounded-t-lg">
+            CHƯƠNG 2: KHÍ LÝ TƯỞNG
+        </div>
+        <div class="navy-bg text-white text-center py-6 text-3xl font-bold rounded-b-lg shadow-lg">
+            BÀI 8: MÔ HÌNH ĐỘNG HỌC PHÂN TỬ CHẤT KHÍ
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto">
+        
+        <!-- Intro Box -->
+        <section class="bg-white p-6 rounded-12px shadow-md border border-gray-200 mb-8">
+            <p class="italic text-gray-700 leading-relaxed">
+                Khi học môn Khoa học tự nhiên ở lớp 6, các em đã biết một số tính chất đặc biệt của chất ở thể khí so với chất ở thể lỏng và thể rắn. Tại sao chất ở thể khí lại có một số tính chất vật lí khác chính chất đó ở các thể khác?
+            </p>
+        </section>
+
+        <!-- Section I -->
+        <section class="bg-white p-8 rounded-12px shadow-md mb-8">
+            <h2 class="section-header navy-text text-2xl">I. Chuyển động và tương tác của các phân tử khí</h2>
+            
+            <h3 class="font-bold text-xl mb-4">1. Chuyển động Brown trong chất khí</h3>
+            <p class="mb-4">Chuyển động Brown không chỉ xảy ra trong chất lỏng mà xảy ra cả trong chất khí. Hình 8.1 vẽ sơ đồ thí nghiệm dùng để quan sát chuyển động Brown trong chất khí.</p>
+
+            <!-- Simulation and Image Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="flex flex-col">
+                    <span class="text-sm font-semibold mb-1 text-center">Mô phỏng chuyển động hạt khói (Brown)</span>
+                    <canvas id="brownianCanvas"></canvas>
+                    <div class="mt-2 text-center">
+                        <button onclick="resetBrownian()" class="text-xs bg-gray-200 px-2 py-1 rounded">Đặt lại mô phỏng</button>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 p-4">
+                    <p class="text-gray-500 mb-2 font-bold">[Sơ đồ thí nghiệm Hình 8.1]</p>
+                    <svg width="200" height="200" viewBox="0 0 200 200">
+                        <!-- Đơn giản hóa sơ đồ thí nghiệm -->
+                        <rect x="80" y="20" width="40" height="100" fill="#ddd" stroke="#333" />
+                        <rect x="70" y="120" width="60" height="10" fill="#555" />
+                        <circle cx="100" cy="150" r="30" fill="none" stroke="#333" stroke-width="2"/>
+                        <line x1="100" y1="120" x2="100" y2="150" stroke="#333" />
+                        <text x="10" y="100" font-size="12" fill="red">Ánh sáng ➔</text>
+                        <text x="130" y="50" font-size="10">Ống kính hiển vi</text>
+                    </svg>
+                    <p class="text-xs text-center mt-2">Ống thủy tinh đựng khói, đèn chiếu sáng và kính hiển vi</p>
+                </div>
+            </div>
+
+            <!-- Discussion Questions -->
+            <div class="space-y-4">
+                <div class="question-box">
+                    <p class="font-bold">Câu hỏi 1: Dựa vào Hình 8.1, hãy mô tả thí nghiệm dùng để quan sát chuyển động Brown trong không khí.</p>
+                    <button onclick="toggleAnswer('ans1')" class="mt-2 text-sm navy-text underline">Xem phương án trả lời</button>
+                    <div id="ans1" class="answer-box">
+                        Thí nghiệm gồm một ống thủy tinh nhỏ chứa khói. Ánh sáng từ đèn chiếu tập trung vào ống. Quan sát các hạt khói qua kính hiển vi, ta thấy chúng là những điểm sáng chuyển động hỗn loạn không ngừng.
+                    </div>
+                </div>
+
+                <div class="question-box">
+                    <p class="font-bold">Câu hỏi 2: Hãy dựa vào quỹ đạo chuyển động của hạt khói trong không khí (Hình 8.2) để chứng tỏ rằng các phân tử không khí chuyển động hỗn loạn, không ngừng.</p>
+                    <button onclick="toggleAnswer('ans2')" class="mt-2 text-sm navy-text underline">Xem phương án trả lời</button>
+                    <div id="ans2" class="answer-box">
+                        Hạt khói có kích thước lớn hơn nhiều so với phân tử khí. Việc hạt khói chuyển động dích dắc, hỗn loạn chứng tỏ nó bị các phân tử không khí va chạm từ mọi phía một cách không đồng đều. Điều này gián tiếp chứng tỏ các phân tử khí chuyển động hỗn loạn, không ngừng.
+                    </div>
+                </div>
+
+                <div class="question-box">
+                    <p class="font-bold">Câu hỏi 3: Khi quan sát tia nắng mặt trời chiếu qua cửa sổ, ta thấy các hạt bụi chuyển động. Chuyển động này có phải là chuyển động Brown không? Tại sao?</p>
+                    <button onclick="toggleAnswer('ans3')" class="mt-2 text-sm navy-text underline">Xem phương án trả lời</button>
+                    <div id="ans3" class="answer-box">
+                        Không hẳn. Các hạt bụi nhìn thấy được bằng mắt thường thường chuyển động do dòng đối lưu không khí (gió nhẹ). Chuyển động Brown chỉ quan sát rõ với các hạt cực nhỏ dưới kính hiển vi, nơi tác động của va chạm phân tử thắng được trọng lực và dòng khí vĩ mô.
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 p-4 border-l-4 border-blue-500 bg-blue-50">
+                <p class="font-bold mb-2">Kết quả từ thí nghiệm:</p>
+                <ul class="list-disc ml-6 space-y-2">
+                    <li>Chất khí được cấu tạo từ các phân tử chuyển động hỗn loạn, không ngừng.</li>
+                    <li>Nhiệt độ càng cao, các hạt khói (và phân tử khí) chuyển động càng nhanh.</li>
+                </ul>
+            </div>
+
+            <div class="mt-6">
+                <h4 class="font-bold mb-2">Tốc độ trung bình:</h4>
+                <p class="mb-2 text-justify">Trong một khối khí, các phân tử có tốc độ khác nhau. Ta sử dụng khái niệm tốc độ trung bình có tính thống kê:</p>
+                <p class="text-center font-mono bg-gray-100 p-2 rounded">
+                    \( \overline{v} = \frac{v_1 + v_2 + ... + v_n}{n} \)
+                </p>
+                <p class="mt-2 italic text-sm text-gray-600">* Ví dụ: Ở \(0^\circ C\), phân tử Oxygen có tốc độ trung bình khoảng \(400 \, m/s\).</p>
+            </div>
+
+            <h3 class="font-bold text-xl mt-8 mb-4">2. Tương tác giữa các phân tử khí</h3>
+            <p class="mb-4 text-justify">Giữa các phân tử khí có lực hút và lực đẩy (lực liên kết). Tuy nhiên, vì khoảng cách giữa các phân tử khí rất lớn nên lực này rất yếu so với thể lỏng và rắn.</p>
+            
+            <div class="question-box">
+                <p class="font-bold">Câu 1: Nêu hiện tượng thực tế chứng tỏ lực liên kết giữa các phân tử khí rất yếu.</p>
+                <button onclick="toggleAnswer('ansT1')" class="mt-2 text-sm navy-text underline">Xem trả lời</button>
+                <div id="ansT1" class="answer-box">
+                    Chất khí không có hình dạng và thể tích xác định, nó luôn bành trướng để chiếm toàn bộ thể tích bình chứa. Điều này chứng tỏ các phân tử khí tự do di chuyển mà ít bị ràng buộc bởi các phân tử lân cận.
+                </div>
+            </div>
+
+            <div class="question-box">
+                <p class="font-bold">Câu 2: Dựa vào khối lượng riêng để chứng tỏ khoảng cách giữa các phân tử khí rất lớn.</p>
+                <button onclick="toggleAnswer('ansT2')" class="mt-2 text-sm navy-text underline">Xem trả lời</button>
+                <div id="ansT2" class="answer-box">
+                    Khối lượng riêng của nước đá là \(917 \, kg/m^3\), nước lỏng là \(1000 \, kg/m^3\), trong khi hơi nước ở \(100^\circ C, 1 \, atm\) chỉ khoảng \(0.6 \, kg/m^3\). Cùng một lượng chất nhưng thể tích khí lớn hơn hàng nghìn lần, chứng tỏ khoảng cách giữa các phân tử khí rất lớn.
+                </div>
+            </div>
+        </section>
+
+        <!-- Section II -->
+        <section class="bg-white p-8 rounded-12px shadow-md mb-8">
+            <h2 class="section-header navy-text text-2xl">II. Mô hình động học phân tử chất khí</h2>
+            <div class="space-y-4 text-justify">
+                <p>1. Chất khí được cấu tạo từ các phân tử có kích thước rất nhỏ so với khoảng cách giữa chúng. Lực liên kết rất yếu.</p>
+                <p>2. Các phân tử khí chuyển động hỗn loạn, không ngừng. Nhiệt độ càng cao, chuyển động càng nhanh.</p>
+                <p>3. Khi chuyển động, chúng va chạm với nhau và với thành bình, gây ra <strong>áp suất</strong> lên thành bình.</p>
+            </div>
+
+            <div class="mt-8">
+                <h4 class="font-bold mb-4">Thảo luận: Điền bảng 8.1</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Mô hình động học phân tử</th>
+                            <th>Thí nghiệm/Hiện tượng thực tế</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Chuyển động hỗn loạn, không ngừng</td>
+                            <td>Chuyển động Brown trong không khí</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Kích thước rất nhỏ so với khoảng cách</td>
+                            <td class="italic text-blue-600">
+                                <button onclick="toggleAnswer('tab1')" class="underline">Nhấn xem</button>
+                                <div id="tab1" class="hidden text-black not-italic">Tính dễ nén của chất khí; khối lượng riêng chất khí rất nhỏ.</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Va chạm gây áp suất</td>
+                            <td class="italic text-blue-600">
+                                <button onclick="toggleAnswer('tab2')" class="underline">Nhấn xem</button>
+                                <div id="tab2" class="hidden text-black not-italic">Quả bóng bay căng tròn; lốp xe căng hơi khi bơm thêm khí.</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section III -->
+        <section class="bg-white p-8 rounded-12px shadow-md mb-8">
+            <h2 class="section-header navy-text text-2xl">III. Khí lý tưởng</h2>
+            <div class="bg-yellow-50 p-4 border-l-4 border-yellow-400 mb-4">
+                <p class="font-bold">Định nghĩa:</p>
+                <p>Khí lí tưởng là một mô hình đơn giản hóa:</p>
+                <ul class="list-decimal ml-6 mt-2">
+                    <li>Các phân tử được coi là <strong>chất điểm</strong>.</li>
+                    <li>Không tương tác khi chưa va chạm.</li>
+                    <li>Va chạm là <strong>hoàn toàn đàn hồi</strong>.</li>
+                </ul>
+            </div>
+
+            <div class="question-box">
+                <p class="font-bold">Thảo luận: Dùng mô hình động học để giải thích tại sao khi giảm thể tích (giữ nguyên nhiệt độ) thì áp suất tăng?</p>
+                <button onclick="toggleAnswer('ansIII')" class="mt-2 text-sm navy-text underline">Xem lời giải</button>
+                <div id="ansIII" class="answer-box">
+                    Khi giảm thể tích, mật độ phân tử khí (số phân tử trong một đơn vị thể tích) tăng lên. Do nhiệt độ không đổi nên tốc độ trung bình không đổi. Tuy nhiên, mật độ tăng dẫn đến số lần va chạm của các phân tử vào một đơn vị diện tích thành bình trong một đơn vị thời gian tăng lên. Kết quả là áp suất tăng. 
+                    <br><strong>Ví dụ:</strong> Khi ta dùng tay nén pit-tông của ống tiêm (bịt đầu), ta cảm thấy lực đẩy ngược lại càng mạnh do áp suất khí bên trong tăng.
+                </div>
+            </div>
+        </section>
+
+        <!-- Section IV -->
+        <section class="bg-white p-8 rounded-12px shadow-md mb-8">
+            <h2 class="section-header navy-text text-2xl">IV. Củng cố</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-blue-50 p-6 rounded-lg">
+                    <h3 class="font-bold text-lg text-blue-800 mb-3">EM ĐÃ HỌC</h3>
+                    <ul class="list-disc ml-5 space-y-2 text-sm">
+                        <li>Cấu tạo chất khí từ các phân tử nhỏ, khoảng cách lớn.</li>
+                        <li>Chuyển động hỗn loạn, không ngừng (liên quan đến nhiệt độ).</li>
+                        <li>Va chạm thành bình gây ra áp suất.</li>
+                    </ul>
+                </div>
+                <div class="bg-green-50 p-6 rounded-lg">
+                    <h3 class="font-bold text-lg text-green-800 mb-3">EM CÓ THỂ</h3>
+                    <p class="text-sm">Giải thích tại sao chất khí luôn chiếm toàn bộ bình chứa, tại sao áp suất khí tác dụng theo mọi hướng và sự phụ thuộc của áp suất vào nhiệt độ, thể tích.</p>
+                </div>
+            </div>
+
+            <!-- Quiz Section -->
+            <div class="mt-12">
+                <h3 class="font-bold text-xl mb-6 text-center navy-text">5 BÀI TẬP CỦNG CỐ</h3>
+                <div id="quizContainer" class="space-y-8">
+                    <!-- Q1 -->
+                    <div class="quiz-item border-b pb-4">
+                        <p class="font-semibold">Câu 1: Tính chất nào sau đây KHÔNG phải của phân tử khí?</p>
+                        <div class="mt-2 space-y-2">
+                            <label class="block"><input type="radio" name="q1" value="A"> A. Chuyển động không ngừng.</label>
+                            <label class="block"><input type="radio" name="q1" value="B"> B. Kích thước rất nhỏ.</label>
+                            <label class="block"><input type="radio" name="q1" value="C"> C. Giữa các phân tử có khoảng cách.</label>
+                            <label class="block"><input type="radio" name="q1" value="D"> D. Chỉ chuyển động khi bị va chạm.</label>
+                        </div>
+                    </div>
+                    <!-- Q2 -->
+                    <div class="quiz-item border-b pb-4">
+                        <p class="font-semibold">Câu 2: Chuyển động Brown chứng tỏ điều gì?</p>
+                        <div class="mt-2 space-y-2">
+                            <label class="block"><input type="radio" name="q2" value="A"> A. Các phân tử khí đứng yên.</label>
+                            <label class="block"><input type="radio" name="q2" value="B"> B. Các phân tử khí chuyển động hỗn loạn.</label>
+                            <label class="block"><input type="radio" name="q2" value="C"> C. Hạt khói tự phát ra nhiệt.</label>
+                            <label class="block"><input type="radio" name="q2" value="D"> D. Không khí không có cấu tạo phân tử.</label>
+                        </div>
+                    </div>
+                    <!-- Q3 -->
+                    <div class="quiz-item border-b pb-4">
+                        <p class="font-semibold">Câu 3: Khi nhiệt độ của một khối khí tăng lên thì:</p>
+                        <div class="mt-2 space-y-2">
+                            <label class="block"><input type="radio" name="q3" value="A"> A. Tốc độ trung bình phân tử tăng.</label>
+                            <label class="block"><input type="radio" name="q3" value="B"> B. Khoảng cách các phân tử giảm.</label>
+                            <label class="block"><input type="radio" name="q3" value="C"> C. Khối lượng mỗi phân tử tăng.</label>
+                            <label class="block"><input type="radio" name="q3" value="D"> D. Lực liên kết giữa các phân tử mạnh lên.</label>
+                        </div>
+                    </div>
+                    <!-- Q4 -->
+                    <div class="quiz-item border-b pb-4">
+                        <p class="font-semibold">Câu 4: Áp suất chất khí lên thành bình gây ra bởi:</p>
+                        <div class="mt-2 space-y-2">
+                            <label class="block"><input type="radio" name="q4" value="A"> A. Trọng lượng của các phân tử khí.</label>
+                            <label class="block"><input type="radio" name="q4" value="B"> B. Sự va chạm của các phân tử vào thành bình.</label>
+                            <label class="block"><input type="radio" name="q4" value="C"> C. Lực hút giữa các phân tử khí và thành bình.</label>
+                            <label class="block"><input type="radio" name="q4" value="D"> D. Sự bành trướng của thể tích phân tử.</label>
+                        </div>
+                    </div>
+                    <!-- Q5 -->
+                    <div class="quiz-item border-b pb-4">
+                        <p class="font-semibold">Câu 5: Trong mô hình khí lí tưởng, ta bỏ qua yếu tố nào?</p>
+                        <div class="mt-2 space-y-2">
+                            <label class="block"><input type="radio" name="q5" value="A"> A. Khối lượng phân tử.</label>
+                            <label class="block"><input type="radio" name="q5" value="B"> B. Chuyển động của phân tử.</label>
+                            <label class="block"><input type="radio" name="q5" value="C"> C. Thể tích riêng của phân tử.</label>
+                            <label class="block"><input type="radio" name="q5" value="D"> D. Sự va chạm với thành bình.</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-8">
+                    <button onclick="checkQuiz()" class="btn-navy text-lg px-12 py-3">NỘP BÀI</button>
+                    <p id="quizResult" class="mt-4 font-bold text-xl"></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Toggle Answer Function
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === "block" || el.classList.contains('block')) {
+                el.style.display = "none";
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            } else {
+                el.style.display = "block";
+                el.classList.remove('hidden');
+                el.classList.add('block');
+            }
+        }
+
+        // Quiz Logic
+        const correctAnswers = {
+            q1: "D",
+            q2: "B",
+            q3: "A",
+            q4: "B",
+            q5: "C"
+        };
+
+        function checkQuiz() {
+            let score = 0;
+            const total = 5;
+            let feedback = "";
+            
+            for (let i = 1; i <= total; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected && selected.value === correctAnswers[`q${i}`]) {
+                    score++;
+                }
+            }
+
+            const resultDisplay = document.getElementById('quizResult');
+            if (score === total) {
+                resultDisplay.style.color = "#059669"; // Green-600
+                resultDisplay.innerText = `Chúc mừng! Bạn đúng tuyệt đối: ${score}/${total}`;
+            } else {
+                resultDisplay.style.color = "#dc2626"; // Red-600
+                resultDisplay.innerText = `Kết quả của bạn: ${score}/${total}. Hãy thử lại những câu sai nhé!`;
+            }
+        }
+
+        // Brownian Motion Simulation
+        const canvas = document.getElementById('brownianCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let smokeParticle = { x: 0, y: 0, path: [] };
+
+        function initBrownian() {
+            particles = [];
+            // Create invisible gas molecules
+            for(let i=0; i<40; i++){
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6
+                });
+            }
+            // The visible smoke particle
+            smokeParticle = {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                path: [{x: canvas.width / 2, y: canvas.height / 2}]
+            };
+        }
+
+        function resetBrownian() {
+            initBrownian();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw path of smoke particle
+            ctx.beginPath();
+            ctx.strokeStyle = "#3b82f6";
+            ctx.lineWidth = 1;
+            if(smokeParticle.path.length > 0) {
+                ctx.moveTo(smokeParticle.path[0].x, smokeParticle.path[0].y);
+                for(let p of smokeParticle.path) ctx.lineTo(p.x, p.y);
+            }
+            ctx.stroke();
+
+            // Draw gas particles (very faint)
+            ctx.fillStyle = "rgba(100, 100, 100, 0.2)";
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Collision with smoke particle
+                let dx = p.x - smokeParticle.x;
+                let dy = p.y - smokeParticle.y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                if(dist < 10) {
+                    smokeParticle.x += p.vx * 0.8;
+                    smokeParticle.y += p.vy * 0.8;
+                    smokeParticle.path.push({x: smokeParticle.x, y: smokeParticle.y});
+                    if(smokeParticle.path.length > 100) smokeParticle.path.shift();
+                }
+            });
+
+            // Keep smoke particle in bounds
+            if(smokeParticle.x < 10) smokeParticle.x = 10;
+            if(smokeParticle.x > canvas.width - 10) smokeParticle.x = canvas.width - 10;
+            if(smokeParticle.y < 10) smokeParticle.y = 10;
+            if(smokeParticle.y > canvas.height - 10) smokeParticle.y = canvas.height - 10;
+
+            // Draw smoke particle
+            ctx.fillStyle = "#1e3a8a";
+            ctx.beginPath();
+            ctx.arc(smokeParticle.x, smokeParticle.y, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            requestAnimationFrame(draw);
+        }
+
+        window.onload = () => {
+            // Resize canvas to container
+            canvas.width = canvas.offsetWidth;
+            canvas.height = 300;
+            initBrownian();
+            draw();
+        };
+    </script>
+</body>
+</html>
