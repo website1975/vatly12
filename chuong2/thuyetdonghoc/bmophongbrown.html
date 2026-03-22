@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng Chuyển Động Brown Ziczac</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #simulationCanvas {
+            background-color: #0f172a; /* Màu xanh đen huyền bí */
+            border-radius: 1rem;
+            touch-action: none;
+        }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-200 flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl p-6">
+        <h1 class="text-xl font-bold text-center mb-6 text-gray-800 uppercase tracking-tighter">
+            Quỹ Đạo Ziczac của Hạt Khói
+        </h1>
+
+        <div class="relative w-full aspect-square mb-6 mx-auto max-w-[400px]">
+            <canvas id="simulationCanvas" class="w-full h-full"></canvas>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <label class="flex items-center justify-center space-x-3 bg-gray-50 border border-gray-200 p-3 rounded-xl cursor-pointer hover:bg-gray-100 transition">
+                <input type="checkbox" id="smokeToggle" checked class="w-5 h-5 text-yellow-500 rounded">
+                <span class="text-sm font-bold text-gray-700">Hạt Khói</span>
+            </label>
+            <label class="flex items-center justify-center space-x-3 bg-gray-50 border border-gray-200 p-3 rounded-xl cursor-pointer hover:bg-gray-100 transition">
+                <input type="checkbox" id="airToggle" checked class="w-5 h-5 text-blue-500 rounded">
+                <span class="text-sm font-bold text-gray-700">Phân Tử Khí</span>
+            </label>
+        </div>
+
+        <button id="resetButton" class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold hover:bg-black transition-all active:scale-95 flex items-center justify-center space-x-2">
+            <span>Làm mới quỹ đạo</span>
+        </button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simulationCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Thông số mô phỏng
+        const AIR_COUNT = 350; // Mật độ khí cao
+        const SMOKE_RADIUS = 5;
+        const SNAPSHOT_INTERVAL = 12; // Sau 12 khung hình thì nối 1 đoạn ziczac
+        
+        let airParticles = [];
+        let smoke;
+        let frameCounter = 0;
+
+        class Air {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 6;
+                this.vy = (Math.random() - 0.5) * 6;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(147, 197, 253, 0.5)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 1.2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        class Smoke {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = canvas.width / 2;
+                this.y = canvas.height / 2;
+                this.vx = 0;
+                this.vy = 0;
+                this.history = [{x: this.x, y: this.y}]; // Lưu các điểm nút ziczac
+            }
+            update() {
+                // Tạo lực đẩy ngẫu nhiên (va chạm giả lập)
+                this.vx += (Math.random() - 0.5) * 1.8;
+                this.vy += (Math.random() - 0.5) * 1.8;
+                this.vx *= 0.95; // Ma sát môi trường
+                this.vy *= 0.95;
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Giới hạn biên
+                if (this.x < 10 || this.x > canvas.width - 10) this.vx *= -1.2;
+                if (this.y < 10 || this.y > canvas.height - 10) this.vy *= -1.2;
+
+                // CƠ CHẾ TẠO ZICZAC
+                frameCounter++;
+                if (frameCounter % SNAPSHOT_INTERVAL === 0) {
+                    this.history.push({x: this.x, y: this.y});
+                    if (this.history.length > 40) this.history.shift(); // Giới hạn độ dài quỹ đạo
+                }
+            }
+            draw() {
+                // 1. Vẽ đường ziczac
+                if (this.history.length > 1) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#fdbaf8'; // Màu hồng sáng để nổi bật trên nền tối
+                    ctx.lineWidth = 2;
+                    ctx.lineJoin = 'miter'; // Tạo góc nhọn dứt khoát
+                    ctx.moveTo(this.history[0].x, this.history[0].y);
+                    for (let i = 1; i < this.history.length; i++) {
+                        ctx.lineTo(this.history[i].x, this.history[i].y);
+                    }
+                    ctx.stroke();
+                }
+
+                // 2. Vẽ hạt khói (chỉ vẽ nếu checkbox Smoke được tích)
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#fff';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, SMOKE_RADIUS, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0; // Reset shadow cho các phần tử khác
+            }
+        }
+
+        function init() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            airParticles = Array.from({length: AIR_COUNT}, () => new Air());
+            smoke = new Smoke();
+            animate();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const showAir = document.getElementById('airToggle').checked;
+            const showSmoke = document.getElementById('smokeToggle').checked;
+
+            if (showAir) {
+                airParticles.forEach(p => { p.update(); p.draw(); });
+            }
+            
+            if (showSmoke) {
+                smoke.update();
+                smoke.draw();
+            } else {
+                // Vẫn cập nhật vị trí ngầm để khi hiện lại nó không bị đứng yên
+                smoke.update();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        document.getElementById('resetButton').onclick = () => smoke.reset();
+
+        window.onload = init;
+        window.onresize = () => {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        };
+    </script>
+</body>
+</html>
