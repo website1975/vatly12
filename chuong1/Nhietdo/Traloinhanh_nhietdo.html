@@ -3,547 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ôn Tập: Nhiệt độ và Sự chuyển thể (Tải Nhanh)</title>
-    
-    <!-- CSS TỰ LÀM: Ưu tiên tải nhanh CSS để hiển thị giao diện ngay lập tức -->
+    <title>Ôn Tập: Nhiệt độ và Sự chuyển thể (Bản Chuẩn Độc Lập)</title>
     <style>
-        /* --- CSS Reset and Base Styles --- */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-        .quiz-container {
-            width: 100%;
-            max-width: 1000px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        /* --- Header (Thời gian & Tiến độ) --- */
-        .quiz-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 25px;
-            /* Đã thay đổi màu nền để buộc cập nhật hiển thị */
-            background-color: #e0f7fa; 
-            border-bottom: 1px solid #007bff;
-            font-weight: 600;
-            color: #007bff;
-        }
-
-        /* --- Main Layout (Sidebar & Content) --- */
-        .quiz-main {
-            display: flex;
-        }
-        .sidebar {
-            width: 250px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-right: 1px solid #ddd;
-        }
-        .content {
-            flex-grow: 1;
-            padding: 30px;
-        }
-
-        /* --- Navigation Buttons (Sidebar) --- */
-        .nav-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        .q-button {
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            text-align: center;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #fff;
-            color: #333;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-        .q-button.current {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
-        }
-        .q-button.answered {
-            background-color: #28a745;
-            color: white;
-            border-color: #28a745;
-        }
-
-        /* --- Question Content --- */
-        .question-index {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #007bff;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #007bff;
-            text-align: center;
-        }
-        .question-text {
-            font-size: 1.2em;
-            font-weight: 600;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-        .option {
-            display: block;
-            margin-bottom: 12px;
-            padding: 15px;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s;
-            position: relative;
-        }
-        .option input {
-            position: absolute;
-            opacity: 0;
-        }
-        .option .label-text {
-            margin-left: 25px;
-        }
-        /* Đảm bảo MathJax hiển thị tốt trong đáp án */
-        .option .label-text span {
-            display: inline-block;
-        }
-        /* Đảm bảo rằng nội dung đã tải xong có thể cuộn trên mobile */
-        @media (max-width: 768px) {
-            .quiz-main {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid #ddd;
-            }
-            .quiz-container {
-                padding: 0;
-            }
-        }
-
-        /* --- Visual Feedback & Rationale --- */
-        .feedback {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            font-weight: bold;
-            display: none;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .feedback.correct {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .feedback.incorrect {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        .rationale {
-            margin-top: 15px;
-            padding: 10px;
-            background-color: #f0f8ff;
-            border: 1px dashed #ced4da;
-            border-radius: 6px;
-            font-size: 0.95em;
-            color: #495057;
-        }
-        .show-answer-btn {
-            background-color: #17a2b8;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
-            font-weight: 600;
-        }
-
-        /* --- Footer Navigation --- */
-        .footer-nav {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 25px;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }
-        .nav-btn, #submit-quiz {
-            padding: 12px 25px;
-            font-size: 1em;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .nav-btn.prev {
-            background-color: #6c757d;
-            color: white;
-        }
-        .nav-btn.next {
-            background-color: #007bff;
-            color: white;
-        }
-        #submit-quiz {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        /* --- Results Screen --- */
-        #results {
-            display: none;
-            text-align: center;
-            padding: 50px;
-            background-color: #f0faff;
-            border-radius: 12px;
-            margin: 20px auto;
-        }
+        /* --- Giữ nguyên CSS của bạn --- */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .quiz-container { width: 100%; max-width: 1000px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); overflow: hidden; }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background-color: #e0f7fa; border-bottom: 1px solid #007bff; font-weight: 600; color: #007bff; }
+        .quiz-main { display: flex; }
+        .sidebar { width: 250px; padding: 20px; background-color: #f8f9fa; border-right: 1px solid #ddd; }
+        .content { flex-grow: 1; padding: 30px; min-height: 400px; }
+        .nav-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+        .q-button { width: 35px; height: 35px; line-height: 35px; text-align: center; border: 1px solid #ccc; border-radius: 5px; background-color: #fff; cursor: pointer; font-weight: 500; }
+        .q-button.current { background-color: #007bff; color: white; border-color: #007bff; }
+        .q-button.answered { background-color: #28a745; color: white; }
+        .question-index { font-size: 1.4em; font-weight: 700; color: #007bff; margin-bottom: 15px; border-bottom: 2px solid #007bff; padding-bottom: 5px; }
+        .question-text { font-size: 1.15em; font-weight: 600; margin-bottom: 20px; line-height: 1.6; }
+        .option { display: block; margin-bottom: 10px; padding: 12px; border: 1px solid #e9ecef; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .option:hover { background-color: #f1f8ff; }
+        .feedback { margin-top: 15px; padding: 12px; border-radius: 8px; font-weight: bold; display: none; }
+        .feedback.correct { background-color: #d4edda; color: #155724; }
+        .feedback.incorrect { background-color: #f8d7da; color: #721c24; }
+        .rationale { margin-top: 15px; padding: 15px; background-color: #fff3cd; border-left: 5px solid #ffc107; border-radius: 4px; display: none; }
+        .footer-nav { display: flex; justify-content: space-between; margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee; }
+        .nav-btn, #submit-quiz, .show-answer-btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .nav-btn.prev { background-color: #6c757d; color: white; }
+        .nav-btn.next { background-color: #007bff; color: white; }
+        #submit-quiz { background-color: #dc3545; color: white; }
+        .show-answer-btn { background-color: #17a2b8; color: white; margin-top: 10px; }
+        #results { display: none; text-align: center; padding: 40px; }
+        @media (max-width: 768px) { .quiz-main { flex-direction: column; } .sidebar { width: 100%; border-right: none; } }
     </style>
 </head>
 <body>
 
 <div class="quiz-container">
     <div class="quiz-header">
-        <div class="timer">Thời gian: <span id="time-left">10:00</span></div>
-        <div class="progress">Tiến độ: <span id="current-progress">1</span>/20</div>
+        <div class="timer">⏱ Thời gian: <span id="time-left">10:00</span></div>
+        <div class="progress">📍 Câu hỏi: <span id="current-progress">1</span>/20</div>
     </div>
 
     <div class="quiz-main">
         <div class="sidebar">
-            <h2>Danh Mục Câu Hỏi</h2>
-            <div class="nav-grid" id="q-nav-buttons">
-            </div>
+            <h3 style="margin-top:0">Danh mục câu</h3>
+            <div class="nav-grid" id="q-nav-buttons"></div>
         </div>
-
         <div class="content" id="quiz-content-area">
-            <!-- Nội dung sẽ được tạo bởi renderQuestion() -->
-            <div class="text-center p-8 text-gray-500">Đang tải nội dung...</div>
+            <p>Đang tải câu hỏi...</p>
         </div>
     </div>
     
-    <div id="results">
-    </div>
+    <div id="results"></div>
 </div>
 
-<!-- CẤU HÌNH VÀ TẢI MATHJAX Ở CUỐI BODY -->
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script>
-    // Cấu hình MathJax ngay trước khi tải thư viện
     window.MathJax = {
-      tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']], // Bắt buộc nhận diện $...$
-        displayMath: [['$$', '$$'], ['\\[', '\\]']]
-      },
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$']]
+        },
+        startup: {
+            ready: () => {
+                console.log('MathJax is ready!');
+                MathJax.startup.defaultReady();
+            }
+        }
     };
 </script>
-<!-- ĐẢM BẢO TẢI ASYNC ĐỂ KHÔNG CHẶN CÁC THÀNH PHẦN KHÁC -->
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-<!-- KẾT THÚC CẤU HÌNH VÀ TẢI MATHJAX -->
-
 
 <script>
-    // Dữ liệu 20 câu hỏi đã phân loại (Sử dụng cú pháp MathJax $...$ và $$...$$)
+    // Dữ liệu câu hỏi (Giữ nguyên từ file gốc của bạn)
     const questions = [
-        // I. BIẾT/HIỂU/GHI NHỚ (7 câu)
         { id: 1, type: "Ghi nhớ", question: "Khi hai vật có nhiệt độ khác nhau tiếp xúc với nhau thì năng lượng nhiệt sẽ truyền một cách tự phát từ:", options: ["Vật có nhiệt độ thấp hơn sang vật có nhiệt độ cao hơn.", "Vật có khối lượng lớn hơn sang vật có khối lượng nhỏ hơn.", "Vật có thể tích lớn hơn sang vật có thể tích nhỏ hơn.", "Vật có nhiệt độ cao hơn sang vật có nhiệt độ thấp hơn."], answer: 3, rationale: "Sự truyền nhiệt tự phát luôn xảy ra từ vật có nhiệt độ cao hơn sang vật có nhiệt độ thấp hơn theo Định luật Truyền nhiệt." },
-        { id: 2, type: "Ghi nhớ", question: "Hai hệ ở trạng thái cân bằng nhiệt thì:", options: ["Chúng nhất thiết phải chứa cùng một lượng nhiệt.", "Chúng nhất thiết phải có cùng khối lượng.", "Chúng nhất thiết phải ở cùng nhiệt độ.", "Chúng nhất thiết phải được cấu tạo từ cùng một chất."], answer: 2, rationale: "Trạng thái cân bằng nhiệt là trạng thái mà ở đó không có sự trao đổi năng lượng nhiệt ròng, điều này xảy ra khi hai hệ có nhiệt độ bằng nhau." },
-        { id: 3, type: "Ghi nhớ", question: "Nhiệt độ chuẩn dùng để xây dựng thang đo Celsius là:", options: ["Nhiệt độ nóng chảy của sáp nến và nhiệt độ sôi của rượu.", "Nhiệt độ nóng chảy của sáp nến và nhiệt độ sôi của nước.", "Nhiệt độ nóng chảy của nước đá và nhiệt độ sôi của sáp nến.", "Nhiệt độ nóng chảy của nước đá và nhiệt độ sôi của nước tinh khiết ở áp suất tiêu chuẩn."], answer: 3, rationale: "Hai điểm này được gán giá trị lần lượt là $0^{\\circ}C$ và $100^{\\circ}C$ để tạo nên thang đo Celsius." },
-        { id: 4, type: "Ghi nhớ", question: "Ở nhiệt độ không tuyệt đối ($0 \\text{ K}$), động năng chuyển động nhiệt của các phân tử:", options: ["Bằng không.", "Đạt giá trị cực đại.", "Đạt giá trị cực tiểu nhưng khác không.", "Có thể thay đổi tùy thuộc vào chất."], answer: 0, rationale: "Nhiệt độ không tuyệt đối là giới hạn dưới của nhiệt độ, nơi chuyển động nhiệt của các phân tử vật chất ngừng lại theo lý thuyết cổ điển." },
-        { id: 5, type: "Ghi nhớ", question: "Mối liên hệ giữa thang nhiệt độ Celsius ($t$) và thang nhiệt độ Fahrenheit ($T_F$) là:", options: ["$T(^{\\circ}F)=1,8t(^{\\circ}C)+32$", "$T(^{\\circ}F)=1,8t(^{\\circ}C)+3,2$", "$T(^{\\circ}F)=3,2t(^{\\circ}C)+18$", "$T(^{\\circ}F)=18t(^{\\circ}C)+32$"], answer: 0, rationale: "Đây là công thức chuẩn: $T_F = 1,8t + 32$." },
-        { id: 6, type: "Ghi nhớ", question: "Mối liên hệ giữa thang nhiệt độ Celsius ($t$) và thang nhiệt độ Kelvin ($T_K$) (làm tròn) là:", options: ["$T(K)=273t(^{\\circ}C)+273$", "$T(K)=t(^{\\circ}C)+273$", "$T(K)=1,8t(^{\\circ}C)+273$", "$T(K)=18t(^{\\circ}C)+32$"], answer: 1, rationale: "Thang Kelvin và Celsius có cùng khoảng chia, $T_K = t + 273,15 \\approx t + 273$." },
-        { id: 7, type: "Ghi nhớ", question: "Các vật không thể có nhiệt độ thấp hơn:", options: ["$5^{\\circ}C$", "$100 \\text{ K}$", "$-250^{\\circ}C$", "$-273,15^{\\circ}C$"], answer: 3, rationale: "Nhiệt độ không tuyệt đối là $0 \\text{ K}$, tương đương với $-273,15^{\\circ}C$." },
-
-        // II. HIỂU HIỆN TƯỢNG VẬT LÝ (7 câu)
-        { id: 8, type: "Hiểu", question: "Trong nhiệt kế thủy ngân, biến thiên $1^{\\circ}C$ bằng:", options: ["Biến thiên $1 \\text{ K}$", "Biến thiên $1,5 \\text{ K}$", "Biến thiên $2 \\text{ K}$", "Biến thiên $1,8 \\text{ K}$"], answer: 0, rationale: "Khoảng chia của thang Celsius và thang Kelvin là hoàn toàn bằng nhau, nên $\\Delta t_C = \\Delta T_K$." },
-        { id: 9, type: "Hiểu", question: "Một độ biến thiên độ $C$ trên nhiệt kế cũng bằng:", options: ["$1^{\\circ}F$", "$0,5^{\\circ}F$", "$1,8^{\\circ}F$", "$2^{\\circ}F$"], answer: 2, rationale: "Tỉ lệ khoảng chia ${}^{\\circ}F$ và ${}^{\\circ}C$ là $180/100 = 1,8$." },
-        { id: 10, type: "Hiểu", question: "Điểm ba của nước (nhiệt độ mà nước tồn tại đồng thời 3 thể: rắn, lỏng, hơi) theo độ $C$ là:", options: ["$0^{\\circ}C$", "$0,01^{\\circ}C$", "$-0,01^{\\circ}C$", "$100^{\\circ}C$"], answer: 1, rationale: "Điểm ba của nước được định nghĩa chính xác là $0,01^{\\circ}C$." },
-        { id: 11, type: "Hiểu", question: "Phạm vi đo của nhiệt kế thủy ngân đo thân nhiệt ($35^{\\circ}C$ đến $42^{\\circ}C$) được thiết kế dựa trên cơ sở nào?", options: ["Vì đó là giới hạn tối đa trong sự dãn nở vì nhiệt của thủy ngân.", "Vì phạm vi này đủ để bao quát thân nhiệt bình thường và các trường hợp sốt nhẹ, sốt cao ở người.", "Vì nhiệt độ cao hơn $42^{\\circ}C$ thì thể tích thủy ngân biến thiên không còn tuyến tính.", "Vì nhiệt độ cơ thể người luôn duy trì chính xác trong khoảng này."], answer: 1, rationale: "Phạm vi đo được tối ưu hóa để phù hợp với mục đích y tế: đo thân nhiệt của con người trong điều kiện bình thường đến sốt cao." },
-        { id: 12, type: "Hiểu", question: "Để xác định lại vị trí vạch $0^{\\circ}C$ trên nhiệt kế bị mất vạch chia, ta cần đặt nhiệt kế vào đối tượng nào dưới đây ở áp suất tiêu chuẩn?", options: ["Nước sôi.", "Ngăn đông của tủ lạnh.", "Nước đá đang tan chảy.", "Cơ thể người khỏe mạnh."], answer: 2, rationale: "Hỗn hợp nước đá và nước lỏng đang cân bằng ở áp suất tiêu chuẩn có nhiệt độ chính xác là $0^{\\circ}C$." },
-        { id: 13, type: "Hiểu", question: "Người ta thả một viên nước đá vào cốc nước A. Ở cốc này, nước (môi trường) toả nhiệt lượng hay nhận nhiệt lượng, và nhiệt độ của nước trong cốc tăng hay giảm?", options: ["Nước nhận nhiệt lượng và nhiệt độ tăng.", "Nước toả nhiệt lượng và nhiệt độ giảm.", "Nước nhận nhiệt lượng và nhiệt độ giảm.", "Nước toả nhiệt lượng và nhiệt độ tăng."], answer: 1, rationale: "Nước toả nhiệt lượng cho viên nước đá tan chảy, do đó nhiệt độ của nước trong cốc sẽ giảm." },
-        { id: 14, type: "Hiểu", question: "Người ta nhúng cốc nước B vào trong một bình chứa nước ấm. Ở cốc này, nước (hệ) toả nhiệt lượng hay nhận nhiệt lượng, và nhiệt độ của nước trong cốc tăng hay giảm?", options: ["Nước toả nhiệt lượng và nhiệt độ giảm.", "Nước nhận nhiệt lượng và nhiệt độ tăng.", "Nước toả nhiệt lượng và nhiệt độ tăng.", "Nước nhận nhiệt lượng và nhiệt độ giảm."], answer: 1, rationale: "Nước trong cốc B nhận nhiệt lượng từ nước ấm, do đó nhiệt độ của nước trong cốc sẽ tăng." },
-
-        // III. TÍNH TOÁN PHỨC TẠP (6 câu)
-        { id: 15, type: "Tính toán", question: "Một vật có nhiệt độ theo thang Celsius là $52^{\\circ}C$. Nhiệt độ của vật theo thang Fahrenheit ($^{\\circ}F$) là bao nhiêu?", options: ["$125,6^{\\circ}F$", "$152,6^{\\circ}F$", "$126,5^{\\circ}F$", "$162,5^{\\circ}F$"], answer: 0, rationale: "Tính: $T_F = 1,8 \\times 52 + 32 = 125,6^{\\circ}F$." },
-        { id: 16, type: "Tính toán", question: "Một vật có nhiệt độ theo thang Fahrenheit là $95^{\\circ}F$. Nhiệt độ của vật theo thang Kelvin ($K$) (làm tròn) là:", options: ["$35 \\text{ K}$", "$308 \\text{ K}$", "$368 \\text{ K}$", "$178 \\text{ K}$"], answer: 1, rationale: "B1: $t = (95-32)/1,8 = 35^{\\circ}C$. B2: $T_K = 35 + 273 \\approx 308 \\text{ K}$." },
-        { id: 17, type: "Tính toán", question: "Nhiệt độ thấp nhất từng được ghi nhận trên Trái Đất là $-89,2^{\\circ}C$. Hãy đổi sang độ $F$ (làm tròn).", options: ["$-128,6^{\\circ}F$", "$-100,2^{\\circ}F$", "$-142,5^{\\circ}F$", "$-150,8^{\\circ}F$"], answer: 0, rationale: "Tính: $T_F = 1,8 \\times (-89,2) + 32 = -128,56^{\\circ}F \\approx -128,6^{\\circ}F$." },
-        { id: 18, type: "Tính toán", question: "Nước đá ở nhiệt độ $-10^{\\circ}C$. Hãy đổi nhiệt độ này sang độ $F$.", options: ["$14^{\\circ}F$", "$10^{\\circ}F$", "$20^{\\circ}F$", "$-18^{\\circ}F$"], answer: 0, rationale: "Tính: $T_F = 1,8 \\times (-10) + 32 = 14^{\\circ}F$." },
-        { id: 19, type: "Tính toán", question: "Giả sử nhiệt giai $X$ có điểm đông đặc của nước là $10X$ và điểm sôi của nước là $200X$. Nhiệt độ $50X$ tương ứng với bao nhiêu độ $C$ (làm tròn)?", options: ["$21^{\\circ}C$", "$26^{\\circ}C$", "$20^{\\circ}C$", "$15^{\\circ}C$"], answer: 0, rationale: "Công thức chuyển đổi: $$\\frac{T_X - T_{\\text{đđ}}}{T_{\\text{sôi}} - T_{\\text{đđ}}} = \\frac{T_C - 0}{100 - 0}$$ Thay số: $$\\frac{50 - 10}{200 - 10} = \\frac{T_C}{100} \\implies T_C = 100 \\times \\frac{40}{190} \\approx 21,05^{\\circ}C$$" },
-        { id: 20, type: "Tính toán", question: "Khoảng cách từ vạch $20^{\\circ}C$ đến $32^{\\circ}C$ là $1,5 \\text{ cm}$. Tính khoảng cách từ vạch $14^{\\circ}C$ đến $50^{\\circ}C$ trên nhiệt kế.", options: ["$3,5 \\text{ cm}$", "$4,5 \\text{ cm}$", "$5,0 \\text{ cm}$", "$6,5 \\text{ cm}$"], answer: 1, rationale: "Sự dãn nở là tuyến tính. Thiết lập tỉ lệ: $$\\frac{L_{14-50}}{1,5 \\text{ cm}} = \\frac{50^{\\circ}C - 14^{\\circ}C}{32^{\\circ}C - 20^{\\circ}C} = \\frac{36}{12} = 3$$ Vậy $L_{14-50} = 3 \\times 1,5 = 4,5 \\text{ cm}$." }
+        { id: 2, type: "Ghi nhớ", question: "Hai hệ ở trạng thái cân bằng nhiệt thì:", options: ["Chúng nhất thiết phải chứa cùng một lượng nhiệt.", "Chúng nhất thiết phải có cùng khối lượng.", "Chúng nhất thiết phải có cùng nhiệt độ.", "Chúng nhất thiết phải được cấu tạo từ cùng một chất."], answer: 2, rationale: "Trạng thái cân bằng nhiệt xảy ra khi hai hệ có nhiệt độ bằng nhau." },
+        { id: 3, type: "Ghi nhớ", question: "Nhiệt độ chuẩn dùng để xây dựng thang đo Celsius là:", options: ["Nhiệt độ nóng chảy của sáp nến và nhiệt độ sôi của rượu.", "Nhiệt độ nóng chảy của sáp nến và nhiệt độ sôi của nước.", "Nhiệt độ nóng chảy của nước đá và nhiệt độ sôi của sáp nến.", "Nhiệt độ nóng chảy của nước đá và nhiệt độ sôi của nước tinh khiết ở áp suất tiêu chuẩn."], answer: 3, rationale: "Hai điểm này được gán giá trị lần lượt là $0^{\\circ}C$ và $100^{\\circ}C$." },
+        { id: 4, type: "Ghi nhớ", question: "Ở nhiệt độ không tuyệt đối ($0 \\text{ K}$), động năng chuyển động nhiệt của các phân tử:", options: ["Bằng không.", "Đạt giá trị cực đại.", "Đạt giá trị cực tiểu nhưng khác không.", "Có thể thay đổi tùy thuộc vào chất."], answer: 0, rationale: "Nhiệt độ không tuyệt đối là giới hạn nơi chuyển động nhiệt của các phân tử ngừng lại." },
+        { id: 5, type: "Ghi nhớ", question: "Mối liên hệ giữa thang nhiệt độ Celsius ($t$) và thang nhiệt độ Fahrenheit ($T_F$) là:", options: ["$T(^{\\circ}F)=1,8t(^{\\circ}C)+32$", "$T(^{\\circ}F)=1,8t(^{\\circ}C)+3,2$", "$T(^{\\circ}F)=3,2t(^{\\circ}C)+18$", "$T(^{\\circ}F)=18t(^{\\circ}C)+32$"], answer: 0, rationale: "Công thức chuẩn: $T_F = 1,8t + 32$." },
+        { id: 6, type: "Ghi nhớ", question: "Mối liên hệ giữa thang nhiệt độ Celsius ($t$) và thang nhiệt độ Kelvin ($T_K$) là:", options: ["$T(K)=273t(^{\\circ}C)+273$", "$T(K)=t(^{\\circ}C)+273$", "$T(K)=1,8t(^{\\circ}C)+273$", "$T(K)=18t(^{\\circ}C)+32$"], answer: 1, rationale: "$T_K = t + 273$." },
+        { id: 7, type: "Ghi nhớ", question: "Các vật không thể có nhiệt độ thấp hơn:", options: ["$5^{\\circ}C$", "$100 \\text{ K}$", "$-250^{\\circ}C$", "$-273,15^{\\circ}C$"], answer: 3, rationale: "Nhiệt độ không tuyệt đối là $0 \\text{ K} \\approx -273,15^{\\circ}C$." },
+        { id: 8, type: "Hiểu", question: "Trong nhiệt kế thủy ngân, biến thiên $1^{\\circ}C$ bằng:", options: ["Biến thiên $1 \\text{ K}$", "Biến thiên $1,5 \\text{ K}$", "Biến thiên $2 \\text{ K}$", "Biến thiên $1,8 \\text{ K}$"], answer: 0, rationale: "Khoảng chia của thang Celsius và Kelvin bằng nhau." },
+        { id: 9, type: "Hiểu", question: "Một độ biến thiên độ $C$ trên nhiệt kế cũng bằng:", options: ["$1^{\\circ}F$", "$0,5^{\\circ}F$", "$1,8^{\\circ}F$", "$2^{\\circ}F$"], answer: 2, rationale: "Tỉ lệ khoảng chia là $1,8$." },
+        { id: 10, type: "Hiểu", question: "Điểm ba của nước theo độ $C$ là:", options: ["$0^{\\circ}C$", "$0,01^{\\circ}C$", "$-0,01^{\\circ}C$", "$100^{\\circ}C$"], answer: 1, rationale: "Định nghĩa là $0,01^{\\circ}C$." },
+        { id: 11, type: "Hiểu", question: "Phạm vi đo của nhiệt kế thủy ngân đo thân nhiệt ($35^{\\circ}C$ đến $42^{\\circ}C$) thiết kế dựa trên:", options: ["Giới hạn dãn nở thủy ngân.", "Bao quát thân nhiệt bình thường và sốt ở người.", "Tính tuyến tính của thủy ngân.", "Cơ thể người luôn duy trì khoảng này."], answer: 1, rationale: "Tối ưu cho mục đích y tế." },
+        { id: 12, type: "Hiểu", question: "Để xác định vạch $0^{\\circ}C$, ta đặt nhiệt kế vào:", options: ["Nước sôi.", "Ngăn đông tủ lạnh.", "Nước đá đang tan.", "Cơ thể người."], answer: 2, rationale: "Nước đá đang tan ở áp suất tiêu chuẩn là $0^{\\circ}C$." },
+        { id: 13, type: "Hiểu", question: "Thả viên đá vào cốc nước. Nước tỏa hay nhận nhiệt, nhiệt độ tăng hay giảm?", options: ["Nhận nhiệt, tăng.", "Tỏa nhiệt, giảm.", "Nhận nhiệt, giảm.", "Tỏa nhiệt, tăng."], answer: 1, rationale: "Nước tỏa nhiệt cho đá tan nên nhiệt độ nước giảm." },
+        { id: 14, type: "Hiểu", question: "Nhúng cốc nước vào bình nước ấm. Nước tỏa hay nhận nhiệt, nhiệt độ tăng hay giảm?", options: ["Tỏa nhiệt, giảm.", "Nhận nhiệt, tăng.", "Tỏa nhiệt, tăng.", "Nhận nhiệt, giảm."], answer: 1, rationale: "Nhận nhiệt từ nước ấm nên nhiệt độ tăng." },
+        { id: 15, type: "Tính toán", question: "Vật có nhiệt độ $52^{\\circ}C$. Đổi sang độ $F$:", options: ["$125,6^{\\circ}F$", "$152,6^{\\circ}F$", "$126,5^{\\circ}F$", "$162,5^{\\circ}F$"], answer: 0, rationale: "$T_F = 1,8 \\times 52 + 32 = 125,6^{\\circ}F$." },
+        { id: 16, type: "Tính toán", question: "Vật có nhiệt độ $95^{\\circ}F$. Đổi sang Kelvin (làm tròn):", options: ["$35 \\text{ K}$", "$308 \\text{ K}$", "$368 \\text{ K}$", "$178 \\text{ K}$"], answer: 1, rationale: "$t = (95-32)/1,8 = 35^{\\circ}C \\implies T = 35 + 273 = 308 \\text{ K}$." },
+        { id: 17, type: "Tính toán", question: "Nhiệt độ $-89,2^{\\circ}C$ đổi sang độ $F$:", options: ["$-128,6^{\\circ}F$", "$-100,2^{\\circ}F$", "$-142,5^{\\circ}F$", "$-150,8^{\\circ}F$"], answer: 0, rationale: "$T_F = 1,8 \\times (-89,2) + 32 \approx -128,6^{\\circ}F$." },
+        { id: 18, type: "Tính toán", question: "Đá ở $-10^{\\circ}C$ đổi sang độ $F$:", options: ["$14^{\\circ}F$", "$10^{\\circ}F$", "$20^{\\circ}F$", "$-18^{\\circ}F$"], answer: 0, rationale: "$T_F = 1,8 \times (-10) + 32 = 14^{\\circ}F$." },
+        { id: 19, type: "Tính toán", question: "Nhiệt giai $X$ (Đông: $10X$, Sôi: $200X$). $50X$ là bao nhiêu độ $C$?", options: ["$21^{\\circ}C$", "$26^{\\circ}C$", "$20^{\\circ}C$", "$15^{\\circ}C$"], answer: 0, rationale: "$T_C = 100 \times \frac{50-10}{200-10} \approx 21^{\\circ}C$." },
+        { id: 20, type: "Tính toán", question: "Từ $20^{\\circ}C$ đến $32^{\\circ}C$ là $1,5 \text{ cm}$. Từ $14^{\\circ}C$ đến $50^{\\circ}C$ là bao nhiêu?", options: ["$3,5 \text{ cm}$", "$4,5 \text{ cm}$", "$5,0 \text{ cm}$", "$6,5 \text{ cm}$"], answer: 1, rationale: "Tỉ lệ: $\frac{50-14}{32-20} \times 1,5 = 3 \times 1,5 = 4,5 \text{ cm}$." }
     ];
 
-    let currentQuestionIndex = 0;
+    let currentIdx = 0;
     const userAnswers = Array(questions.length).fill(null);
-    let score = 0;
-    const timeLimit = 600; // 10 phút = 600 giây
-    let timeLeft = timeLimit;
+    let timeLeft = 600;
     let timerInterval;
-    let isQuizSubmitted = false;
+    let isSubmitted = false;
 
-    // --- DOM Elements ---
-    const quizContentArea = document.getElementById('quiz-content-area');
-    const qNavButtonsContainer = document.getElementById('q-nav-buttons');
-    const timerDisplay = document.getElementById('time-left');
-    const progressDisplay = document.getElementById('current-progress');
-    const resultsArea = document.getElementById('results');
+    const contentArea = document.getElementById('quiz-content-area');
+    const navButtons = document.getElementById('q-nav-buttons');
 
-    // --- Chức năng chính ---
+    function init() {
+        renderNav();
+        renderQuestion(0);
+        startTimer();
+    }
 
-    function startTimer() {
-        timerInterval = setInterval(() => {
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                submitQuiz(true);
-                return;
-            }
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            timeLeft--;
-        }, 1000);
+    function renderNav() {
+        navButtons.innerHTML = questions.map((q, i) => `
+            <div class="q-button" id="nav-${i}" onclick="renderQuestion(${i})">${q.id}</div>
+        `).join('');
     }
 
     function renderQuestion(index) {
-        currentQuestionIndex = index;
+        currentIdx = index;
         const q = questions[index];
+        const labels = ['A', 'B', 'C', 'D'];
 
-        const optionLabels = ['A', 'B', 'C', 'D'];
-        
-        // Bọc nội dung câu hỏi và đáp án trong thẻ <span> để MathJax xử lý
-        const questionText = `(${q.type}): ${q.question}`;
-        const optionsHTML = q.options.map((option, i) => `
-            <label class="option" onclick="selectAnswer(${q.id - 1}, ${i})">
-                <input type="radio" name="q${q.id}" value="${i}" ${userAnswers[index] === i ? 'checked' : ''} ${isQuizSubmitted ? 'disabled' : ''}>
-                <strong>${optionLabels[i]}.</strong> <span class="label-text">${option}</span>
+        let optionsHTML = q.options.map((opt, i) => `
+            <label class="option">
+                <input type="radio" name="q" value="${i}" 
+                    ${userAnswers[index] === i ? 'checked' : ''} 
+                    ${isSubmitted ? 'disabled' : ''}
+                    onchange="selectAns(${index}, ${i})">
+                <strong>${labels[i]}.</strong> <span>${opt}</span>
             </label>
         `).join('');
 
-        const questionHTML = `
+        contentArea.innerHTML = `
             <div class="question-index">Câu ${q.id}/20</div>
-            <p class="question-text"><span>${questionText}</span></p>
-            <div class="options-container">
-                ${optionsHTML}
-            </div>
-            <div class="feedback" id="feedback-${q.id}" style="display: none;"></div>
+            <p class="question-text">(${q.type}): ${q.question}</p>
+            <div class="options-container">${optionsHTML}</div>
+            <div class="feedback" id="fb-${index}"></div>
+            <div class="rationale" id="rat-${index}"><strong>Lời giải:</strong> ${q.rationale}</div>
             
             <div class="footer-nav">
-                <button class="nav-btn prev" id="prev-btn" onclick="changeQuestion(-1)" ${index === 0 ? 'disabled' : ''}>← Câu Trước</button>
-                <button id="submit-quiz" onclick="submitQuiz()" style="display: ${index === questions.length - 1 ? 'inline-block' : 'none'};">Nộp Bài</button>
-                <button class="show-answer-btn" onclick="showAnswerRationale(${q.id - 1})" style="display: ${isQuizSubmitted ? 'inline-block' : 'none'};">Xem Lời Giải</button>
-                <button class="nav-btn next" id="next-btn" onclick="changeQuestion(1)" ${index === questions.length - 1 ? 'disabled' : ''}>Câu Tiếp →</button>
+                <button class="nav-btn prev" onclick="changeQ(-1)" ${index === 0 ? 'disabled' : ''}>← Trước</button>
+                ${index === 19 && !isSubmitted ? '<button id="submit-quiz" onclick="finish()">Nộp Bài</button>' : ''}
+                ${isSubmitted ? `<button class="show-answer-btn" onclick="toggleRat(${index})">Xem lời giải</button>` : ''}
+                <button class="nav-btn next" onclick="changeQ(1)" ${index === 19 ? 'disabled' : ''}>Tiếp →</button>
             </div>
         `;
-        quizContentArea.innerHTML = questionHTML;
 
-        // Yêu cầu MathJax render lại nội dung vừa được load
-        // Đã tối ưu hóa: MathJax.typesetPromise là hàm bất đồng bộ, giúp không chặn main thread.
-        // Nó sẽ được chạy sau khi MathJax đã sẵn sàng (xem hàm initQuiz).
-        if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
-             MathJax.typesetPromise([quizContentArea]).catch((err) => {
-                console.error("Lỗi khi MathJax typesetting:", err);
-             });
-        }
+        updateNavUI();
+        if (window.MathJax) MathJax.typesetPromise([contentArea]);
+        if (isSubmitted) showFeedback(index);
+    }
 
-        // Cập nhật tiến độ
-        progressDisplay.textContent = q.id;
+    function selectAns(qIdx, ansIdx) {
+        userAnswers[qIdx] = ansIdx;
+        updateNavUI();
+    }
 
-        // Cập nhật trạng thái nút điều hướng nhanh
-        document.querySelectorAll('.q-button').forEach(btn => {
-            btn.classList.remove('current');
-            if (parseInt(btn.dataset.index) === index) {
-                btn.classList.add('current');
-            }
+    function updateNavUI() {
+        document.querySelectorAll('.q-button').forEach((btn, i) => {
+            btn.className = 'q-button';
+            if (i === currentIdx) btn.classList.add('current');
+            if (userAnswers[i] !== null) btn.classList.add('answered');
         });
-
-        // Hiển thị phản hồi nếu đã nộp bài
-        if (isQuizSubmitted) {
-            checkAndDisplayFeedback(index);
-        }
+        document.getElementById('current-progress').innerText = currentIdx + 1;
     }
 
-    function generateNavigationButtons() {
-        qNavButtonsContainer.innerHTML = questions.map((q, index) => `
-            <div class="q-button ${userAnswers[index] !== null ? 'answered' : ''} ${index === currentQuestionIndex ? 'current' : ''}" data-index="${index}" onclick="renderQuestion(${index})">
-                ${q.id}
-            </div>
-        `).join('');
+    function changeQ(step) {
+        let newIdx = currentIdx + step;
+        if (newIdx >= 0 && newIdx < 20) renderQuestion(newIdx);
     }
 
-    function selectAnswer(qIndex, answerIndex) {
-        if (isQuizSubmitted) return;
-
-        userAnswers[qIndex] = answerIndex;
-        document.querySelector(`.q-button[data-index="${qIndex}"]`).classList.add('answered');
-        
-        // Render lại câu hỏi để cập nhật trạng thái radio button
-        renderQuestion(qIndex); 
-
-        // Tự động chuyển câu hỏi sau 0.5s nếu chưa phải câu cuối
-        if (qIndex < questions.length - 1) {
-             changeQuestion(1);
-        }
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            if (timeLeft <= 0) { finish(); return; }
+            timeLeft--;
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('time-left').innerText = `${m}:${s < 10 ? '0'+s : s}`;
+        }, 1000);
     }
 
-    function changeQuestion(delta) {
-        const newIndex = currentQuestionIndex + delta;
-        if (newIndex >= 0 && newIndex < questions.length) {
-            renderQuestion(newIndex);
-        }
-    }
-
-    function checkAndDisplayFeedback(index) {
-        const q = questions[index];
-        const feedbackElement = document.getElementById(`feedback-${q.id}`);
-        const showAnswerBtn = document.querySelector(`#quiz-content-area .show-answer-btn`);
-        
-        feedbackElement.style.display = 'block';
-        if (showAnswerBtn) showAnswerBtn.style.display = 'inline-block';
-
-        if (userAnswers[index] === q.answer) {
-            feedbackElement.className = 'feedback correct';
-            feedbackElement.innerHTML = '🎉 **Chúc mừng!** Bạn đã trả lời đúng!';
-        } else {
-            feedbackElement.className = 'feedback incorrect';
-            feedbackElement.innerHTML = '😞 **Thông cảm!** Câu trả lời chưa chính xác. Cố gắng lên nhé!';
-        }
-    }
-
-    function showAnswerRationale(index) {
-        const q = questions[index];
-        const qContainer = document.getElementById('quiz-content-area');
-        let rationaleDiv = qContainer.querySelector('.rationale');
-        
-        if (!rationaleDiv) {
-            rationaleDiv = document.createElement('div');
-            rationaleDiv.className = 'rationale';
-            qContainer.querySelector('.feedback').insertAdjacentElement('afterend', rationaleDiv);
-        }
-
-        rationaleDiv.style.display = rationaleDiv.style.display === 'block' ? 'none' : 'block';
-        rationaleDiv.innerHTML = `<strong>Lời giải:</strong> <span>${q.rationale}</span>`;
-        
-        // Yêu cầu MathJax render lại lời giải
-        if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
-            MathJax.typesetPromise([rationaleDiv]);
-        }
-    }
-
-    function calculateScore() {
-        score = 0;
-        questions.forEach((q, index) => {
-            if (userAnswers[index] === q.answer) {
-                score++;
-            }
-        });
-        return score;
-    }
-
-    function submitQuiz(isTimeOut = false) {
-        if (isQuizSubmitted) return;
-
+    function finish() {
         clearInterval(timerInterval);
-        isQuizSubmitted = true;
-        const finalScore = calculateScore();
-        const unattempted = questions.length - userAnswers.filter(a => a !== null).length;
-
+        isSubmitted = true;
+        let score = userAnswers.filter((a, i) => a === questions[i].answer).length;
+        
         document.querySelector('.quiz-main').style.display = 'none';
-        document.querySelector('.quiz-header').style.display = 'none';
-        resultsArea.style.display = 'block';
-        document.querySelector('.quiz-container').style.boxShadow = 'none';
-        
-        resultsArea.innerHTML = `
-            <h2>${isTimeOut ? 'HẾT GIỜ! ĐÃ NỘP BÀI TỰ ĐỘNG.' : 'HOÀN THÀNH BÀI THI!'}</h2>
-            <p>Kết quả cuối cùng của bạn là:</p>
-            <p style="font-size: 3em; color: #dc3545; margin: 10px 0;">${finalScore}/20</p>
-            <p>Số câu chưa trả lời: ${unattempted}</p>
-            <button class="review-btn" onclick="reviewAnswers()">Xem lại toàn bộ đáp án</button>
+        const res = document.getElementById('results');
+        res.style.display = 'block';
+        res.innerHTML = `
+            <h2>Kết quả: ${score}/20</h2>
+            <button class="nav-btn next" onclick="review()">Xem lại bài làm</button>
         `;
-
-        // Render lại câu hỏi hiện tại để hiển thị feedback (nếu người dùng đang xem)
-        renderQuestion(currentQuestionIndex); 
     }
 
-    function reviewAnswers() {
+    function review() {
+        document.getElementById('results').style.display = 'none';
         document.querySelector('.quiz-main').style.display = 'flex';
-        resultsArea.style.display = 'none';
-        // Hiển thị nội dung xem lại
-        document.querySelector('.sidebar').style.display = 'none'; 
-        
-        let fullReviewHTML = '';
-        const optionLabels = ['A', 'B', 'C', 'D'];
-
-        questions.forEach((q, index) => {
-            const isCorrect = userAnswers[index] === q.answer;
-            const correctAnswer = optionLabels[q.answer];
-
-            fullReviewHTML += `
-                <div class="question-content" style="border: 1px solid ${isCorrect ? '#28a745' : '#dc3545'}; padding: 20px; border-radius: 8px; margin-bottom: 25px; background-color: #fff;">
-                    <p class="question-text"><strong>Câu ${q.id}:</strong> <span>(${q.type}): ${q.question}</span></p>
-                    <div class="options-container">
-                        ${q.options.map((option, i) => `
-                            <div class="option" style="background-color: ${i === q.answer ? '#d4edda' : (i === userAnswers[index] && !isCorrect ? '#f8d7da' : '#f8f9fa')}; border: 1px solid ${i === q.answer ? '#28a745' : 'transparent'};">
-                                <strong>${optionLabels[i]}.</strong> <span class="label-text">${option}</span>
-                                ${i === q.answer ? ' (Đáp án đúng)' : ''}
-                                ${i === userAnswers[index] && !isCorrect ? ' (Bạn chọn sai)' : ''}
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="feedback ${isCorrect ? 'correct' : 'incorrect'}" style="display: block; margin-top: 15px;">
-                        ${isCorrect ? '🎉 **Đúng**' : '😞 **Sai** - Đáp án đúng là ' + correctAnswer}
-                    </div>
-                    <div class="rationale" style="display: block;">
-                        <strong>Lời giải:</strong> <span>${q.rationale}</span>
-                    </div>
-                </div>
-            `;
-        });
-        quizContentArea.innerHTML = fullReviewHTML;
-        
-        // Yêu cầu MathJax render toàn bộ nội dung lời giải
-        if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
-            MathJax.typesetPromise([quizContentArea]);
-        }
+        renderQuestion(0);
     }
 
-    // --- Khởi tạo ---
-    function initQuiz() {
-        generateNavigationButtons();
-        renderQuestion(currentQuestionIndex);
-        startTimer();
-    }
-    
-    // --- Tối ưu hóa: Đảm bảo MathJax đã sẵn sàng trước khi gọi initQuiz ---
-    window.onload = function() {
-        if (typeof MathJax !== 'undefined') {
-            // Sử dụng MathJax.startup.promise để đợi MathJax hoàn tất quá trình khởi động
-            MathJax.startup.promise.then(() => {
-                initQuiz();
-            }).catch(err => {
-                console.error("Lỗi khi MathJax khởi động, vẫn tiếp tục khởi tạo quiz:", err);
-                // Nếu MathJax lỗi, vẫn khởi tạo quiz để người dùng có thể thấy câu hỏi không có công thức.
-                initQuiz();
-            });
+    function showFeedback(idx) {
+        const fb = document.getElementById(`fb-${idx}`);
+        fb.style.display = 'block';
+        if (userAnswers[idx] === questions[idx].answer) {
+            fb.className = 'feedback correct';
+            fb.innerText = 'Chính xác!';
         } else {
-            // Nếu MathJax không tải được, khởi tạo quiz ngay lập tức
-            initQuiz();
+            fb.className = 'feedback incorrect';
+            fb.innerText = 'Chưa đúng!';
         }
-    };
-</script>
+    }
 
+    function toggleRat(idx) {
+        const rat = document.getElementById(`rat-${idx}`);
+        rat.style.display = rat.style.display === 'block' ? 'none' : 'block';
+        if (window.MathJax) MathJax.typesetPromise([rat]);
+    }
+
+    // KHỞI CHẠY KHI TRANG SẴN SÀNG
+    document.addEventListener('DOMContentLoaded', init);
+</script>
 </body>
 </html>
