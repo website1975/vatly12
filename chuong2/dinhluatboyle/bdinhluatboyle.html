@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 9: Định luật Boyle - Vật Lý 12</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navy-bg { background-color: #000080; }
+        .navy-text { color: #000080; }
+        .rounded-12px { border-radius: 12px; }
+        .section-header {
+            border-bottom: 4px solid #000080;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.2rem;
+        }
+        .answer-box {
+            display: none;
+            background-color: #f0fff4; /* Light green */
+            border-left: 4px solid #48bb78;
+        }
+        .question-box {
+            background-color: #edf2f7;
+            border-left: 4px solid #000080;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th { background-color: #e2e8f0; border: 1px solid #cbd5e0; padding: 10px; }
+        td { border: 1px solid #cbd5e0; padding: 10px; text-align: center; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Header Section -->
+    <header class="max-w-4xl mx-auto mb-8 text-center text-white">
+        <div class="navy-bg py-2 mb-1 rounded-t-lg shadow-md">
+            <h2 class="text-lg font-semibold uppercase">Chương 2: Khí Lý Tưởng</h2>
+        </div>
+        <div class="navy-bg py-6 rounded-b-lg shadow-lg">
+            <h1 class="text-3xl font-bold uppercase tracking-widest">Bài 9: ĐỊNH LUẬT BOYLE</h1>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto space-y-8">
+        
+        <!-- Lời dẫn -->
+        <section class="bg-white p-6 border border-gray-300 rounded-12px shadow-md italic text-center text-gray-700">
+            "Khi thay đổi thể tích của một khối lượng khí xác định ở nhiệt độ không đổi thì áp suất khí thay đổi như thế nào?"
+        </section>
+
+        <!-- I. Các thông số trạng thái -->
+        <section class="bg-white p-6 rounded-12px shadow-md">
+            <h2 class="section-header text-xl font-bold navy-text uppercase">I. CÁC THÔNG SỐ TRẠNG THÁI CỦA MỘT LƯỢNG KHÍ</h2>
+            <div class="space-y-4 text-justify">
+                <p>Một lượng khí đựng trong một bình kín được xác định bởi bốn đại lượng là khối lượng \( (m) \), thể tích \( (V) \), nhiệt độ \( (T) \) và áp suất \( (p) \).</p>
+                <p>Khi thể tích, nhiệt độ và áp suất của một khối lượng khí xác định không thay đổi, ta nói lượng khí ở trạng thái cân bằng. Thể tích, áp suất và nhiệt độ của lượng khí được gọi là các <strong>thông số trạng thái</strong> của nó.</p>
+                
+                <div class="bg-blue-50 p-4 border-l-4 border-blue-500 rounded my-4 italic">
+                    <strong>Ghi chú:</strong> Các thông số trạng thái của một lượng khí đều là đại lượng có thể đo hoặc xác định được bằng các dụng cụ đo lường.
+                </div>
+
+                <!-- Câu hỏi 1 -->
+                <div class="question-box p-4 rounded mb-4">
+                    <p class="font-semibold">Câu hỏi 1: Người ta dùng các dụng cụ nào để đo, xác định các thông số trạng thái của lượng khí trong hộp kín (nhiệt kế, áp kế)?</p>
+                    <button onclick="toggleAnswer('q1')" class="mt-2 navy-bg text-white px-4 py-1 rounded hover:opacity-90 text-sm">Xem chi tiết</button>
+                    <div id="q1" class="answer-box p-4 mt-2 rounded">
+                        <center><img src="h1.png"></img></center>
+			<p> Dùng nhiệt kế để đo nhiệt độ và áp kế để đo áp suất của lượng khí. Thể tích có thể xác định qua kích thước hình học của bình chứa.
+                    </div>
+                </div>
+
+                <!-- Câu hỏi 2 -->
+                <div class="question-box p-4 rounded mb-4">
+                    <p class="font-semibold">Câu hỏi 2: Nêu tên đơn vị của các đại lượng này trong hệ SI.</p>
+                    <button onclick="toggleAnswer('q2')" class="mt-2 navy-bg text-white px-4 py-1 rounded hover:opacity-90 text-sm">Xem chi tiết</button>
+                    <div id="q2" class="answer-box p-4 mt-2 rounded">
+                        - Thể tích: mét khối \( (m^3) \).<br>
+                        - Áp suất: Pascal \( (Pa) \).<br>
+                        - Nhiệt độ: Kelvin \( (K) \).
+                    </div>
+                </div>
+
+                <div class="bg-yellow-50 p-4 border border-yellow-200 rounded text-sm">
+                    <strong>Lưu ý:</strong> Khí chuyển từ trạng thái này sang trạng thái khác bằng các quá trình biến đổi trạng thái, gọi tắt là <strong>quá trình</strong>.
+                </div>
+            </div>
+        </section>
+
+        <!-- II. Định luật Boyle -->
+        <section class="bg-white p-6 rounded-12px shadow-md">
+            <h2 class="section-header text-xl font-bold navy-text uppercase">II. ĐỊNH LUẬT BOYLE</h2>
+            
+            <h3 class="font-bold text-lg mb-2 text-blue-800">1. Quá trình đẳng nhiệt</h3>
+            <p class="mb-4">Quá trình biến đổi trạng thái của một khối lượng khí xác định khi nhiệt độ giữ không đổi được gọi là <strong>quá trình đẳng nhiệt</strong>.</p>
+
+            <h3 class="font-bold text-lg mb-2 text-blue-800">2. Thí nghiệm</h3>
+            <div class="grid md:grid-cols-2 gap-6 mb-4">
+                <div class="border p-4 rounded">
+                    <p class="font-bold mb-2">Chuẩn bị:</p>
+                    <ul class="list-disc ml-6 text-sm">
+                        <li>Xi lanh trong suốt có chia độ (1).</li>
+                        <li>Pit-tông có ống nối (2).</li>
+                        <li>Áp kế (3).</li>
+                        <li>Giá đỡ (4) và thước đo (5).</li>
+                    </ul>
+                    <div class="mt-4 bg-gray-100 h-40 flex items-center justify-center rounded border-dashed border-2 border-gray-400">
+                        <span class="text-gray-500 text-sm">[Hình minh họa bộ thí nghiệm chất khí]</span>
+                    </div>
+                </div>
+                <div>
+                    <p class="font-bold mb-2">Tiến hành:</p>
+                    <ol class="list-decimal ml-6 text-sm space-y-1">
+                        <li>Bố trí thí nghiệm như hình vẽ.</li>
+                        <li>Dịch chuyển từ từ pit-tông để thay đổi thể tích.</li>
+                        <li>Đọc và ghi kết quả \( p \) và \( V \).</li>
+                    </ol>
+                </div>
+            </div>
+
+            <p class="font-bold mb-2 text-center">Bảng kết quả thí nghiệm mẫu</p>
+            <table class="mb-6">
+                <thead>
+                    <tr>
+                        <th>Lần TN</th>
+                        <th>\( V (cm^3) \)</th>
+                        <th>\( p (10^5 Pa) \)</th>
+                        <th>Tích \( p \cdot V \)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>3,0</td><td>1,0</td><td>3,0</td></tr>
+                    <tr><td>2</td><td>2,5</td><td>1,2</td><td>3,0</td></tr>
+                    <tr><td>3</td><td>2,0</td><td>1,5</td><td>3,0</td></tr>
+                    <tr><td>4</td><td>1,5</td><td>1,9</td><td>~2,85</td></tr>
+                </tbody>
+            </table>
+
+            <div class="space-y-4">
+                <div class="p-3 border rounded bg-gray-50 flex justify-between items-center">
+                    <span>Thảo luận 1: Xác định giá trị tích \( pV \)</span>
+                    <button onclick="toggleAnswer('tl1')" class="navy-bg text-white px-3 py-1 rounded text-xs">Hiển thị kết quả</button>
+                </div>
+                <div id="tl1" class="answer-box p-4 rounded text-sm mb-2">Giá trị tích \( pV \) trong các lần thí nghiệm gần như không đổi (sai số do đo đạc).</div>
+
+                <div class="p-3 border rounded bg-gray-50 flex justify-between items-center">
+                    <span>Thảo luận 2: Vẽ đường biểu diễn \( p \) theo \( V \)</span>
+                    <button onclick="toggleAnswer('tl2')" class="navy-bg text-white px-3 py-1 rounded text-xs">Hiển thị kết quả</button>
+                </div>
+                <div id="tl2" class="answer-box p-4 rounded text-sm mb-2">Đường biểu diễn có dạng một nhánh của đường hypebol, cho thấy \( p \) tỉ lệ nghịch với \( V \).</div>
+            </div>
+
+            <h3 class="font-bold text-lg mt-8 mb-2 text-blue-800">3. Định luật Boyle</h3>
+            <div class="navy-bg text-white p-6 rounded-lg mb-6">
+                <p class="text-lg italic mb-4 text-center">"Khi nhiệt độ của một khối lượng khí xác định giữ không đổi thì áp suất gây ra bởi khí tỉ lệ nghịch với thể tích của nó."</p>
+                <p class="text-2xl font-bold text-center">\( pV = \text{const} \) hoặc \( p_1V_1 = p_2V_2 \)</p>
+            </div>
+
+            <!-- Đồ thị -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="border p-2 rounded text-center">
+                    <div class="h-32 bg-blue-50 flex items-center justify-center mb-2">
+                        <span class="text-xs">[Đồ thị p-V: Hypebol]</span>
+                    </div>
+                    <p class="text-xs font-bold">Hệ tọa độ (p,V)</p>
+                </div>
+                <div class="border p-2 rounded text-center">
+                    <div class="h-32 bg-blue-50 flex items-center justify-center mb-2">
+                        <span class="text-xs">[Đồ thị V-T: Thẳng đứng]</span>
+                    </div>
+                    <p class="text-xs font-bold">Hệ tọa độ (V,T)</p>
+                </div>
+                <div class="border p-2 rounded text-center">
+                    <div class="h-32 bg-blue-50 flex items-center justify-center mb-2">
+                        <span class="text-xs">[Đồ thị p-T: Thẳng đứng]</span>
+                    </div>
+                    <p class="text-xs font-bold">Hệ tọa độ (p,T)</p>
+                </div>
+            </div>
+
+            <div class="border-t pt-4">
+                <button onclick="toggleAnswer('history')" class="w-full py-2 bg-gray-200 rounded font-bold text-sm">Giới thiệu lịch sử tìm ra định luật (Nhấn xem)</button>
+                <div id="history" class="answer-box p-4 mt-2 rounded italic text-sm">
+                    Định luật được Robert Boyle (1627-1691) - nhà vật lý người Ireland tìm ra bằng thực nghiệm năm 1662. Cùng thời gian đó, Edme Mariotte cũng tìm ra độc lập nên đôi khi còn gọi là định luật Boyle-Mariotte.
+                </div>
+            </div>
+
+            <div class="mt-4 space-y-2">
+                <div class="question-box p-3 rounded text-sm">
+                    <strong>Câu hỏi 1:</strong> Nếu vẽ đồ thị \( p \) theo \( 1/V \) thì dạng đồ thị là gì?
+                    <button onclick="toggleAnswer('q_extra1')" class="ml-2 underline text-blue-700">Xem trả lời</button>
+                    <div id="q_extra1" class="answer-box p-3 mt-2 rounded">Dạng đường thẳng đi qua gốc tọa độ vì \( p \) tỉ lệ thuận với \( 1/V \).</div>
+                </div>
+                <div class="question-box p-3 rounded text-sm">
+                    <strong>Câu hỏi 2:</strong> Tìm ví dụ về quá trình đẳng nhiệt trong đời sống?
+                    <button onclick="toggleAnswer('q_extra2')" class="ml-2 underline text-blue-700">Xem trả lời</button>
+                    <div id="q_extra2" class="answer-box p-3 mt-2 rounded">Bóp chậm một quả bóng bay, bơm xe đạp từ từ để hơi không nóng lên...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- III. Củng cố -->
+        <section class="bg-white p-6 rounded-12px shadow-md">
+            <h2 class="section-header text-xl font-bold navy-text uppercase">III. CỦNG CỐ</h2>
+            
+            <div class="mb-8">
+                <h3 class="font-bold border-l-4 border-orange-500 pl-2 mb-4">Bài tập ví dụ</h3>
+                <div class="bg-orange-50 p-4 rounded border border-orange-200">
+                    <p class="mb-2">Một lượng khí có thể tích 10 lít ở áp suất \( 10^5 Pa \). Tính thể tích của lượng khí này ở áp suất \( 1,25 \cdot 10^5 Pa \). Biết nhiệt độ không đổi.</p>
+                    <button onclick="toggleAnswer('ex_sol')" class="bg-orange-500 text-white px-4 py-1 rounded text-sm font-bold">Xem các bước giải</button>
+                    <div id="ex_sol" class="answer-box p-4 mt-2 rounded bg-white border border-green-200">
+                        <p><strong>Bước 1:</strong> Xác định đẳng quá trình: Đẳng nhiệt.</p>
+                        <p><strong>Bước 2:</strong> Tóm tắt trạng thái:<br>
+                           TT1: \( p_1 = 10^5 Pa; V_1 = 10 L \)<br>
+                           TT2: \( p_2 = 1,25 \cdot 10^5 Pa; V_2 = ? \)</p>
+                        <p><strong>Bước 3:</strong> Áp dụng ĐL Boyle:<br>
+                           \( p_1V_1 = p_2V_2 \Rightarrow V_2 = \frac{p_1V_1}{p_2} = \frac{10^5 \cdot 10}{1,25 \cdot 10^5} = 8 \text{ lít} \).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <h3 class="font-bold border-l-4 border-blue-500 pl-2 mb-2">Bài tập vận dụng</h3>
+                
+                <div class="p-4 border rounded">
+                    <p><strong>Bài 1:</strong> Một quả bóng chứa \( 0,04 m^3 \) không khí ở áp suất 120 kPa. Tính áp suất khi giảm thể tích còn \( 0,025 m^3 \).</p>
+                    <button onclick="toggleAnswer('app1')" class="mt-2 text-blue-600 text-sm font-bold">Xem giải chi tiết</button>
+                    <div id="app1" class="answer-box p-4 mt-2 rounded italic">
+                        Áp dụng \( p_1V_1 = p_2V_2 \Rightarrow p_2 = \frac{120 \cdot 0,04}{0,025} = 192 \text{ kPa} \).
+                    </div>
+                </div>
+
+                <div class="p-4 border rounded">
+                    <p><strong>Bài 2:</strong> Một bọt khí nổi từ đáy giếng sâu 6m lên mặt nước. Thể tích tăng bao nhiêu lần? (Cho \( p_0 = 1,013 \cdot 10^5 Pa, \rho = 1000 kg/m^3 \)).</p>
+                    <button onclick="toggleAnswer('app2')" class="mt-2 text-blue-600 text-sm font-bold">Xem giải chi tiết</button>
+                    <div id="app2" class="answer-box p-4 mt-2 rounded italic">
+                        Áp suất đáy giếng: \( p_1 = p_0 + \rho gh = 1,013 \cdot 10^5 + 1000 \cdot 9,8 \cdot 6 \approx 1,601 \cdot 10^5 Pa \).<br>
+                        Áp suất mặt nước: \( p_2 = p_0 = 1,013 \cdot 10^5 Pa \).<br>
+                        Tỉ số thể tích: \( \frac{V_2}{V_1} = \frac{p_1}{p_2} = \frac{1,601}{1,013} \approx 1,58 \text{ lần} \).
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 grid md:grid-cols-2 gap-4">
+                <div class="bg-blue-600 text-white p-4 rounded-lg">
+                    <h4 class="font-bold mb-2">EM ĐÃ HỌC</h4>
+                    <ul class="list-disc ml-5 text-sm">
+                        <li>Thông số trạng thái: p, V, T.</li>
+                        <li>Định luật Boyle: \( pV = \text{const} \).</li>
+                    </ul>
+                </div>
+                <div class="bg-green-600 text-white p-4 rounded-lg">
+                    <h4 class="font-bold mb-2">EM CÓ THỂ</h4>
+                    <p class="text-sm">Giải thích các hiện tượng thực tế như hít thở, hoạt động của ống tiêm, bọt khí nổi dưới nước...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trắc nghiệm -->
+        <section class="bg-white p-6 rounded-12px shadow-md">
+            <h2 class="section-header text-xl font-bold navy-text uppercase">BÀI TẬP TRẮC NGHIỆM</h2>
+            <form id="quizForm" class="space-y-6">
+                <div>
+                    <p class="font-semibold">Câu 1: Quá trình đẳng nhiệt là quá trình biến đổi trạng thái trong đó đại lượng nào không đổi?</p>
+                    <div class="ml-4 space-y-1 mt-2">
+                        <label class="block"><input type="radio" name="q1" value="a"> A. Áp suất</label>
+                        <label class="block"><input type="radio" name="q1" value="b"> B. Thể tích</label>
+                        <label class="block"><input type="radio" name="q1" value="c"> C. Nhiệt độ</label>
+                        <label class="block"><input type="radio" name="q1" value="d"> D. Khối lượng</label>
+                    </div>
+                </div>
+                <div>
+                    <p class="font-semibold">Câu 2: Hệ thức nào sau đây phù hợp với định luật Boyle?</p>
+                    <div class="ml-4 space-y-1 mt-2">
+                        <label class="block"><input type="radio" name="q2" value="a"> A. \( p/V = \text{const} \)</label>
+                        <label class="block"><input type="radio" name="q2" value="b"> B. \( p \cdot V = \text{const} \)</label>
+                        <label class="block"><input type="radio" name="q2" value="c"> C. \( V/p = \text{const} \)</label>
+                        <label class="block"><input type="radio" name="q2" value="d"> D. \( p_1V_2 = p_2V_1 \)</label>
+                    </div>
+                </div>
+                <div>
+                    <p class="font-semibold">Câu 3: Đồ thị đẳng nhiệt trong hệ tọa độ (p,V) là đường:</p>
+                    <div class="ml-4 space-y-1 mt-2">
+                        <label class="block"><input type="radio" name="q3" value="a"> A. Thẳng</label>
+                        <label class="block"><input type="radio" name="q3" value="b"> B. Tròn</label>
+                        <label class="block"><input type="radio" name="q3" value="c"> C. Hypebol</label>
+                        <label class="block"><input type="radio" name="q3" value="d"> D. Parabol</label>
+                    </div>
+                </div>
+                <div>
+                    <p class="font-semibold">Câu 4: Khi nén khí đẳng nhiệt, thể tích giảm 2 lần thì áp suất:</p>
+                    <div class="ml-4 space-y-1 mt-2">
+                        <label class="block"><input type="radio" name="q4" value="a"> A. Tăng 2 lần</label>
+                        <label class="block"><input type="radio" name="q4" value="b"> B. Giảm 2 lần</label>
+                        <label class="block"><input type="radio" name="q4" value="c"> C. Không đổi</label>
+                        <label class="block"><input type="radio" name="q4" value="d"> D. Tăng 4 lần</label>
+                    </div>
+                </div>
+                <div>
+                    <p class="font-semibold">Câu 5: Thông số trạng thái của một lượng khí gồm:</p>
+                    <div class="ml-4 space-y-1 mt-2">
+                        <label class="block"><input type="radio" name="q5" value="a"> A. m, V, T</label>
+                        <label class="block"><input type="radio" name="q5" value="b"> B. p, V, m</label>
+                        <label class="block"><input type="radio" name="q5" value="c"> C. p, V, T</label>
+                        <label class="block"><input type="radio" name="q5" value="d"> D. p, T, m</label>
+                    </div>
+                </div>
+                
+                <button type="button" onclick="checkQuiz()" class="navy-bg text-white px-8 py-3 rounded-lg font-bold hover:opacity-90 shadow-lg">NỘP BÀI</button>
+            </form>
+            <div id="quizResult" class="mt-6 font-bold text-lg hidden"></div>
+        </section>
+    </main>
+
+    <footer class="mt-12 text-center text-gray-500 text-sm pb-8">
+        &copy; 2024 Học liệu Vật Lý 12 - Kết nối tri thức
+    </footer>
+
+    <script>
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === "block") {
+                el.style.display = "none";
+            } else {
+                el.style.display = "block";
+            }
+        }
+
+        function checkQuiz() {
+            const answers = { q1: 'c', q2: 'b', q3: 'c', q4: 'a', q5: 'c' };
+            const form = document.getElementById('quizForm');
+            let score = 0;
+            let total = 5;
+
+            for (let i = 1; i <= total; i++) {
+                const selected = form.querySelector(`input[name="q${i}"]:checked`);
+                if (selected && selected.value === answers[`q${i}`]) {
+                    score++;
+                }
+            }
+
+            const resultDiv = document.getElementById('quizResult');
+            resultDiv.classList.remove('hidden');
+            
+            if (score === total) {
+                resultDiv.style.color = "#059669"; // Green
+                resultDiv.innerHTML = `Chúc mừng! Bạn đúng tuyệt đối: ${score}/${total} điểm.`;
+            } else {
+                resultDiv.style.color = "#dc2626"; // Red
+                resultDiv.innerHTML = `Kết quả của bạn: ${score}/${total} điểm. Hãy kiểm tra lại kiến thức nhé!`;
+            }
+            
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
