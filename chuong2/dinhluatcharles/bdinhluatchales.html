@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 10: Định luật Charles - Vật Lí 12</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2d3748;
+        }
+        .header-primary { background-color: #000080; }
+        .header-navy {
+            background-color: #000080;
+        }
+        .rounded-12 { border-radius: 12px; }
+        .section-header {
+            border-bottom: 4px solid #000033;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #000080;
+        }
+        .rounded-12px {
+            border-radius: 12px;
+        }
+        .intro-box {
+            border: 1px solid #000;
+            background-color: white;
+            padding: 1.5rem;
+            font-style: italic;
+        }
+        .question-box {
+            background-color: #edf2f7;
+            border-left: 5px solid #000080;
+        }
+        .answer-box {
+            background-color: #f0fff4;
+            display: none;
+        }
+        .btn-navy {
+            background-color: #000080;
+            color: white;
+            transition: all 0.3s;
+        }
+        .btn-navy:hover {
+            background-color: #000066;
+            transform: translateY(-1px);
+        }
+        table td, table th {
+            border: 1px solid #cbd5e0;
+            padding: 8px;
+            text-align: center;
+        }
+        table th {
+            background-color: #e2e8f0;
+        }
+        .quiz-option:hover {
+            background-color: #f7fafc;
+        }
+        .bg-color-1 { background-color: #e6fffa; } /* Em đã học */
+        .bg-color-2 { background-color: #fffaf0; } /* Em có thể */
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- HEADER -->
+    <header class="max-w-5xl mx-auto mb-8 shadow-lg overflow-hidden rounded-12">
+        <div class="header-primary text-white py-3 px-6 text-center text-sm font-semibold tracking-widest uppercase">
+            CHƯƠNG 2: KHÍ LÝ TƯỞNG
+        </div>
+                <div class="header-primary text-white py-6 px-6 text-center border-t border-gray-700">
+                        <h1 class="text-3xl font-bold"> BÀI 10: ĐỊNH LUẬT CHARLES</h1>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto mt-8 px-4">
+        
+        <!-- Lời dẫn -->
+        <div class="intro-box mb-8 shadow-sm">
+            Khi giữ nguyên áp suất của một khối lượng khí xác định thì thể tích của khí phụ thuộc như thế nào vào nhiệt độ của nó?
+        </div>
+
+        <!-- PHẦN I -->
+        <section class="bg-white p-8 rounded-12px shadow-md mb-8">
+            <h2 class="section-header text-2xl">I. Định luật Charles</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-xl font-bold mb-2">1. Quá trình đẳng áp</h3>
+                <p>Quá trình biến đổi trạng thái của một khối lượng khí xác định khi giữ áp suất không đổi được gọi là <strong>quá trình đẳng áp</strong>.</p>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-bold mb-2">2. Nghiên cứu của Charles</h3>
+                <p class="mb-4">Năm 1787, nhà vật lí người Pháp Charles đã thực hiện thí nghiệm và nhận thấy với các chất khí khác nhau, khi giữ áp suất không đổi, độ tăng thể tích tương đối theo nhiệt độ là hằng số:</p>
+                
+                <div class="bg-gray-50 p-4 rounded-lg text-center mb-4">
+                    \[ \frac{V - V_0}{V_0 \Delta t} = \frac{1}{273} \quad (10.1) \]
+                    <p class="text-sm text-gray-600 mt-2">Trong đó \(V_0\) là thể tích ở \(0^\circ C\), \(V\) là thể tích ở \(t^\circ C\).</p>
+                </div>
+
+                <p class="mb-4">Đặt \( \alpha = \frac{1}{273} \), ta có công thức hình thành:</p>
+                <div class="text-center bg-blue-50 py-3 rounded mb-4 font-mono">
+                    \( V = V_0(1 + \alpha t) \quad (10.2) \)
+                </div>
+
+                <!-- Đồ thị SVG -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
+                    <div class="text-center">
+                        <svg viewBox="0 0 200 150" class="mx-auto w-full max-w-xs border border-gray-200 bg-white">
+                            <!-- Axis -->
+                            <line x1="20" y1="130" x2="180" y2="130" stroke="black" stroke-width="1" />
+                            <line x1="80" y1="140" x2="80" y2="20" stroke="black" stroke-width="1" />
+                            <!-- Line -->
+                            <line x1="30" y1="130" x2="80" y2="90" stroke="#3182ce" stroke-width="2" stroke-dasharray="2" />
+                            <line x1="80" y1="90" x2="160" y2="30" stroke="#3182ce" stroke-width="2" />
+                            <!-- Labels -->
+                            <text x="175" y="145" font-size="10">t(°C)</text>
+                            <text x="70" y="15" font-size="10">V</text>
+                            <text x="70" y="140" font-size="8">0</text>
+                            <text x="25" y="145" font-size="8">-273</text>
+                            <text x="65" y="95" font-size="8">V₀</text>
+                        </svg>
+                        <p class="text-xs italic mt-2">a) Đồ thị V theo nhiệt độ Celsius</p>
+                    </div>
+                    <div class="text-center">
+                        <svg viewBox="0 0 200 150" class="mx-auto w-full max-w-xs border border-gray-200 bg-white">
+                            <!-- Axis -->
+                            <line x1="20" y1="130" x2="180" y2="130" stroke="black" stroke-width="1" />
+                            <line x1="20" y1="130" x2="20" y2="20" stroke="black" stroke-width="1" />
+                            <!-- Line -->
+                            <line x1="20" y1="130" x2="50" y2="110" stroke="#3182ce" stroke-width="2" stroke-dasharray="2" />
+                            <line x1="50" y1="110" x2="160" y2="40" stroke="#3182ce" stroke-width="2" />
+                            <!-- Labels -->
+                            <text x="175" y="145" font-size="10">T(K)</text>
+                            <text x="10" y="15" font-size="10">V</text>
+                            <text x="15" y="145" font-size="8">0</text>
+                            <text x="45" y="145" font-size="8">273</text>
+                        </svg>
+                        <p class="text-xs italic mt-2">b) Đồ thị V theo nhiệt độ Kelvin</p>
+                    </div>
+                </div>
+
+                <!-- Thảo luận 1 -->
+                <div class="question-box p-4 rounded-lg mb-4">
+                    <p class="font-bold">Câu 1: Hãy giải thích cách vẽ đồ thị của hàm \( V = V_0(1 + \alpha t) \) trong Hình 10.1a.</p>
+                    <button onclick="toggleAnswer('ans1')" class="mt-2 text-sm text-blue-800 underline">Xem gợi ý trình bày</button>
+                    <div id="ans1" class="answer-box p-4 mt-2 rounded-lg text-sm">
+                        Đây là hàm số bậc nhất đối với t dạng \( y = ax + b \). 
+                        - Khi \( t = 0 \), \( V = V_0 \): Đồ thị cắt trục tung tại \( V_0 \).
+                        - Khi \( V = 0 \), \( 1 + \alpha t = 0 \Rightarrow t = -1/\alpha = -273^\circ C \).
+                        - Đồ thị là một đường thẳng đi qua hai điểm trên. Trong thực tế, phần nhiệt độ thấp được vẽ bằng nét đứt vì chất khí sẽ hóa lỏng trước khi đạt tới \( -273^\circ C \).
+                    </div>
+                </div>
+
+                <!-- Thảo luận 2 -->
+                <div class="question-box p-4 rounded-lg mb-6">
+                    <p class="font-bold">Câu 2: Hãy chứng tỏ nếu đổi nhiệt độ Celsius sang Kelvin thì thể tích V tỉ lệ thuận với T.</p>
+                    <button onclick="toggleAnswer('ans2')" class="mt-2 text-sm text-blue-800 underline">Xem gợi ý</button>
+                    <div id="ans2" class="answer-box p-4 mt-2 rounded-lg text-sm">
+                        Ta có: \( V = V_0(1 + \frac{t}{273}) = V_0(\frac{273+t}{273}) \).<br>
+                        Vì \( T = 273 + t \), nên: \( V = \frac{V_0}{273} \cdot T \).<br>
+                        Đặt \( \frac{V_0}{273} = a \) (hằng số), ta có \( V = aT \) hay \( \frac{V}{T} = \text{const} \).
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-bold mb-2">3. Định luật Charles</h3>
+                <div class="bg-blue-900 text-white p-6 rounded-lg mb-4">
+                    <p class="italic">"Khi áp suất của một khối lượng khí xác định giữ không đổi thì thể tích của khí tỉ lệ thuận với nhiệt độ tuyệt đối của nó."</p>
+                    <div class="mt-4 text-center text-2xl font-bold">
+                        \( \frac{V}{T} = \text{hằng số} \)
+                    </div>
+                </div>
+                <p class="mb-4">Cho hai trạng thái 1 và 2:</p>
+                <div class="text-center bg-gray-100 py-3 rounded mb-4">
+                    \( \frac{V_1}{T_1} = \frac{V_2}{T_2} \)
+                </div>
+
+                <!-- Câu hỏi vận dụng -->
+                <div class="space-y-4">
+                    <div class="question-box p-4 rounded-lg">
+                        <p class="font-bold">Câu 1: Ứng với các áp suất khác nhau của cùng một lượng khí, ta có các đường đẳng áp khác nhau. Hãy so sánh \( p_1 \) và \( p_2 \) trên Hình 10.2.</p>
+                        <button onclick="toggleAnswer('ans3')" class="mt-2 text-sm text-blue-800 underline">Click xem hướng dẫn</button>
+                        <div id="ans3" class="answer-box p-4 mt-2 rounded-lg text-sm">
+                            Kẻ một đường thẳng song song với trục V (cùng nhiệt độ T). Đường nào nằm trên sẽ có thể tích lớn hơn. Theo định luật Boyle, ở cùng nhiệt độ, áp suất tỉ lệ nghịch với thể tích. Vì \( V_1 > V_2 \) nên \( p_1 < p_2 \).
+                        </div>
+                    </div>
+
+                    <div class="question-box p-4 rounded-lg">
+                        <p class="font-bold">Câu 2: Hãy tìm ví dụ về ứng dụng định luật Charles trong đời sống.</p>
+                        <button onclick="toggleAnswer('ans4')" class="mt-2 text-sm text-blue-800 underline">Click xem hướng dẫn</button>
+                        <div id="ans4" class="answer-box p-4 mt-2 rounded-lg text-sm">
+                            - Khinh khí cầu: Đốt nóng không khí bên trong làm thể tích tăng, khối lượng riêng giảm giúp khí cầu bay lên.<br>
+                            - Bánh xe bơm căng để ngoài nắng dễ bị nổ do nhiệt độ tăng làm thể tích khí bên trong muốn tăng lên tạo áp lực lớn.
+                        </div>
+                    </div>
+
+                    <div class="bg-yellow-50 p-4 border-l-4 border-yellow-400 rounded-lg">
+                        <p class="font-bold text-yellow-800">Tại sao gọi là độ không tuyệt đối?</p>
+                        <button onclick="toggleAnswer('ans5')" class="mt-2 text-sm text-blue-800 underline">Học sinh nhấn click xem hướng dẫn</button>
+                        <div id="ans5" class="answer-box p-4 mt-2 rounded-lg text-sm bg-yellow-100">
+                            Vì ở nhiệt độ \( -273^\circ C \), theo lý thuyết thể tích khí bằng 0. Đây là mốc nhiệt độ thấp nhất không thể đạt tới được, gọi là \( 0 K \) (Độ không tuyệt đối).
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PHẦN II -->
+        <section class="bg-white p-8 rounded-12px shadow-md mb-8">
+            <h2 class="section-header text-2xl">II. Thí nghiệm minh hoạ</h2>
+            <div class="mb-6">
+                <h3 class="font-bold text-lg mb-2">Chuẩn bị:</h3>
+                <ul class="list-disc ml-6 space-y-1">
+                    <li>Xi lanh thủy tinh (50mL), nút cao su.</li>
+                    <li>Nhiệt kế điện tử.</li>
+                    <li>Ba cốc thủy tinh đựng nước (đá, ấm, nóng).</li>
+                    <li>Giá đỡ, dầu bôi trơn.</li>
+                </ul>
+                <div class="w-full h-48 bg-gray-200 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center my-4">
+                    <p class="text-gray-500">[Hình ảnh bộ thí nghiệm xi lanh trong cốc nước]</p>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="font-bold text-lg mb-2">Tiến hành:</h3>
+                <ol class="list-decimal ml-6 space-y-2">
+                    <li>Bôi trơn pit-tông, lấy 30mL không khí, bịt kín đầu ra.</li>
+                    <li>Ghi giá trị nhiệt độ phòng và thể tích ban đầu.</li>
+                    <li>Nhúng xi lanh vào cốc nước đá, chờ 3 phút rồi ghi \(V, t\).</li>
+                    <li>Lặp lại với nước ấm.</li>
+                    <li>Lặp lại với nước nóng.</li>
+                </ol>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="font-bold text-lg mb-2 text-center">Bảng số liệu thực nghiệm mẫu</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th>Lần TN</th>
+                                <th>\(t (^\circ C)\)</th>
+                                <th>\(T (K)\)</th>
+                                <th>\(V (mL)\)</th>
+                                <th>\(V/T\)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>24,5</td><td>297,5</td><td>30</td><td>0,101</td></tr>
+                            <tr><td>2</td><td>0,5</td><td>273,5</td><td>27</td><td>0,099</td></tr>
+                            <tr><td>3</td><td>41,5</td><td>314,5</td><td>33</td><td>0,105</td></tr>
+                            <tr><td>4</td><td>59,3</td><td>332,3</td><td>35</td><td>0,105</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-center text-sm italic mt-4">Hình 10.4: Đồ thị mối quan hệ V-T từ số liệu trên là một đường thẳng đi qua gốc tọa độ.</p>
+            </div>
+        </section>
+
+        <!-- PHẦN III -->
+        <section class="bg-white p-8 rounded-12px shadow-md mb-8">
+            <h2 class="section-header text-2xl">III. Bài tập</h2>
+            
+            <div class="mb-8">
+                <div class="font-bold bg-navy text-white p-2 rounded-t-lg header-navy">Bài tập 1 (Ví dụ SGK)</div>
+                <div class="p-4 border border-t-0 border-gray-200 rounded-b-lg">
+                    <p>Khi tăng nhiệt độ của một lượng khí xác định từ \( 32^\circ C \) lên \( 117^\circ C \) (áp suất không đổi) thì thể tích tăng thêm 1,7 lít. Tìm thể tích trước và sau khi tăng.</p>
+                    <button onclick="toggleAnswer('sol1')" class="mt-4 btn-navy px-4 py-2 rounded text-sm shadow">Xem hướng dẫn giải các bước</button>
+                    <div id="sol1" class="answer-box p-4 mt-4 rounded-lg">
+                        <strong>Bước 1: Tóm tắt trạng thái</strong><br>
+                        - Trạng thái 1: \( T_1 = 32 + 273 = 305 K \); \( V_1 \)<br>
+                        - Trạng thái 2: \( T_2 = 117 + 273 = 390 K \); \( V_2 = V_1 + 1,7 \)<br><br>
+                        <strong>Bước 2: Áp dụng định luật Charles</strong><br>
+                        \[ \frac{V_1}{T_1} = \frac{V_2}{T_2} \Rightarrow \frac{V_1}{305} = \frac{V_1 + 1,7}{390} \]<br>
+                        <strong>Bước 3: Tính toán</strong><br>
+                        \( 390V_1 = 305V_1 + 518,5 \Rightarrow 85V_1 = 518,5 \Rightarrow V_1 = 6,1 L \)<br>
+                        \( V_2 = 6,1 + 1,7 = 7,8 L \).
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <p class="font-bold mb-2">Câu 1: Thể tích khí tăng thêm 10% khi nhiệt độ tăng tới \( 47^\circ C \). Tính nhiệt độ ban đầu (đẳng áp).</p>
+                    <button onclick="toggleAnswer('sol2')" class="btn-navy px-4 py-2 rounded text-xs">Xem hướng dẫn chi tiết</button>
+                    <div id="sol2" class="answer-box p-4 mt-4 rounded-lg text-sm">
+                        - \( V_2 = V_1 + 0,1V_1 = 1,1V_1 \)<br>
+                        - \( T_2 = 47 + 273 = 320 K \)<br>
+                        - Áp dụng: \( \frac{V_1}{T_1} = \frac{1,1V_1}{320} \Rightarrow T_1 = \frac{320}{1,1} \approx 291 K \approx 18^\circ C \).
+                    </div>
+                </div>
+
+                <div>
+                    <p class="font-bold mb-2">Câu 2: Khối lượng khí 12g có \( V=4L \) ở \( 7^\circ C \). Sau đun nóng đẳng áp, khối lượng riêng là \( 1,2 g/L \). Tính nhiệt độ sau.</p>
+                    <button onclick="toggleAnswer('sol3')" class="btn-navy px-4 py-2 rounded text-xs">Xem hướng dẫn chi tiết</button>
+                    <div id="sol3" class="answer-box p-4 mt-4 rounded-lg text-sm">
+                        - Trạng thái 1: \( V_1 = 4L \), \( T_1 = 280K \).<br>
+                        - Trạng thái 2: Vì khối lượng không đổi \( m=12g \), \( D_2 = 1,2g/L \Rightarrow V_2 = m/D_2 = 12/1,2 = 10L \).<br>
+                        - Áp dụng định luật Charles: \( \frac{4}{280} = \frac{10}{T_2} \Rightarrow T_2 = \frac{280 \cdot 10}{4} = 700K \).
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PHẦN IV -->
+        <section class="bg-white p-8 rounded-12px shadow-md mb-8">
+            <h2 class="section-header text-2xl">IV. Tính gần đúng của định luật Boyle và Charles</h2>
+            <div class="p-4 bg-gray-50 border rounded-lg">
+                <p class="mb-4">Các định luật Boyle và Charles chỉ đúng chính xác cho <strong>khí lí tưởng</strong>. Đối với khí thực, các định luật này chỉ là gần đúng trong điều kiện áp suất không quá cao và nhiệt độ không quá thấp.</p>
+                <p>Khí lí tưởng là loại khí tưởng tượng tuân thủ tuyệt đối các định luật về chất khí.</p>
+            </div>
+        </section>
+
+        <!-- PHẦN V -->
+        <section class="bg-white p-8 rounded-12px shadow-md">
+            <h2 class="section-header text-2xl">V. Củng cố</h2>
+            
+            <div class="bg-color-1 p-6 rounded-lg mb-6 shadow-sm border border-teal-200">
+                <h3 class="font-bold text-teal-800 mb-2">EM ĐÃ HỌC</h3>
+                <p>Định luật Charles: Khi áp suất không đổi, thể tích khối khí tỉ lệ thuận với nhiệt độ tuyệt đối: \( \frac{V}{T} = \text{const} \).</p>
+            </div>
+
+            <div class="bg-color-2 p-6 rounded-lg mb-10 shadow-sm border border-orange-200">
+                <h3 class="font-bold text-orange-800 mb-2">EM CÓ THỂ</h3>
+                <p>Dùng định luật Charles để giải thích các hiện tượng tăng giảm thể tích khí theo nhiệt độ trong thực tế đời sống và kỹ thuật.</p>
+            </div>
+
+            <!-- Quiz -->
+            <div id="quiz-container" class="space-y-8">
+                <h3 class="text-xl font-bold border-b-2 border-gray-300 pb-2">BÀI TẬP TRẮC NGHIỆM</h3>
+                
+                <div class="quiz-item" data-correct="B">
+                    <p class="font-bold">Câu 1: Quá trình đẳng áp là quá trình biến đổi trạng thái có:</p>
+                    <div class="mt-2 space-y-2 ml-4">
+                        <label class="block quiz-option p-2 rounded cursor-pointer"><input type="radio" name="q1" value="A"> A. Thể tích không đổi.</label>
+                        <label class="block quiz-option p-2 rounded cursor-pointer"><input type="radio" name="q1" value="B"> B. Áp suất không đổi.</label>
+                        <label class="block quiz-option p-2 rounded cursor-pointer"><input type="radio" name="q1" value="C"> C. Nhiệt độ không đổi.</label>
+                    </div>
+                </div>
+
+                <div class="quiz-item" data-correct="C">
+                    <p class="font-bold">Câu 2: Hệ thức nào sau đây phù hợp với định luật Charles?</p>
+                    <div class="mt-2 space-y-2 ml-4">
+                        <label class="block quiz-option p-2 rounded cursor-pointer"><input type="radio" name="q2" value="A"> A. \( V \sim t \)</label>
+                        <label class="block quiz-option p-2 rounded cursor-pointer"><input type="radio" name="q2" value="B"> B. \( V/T = \text{const} \)</label>
+                        <label class="block quiz-option p-2 rounded cursor-pointer"><input type="radio" name="q2" value="C"> C. Cả A và B đều đúng.</label>
+                    </div>
+                </div>
+
+                <div class="quiz-item" data-correct="A">
+                    <p class="font-bold">Câu 3: Đường đẳng áp trong hệ tọa độ (V, T) là:</p>
+                    <div class="mt-2 space-y-2 ml-4">
+                        <label class="block quiz-option p-2 rounded cursor-pointer"><input type="radio" name="q3" value="A"> A. Đường thẳng đi qua gốc tọa độ.</label>
+                        <label class="block quiz-option p-2 rounded cursor-pointer"><input type="radio" name="q3" value="B"> B. Đường hyperbol.</label>
+                        <label class="block quiz-option p-2 rounded cursor-pointer"><input type="radio" name="q3" value="C"> C. Đường thẳng song song trục hoành.</label>
+                    </div>
+                </div>
+
+                <div class="quiz-item" data-correct="B">
+                    <p class="font-bold">Câu 4: Khi nhiệt độ tuyệt đối của một khối khí tăng lên 2 lần thì thể tích của nó (áp suất không đổi) sẽ:</p>
+                    <div class="mt-2 space-y-2 ml-4">
+                        <label class="block quiz-option p-2 rounded cursor-pointer"><input type="radio" name="q4" value="A"> A. Giảm 2 lần.</label>
+                        <label class="block quiz-option p-2 rounded cursor-pointer"><input type="radio" name="q4" value="B"> B. Tăng 2 lần.</label>
+                        <label class="block quiz-option p-2 rounded cursor-pointer"><input type="radio" name="q4" value="C"> C. Không đổi.</label>
+                    </div>
+                </div>
+
+                <div class="quiz-item" data-correct="A">
+                    <p class="font-bold">Câu 5: Nhiệt độ tuyệt đối là nhiệt độ đo theo thang:</p>
+                    <div class="mt-2 space-y-2 ml-4">
+                        <label class="block quiz-option p-2 rounded cursor-pointer"><input type="radio" name="q5" value="A"> A. Kelvin.</label>
+                        <label class="block quiz-option p-2 rounded cursor-pointer"><input type="radio" name="q5" value="B"> B. Celsius.</label>
+                        <label class="block quiz-option p-2 rounded cursor-pointer"><input type="radio" name="q5" value="C"> C. Fahrenheit.</label>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button onclick="checkQuiz()" class="btn-navy px-10 py-3 rounded-full font-bold shadow-lg uppercase">Nộp bài</button>
+                    <div id="quiz-result" class="mt-6 text-xl font-bold"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function toggleAnswer(id) {
+            const element = document.getElementById(id);
+            if (element.style.display === "block") {
+                element.style.display = "none";
+            } else {
+                element.style.display = "block";
+            }
+        }
+
+        function checkQuiz() {
+            const quizItems = document.querySelectorAll('.quiz-item');
+            let score = 0;
+            let total = quizItems.length;
+
+            quizItems.forEach((item, index) => {
+                const qName = 'q' + (index + 1);
+                const selected = document.querySelector(`input[name="${qName}"]:checked`);
+                const correctAnswer = item.getAttribute('data-correct');
+
+                if (selected) {
+                    if (selected.value === correctAnswer) {
+                        score++;
+                        item.style.color = "green";
+                    } else {
+                        item.style.color = "red";
+                    }
+                } else {
+                    item.style.color = "gray";
+                }
+            });
+
+            const resultDiv = document.getElementById('quiz-result');
+            if (score === total) {
+                resultDiv.innerHTML = `<span class="text-green-600">Tuyệt vời! Bạn đạt điểm tuyệt đối: ${score}/${total}</span>`;
+            } else {
+                resultDiv.innerHTML = `<span class="text-red-600">Kết quả của bạn: ${score}/${total}. Hãy kiểm tra lại các câu sai!</span>`;
+            }
+        }
+    </script>
+</body>
+</html>
