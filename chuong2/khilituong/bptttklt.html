@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vật Lý 12 - Phương trình trạng thái khí lí tưởng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .header-primary { background-color: #000080; }
+        .navy-bg {
+            background-color: #000080;
+        }
+        .navy-text {
+            color: #000080;
+        }
+        .section-header {
+            border-bottom: 4px solid #000033;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.25rem;
+        }
+        .rounded-12px {
+            border-radius: 12px;
+        }
+        .question-box {
+            background-color: #edf2f7;
+            border-left: 5px solid #000080;
+        }
+        .answer-box {
+            display: none;
+            background-color: #f0fff4;
+            border-left: 5px solid #48bb78;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th {
+            background-color: #e2e8f0;
+            border: 1px solid #cbd5e0;
+            padding: 8px;
+        }
+        td {
+            border: 1px solid #cbd5e0;
+            padding: 8px;
+            text-align: center;
+        }
+        .intro-box {
+            border: 1px solid black;
+            background-color: white;
+            padding: 1.5rem;
+        }
+        .rounded-12 { border-radius: 12px; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+        <header class="max-w-5xl mx-auto mb-8 shadow-lg overflow-hidden rounded-12">
+        <div class="header-primary text-white py-3 px-6 text-center text-sm font-semibold tracking-widest uppercase">
+            CHƯƠNG 2: KHÍ LÝ TƯỞNG
+        </div>
+                <div class="header-primary text-white py-6 px-6 text-center border-t border-gray-700">
+                        <h1 class="text-3xl font-bold"> Bài 11: PHƯƠNG TRÌNH TRẠNG THÁI KHÍ LÝ TƯỞNG</h1>
+        </div>
+    </header>
+    <main class="max-w-5xl mx-auto space-y-8">
+
+        <!-- INTRO BOX -->
+        <section class="intro-box rounded-lg shadow-sm">
+            <p class="italic text-gray-800 text-lg">
+                Các định luật Boyle và Charles chỉ xác định mối liên hệ giữa hai cặp thông số "áp suất - thể tích" và "thể tích - nhiệt độ" của một khối lượng khí xác định. Vậy, làm thế nào để xác định được mối liên hệ của cả ba thông số trạng thái của một khối lượng khí xác định?
+            </p>
+        </section>
+
+        <!-- I. PHƯƠNG TRÌNH KHÍ LÝ TƯỞNG -->
+        <section class="bg-white p-8 rounded-12px shadow-md">
+            <h2 class="section-header navy-text text-2xl uppercase">I. Phương trình khí lý tưởng</h2>
+            
+            <div class="mb-8">
+                <h3 class="font-bold text-xl mb-4 text-gray-800">1. Phương trình trạng thái của một lượng khí xác định</h3>
+                
+                <p class="mb-4">Xét một khối lượng khí chuyển từ trạng thái 1 sang trạng thái 2 thông qua trạng thái trung gian (1'):</p>
+
+                <!-- SƠ ĐỒ CHUYỂN TRẠNG THÁI -->
+                <div class="flex flex-col items-center bg-gray-50 p-6 rounded-lg border border-dashed border-gray-400 mb-6">
+                    <p class="font-bold text-navy-text mb-4">Sơ đồ chuyển trạng thái</p>
+                    <div class="flex flex-wrap justify-center items-center gap-4">
+                        <div class="p-4 bg-white border-2 border-navy-800 rounded shadow-sm text-center">
+                            <span class="font-bold">Trạng thái 1</span><br>
+                            \( (p_1, V_1, T_1) \)
+                        </div>
+                        <div class="text-2xl font-bold navy-text">───▶</div>
+                        <div class="p-4 bg-white border-2 border-dashed border-gray-400 rounded text-center">
+                            <span class="font-bold italic">Trạng thái 1'</span><br>
+                            \( (p', V', T_1) \)<br>
+                            <span class="text-xs">(Đẳng nhiệt \(T_1\))</span>
+                        </div>
+                        <div class="text-2xl font-bold navy-text">───▶</div>
+                        <div class="p-4 bg-white border-2 border-navy-800 rounded shadow-sm text-center">
+                            <span class="font-bold">Trạng thái 2</span><br>
+                            \( (p_2, V_2, T_2) \)<br>
+                            <span class="text-xs">(Đẳng áp \(p_2\))</span>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center bg-blue-50 p-4 rounded-lg w-full">
+                        <p class="font-bold">Thiết lập công thức:</p>
+                        <p class="mt-2">Từ (1) → (1'): \( p_1V_1 = p'V' \) (Định luật Boyle)</p>
+                        <p>Từ (1') → (2): \( \frac{V'}{T_1} = \frac{V_2}{T_2} \) (Định luật Charles)</p>
+                        <p class="mt-2 font-bold navy-text">Kết quả: \( \frac{p_1V_1}{T_1} = \frac{p_2V_2}{T_2} \) hay \( \frac{pV}{T} = \text{hằng số} \)</p>
+                    </div>
+                </div>
+
+                <!-- CÂU HỎI TƯƠNG TÁC -->
+                <div class="space-y-4">
+                    <div class="question-box p-4 rounded-lg">
+                        <p class="font-bold italic text-navy-text">Câu hỏi 1: Hãy thiết lập phương trình trạng thái bằng một cách khác (ví dụ: qua quá trình đẳng tích)?</p>
+                        <button onclick="toggleAnswer('ans1')" class="mt-2 navy-bg text-white px-4 py-1 rounded text-sm hover:opacity-90">Học sinh nhấn xem cách thiết lập</button>
+                        <div id="ans1" class="answer-box mt-3 p-4 rounded-lg">
+                            <p><strong>Cách khác:</strong> Cho khí đi từ (1) ➔ (1'') qua quá trình đẳng tích, rồi từ (1'') ➔ (2) qua quá trình đẳng nhiệt.</p>
+                            <ul class="list-disc ml-5 mt-2">
+                                <li>Đẳng tích (1 ➔ 1''): \( \frac{p_1}{T_1} = \frac{p''}{T_2} \Rightarrow p'' = \frac{p_1 T_2}{T_1} \)</li>
+                                <li>Đẳng nhiệt (1'' ➔ 2): \( p'' V_1 = p_2 V_2 \Rightarrow \left(\frac{p_1 T_2}{T_1}\right) V_1 = p_2 V_2 \)</li>
+                                <li>Biến đổi: \( \frac{p_1 V_1}{T_1} = \frac{p_2 V_2}{T_2} \) (đpcm).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="question-box p-4 rounded-lg">
+                        <p class="font-bold italic text-navy-text">Câu hỏi 2: Tại sao phương trình này được gọi là "Phương trình trạng thái của khí lí tưởng"?</p>
+                        <button onclick="toggleAnswer('ans2')" class="mt-2 navy-bg text-white px-4 py-1 rounded text-sm hover:opacity-90">Học sinh nhấn xem trả lời</button>
+                        <div id="ans2" class="answer-box mt-3 p-4 rounded-lg text-green-800">
+                            Vì các định luật Boyle và Charles được sử dụng để thiết lập phương trình này chỉ nghiệm đúng chính xác đối với khí lí tưởng. Đối với khí thực, phương trình này chỉ mang tính chất gần đúng ở điều kiện áp suất thấp và nhiệt độ không quá thấp.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- THẢO LUẬN -->
+                <div class="mt-8 border-t-2 border-gray-100 pt-6">
+                    <h4 class="font-bold navy-text uppercase mb-4">Thảo luận</h4>
+                    <div class="space-y-6">
+                        <div class="bg-gray-50 p-4 rounded border">
+                            <p><strong>Câu 1:</strong> Biểu diễn vẽ đồ thị quá trình chuyển từ trạng thái (1) sang trạng thái (2) qua trạng thái trung gian (1') trong hệ tọa độ (p - V)?</p>
+                            <button onclick="toggleAnswer('ans-tl1')" class="mt-2 border border-navy-800 navy-text px-4 py-1 rounded text-sm font-semibold">Học sinh nhấn nút xem gợi ý trình bày</button>
+                            <div id="ans-tl1" class="answer-box mt-3 p-4 rounded-lg">
+                                <p>Đồ thị trong hệ (p - V):</p>
+                                <ul class="list-disc ml-5">
+                                    <li>Đoạn (1) - (1'): Là một cung đường Hyperbol (đường đẳng nhiệt).</li>
+                                    <li>Đoạn (1') - (2): Là một đoạn thẳng nằm ngang song song với trục hoành (đường đẳng áp).</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-50 p-4 rounded border">
+                            <p><strong>Câu 2:</strong> Từ mối quan hệ trong phương trình trạng thái, hãy thiết lập hệ thức cho quá trình đẳng tích?</p>
+                            <button onclick="toggleAnswer('ans-tl2')" class="mt-2 border border-navy-800 navy-text px-4 py-1 rounded text-sm font-semibold">Học sinh nhấn nút xem gợi ý</button>
+                            <div id="ans-tl2" class="answer-box mt-3 p-4 rounded-lg">
+                                <p>Trong quá trình đẳng tích: \( V_1 = V_2 \).</p>
+                                <p>Từ \( \frac{p_1 V_1}{T_1} = \frac{p_2 V_2}{T_2} \), ta triệt tiêu \( V_1 \) và \( V_2 \).</p>
+                                <p>Kết quả: \( \frac{p_1}{T_1} = \frac{p_2}{T_2} \Rightarrow \frac{p}{T} = \text{hằng số} \). Đây chính là định luật Charles cho quá trình đẳng tích (thường gọi là định luật Gay-Lussac).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BÀI TẬP VÍ DỤ -->
+                <div class="mt-8 bg-yellow-50 p-6 rounded-12px border-l-8 border-yellow-400">
+                    <h4 class="font-bold text-lg mb-2">Bài tập ví dụ:</h4>
+                    <p class="italic mb-4">Một khối khí có thể tích \( 100 \, cm^3 \) ở nhiệt độ \( 27^\circ C \) và áp suất \( 10^5 \, Pa \). Nếu nén khí đến thể tích \( 20 \, cm^3 \) và nhiệt độ tăng lên đến \( 39^\circ C \), thì áp suất của khối khí là bao nhiêu?</p>
+                    <button onclick="toggleAnswer('ans-vd')" class="navy-bg text-white px-6 py-2 rounded shadow-lg">Học sinh nhấn xem cách giải các bước</button>
+                    <div id="ans-vd" class="answer-box mt-4 p-6 bg-white rounded-lg">
+                        <p class="font-bold text-navy-text">Giải:</p>
+                        <p><strong>Bước 1:</strong> Xác định các thông số trạng thái 1:</p>
+                        <p>\( V_1 = 100 \, cm^3; \, p_1 = 10^5 \, Pa; \, T_1 = 27 + 273 = 300 \, K \)</p>
+                        <p><strong>Bước 2:</strong> Xác định các thông số trạng thái 2:</p>
+                        <p>\( V_2 = 20 \, cm^3; \, T_2 = 39 + 273 = 312 \, K; \, p_2 = ? \)</p>
+                        <p><strong>Bước 3:</strong> Áp dụng phương trình trạng thái:</p>
+                        <p>\( \frac{p_1 V_1}{T_1} = \frac{p_2 V_2}{T_2} \Rightarrow p_2 = \frac{p_1 V_1 T_2}{V_2 T_1} \)</p>
+                        <p>\( p_2 = \frac{10^5 \cdot 100 \cdot 312}{20 \cdot 300} = 5,2 \cdot 10^5 \, Pa \)</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-navy-text text-white text-center font-bold rounded">
+                    PHÁT BIỂU: Phương trình trạng thái của một lượng khí xác định cho biết tích áp suất và thể tích chia cho nhiệt độ tuyệt đối là một hằng số.
+                </div>
+            </div>
+
+            <!-- 2. PHƯƠNG TRÌNH CLAPEYRON -->
+            <div class="mt-12">
+                <h3 class="font-bold text-xl mb-4 text-gray-800">2. Phương trình Clapeyron</h3>
+                <div class="space-y-4">
+                    <p>Giới thiệu phương trình: Với một lượng khí bất kỳ có số mol là \( n \), phương trình trạng thái được viết dưới dạng:</p>
+                    <div class="bg-gray-100 p-6 rounded-lg text-center">
+                        <p class="text-3xl font-bold navy-text">\( pV = nRT \)</p>
+                    </div>
+                    
+                    <p><strong>Cách tìm hằng số R:</strong> Ở điều kiện tiêu chuẩn (\( p_0 = 1,013 \cdot 10^5 \, Pa; \, T_0 = 273,15 \, K \)), 1 mol khí (\( n = 1 \)) có thể tích \( V_0 = 22,4 \cdot 10^{-3} \, m^3 \).</p>
+                    <p>Hằng số khí lí tưởng: \( R = \frac{p_0 V_0}{T_0} \approx 8,31 \, J/(mol.K) \).</p>
+
+                    <div class="mt-4">
+                        <button onclick="toggleAnswer('ans-history')" class="text-navy-text underline font-semibold">Giới thiệu sự ra đời phương trình (Học sinh nhấn vào xem)</button>
+                        <div id="ans-history" class="answer-box mt-3 p-4 rounded-lg italic">
+                            Phương trình này được thiết lập bởi nhà vật lý và kỹ sư người Pháp Benoit Paul Émile Clapeyron vào năm 1834. Ông đã kết hợp định luật Boyle, định luật Charles và định luật Avogadro thành một phương trình duy nhất, đặt nền móng cho nhiệt động lực học hiện đại.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- II. VẬN DỤNG -->
+        <section class="bg-white p-8 rounded-12px shadow-md">
+            <h2 class="section-header navy-text text-2xl uppercase">II. Vận dụng</h2>
+            
+            <div class="space-y-8">
+                <!-- Bài toán 1 -->
+                <div class="p-6 border border-gray-200 rounded-lg">
+                    <h4 class="font-bold text-navy-text mb-2">Bài toán 1: Bóng thám không</h4>
+                    <p class="mb-4">Một quả bóng thám không được bơm khí helium ở điều kiện \( p = 1,02 \cdot 10^5 \, Pa \) và \( T = 300 \, K \). Khi lên cao, áp suất khí giảm còn \( 0,3 \cdot 10^5 \, Pa \) và nhiệt độ là \( 200 \, K \). Biết bán kính bóng khi lên cao là \( 10 \, m \), tính bán kính bóng khi vừa bơm xong?</p>
+                    <button onclick="toggleAnswer('ans-bt1')" class="navy-bg text-white px-4 py-1 rounded text-sm">Học sinh nhấn xem cách giải chi tiết</button>
+                    <div id="ans-bt1" class="answer-box mt-3 p-4 rounded-lg">
+                        <p>Dùng phương trình trạng thái: \( \frac{p_1 V_1}{T_1} = \frac{p_2 V_2}{T_2} \)</p>
+                        <p>Với \( V = \frac{4}{3} \pi R^3 \), ta có: \( \frac{p_1 R_1^3}{T_1} = \frac{p_2 R_2^3}{T_2} \)</p>
+                        <p>\( R_1^3 = R_2^3 \cdot \frac{p_2}{p_1} \cdot \frac{T_1}{T_2} = 10^3 \cdot \frac{0,3}{1,02} \cdot \frac{300}{200} \approx 441 \)</p>
+                        <p>\( \Rightarrow R_1 \approx 7,6 \, m \).</p>
+                    </div>
+                </div>
+
+                <!-- Bài toán 2 -->
+                <div class="p-6 border border-gray-200 rounded-lg">
+                    <h4 class="font-bold text-navy-text mb-2">Bài toán 2: Túi khí ô tô</h4>
+                    <p class="mb-4">Trong túi khí ô tô chứa 100g \( NaN_3 \). Khi va chạm, phản ứng phân hủy tạo ra khí \( N_2 \). Biết thể tích túi khí khi phồng lên là 48 lít và nhiệt độ là \( 30^\circ C \). Tính áp suất của khí trong túi? (Cho \( M_{NaN_3} = 65 \))</p>
+                    <button onclick="toggleAnswer('ans-bt2')" class="navy-bg text-white px-4 py-1 rounded text-sm">Học sinh nhấn xem cách giải</button>
+                    <div id="ans-bt2" class="answer-box mt-3 p-4 rounded-lg">
+                        <p>1. Số mol \( NaN_3 \): \( n = 100/65 \approx 1,538 \, mol \).</p>
+                        <p>2. Phương trình: \( 2NaN_3 \rightarrow 2Na + 3N_2 \). Số mol \( N_2 \): \( n_{khí} = \frac{3}{2} \cdot 1,538 = 2,307 \, mol \).</p>
+                        <p>3. Áp dụng \( p = \frac{nRT}{V} \): \( T = 30 + 273 = 303 \, K; V = 48 \cdot 10^{-3} \, m^3 \).</p>
+                        <p>\( p = \frac{2,307 \cdot 8,31 \cdot 303}{48 \cdot 10^{-3}} \approx 1,21 \cdot 10^5 \, Pa \).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- III. CỦNG CỐ -->
+        <section class="bg-white p-8 rounded-12px shadow-md">
+            <h2 class="section-header navy-text text-2xl uppercase">III. Củng cố</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <div class="p-6 rounded-lg" style="background-color: #e0f2fe;">
+                    <h4 class="font-bold text-blue-800 mb-2">Em đã học</h4>
+                    <ul class="list-disc ml-5 text-blue-900 space-y-2">
+                        <li>Hệ thức: \( \frac{p_1 V_1}{T_1} = \frac{p_2 V_2}{T_2} \)</li>
+                        <li>Phương trình Clapeyron: \( pV = nRT \)</li>
+                        <li>Hằng số khí lí tưởng \( R = 8,31 \, J/(mol.K) \)</li>
+                    </ul>
+                </div>
+                <div class="p-6 rounded-lg" style="background-color: #dcfce7;">
+                    <h4 class="font-bold text-green-800 mb-2">Em có thể</h4>
+                    <p class="text-green-900 italic">
+                        Vận dụng phương trình trạng thái để giải thích các hiện tượng thực tế như sự thay đổi áp suất lốp xe, nguyên lý túi khí ô tô và bóng thám không.
+                    </p>
+                </div>
+            </div>
+
+            <!-- TRẮC NGHIỆM -->
+            <div class="border-t pt-6">
+                <h3 class="font-bold text-xl navy-text mb-6">Bài tập trắc nghiệm củng cố</h3>
+                <form id="quizForm" class="space-y-8">
+                    <!-- Câu 1 -->
+                    <div class="space-y-3 p-4 bg-gray-50 rounded">
+                        <p class="font-bold">Câu 1: Hệ thức nào sau đây không phù hợp với phương trình trạng thái khí lí tưởng?</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q1" value="A"> <span>A. \( pV/T = \text{hằng số} \)</span></label>
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q1" value="B"> <span>B. \( p_1V_1/T_1 = p_2V_2/T_2 \)</span></label>
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q1" value="C"> <span>C. \( pV \sim T \)</span></label>
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q1" value="D"> <span>D. \( pT/V = \text{hằng số} \)</span></label>
+                        </div>
+                    </div>
+
+                    <!-- Câu 2 -->
+                    <div class="space-y-3 p-4 bg-gray-50 rounded">
+                        <p class="font-bold">Câu 2: Đơn vị của nhiệt độ T trong các phương trình trạng thái phải là:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q2" value="A"> <span>A. Độ C (\( ^\circ C \))</span></label>
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q2" value="B"> <span>B. Kelvin (K)</span></label>
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q2" value="C"> <span>C. Độ F (\( ^\circ F \))</span></label>
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q2" value="D"> <span>D. Đơn vị nào cũng được</span></label>
+                        </div>
+                    </div>
+
+                    <!-- Câu 3 -->
+                    <div class="space-y-3 p-4 bg-gray-50 rounded">
+                        <p class="font-bold">Câu 3: Trong phương trình \( pV = nRT \), R được gọi là:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q3" value="A"> <span>A. Hằng số Boltzmann</span></label>
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q3" value="B"> <span>B. Hằng số hấp dẫn</span></label>
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q3" value="C"> <span>C. Hằng số khí lí tưởng</span></label>
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q3" value="D"> <span>D. Biến số trạng thái</span></label>
+                        </div>
+                    </div>
+
+                    <!-- Câu 4 -->
+                    <div class="space-y-3 p-4 bg-gray-50 rounded">
+                        <p class="font-bold">Câu 4: Khi thể tích khối khí giảm 2 lần và nhiệt độ tuyệt đối tăng 2 lần thì áp suất sẽ:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q4" value="A"> <span>A. Không đổi</span></label>
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q4" value="B"> <span>B. Tăng 2 lần</span></label>
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q4" value="C"> <span>C. Tăng 4 lần</span></label>
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q4" value="D"> <span>D. Giảm 4 lần</span></label>
+                        </div>
+                    </div>
+
+                    <!-- Câu 5 -->
+                    <div class="space-y-3 p-4 bg-gray-50 rounded">
+                        <p class="font-bold">Câu 5: Một mol khí ở đktc có thể tích xấp xỉ là:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q5" value="A"> <span>A. 22,4 lít</span></label>
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q5" value="B"> <span>B. 24,0 lít</span></label>
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q5" value="C"> <span>C. 11,2 lít</span></label>
+                            <label class="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-white"><input type="radio" name="q5" value="D"> <span>D. 2,24 lít</span></label>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center py-6">
+                        <button type="button" onclick="checkQuiz()" class="navy-bg text-white px-12 py-3 rounded-full font-bold text-lg hover:shadow-xl transition-all">NỘP BÀI</button>
+                        <div id="quizResult" class="mt-6 text-xl font-bold hidden p-4 rounded-lg w-full text-center"></div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center py-10 text-gray-400">
+        &copy; 2026 - Giáo trình Vật lý 12 điện tử
+    </footer>
+
+    <script>
+        // Hàm ẩn hiện câu trả lời
+        function toggleAnswer(id) {
+            const element = document.getElementById(id);
+            if (element.style.display === "block") {
+                element.style.display = "none";
+            } else {
+                element.style.display = "block";
+            }
+        }
+
+        // Hàm kiểm tra trắc nghiệm
+        function checkQuiz() {
+            const correctAnswers = {
+                q1: 'D',
+                q2: 'B',
+                q3: 'C',
+                q4: 'C',
+                q5: 'A'
+            };
+
+            let score = 0;
+            const form = document.getElementById('quizForm');
+            const resultDiv = document.getElementById('quizResult');
+            const totalQuestions = Object.keys(correctAnswers).length;
+
+            for (let i = 1; i <= totalQuestions; i++) {
+                const qName = 'q' + i;
+                const selected = form.querySelector(`input[name="${qName}"]:checked`);
+                
+                if (selected && selected.value === correctAnswers[qName]) {
+                    score++;
+                }
+            }
+
+            resultDiv.classList.remove('hidden');
+            if (score === totalQuestions) {
+                resultDiv.className = "mt-6 text-xl font-bold p-4 rounded-lg w-full text-center bg-green-100 text-green-700 border-2 border-green-500";
+                resultDiv.innerHTML = `Chúc mừng! Bạn đã trả lời đúng tuyệt đối: ${score}/${totalQuestions} điểm.`;
+            } else if (score >= 3) {
+                resultDiv.className = "mt-6 text-xl font-bold p-4 rounded-lg w-full text-center bg-blue-100 text-blue-700 border-2 border-blue-500";
+                resultDiv.innerHTML = `Khá tốt! Bạn đã trả lời đúng: ${score}/${totalQuestions} điểm.`;
+            } else {
+                resultDiv.className = "mt-6 text-xl font-bold p-4 rounded-lg w-full text-center bg-red-100 text-red-700 border-2 border-red-500";
+                resultDiv.innerHTML = `Bạn cần ôn tập thêm. Kết quả: ${score}/${totalQuestions} điểm.`;
+            }
+
+            // Cuộn xuống kết quả
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
