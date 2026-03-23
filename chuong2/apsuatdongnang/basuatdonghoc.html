@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 12: Áp suất khí theo mô hình động học phân tử</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        .navy-bg { background-color: #000080; }
+        .navy-text { color: #000080; }
+        .border-navy { border-color: #000080; }
+        .rounded-12px { border-radius: 12px; }
+        
+        section h2 {
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 4px solid #000033;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding-bottom: 4px;
+        }
+
+        .answer-box {
+            display: none;
+            background-color: #f0fff4;
+            border-left: 4px solid #48bb78;
+        }
+
+        .question-box {
+            background-color: #edf2f7;
+            border-left: 4px solid #2b6cb0;
+        }
+
+        .info-box { background-color: #fffaf0; border: 1px solid #feebc8; }
+        .can-box { background-color: #ebf8ff; border: 1px solid #bee3f8; }
+        .note-box { background-color: #fff5f5; border: 1px solid #feb2b2; }
+
+        table { border-collapse: collapse; width: 100%; }
+        th { background-color: #e2e8f0; border: 1px solid #cbd5e0; padding: 8px; }
+        td { border: 1px solid #cbd5e0; padding: 8px; text-align: center; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Header Section -->
+    <header class="max-w-4xl mx-auto mb-8 text-white shadow-lg overflow-hidden rounded-12px">
+        <div class="navy-bg p-3 text-sm text-center font-semibold tracking-wider uppercase">Chương II: Khí Lí Tưởng</div>
+        <div class="navy-bg p-6 text-2xl md:text-3xl font-bold text-center border-t border-blue-800">
+            BÀI 12: ÁP SUẤT KHÍ THEO MÔ HÌNH ĐHPT.<br>QUAN HỆ GIỮA ĐỘNG NĂNG VÀ NHIỆT ĐỘ
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto space-y-8">
+
+        <!-- Intro Box -->
+        <div class="bg-white p-6 border border-black rounded-12px shadow-md">
+            <p class="italic text-center text-gray-700">
+                "Áp suất khí phụ thuộc như thế nào vào những đại lượng đặc trưng sau đây của phân tử: khối lượng phân tử, tốc độ chuyển động của phân tử, mật độ phân tử, lực liên kết phân tử?"
+            </p>
+        </div>
+
+        <!-- Section I -->
+        <section class="bg-white p-8 rounded-12px shadow-md">
+            <h2 class="section-header navy-text text-2xl uppercase">I. ÁP SUẤT KHÍ THEO MÔ HÌNH ĐỘNG HỌC PHÂN TỬ</h2>
+            
+            <h3 class="font-bold text-lg mb-4 navy-text">1. Tác dụng của một phân tử khí lên thành bình</h3>
+            <p class="mb-4">Xét một lượng khí gồm \( N \) phân tử chứa trong một bình lập phương có cạnh \( l \). Khi một phân tử khối lượng \( m \) va chạm đàn hồi vào thành bình ABCD với tốc độ \( v \):</p>
+            <ul class="list-disc ml-6 mb-4 space-y-2">
+                <li>Động lượng trước va chạm: \( p_1 = +mv \)</li>
+                <li>Động lượng sau va chạm: \( p_2 = -mv \)</li>
+                <li>Độ biến thiên động lượng: \( |\Delta p| = |(-mv) - (+mv)| = 2mv \)</li>
+            </ul>
+
+            <!-- Question 1 & 2 -->
+            <div class="question-box p-4 rounded-lg mb-4">
+                <p class="font-semibold mb-2">1. Tại sao có thể coi chuyển động của phân tử khí trước và sau khi va chạm với thành bình là chuyển động thẳng đều?</p>
+                <p class="font-semibold mb-2">2. Tính thời gian \( \Delta t \) giữa hai va chạm liên tiếp của một phân tử lên thành bình ABCD theo \( l \) và \( v \).</p>
+                <button onclick="toggleAnswer('ans1')" class="mt-2 px-4 py-2 navy-bg text-white rounded hover:bg-blue-900 transition">Xem lời giải</button>
+                <div id="ans1" class="answer-box p-4 mt-3 rounded">
+                    <p>1. Vì trong mô hình khí lí tưởng, ta bỏ qua lực tương tác giữa các phân tử khi chúng chưa va chạm. Theo định luật I Newton, khi không có lực tác dụng, phân tử sẽ chuyển động thẳng đều.</p>
+                    <p class="mt-2">2. Khoảng cách giữa hai lần va chạm liên tiếp vào cùng một thành bình là quãng đường đi và về: \( s = 2l \). Thời gian là: \( \Delta t = \frac{2l}{v} \).</p>
+                </div>
+            </div>
+
+            <!-- Hoạt động chứng minh -->
+            <div class="border-2 border-dashed border-blue-300 p-4 rounded-lg mb-6">
+                <p class="font-bold text-blue-800">Hoạt động: Chứng minh công thức áp suất</p>
+                <p class="text-sm italic">Sử dụng xung lượng của lực \( F \cdot \Delta t = \Delta p \)...</p>
+                <button onclick="toggleAnswer('act1')" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm">Xem hướng giải quyết</button>
+                <div id="act1" class="answer-box p-4 mt-3 rounded text-sm">
+                    <p>a) Lực do thành bình tác dụng lên phân tử: \( F = \frac{\Delta p}{\Delta t} = \frac{-2mv}{2l/v} = -\frac{mv^2}{l} \). Theo định luật III Newton, lực phân tử tác dụng lên bình là \( + \frac{mv^2}{l} \).</p>
+                    <p class="mt-2">b) Áp suất: \( p_m = \frac{F}{S} = \frac{mv^2/l}{l^2} = \frac{mv^2}{l^3} = \frac{m}{V}v^2 \) (với \( V = l^3 \)).</p>
+                </div>
+            </div>
+
+            <h3 class="font-bold text-lg mb-4 navy-text mt-8">2. Tác dụng của N phân tử khí lên thành bình</h3>
+            <p class="mb-4">Do chuyển động hỗn loạn, trung bình có \( \frac{1}{3}N \) phân tử chuyển động theo mỗi phương (Ox, Oy, Oz). Công thức áp suất tổng cộng:</p>
+            <div class="bg-gray-100 p-4 rounded text-center text-xl font-mono mb-4">
+                \( p = \frac{1}{3} \frac{Nm}{V} \overline{v^2} \) (12.1)
+            </div>
+            <p class="mb-4">Hoặc biểu diễn qua mật độ phân tử \( \mu = \frac{N}{V} \) và động năng trung bình \( \overline{E}_d = \frac{1}{2} m \overline{v^2} \):</p>
+            <div class="bg-gray-100 p-4 rounded text-center text-xl font-mono mb-6">
+                \( p = \frac{2}{3} \mu \overline{E}_d \) (12.2)
+            </div>
+
+            <!-- Question Boyle -->
+            <div class="question-box p-4 rounded-lg">
+                <p class="font-semibold mb-2">? Hãy chứng tỏ hệ thức (12.1) phù hợp với định luật Boyle.</p>
+                <button onclick="toggleAnswer('ans2')" class="mt-2 px-4 py-2 navy-bg text-white rounded hover:bg-blue-900 transition">Xem lời giải</button>
+                <div id="ans2" class="answer-box p-4 mt-3 rounded">
+                    Từ (12.1): \( p = \frac{1}{3} \frac{Nm}{V} \overline{v^2} \Rightarrow pV = \frac{1}{3}Nm\overline{v^2} \). <br>
+                    Ở nhiệt độ không đổi, \( \overline{v^2} \) không đổi. Với một lượng khí xác định (\( N, m \) không đổi), ta có \( pV = \text{const} \). Đây chính là nội dung định luật Boyle.
+                </div>
+            </div>
+        </section>
+
+        <!-- Section II -->
+        <section class="bg-white p-8 rounded-12px shadow-md">
+            <h2 class="section-header navy-text text-2xl uppercase">II. MỐI QUAN HỆ GIỮA ĐỘNG NĂNG PHÂN TỬ VÀ NHIỆT ĐỘ</h2>
+            <p class="mb-4">Kết hợp phương trình trạng thái \( pV = nRT \) và công thức áp suất mô hình động học, ta rút ra:</p>
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-6 text-center mb-6">
+                <span class="text-2xl font-bold">\( \overline{E}_d = \frac{3}{2} kT \)</span> (12.3)
+            </div>
+            <p class="mb-4">Trong đó \( k \) là <strong>hằng số Boltzmann</strong>:</p>
+            <p class="text-center font-bold text-lg">\( k = \frac{R}{N_A} \approx 1,38 \cdot 10^{-23} \, \text{J/K} \)</p>
+
+            <div class="note-box p-4 rounded-lg my-6">
+                <p class="font-bold text-red-700">Hệ quả quan trọng:</p>
+                <ul class="list-decimal ml-6 mt-2 space-y-1">
+                    <li>Các khí khác nhau ở cùng nhiệt độ thì có động năng tịnh tiến trung bình bằng nhau.</li>
+                    <li>Nhiệt độ tuyệt đối là số đo động năng tịnh tiến trung bình của phân tử.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Em có biết -->
+        <div class="info-box p-6 rounded-12px shadow-sm">
+            <h4 class="font-bold text-orange-700 uppercase mb-2">Em có biết?</h4>
+            <ul class="list-disc ml-6 space-y-2 text-sm">
+                <li>Hệ thức (12.3) áp dụng cho mô hình chất điểm (chuyển động tịnh tiến). Nếu phân tử phức tạp, nó còn có động năng quay và dao động.</li>
+                <li><strong>Tốc độ căn quân phương:</strong> \( v_{rms} = \sqrt{\overline{v^2}} \). Nó khác với tốc độ trung bình cộng của các phân tử.</li>
+            </ul>
+        </div>
+
+        <!-- Em có thể -->
+        <div class="can-box p-6 rounded-12px shadow-sm">
+            <h4 class="font-bold text-blue-700 uppercase mb-2">Em có thể</h4>
+            <p class="text-sm">Giải thích được tại sao trong quá trình đẳng tích, áp suất tỉ lệ thuận với nhiệt độ tuyệt đối dựa trên việc khi \( T \) tăng thì \( \overline{E}_d \) tăng, dẫn đến va chạm vào thành bình mạnh hơn và nhiều hơn.</p>
+        </div>
+
+        <!-- Quiz Section -->
+        <section class="bg-white p-8 rounded-12px shadow-md">
+            <h2 class="text-red-700 border-red-700">BÀI TẬP CỦNG CỐ</h2>
+            <div id="quiz" class="space-y-6">
+                <!-- Câu 1 -->
+                <div class="quiz-item">
+                    <p class="font-bold">Câu 1: Hằng số Boltzmann \( k \) có giá trị là:</p>
+                    <div class="mt-2 space-y-1">
+                        <label class="block"><input type="radio" name="q1" value="A"> A. \( 1,38 \cdot 10^{-23} \, \text{J/K} \)</label>
+                        <label class="block"><input type="radio" name="q1" value="B"> B. \( 8,31 \, \text{J/mol.K} \)</label>
+                        <label class="block"><input type="radio" name="q1" value="C"> C. \( 6,02 \cdot 10^{23} \, \text{mol}^{-1} \)</label>
+                        <label class="block"><input type="radio" name="q1" value="D"> D. \( 1,38 \cdot 10^{23} \, \text{J/K} \)</label>
+                    </div>
+                </div>
+
+                <!-- Câu 2 -->
+                <div class="quiz-item">
+                    <p class="font-bold">Câu 2: Động năng tịnh tiến trung bình của phân tử khí tỉ lệ thuận với:</p>
+                    <div class="mt-2 space-y-1">
+                        <label class="block"><input type="radio" name="q2" value="A"> A. Khối lượng phân tử</label>
+                        <label class="block"><input type="radio" name="q2" value="B"> B. Áp suất khí</label>
+                        <label class="block"><input type="radio" name="q2" value="C"> C. Nhiệt độ tuyệt đối \( T \)</label>
+                        <label class="block"><input type="radio" name="q2" value="D"> D. Thể tích bình chứa</label>
+                    </div>
+                </div>
+
+                <!-- Câu 3 -->
+                <div class="quiz-item">
+                    <p class="font-bold">Câu 3: Công thức tính áp suất khí theo mật độ phân tử \( \mu \) và động năng trung bình là:</p>
+                    <div class="mt-2 space-y-1">
+                        <label class="block"><input type="radio" name="q3" value="A"> A. \( p = \mu \overline{E}_d \)</label>
+                        <label class="block"><input type="radio" name="q3" value="B"> B. \( p = \frac{2}{3} \mu \overline{E}_d \)</label>
+                        <label class="block"><input type="radio" name="q3" value="C"> C. \( p = \frac{3}{2} \mu \overline{E}_d \)</label>
+                        <label class="block"><input type="radio" name="q3" value="D"> D. \( p = \frac{1}{3} \mu \overline{E}_d \)</label>
+                    </div>
+                </div>
+
+                <!-- Câu 4 -->
+                <div class="quiz-item">
+                    <p class="font-bold">Câu 4: Khi nhiệt độ của một lượng khí tăng gấp đôi thì động năng tịnh tiến trung bình của phân tử khí đó sẽ:</p>
+                    <div class="mt-2 space-y-1">
+                        <label class="block"><input type="radio" name="q4" value="A"> A. Giảm một nửa</label>
+                        <label class="block"><input type="radio" name="q4" value="B"> B. Không đổi</label>
+                        <label class="block"><input type="radio" name="q4" value="C"> C. Tăng gấp 4 lần</label>
+                        <label class="block"><input type="radio" name="q4" value="D"> D. Tăng gấp 2 lần</label>
+                    </div>
+                </div>
+
+                <!-- Câu 5 -->
+                <div class="quiz-item">
+                    <p class="font-bold">Câu 5: Hai loại khí Oxi và Nitơ ở cùng một nhiệt độ \( 27^\circ C \). Đại lượng nào sau đây của chúng là giống nhau?</p>
+                    <div class="mt-2 space-y-1">
+                        <label class="block"><input type="radio" name="q5" value="A"> A. Tốc độ căn quân phương</label>
+                        <label class="block"><input type="radio" name="q5" value="B"> B. Động năng tịnh tiến trung bình</label>
+                        <label class="block"><input type="radio" name="q5" value="C"> C. Khối lượng phân tử</label>
+                        <label class="block"><input type="radio" name="q5" value="D"> D. Mật độ phân tử</label>
+                    </div>
+                </div>
+
+                <div class="text-center pt-4">
+                    <button onclick="checkQuiz()" class="px-8 py-3 navy-bg text-white font-bold rounded-lg hover:bg-blue-900 transition shadow-lg">NỘP BÀI</button>
+                    <div id="quiz-result" class="mt-4 font-bold text-lg"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="max-w-4xl mx-auto mt-12 mb-8 text-center text-gray-500 text-sm">
+        &copy; 2024 - Tài liệu học tập Vật Lý 12 - Kết nối tri thức
+    </footer>
+
+    <script>
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === "block") {
+                el.style.display = "none";
+            } else {
+                el.style.display = "block";
+            }
+        }
+
+        function checkQuiz() {
+            const answers = {
+                q1: "A",
+                q2: "C",
+                q3: "B",
+                q4: "D",
+                q5: "B"
+            };
+            
+            let score = 0;
+            let total = 5;
+            let resultDiv = document.getElementById('quiz-result');
+            
+            for (let i = 1; i <= total; i++) {
+                const userAns = document.querySelector(`input[name="q${i}"]:checked`);
+                if (userAns && userAns.value === answers[`q${i}`]) {
+                    score++;
+                }
+            }
+            
+            if (score === total) {
+                resultDiv.style.color = "green";
+                resultDiv.innerHTML = `Tuyệt vời! Bạn đúng ${score}/${total} câu.`;
+            } else {
+                resultDiv.style.color = "red";
+                resultDiv.innerHTML = `Bạn đúng ${score}/${total} câu. Hãy ôn tập lại nhé!`;
+            }
+        }
+    </script>
+</body>
+</html>
