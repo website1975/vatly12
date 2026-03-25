@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 13: Bài tập về khí lí tưởng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2d3748;
+        }
+        .navy-bg { background-color: #000080; }
+        .navy-text { color: #000080; }
+        .rounded-12px { border-radius: 12px; }
+
+        .section-header {
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 3px solid #000033;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+        .intro-box {
+            border: 1px solid #cbd5e0;
+            background-color: white;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .question-box {
+            background-color: #edf2f7;
+            border-left: 5px solid #000080;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .answer-box {
+            background-color: #f0fff4;
+            border-left: 5px solid #38a169;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .note-box { background-color: #fffaf0; border: 1px solid #feebc8; padding: 1rem; border-radius: 8px; }
+        .can-do-box { background-color: #ebf8ff; border: 1px solid #bee3f8; padding: 1rem; border-radius: 8px; }
+        .learned-box { background-color: #f0fff4; border: 1px solid #c6f6d5; padding: 1rem; border-radius: 8px; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Header Section -->
+        <header class="max-w-4xl mx-auto mb-8 text-white shadow-lg overflow-hidden rounded-12px">
+        <div class="navy-bg p-3 text-sm text-center font-semibold tracking-wider uppercase">Chương II: Khí Lí Tưởng</div>
+             <div class="navy-bg p-6 text-2xl md:text-3xl font-bold text-center border-t border-blue-800">Bài 13: BÀI TẬP VỀ KHÍ LÍ TƯỞNG</div>
+    </header>
+
+    <main class="max-w-4xl mx-auto">
+        <!-- Intro Box -->
+        <div class="intro-box rounded-lg shadow-sm">
+            <p class="italic text-gray-700">
+                Để giải các bài tập về sự chuyển trạng thái của khí lí tưởng thì cần dùng những công thức nào? Nêu rõ ý nghĩa và cách dùng của từng công thức.
+            </p>
+        </div>
+
+        <!-- Section I -->
+        <section class="bg-white p-6 rounded-12px shadow-md mb-8">
+            <h2 class="section-header text-xl">I. MỘT SỐ LƯU Ý TRONG VIỆC GIẢI BÀI TẬP VỀ KHÍ LÍ TƯỞNG</h2>
+            <p class="mb-4">Phần khí lí tưởng bao gồm bốn nội dung chính: Mô hình động học phân tử chất khí, phương trình trạng thái của khí lí tưởng, áp suất khí theo mô hình động học phân tử và động năng phân tử.</p>
+            
+            <div class="space-y-6">
+                <div>
+                    <h3 class="font-bold text-lg mb-2">1. Lưu ý khi giải bài tập định tính</h3>
+                    <p>Các bài tập này thường yêu cầu vận dụng mô hình khí lí tưởng và mối quan hệ giữa các thông số trạng thái \( (p, V, T) \) để giải thích các hiện tượng, ứng dụng thực tế có liên quan. Khi giải cần lưu ý đến điều kiện về <strong>khối lượng khí xác định</strong>.</p>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-lg mb-2">2. Lưu ý khi giải bài tập định lượng</h3>
+                    <p>Các bài tập định lượng chủ yếu là về sự chuyển trạng thái. Việc giải thường tiến hành theo 3 bước:</p>
+                    <ul class="list-decimal ml-6 mt-2 space-y-1">
+                        <li>Xác định lượng khí có thay đổi hay không (khối lượng, số mol).</li>
+                        <li>Xác định trạng thái đầu, trạng thái cuối và quá trình chuyển trạng thái.</li>
+                        <li>Xác định các thông số đặc trưng (\( V, p, T, m \)) trong từng trạng thái.</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-lg mb-2">3. Lưu ý khi giải bài tập thí nghiệm</h3>
+                    <p>Tập trung vào yêu cầu xử lí số liệu, biểu diễn bằng đồ thị mối quan hệ giữa \( p, V, T \) trong các hệ trục tọa độ khác nhau để rút ra kết luận.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section II -->
+        <section class="bg-white p-6 rounded-12px shadow-md mb-8">
+            <h2 class="section-header text-xl">II. BÀI TẬP VÍ DỤ</h2>
+            
+            <!-- Ví dụ 1 -->
+            <div class="mb-8">
+                <div class="question-box">
+                    <p class="font-bold">Ví dụ 1:</p>
+                    <p>Một bình hình trụ dung tích 8 lít, đặt thẳng đứng, đậy kín bằng một nắp khối lượng 2 kg, đường kính 20 cm. Khí ở \( 100^\circ C \) và áp suất \( 10^5 \text{ Pa} \). Khi nhiệt độ giảm còn \( 20^\circ C \):</p>
+                    <p>a) Áp suất khí trong bình bằng bao nhiêu?</p>
+                    <p>b) Muốn mở nắp bình cần một lực tối thiểu bằng bao nhiêu? Lấy \( g = 9,8 \text{ m/s}^2 \).</p>
+                    <button onclick="toggleAnswer('ans1')" class="mt-2 bg-[#000080] text-white px-4 py-1 rounded hover:opacity-90 transition">Xem lời giải</button>
+                </div>
+                <div id="ans1" class="answer-box">
+                    <p><strong>Giải:</strong></p>
+                    <p>a) Quá trình đẳng tích (\( V_1 = V_2 = 8 \text{ L} \)):</p>
+                    <p>Trạng thái 1: \( T_1 = 373 \text{ K}, p_1 = 10^5 \text{ Pa} \)</p>
+                    <p>Trạng thái 2: \( T_2 = 293 \text{ K}, p_2 = ? \)</p>
+                    <p>Công thức: \( \frac{p_1}{T_1} = \frac{p_2}{T_2} \Rightarrow p_2 = \frac{p_1 \cdot T_2}{T_1} = \frac{10^5 \cdot 293}{373} \approx 7,86 \cdot 10^4 \text{ Pa} \).</p>
+                    <p>b) Điều kiện mở nắp: \( F + p_2 S = mg + p_1 S \)</p>
+                    <p>Với \( S = \frac{\pi d^2}{4} \approx 0,0314 \text{ m}^2 \). Tính được \( F = (p_1 - p_2)S + mg = (10^5 - 7,86 \cdot 10^4) \cdot 0,0314 + 2 \cdot 9,8 \approx 692 \text{ N} \).</p>
+                </div>
+            </div>
+
+            <!-- Ví dụ 2 -->
+            <div class="mb-8">
+                <div class="question-box">
+                    <p class="font-bold">Ví dụ 2:</p>
+                    <p>So sánh nhiệt độ \( T_1 \) và \( T_2 \) từ đồ thị đường đẳng nhiệt trong hệ tọa độ \( (p, V) \).</p>
+		<div class="w-full h-40 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center my-6">
+                    <img src="h1.png" class="max-w-full max-h-full object-contain"></img>
+                </div>		    
+
+                    <button onclick="toggleAnswer('ans2')" class="mt-2 bg-[#000080] text-white px-4 py-1 rounded hover:opacity-90 transition">Xem lời giải</button>
+                </div>
+		<div id="ans2" class="answer-box class="W-full h-10 ">
+		<center><img src="h2.png" class="max-w-full max-h-full object - contain"></img></center>
+		<p><strong>Giải:</strong> Kẻ một đường đẳng áp song song với trục \( OV \). Đường này cắt hai đồ thị tại \( V_1 \) và \( V_2 \). Từ đồ thị thấy \( V_1 < V_2 \). Với cùng áp suất, thể tích tỉ lệ thuận với nhiệt độ tuyệt đối nên \( T_1 < T_2 \).</p>
+                </div>
+            </div>
+
+            <!-- Ví dụ 3 -->
+            <div class="mb-8">
+                <div class="question-box">
+                    <p class="font-bold">Ví dụ 3:</p>
+                    <p>Một bình kín chứa \( m = 1,00 \text{ kg} \) khí ở \( p_1 = 10^7 \text{ Pa} \). Lấy khí ra đến khi áp suất còn \( p_2 = 2,5 \cdot 10^6 \text{ Pa} \). Tính khối lượng khí đã lấy ra (nhiệt độ không đổi).</p>
+                    <button onclick="toggleAnswer('ans3')" class="mt-2 bg-[#000080] text-white px-4 py-1 rounded hover:opacity-90 transition">Xem lời giải</button>
+                </div>
+                <div id="ans3" class="answer-box">
+                    <p><strong>Giải:</strong> Sử dụng phương trình Clapeyron-Mendeleev:</p>
+                    <p>\( p_1 V = \frac{m_1}{M}RT \) (1)</p>
+                    <p>\( p_2 V = \frac{m_2}{M}RT \) (2)</p>
+                    <p>Lập tỉ số (1)/(2): \( \frac{p_1}{p_2} = \frac{m_1}{m_2} \Rightarrow m_2 = m_1 \cdot \frac{p_2}{p_1} = 1 \cdot \frac{2,5 \cdot 10^6}{10^7} = 0,25 \text{ kg} \).</p>
+                    <p>Khối lượng lấy ra: \( \Delta m = m_1 - m_2 = 1,00 - 0,25 = 0,75 \text{ kg} \).</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section III -->
+        <section class="bg-white p-6 rounded-12px shadow-md mb-8">
+            <h2 class="section-header text-xl">III. BÀI TẬP VẬN DỤNG</h2>
+            
+            <!-- Bài 1 -->
+            <div class="mb-8">
+                <div class="question-box">
+                    <p class="font-bold">Bài 1:</p>
+                    <p>Một lượng khí ở điều kiện tiêu chuẩn (ĐKTC) có thể tích \( 2 \text{ m}^3 \). Nếu nén đẳng nhiệt lượng khí này tới áp suất \( 5 \cdot 10^5 \text{ Pa} \) thì thể tích của lượng khí sẽ là bao nhiêu?</p>
+                    <button onclick="toggleAnswer('ans_vd1')" class="mt-2 bg-[#000080] text-white px-4 py-1 rounded hover:opacity-90 transition">Xem lời giải</button>
+                </div>
+                <div id="ans_vd1" class="answer-box">
+                    <p><strong>Giải:</strong></p>
+                    <p>Áp dụng định luật Boyle cho quá trình đẳng nhiệt:</p>
+                    <p>Trạng thái 1 (ĐKTC): \( p_1 = 1,013 \cdot 10^5 \text{ Pa} \), \( V_1 = 2 \text{ m}^3 \).</p>
+                    <p>Trạng thái 2: \( p_2 = 5 \cdot 10^5 \text{ Pa} \), \( V_2 = ? \)</p>
+                    <p>\( p_1 V_1 = p_2 V_2 \Rightarrow V_2 = \frac{p_1 V_1}{p_2} = \frac{1,013 \cdot 10^5 \cdot 2}{5 \cdot 10^5} \approx 0,405 \text{ m}^3 \).</p>
+                </div>
+            </div>
+
+            <!-- Bài 2 -->
+            <div class="mb-8">
+                <div class="question-box">
+                    <p class="font-bold">Bài 2 (Câu hỏi về Bóng thám không):</p>
+                    <p>a) Tại sao vỏ bóng phải được làm bằng chất liệu đàn hồi?</p>
+                    <p>b) Tại sao để bóng bay lên, người ta phải bơm vào bóng một loại khí có khối lượng riêng nhỏ hơn không khí?</p>
+                    <p>c) Bóng thám không thường chỉ bay lên tới độ cao khoảng từ 30 km đến 40 km là bị vỡ. Tại sao bóng bị vỡ?</p>
+                    <button onclick="toggleAnswer('ans_vd2')" class="mt-2 bg-[#000080] text-white px-4 py-1 rounded hover:opacity-90 transition">Xem trả lời</button>
+                </div>
+                <div id="ans_vd2" class="answer-box">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>a)</strong> Vỏ bóng làm bằng chất liệu đàn hồi để nó có thể giãn nở khi áp suất khí quyển bên ngoài giảm dần theo độ cao, giúp cân bằng áp suất bên trong và bên ngoài mà không làm nổ bóng ngay lập tức.</li>
+                        <li><strong>b)</strong> Theo lực đẩy Archimedes, để vật bay lên được trong không khí thì trọng lượng của nó phải nhỏ hơn lực đẩy Archimedes của không khí tác dụng lên nó. Khí có khối lượng riêng nhỏ (như Hydrogen hay Helium) giúp tổng khối lượng bóng nhỏ hơn khối lượng không khí bị chiếm chỗ.</li>
+                        <li><strong>c)</strong> Càng lên cao, áp suất khí quyển càng giảm. Hiệu áp suất giữa bên trong và bên ngoài tăng làm khí giãn nở, kéo căng vỏ bóng. Đến độ cao 30-40 km, độ giãn nở vượt quá giới hạn đàn hồi của vật liệu khiến bóng bị vỡ.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bài 3 -->
+            <div class="mb-8">
+                <div class="question-box">
+                    <p class="font-bold">Bài 3:</p>
+                    <p>Một bình dung tích \( 40 \text{ dm}^3 \) chứa \( 3,96 \text{ kg} \) khí oxygen. Hỏi ở nhiệt độ nào thì bình có thể bị vỡ, biết bình chỉ chịu được áp suất không quá \( 60 \text{ atm} \). Lấy khối lượng riêng của oxygen ở ĐKTC là \( 1,43 \text{ kg/m}^3 \).</p>
+                    <button onclick="toggleAnswer('ans_vd3')" class="mt-2 bg-[#000080] text-white px-4 py-1 rounded hover:opacity-90 transition">Xem lời giải</button>
+                </div>
+                <div id="ans_vd3" class="answer-box">
+                    <p><strong>Giải:</strong></p>
+                    <p>Khối lượng mol của Oxygen \( O_2 \) là \( M = 32 \text{ g/mol} = 0,032 \text{ kg/mol} \).</p>
+                    <p>Dùng phương trình Clapeyron-Mendeleev: \( pV = \frac{m}{M}RT \)</p>
+                    <p>Với \( p = 60 \text{ atm} \approx 60 \cdot 1,013 \cdot 10^5 \text{ Pa} \), \( V = 40 \text{ dm}^3 = 0,04 \text{ m}^3 \), \( m = 3,96 \text{ kg} \).</p>
+                    <p>\( T = \frac{pVM}{mR} = \frac{(60 \cdot 1,013 \cdot 10^5) \cdot 0,04 \cdot 0,032}{3,96 \cdot 8,31} \approx 236 \text{ K} \).</p>
+                    <p>Nhiệt độ tương ứng: \( t \approx 236 - 273 = -37^\circ C \).</p>
+                </div>
+            </div>
+
+            <!-- Bài 4 -->
+            <div class="mb-8">
+                <div class="question-box">
+                    <p class="font-bold">Bài 4:</p>
+                    <p>Một bình chứa khí được nén ở nhiệt độ \( 27^\circ C \) và áp suất \( 40 \text{ atm} \). Nếu nhiệt độ giảm xuống còn \( 12^\circ C \) và một nửa lượng khí thoát ra khỏi bình thì áp suất khí sẽ bằng bao nhiêu?</p>
+                    <button onclick="toggleAnswer('ans_vd4')" class="mt-2 bg-[#000080] text-white px-4 py-1 rounded hover:opacity-90 transition">Xem lời giải</button>
+                </div>
+                <div id="ans_vd4" class="answer-box">
+                    <p><strong>Giải:</strong></p>
+                    <p>Trạng thái 1: \( p_1 = 40 \text{ atm} \), \( T_1 = 300 \text{ K} \), số mol \( n_1 \).</p>
+                    <p>Trạng thái 2: \( p_2 = ? \), \( T_2 = 285 \text{ K} \), số mol \( n_2 = 0,5 n_1 \).</p>
+                    <p>Vì thể tích bình \( V \) không đổi: \( \frac{p_1}{n_1 T_1} = \frac{p_2}{n_2 T_2} \)</p>
+                    <p>\( \Rightarrow p_2 = p_1 \cdot \frac{n_2}{n_1} \cdot \frac{T_2}{T_1} = 40 \cdot 0,5 \cdot \frac{285}{300} = 19 \text{ atm} \).</p>
+                </div>
+            </div>
+
+            <!-- Bài 5 -->
+            <div class="mb-8">
+                <div class="question-box">
+                    <p class="font-bold">Bài 5:</p>
+                    <p>Vẽ đường biểu diễn bốn quá trình chuyển trạng thái của một lượng khí xác định. Hãy xác định tên của các quá trình này và nêu quy luật biến đổi của các thông số trạng thái trong từng quá trình.</p>
+                    <button onclick="toggleAnswer('ans_vd5')" class="mt-2 bg-[#000080] text-white px-4 py-1 rounded hover:opacity-90 transition">Xem hướng giải quyết</button>
+                </div>
+                <div id="ans_vd5" class="answer-box">
+                    <p><strong>Phân tích:</strong></p>
+                    <ul class="list-decimal ml-5 space-y-2">
+                        <li>Dựa vào trục tọa độ (ví dụ p-V, V-T, hay p-T) để nhận diện đường thẳng hay đường cong.</li>
+                        <li>Đường thẳng đi qua gốc tọa độ trong hệ (V,T) là đẳng áp; trong hệ (p,T) là đẳng tích.</li>
+                        <li>Đường Hyperbol trong hệ (p,V) là đẳng nhiệt.</li>
+                        <li>Nêu rõ thông số nào không đổi, hai thông số còn lại tỉ lệ thuận hay nghịch với nhau.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary Boxes -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div class="learned-box shadow-sm">
+                <h3 class="font-bold navy-text mb-2">EM ĐÃ HỌC</h3>
+                <p>Cách giải các bài tập về khí lí tưởng (định tính, định lượng, thí nghiệm) dựa trên các định luật Boyle, Charles và phương trình trạng thái.</p>
+            </div>
+            <div class="can-do-box shadow-sm">
+                <h3 class="font-bold text-blue-800 mb-2">EM CÓ THỂ</h3>
+                <p>Vận dụng được các phương trình trạng thái của khí lí tưởng để giải các bài tập và giải thích hiện tượng đời sống như bóng thám không, lốp xe, bình nén.</p>
+            </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <section class="bg-white p-6 rounded-12px shadow-md mb-8">
+            <h2 class="section-header text-xl">TRẮC NGHIỆM CỦNG CỐ</h2>
+            <div id="quiz" class="space-y-6">
+                <!-- Câu 1 -->
+                <div>
+                    <p class="font-medium">Câu 1. Một lượng khí ở ĐKTC có thể tích \( 2 \text{ m}^3 \). Nếu nén đẳng nhiệt tới áp suất \( 5 \cdot 10^5 \text{ Pa} \) thì thể tích là:</p>
+                    <div class="mt-2 space-y-1">
+                        <label class="block"><input type="radio" name="q1" value="A"> A. \( 10 \text{ m}^3 \)</label>
+                        <label class="block"><input type="radio" name="q1" value="B"> B. \( 1 \text{ m}^3 \)</label>
+                        <label class="block"><input type="radio" name="q1" value="C"> C. \( 0,4 \text{ m}^3 \)</label>
+                        <label class="block"><input type="radio" name="q1" value="D"> D. \( 4 \text{ m}^3 \)</label>
+                    </div>
+                </div>
+
+                <!-- Câu 2 -->
+                <div>
+                    <p class="font-medium">Câu 2. Trong quá trình đẳng tích của một khối lượng khí xác định, khi nhiệt độ tuyệt đối tăng gấp đôi thì áp suất sẽ:</p>
+                    <div class="mt-2 space-y-1">
+                        <label class="block"><input type="radio" name="q2" value="A"> A. Giảm một nửa</label>
+                        <label class="block"><input type="radio" name="q2" value="B"> B. Tăng gấp đôi</label>
+                        <label class="block"><input type="radio" name="q2" value="C"> C. Không đổi</label>
+                        <label class="block"><input type="radio" name="q2" value="D"> D. Tăng gấp bốn</label>
+                    </div>
+                </div>
+
+                <!-- Câu 3 -->
+                <div>
+                    <p class="font-medium">Câu 3. Đơn vị nào sau đây KHÔNG phải là đơn vị của áp suất?</p>
+                    <div class="mt-2 space-y-1">
+                        <label class="block"><input type="radio" name="q3" value="A"> A. Pa</label>
+                        <label class="block"><input type="radio" name="q3" value="B"> B. mmHg</label>
+                        <label class="block"><input type="radio" name="q3" value="C"> C. Atm</label>
+                        <label class="block"><input type="radio" name="q3" value="D"> D. Joule (J)</label>
+                    </div>
+                </div>
+
+                <!-- Câu 4 -->
+                <div>
+                    <p class="font-medium">Câu 4. Phương trình trạng thái khí lí tưởng là:</p>
+                    <div class="mt-2 space-y-1">
+                        <label class="block"><input type="radio" name="q4" value="A"> A. \( pV/T = \text{const} \)</label>
+                        <label class="block"><input type="radio" name="q4" value="B"> B. \( pT/V = \text{const} \)</label>
+                        <label class="block"><input type="radio" name="q4" value="C"> C. \( VT/p = \text{const} \)</label>
+                        <label class="block"><input type="radio" name="q4" value="D"> D. \( pVT = \text{const} \)</label>
+                    </div>
+                </div>
+
+                <!-- Câu 5 -->
+                <div>
+                    <p class="font-medium">Câu 5. Một bình dung tích không đổi chứa khí ở \( 27^\circ C \). Để áp suất tăng gấp 2 lần thì cần đun nóng khí đến:</p>
+                    <div class="mt-2 space-y-1">
+                        <label class="block"><input type="radio" name="q5" value="A"> A. \( 54^\circ C \)</label>
+                        <label class="block"><input type="radio" name="q5" value="B"> B. \( 327^\circ C \)</label>
+                        <label class="block"><input type="radio" name="q5" value="C"> C. \( 600^\circ C \)</label>
+                        <label class="block"><input type="radio" name="q5" value="D"> D. \( 150^\circ C \)</label>
+                    </div>
+                </div>
+
+                <button onclick="checkQuiz()" class="bg-[#000033] text-white px-8 py-2 rounded-lg font-bold hover:bg-black transition">NỘP BÀI</button>
+                <div id="quiz-result" class="mt-4 font-bold text-lg"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center text-gray-500 py-8 border-t border-gray-200 max-w-4xl mx-auto">
+        &copy; 2024 - Vật lý 12 Kết nối tri thức
+    </footer>
+
+    <script>
+        function toggleAnswer(id) {
+            const element = document.getElementById(id);
+            if (element.style.display === "block") {
+                element.style.display = "none";
+            } else {
+                element.style.display = "block";
+            }
+        }
+
+        function checkQuiz() {
+            const answers = {
+                q1: "C",
+                q2: "B",
+                q3: "D",
+                q4: "A",
+                q5: "B"
+            };
+            let score = 0;
+            let total = 5;
+            let resultDiv = document.getElementById('quiz-result');
+
+            for (let i = 1; i <= total; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected && selected.value === answers[`q${i}`]) {
+                    score++;
+                }
+            }
+
+            if (score === total) {
+                resultDiv.style.color = "#38a169";
+                resultDiv.innerHTML = `Chúc mừng! Bạn đúng ${score}/${total} câu.`;
+            } else {
+                resultDiv.style.color = "#e53e3e";
+                resultDiv.innerHTML = `Bạn đúng ${score}/${total} câu. Hãy ôn tập lại nhé!`;
+            }
+        }
+    </script>
+</body>
+</html>
