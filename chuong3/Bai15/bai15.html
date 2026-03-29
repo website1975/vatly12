@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 15: Lực Từ - Vật Lý 12</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .header-navy {
+            background-color: #808080;
+        }
+        .section-header {
+            border-bottom: 4px solid #1a202c;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding-bottom: 4px;
+        }
+        .rounded-12px {
+            border-radius: 12px;
+        }
+        .question-box {
+            background-color: #edf2f7;
+            border-left: 4px solid #2b6cb0;
+        }
+        .answer-box {
+            background-color: #f0fff4;
+            display: none;
+        }
+        .note-box {
+            background-color: #fffaf0;
+            border: 1px solid #feebc8;
+        }
+        .em-co-the-box {
+            background-color: #ebf8ff;
+            border: 1px solid #bee3f8;
+        }
+        .em-co-biet-box {
+            background-color: #faf5ff;
+            border: 1px solid #e9d8fd;
+        }
+        table, th, td {
+            border: 1px solid #cbd5e0;
+        }
+        th {
+            background-color: #e2e8f0;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Header Section - Đã cập nhật bo góc 12px -->
+    <header class="max-w-5xl mx-auto mb-8 shadow-lg overflow-hidden rounded-[12px]">
+        <div class="header-navy text-white text-center p-3 text-sm font-semibold tracking-wider">
+            CHƯƠNG III – TỪ TRƯỜNG
+        </div>
+        <div class="header-navy text-white p-8 text-center border-t border-gray-500">
+            <h1 class="text-3xl font-bold uppercase tracking-tight">BÀI 15: LỰC TỪ TÁC DỤNG LÊN DÂY DẪN MANG DÒNG ĐIỆN. CẢM ỨNG TỪ</h1>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto space-y-8">
+        
+        <!-- Intro Box -->
+        <section class="bg-white p-6 rounded-12px shadow-md border border-gray-300">
+            <p class="italic text-gray-700">
+                Tính chất cơ bản của từ trường là gây ra lực từ tác dụng lên một nam châm hay một dòng điện đặt trong từ trường đó. Vậy lực từ có đặc điểm như thế nào?
+            </p>
+        </section>
+
+        <!-- Section I -->
+        <section class="bg-white p-8 rounded-12px shadow-md">
+            <h2 class="section-header text-xl font-bold uppercase">I. THÍ NGHIỆM VỀ LỰC TỪ TÁC DỤNG LÊN ĐOẠN DÂY DẪN MANG DÒNG ĐIỆN</h2>
+            <p class="mb-4">Để khảo sát lực từ tác dụng lên đoạn dây dẫn mang dòng điện người ta sử dụng thiết bị như Hình 15.1.</p>
+            
+            <!-- Placeholder for Image 15.1 -->
+            <div class="w-full bg-gray-200 h-64 flex flex-col items-center justify-center mb-6 rounded-lg border-2 border-dashed border-gray-300">
+		<img src="h1.png" class="max-h-full max-w-full object-contain"></img>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-bold mb-2">Chuẩn bị:</h3>
+                    <ul class="list-disc ml-5 space-y-1 text-gray-700">
+                        <li>Hộp gỗ có gắn nam châm điện, đòn cân (2), gia trọng (3).</li>
+                        <li>Khung dây dẫn (4) (\(n=200\) vòng, \(l=10\) cm).</li>
+                        <li>Ampe kế (5), (6); Biến trở (7); Công tắc đảo chiều (8), (9).</li>
+                        <li>Lực kế (11); Đèn chỉ hướng (12); Nguồn DC 12V (13).</li>
+                    </ul>
+                </div>
+                <div class="question-box p-4 rounded">
+                    <h3 class="font-bold flex items-center">
+                        <span class="mr-2 text-xl">✋</span> Hoạt động:
+                    </h3>
+                    <p class="mt-2 text-sm">1. Giải thích hiện tượng xảy ra với khung dây?</p>
+                    <p class="mt-2 text-sm">2. Xác định chiều cảm ứng từ, dòng điện và lực từ?</p>
+                    <button onclick="toggleAnswer('ans1')" class="mt-3 bg-gray-600 text-white px-4 py-1 rounded text-sm hover:bg-gray-700 transition">Xem hướng giải quyết</button>
+                    <div id="ans1" class="answer-box p-4 mt-2 rounded text-sm border border-green-200">
+                        <strong>Hướng dẫn:</strong><br>
+                        - Khi đóng điện, dòng điện qua khung dây nằm trong từ trường của nam châm điện sẽ chịu tác dụng của lực từ làm đòn cân bị lệch.<br>
+                        - Sử dụng quy tắc bàn tay trái để xác định mối quan hệ giữa các vectơ \(\vec{B}, \vec{I}, \vec{F}\).
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 p-4 border-l-4 border-gray-800 bg-gray-50 rounded-r">
+                <p class="font-semibold italic text-gray-800">Kết luận:</p>
+                <p>Lực từ \(\vec{F}\) có phương vuông góc với đoạn dây dẫn mang dòng điện và vuông góc với đường sức từ.</p>
+            </div>
+
+            <!-- Placeholder for Image 15.2 -->
+            <div class="w-full bg-gray-200 h-48 flex items-center justify-center mt-6 rounded-lg">
+		<img src="h2.png" class="max-h-full max-w-full object-contain"></img>
+            </div>
+
+            <!-- Quy tắc bàn tay trái -->
+            <div class="mt-8">
+                <h3 class="font-bold text-lg mb-4 text-gray-800 border-l-4 border-gray-600 pl-3">Quy tắc bàn tay trái:</h3>
+                <p class="bg-blue-50 p-4 rounded-lg italic border border-blue-100 shadow-sm">
+                    Đặt bàn tay trái sao cho vectơ cảm ứng từ \(\vec{B}\) hướng vào lòng bàn tay, chiều từ cổ tay đến các ngón tay trùng với chiều dòng điện, thì ngón tay cái choãi ra \(90^\circ\) chỉ chiều của lực từ \(\vec{F}\).
+                </p>
+                <div class="w-full bg-gray-200 h-48 flex items-center justify-center mt-4 rounded-lg">
+			<img src="h3.png" class="max-h-full max-w-full object-contain"></img>
+                </div>
+            </div>
+
+            <!-- Câu hỏi dấu hỏi -->
+            <div class="mt-6 question-box p-4 rounded">
+                <p class="font-bold text-sm flex items-center"><span class="text-blue-600 mr-2">❓</span> Sử dụng quy tắc bàn tay trái để kiểm chứng Hình 15.2 và xác định lực từ trong Hình 15.4.</p>
+                <button onclick="toggleAnswer('ans_qs1')" class="mt-2 bg-gray-600 text-white px-3 py-1 rounded text-xs hover:bg-gray-700">Xem câu trả lời</button>
+                <div id="ans_qs1" class="answer-box p-4 mt-2 rounded text-sm border border-green-200">
+                    - Hình 15.4a: Lực từ hướng lên trên.<br>
+                    - Hình 15.4b: Lực từ hướng sang trái.<br>
+                    - Hình 15.4c: Không có lực từ vì dòng điện song song với đường sức từ (\(\alpha = 0\)).
+                </div>
+            </div>
+        </section>
+
+        <!-- Section II -->
+        <section class="bg-white p-8 rounded-12px shadow-md">
+            <h2 class="section-header text-xl font-bold uppercase">II. ĐỘ LỚN CẢM ỨNG TỪ</h2>
+            <h3 class="font-bold text-lg mb-2">1. Biểu thức</h3>
+            <p class="text-gray-700">Độ lớn của lực từ \(F\) tỉ lệ với cường độ dòng điện \(I\), chiều dài đoạn dây \(L\) và \(\sin \alpha\). Thương số sau đây là hằng số và được gọi là độ lớn cảm ứng từ \(B\):</p>
+            <div class="text-center my-6 p-6 bg-gray-100 rounded-lg shadow-inner">
+                <p class="text-2xl font-bold">\( B = \frac{F}{IL \sin \alpha} \)</p>
+                <p class="mt-3 text-gray-600 font-medium">Suy ra: <span class="text-red-600">\( F = BIL \sin \alpha \)</span></p>
+            </div>
+
+            <h3 class="font-bold text-lg mb-2">2. Đơn vị</h3>
+            <p>Trong hệ SI, đơn vị cảm ứng từ là <strong>tesla (T)</strong>.</p>
+            <p class="italic text-sm mt-2 text-gray-600">\( 1 T = \frac{1 N}{1 A \cdot 1 m} \)</p>
+
+            <div class="mt-8 p-4 border border-blue-200 rounded-lg bg-blue-50">
+                <p class="font-bold text-blue-800 mb-2">Bài tập ví dụ 1:</p>
+                <p class="text-gray-700">Đoạn dây \(L=1\)m, \(I=3\)A, \(B=5 \cdot 10^{-2}\)T, góc hợp bởi dây và \(\vec{B}\) là \(60^\circ\). Tính \(F\)?</p>
+                <button onclick="toggleAnswer('ex1')" class="mt-3 text-blue-600 font-bold underline text-sm hover:text-blue-800">Xem giải chi tiết</button>
+                <div id="ex1" class="answer-box p-4 mt-3 rounded-lg border border-green-300">
+                    Áp dụng công thức: \( F = BIL \sin \alpha \)<br>
+                    \( F = 5 \cdot 10^{-2} \cdot 3 \cdot 1 \cdot \sin(60^\circ) \)<br>
+                    \( F = 0,15 \cdot \frac{\sqrt{3}}{2} \approx 0,13 \, (N). \)
+                </div>
+            </div>
+        </section>
+
+        <!-- Section III -->
+        <section class="bg-white p-8 rounded-12px shadow-md">
+            <h2 class="section-header text-xl font-bold uppercase">III. THỰC HÀNH ĐO ĐỘ LỚN CẢM ỨNG TỪ</h2>
+            <p class="mb-4">Mục đích: Xác định độ lớn cảm ứng từ của từ trường đều bằng thiết bị thí nghiệm Hình 15.1.</p>
+            
+            <div class="overflow-x-auto rounded-lg">
+                <table class="w-full text-center text-sm">
+                    <thead>
+                        <tr>
+                            <th class="p-3">Lần thí nghiệm</th>
+                            <th class="p-3">\( I(A) \)</th>
+                            <th class="p-3">\( F(N) \)</th>
+                            <th class="p-3">\( B = \frac{F}{IL} \) (với \(L = 0,02m\))</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                        <tr><td class="p-3">1</td><td class="p-3">0,1</td><td class="p-3">0,02</td><td class="p-3">0,010</td></tr>
+                        <tr><td class="p-3">2</td><td class="p-3">0,2</td><td class="p-3">0,05</td><td class="p-3">0,013</td></tr>
+                        <tr><td class="p-3">3</td><td class="p-3">0,3</td><td class="p-3">0,07</td><td class="p-3">0,012</td></tr>
+                        <tr><td class="p-3">4</td><td class="p-3">0,4</td><td class="p-3">0,09</td><td class="p-3">0,011</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="w-full bg-gray-200 h-64 flex items-center justify-center mt-6 rounded-lg">
+		<img src="h4.png" class="max-h-full max-w-full object-contain"></img>
+            </div>
+        </section>
+
+        <!-- Summary Boxes -->
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="note-box p-6 rounded-12px shadow-sm">
+                <h3 class="font-bold text-orange-800 uppercase mb-3 flex items-center">
+                    <span class="mr-2">📝</span> LƯU Ý / EM ĐÃ HỌC
+                </h3>
+                <ul class="text-sm space-y-2 text-orange-900">
+                    <li>Lực từ \(\vec{F}\) đặt tại trung điểm đoạn dây, vuông góc với \(\vec{I}\) và \(\vec{B}\).</li>
+                    <li>Độ lớn: \( F = BIL \sin \alpha \).</li>
+                    <li>Đơn vị cảm ứng từ: Tesla (T).</li>
+                </ul>
+            </div>
+            <div class="em-co-the-box p-6 rounded-12px shadow-sm">
+                <h3 class="font-bold text-blue-800 uppercase mb-3 flex items-center">
+                    <span class="mr-2">🚀</span> EM CÓ THỂ
+                </h3>
+                <p class="text-sm text-blue-900">
+                    Giải thích được nguyên tắc hoạt động của tàu đệm từ dựa trên tương tác giữa các nam châm điện đặt ở đường ray và nam châm siêu dẫn đặt trên tàu.
+                </p>
+            </div>
+        </div>
+
+        <section class="em-co-biet-box p-6 rounded-12px shadow-sm">
+            <h3 class="font-bold text-purple-800 uppercase mb-3 flex items-center">
+                <span class="mr-2">💡</span> EM CÓ BIẾT: TÀU ĐỆM TỪ
+            </h3>
+            <p class="text-sm leading-relaxed text-purple-900">
+                Tàu đệm từ là phương tiện không tiếp xúc trực tiếp với ray, vận hành êm và tốc độ cao. 
+                Sử dụng cơ chế đẩy (tương tác nam châm siêu dẫn) và cơ chế nâng (lực từ thắng trọng lực khi đạt tốc độ tới hạn).
+            </p>
+            <div class="grid grid-cols-2 gap-4 mt-4">
+                <div class="bg-gray-200 h-32 flex items-center justify-center rounded-lg">[Hình 15.7: Cơ chế đẩy]</div>
+                <div class="bg-gray-200 h-32 flex items-center justify-center rounded-lg">[Hình 15.8: Cơ chế nâng]</div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section class="bg-white p-8 rounded-12px shadow-md border-t-8 border-gray-600">
+            <h2 class="text-2xl font-bold mb-6 text-center uppercase tracking-wider">Bài tập trắc nghiệm củng cố</h2>
+            
+            <div id="quiz-container" class="space-y-6">
+                <div class="quiz-item bg-gray-50 p-4 rounded-lg">
+                    <p class="font-semibold">Câu 1: Đơn vị của cảm ứng từ trong hệ SI là gì?</p>
+                    <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q1" value="0" class="mr-2"> Weber (Wb)</label>
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q1" value="1" class="mr-2"> Tesla (T)</label>
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q1" value="0" class="mr-2"> Niutơn (N)</label>
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q1" value="0" class="mr-2"> Ampe (A)</label>
+                    </div>
+                    <div id="hint1" class="hidden mt-3 p-3 bg-green-50 text-sm rounded border border-green-200">
+                        <strong>Giải chi tiết:</strong> Đơn vị cảm ứng từ ký hiệu là T (Tesla), đặt theo tên nhà vật lý Nikola Tesla.
+                    </div>
+                </div>
+
+                <div class="quiz-item bg-gray-50 p-4 rounded-lg">
+                    <p class="font-semibold">Câu 2: Công thức tính độ lớn lực từ tác dụng lên đoạn dây dẫn là:</p>
+                    <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q2" value="0" class="mr-2"> \( F = BIL \cos \alpha \)</label>
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q2" value="1" class="mr-2"> \( F = BIL \sin \alpha \)</label>
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q2" value="0" class="mr-2"> \( F = BI / L \)</label>
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q2" value="0" class="mr-2"> \( F = B / (IL) \)</label>
+                    </div>
+                    <div id="hint2" class="hidden mt-3 p-3 bg-green-50 text-sm rounded border border-green-200">
+                        <strong>Giải chi tiết:</strong> Độ lớn lực từ phụ thuộc vào B, I, L và góc hợp bởi dây dẫn với đường sức từ.
+                    </div>
+                </div>
+
+                <div class="quiz-item bg-gray-50 p-4 rounded-lg">
+                    <p class="font-semibold">Câu 3: Quy tắc bàn tay trái dùng để xác định:</p>
+                    <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q3" value="0" class="mr-2"> Độ lớn cảm ứng từ</label>
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q3" value="1" class="mr-2"> Chiều của lực từ</label>
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q3" value="0" class="mr-2"> Chiều của dòng điện</label>
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q3" value="0" class="mr-2"> Chiều đường sức từ</label>
+                    </div>
+                    <div id="hint3" class="hidden mt-3 p-3 bg-green-50 text-sm rounded border border-green-200">
+                        <strong>Giải chi tiết:</strong> Quy tắc này giúp xác định hướng của lực từ F khi biết B và I.
+                    </div>
+                </div>
+
+                <div class="quiz-item bg-gray-50 p-4 rounded-lg">
+                    <p class="font-semibold">Câu 4: Khi dây dẫn đặt song song với đường sức từ thì lực từ có giá trị:</p>
+                    <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q4" value="1" class="mr-2"> Bằng 0</label>
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q4" value="0" class="mr-2"> Cực đại</label>
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q4" value="0" class="mr-2"> Bằng BIL</label>
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q4" value="0" class="mr-2"> Bằng 1T</label>
+                    </div>
+                    <div id="hint4" class="hidden mt-3 p-3 bg-green-50 text-sm rounded border border-green-200">
+                        <strong>Giải chi tiết:</strong> Khi song song, \(\alpha = 0^\circ \Rightarrow \sin \alpha = 0 \Rightarrow F = 0\).
+                    </div>
+                </div>
+
+                <div class="quiz-item bg-gray-50 p-4 rounded-lg">
+                    <p class="font-semibold">Câu 5: Tesla (T) tương đương với đơn vị nào?</p>
+                    <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q5" value="1" class="mr-2"> \(N/(A \cdot m)\)</label>
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q5" value="0" class="mr-2"> \(N \cdot A / m\)</label>
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q5" value="0" class="mr-2"> \(m/(N \cdot A)\)</label>
+                        <label class="p-2 border rounded hover:bg-white cursor-pointer"><input type="radio" name="q5" value="0" class="mr-2"> \(A/(N \cdot m)\)</label>
+                    </div>
+                    <div id="hint5" class="hidden mt-3 p-3 bg-green-50 text-sm rounded border border-green-200">
+                        <strong>Giải chi tiết:</strong> Từ công thức \(B = F/(IL)\), đơn vị là \(N/(A \cdot m)\).
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center border-t pt-6">
+                <button onclick="checkQuiz()" class="bg-gray-800 text-white px-10 py-3 rounded-lg hover:bg-black transition-all font-bold shadow-md">NỘP BÀI</button>
+                <p id="quiz-result" class="mt-4 font-bold text-xl"></p>
+            </div>
+        </section>
+
+        <!-- Applied Problems -->
+        <section class="bg-white p-8 rounded-12px shadow-md mb-20">
+            <h2 class="text-xl font-bold uppercase mb-6 border-b-2 border-gray-100 pb-2">Bài tập vận dụng tính toán</h2>
+            
+            <div class="space-y-6">
+                <div class="p-5 border rounded-lg bg-gray-50">
+                    <p><strong>Bài 1:</strong> Một đoạn dây dẫn thẳng dài \(0,4\)m mang dòng điện \(5\)A đặt trong từ trường đều có cảm ứng từ \(0,08\)T. Tính lực từ khi dây vuông góc với cảm ứng từ.</p>
+                    <button onclick="toggleAnswer('vd1')" class="mt-3 bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-semibold hover:bg-blue-200">Xem lời giải</button>
+                    <div id="vd1" class="answer-box p-4 mt-3 rounded-lg border border-green-200">
+                        <strong>Giải:</strong><br>
+                        Vì dây vuông góc nên \(\alpha = 90^\circ \Rightarrow \sin \alpha = 1\).<br>
+                        Áp dụng: \( F = BIL = 0,08 \cdot 5 \cdot 0,4 = 0,16 \, (N) \).
+                    </div>
+                </div>
+
+                <div class="p-5 border rounded-lg bg-gray-50">
+                    <p><strong>Bài 2:</strong> Một đoạn dây dẫn dài \(20\)cm đặt trong từ trường đều sao cho dây hợp với \(\vec{B}\) một góc \(30^\circ\). Lực từ tác dụng là \(0,1\)N. Biết \(I = 10\)A, tính \(B\).</p>
+                    <button onclick="toggleAnswer('vd2')" class="mt-3 bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-semibold hover:bg-blue-200">Xem lời giải</button>
+                    <div id="vd2" class="answer-box p-4 mt-3 rounded-lg border border-green-200">
+                        <strong>Giải:</strong><br>
+                        Đổi \(L = 0,2 \, m\). Ta có \( F = BIL \sin 30^\circ \).<br>
+                        \(\Rightarrow B = \frac{F}{IL \sin 30^\circ} = \frac{0,1}{10 \cdot 0,2 \cdot 0,5} = \frac{0,1}{1} = 0,1 \, (T) \).
+                    </div>
+                </div>
+
+                <div class="p-5 border rounded-lg bg-gray-50">
+                    <p><strong>Bài 3:</strong> Một khung dây hình vuông cạnh \(10\)cm gồm \(50\) vòng dây đặt trong từ trường đều \(B = 0,02\)T. Dòng điện qua khung là \(2\)A. Tính lực từ cực đại tác dụng lên một cạnh của khung.</p>
+                    <button onclick="toggleAnswer('vd3')" class="mt-3 bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-semibold hover:bg-blue-200">Xem lời giải</button>
+                    <div id="vd3" class="answer-box p-4 mt-3 rounded-lg border border-green-200">
+                        <strong>Giải:</strong><br>
+                        Lực tác dụng lên một cạnh của khung dây có \(N\) vòng dây là: \( F = N \cdot BIL \sin \alpha \).<br>
+                        Lực cực đại khi \(\alpha = 90^\circ \Rightarrow F_{max} = N \cdot BIL \).<br>
+                        \( F_{max} = 50 \cdot 0,02 \cdot 2 \cdot 0,1 = 0,2 \, (N) \).
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="max-w-5xl mx-auto py-8 text-center text-gray-500 text-sm">
+        &copy; 2024 - Bài Học Vật Lý 12 Tương Tác
+    </footer>
+
+    <script>
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === "block") {
+                el.style.display = "none";
+            } else {
+                el.style.display = "block";
+            }
+        }
+
+        function checkQuiz() {
+            let score = 0;
+            const total = 5;
+            for (let i = 1; i <= total; i++) {
+                const radios = document.getElementsByName('q' + i);
+                let selected = false;
+                for (let r of radios) {
+                    if (r.checked) {
+                        selected = true;
+                        if (r.value === "1") {
+                            score++;
+                        }
+                    }
+                }
+                // Hiển thị lời giải chi tiết sau khi nộp
+                document.getElementById('hint' + i).classList.remove('hidden');
+            }
+            const resultDisplay = document.getElementById('quiz-result');
+            resultDisplay.innerText = "Kết quả: " + score + "/" + total + " câu đúng.";
+            if (score === total) {
+                resultDisplay.style.color = "green";
+                resultDisplay.innerText += " Chúc mừng bạn đã hoàn thành xuất sắc!";
+            } else {
+                resultDisplay.style.color = "red";
+                resultDisplay.innerText += " Bạn hãy xem lại lời giải chi tiết bên dưới mỗi câu nhé.";
+            }
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
