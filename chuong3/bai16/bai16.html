@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 16: Từ Thông. Hiện Tượng Cảm Ứng Điện Từ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        .header-navy {
+            background-color: #808080;
+        }
+        .section-title {
+            border-bottom: 4px solid #2d3748;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.2rem;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .image-placeholder {
+            border: 2px dashed #cbd5e0;
+            background-color: #edf2f7;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            color: #718096;
+            text-align: center;
+            padding: 1rem;
+        }
+        .btn-navy {
+            background-color: #808080;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: opacity 0.2s;
+        }
+        .btn-navy:hover {
+            opacity: 0.9;
+        }
+        .answer-box {
+            background-color: #f0fff4;
+            border-left: 4px solid #48bb78;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .question-box {
+            background-color: #edf2f7;
+            border-left: 4px solid #2b6cb0;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .note-box {
+            border: 2px solid #808080;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+        .em-co-biet { background-color: #fffaf0; border-color: #ed8936; }
+        .em-co-the { background-color: #ebf8ff; border-color: #4299e1; }
+        .luu-y { background-color: #fff5f5; border-color: #f56565; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { border: 1px solid #cbd5e0; padding: 12px; text-align: center; }
+        th { background-color: #e2e8f0; }
+        
+        .quiz-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Header Section -->
+    <header class="max-w-4xl mx-auto mb-8 text-white overflow-hidden rounded-[12px] shadow-md">
+        <div class="header-navy p-3 text-center text-sm font-semibold tracking-wider">CHƯƠNG III: TỪ TRƯỜNG</div>
+        <div class="header-navy p-6 text-center text-2xl font-bold uppercase border-t border-gray-400">
+            BÀI 16: TỪ THÔNG. HIỆN TƯỢNG CẢM ỨNG ĐIỆN TỪ
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto">
+        <!-- Intro Box -->
+        <div class="bg-white p-6 rounded-[12px] shadow-md mb-6 border border-black/10">
+            <p class="italic text-gray-700">
+                Khi số đường sức từ xuyên qua tiết diện của cuộn dây dẫn kín biến thiên thì trong cuộn dây dẫn đó xuất hiện dòng điện cảm ứng. Hãy cho biết có những cách nào làm cho số đường sức từ qua tiết diện của cuộn dây dẫn kín biến thiên?
+            </p>
+            <button class="btn-navy mt-3 text-xs" onclick="toggleAnswer('ans-intro')">Xem gợi ý giải quyết</button>
+            <div id="ans-intro" class="answer-box">
+                Có thể thay đổi cảm ứng từ B (đưa nam châm lại gần/ra xa), thay đổi diện tích S của cuộn dây, hoặc thay đổi góc nghiêng giữa cuộn dây và từ trường.
+            </div>
+        </div>
+
+        <!-- Section I -->
+        <section class="bg-white p-6 rounded-[12px] shadow-md mb-6">
+            <h2 class="section-title text-xl">I. TỪ THÔNG</h2>
+            <p class="mb-4 text-justify">Xét một vòng dây dẫn kín (C) có diện tích S, được đặt trong từ trường đều B. Vẽ vectơ đơn vị pháp tuyến \( \vec{n} \) của S. Chiều của \( \vec{n} \) có thể chọn tuỳ ý. Góc hợp thành bởi \( \vec{B} \) và \( \vec{n} \) kí hiệu là \( \alpha \).</p>
+            
+            <div class="bg-gray-50 p-4 rounded text-center my-4 font-bold text-lg border border-gray-200">
+                \( \Phi = B \cdot S \cdot \cos(\alpha) \) <span class="text-sm font-normal ml-4">(16.1)</span>
+            </div>
+
+            <p class="mb-4">Đại lượng \( \Phi \) gọi là <strong>từ thông</strong> qua diện tích S. Đơn vị của từ thông trong hệ SI là vêbe (weber), kí hiệu Wb.</p>
+            <p class="mb-4">Ta có: \( 1 \, \text{Wb} = 1 \, \text{T} \cdot 1 \, \text{m}^2 \).</p>
+
+            <div class="image-placeholder">
+                <img src="h1.png" alt="[Hình 16.1: Mô tả đường sức từ xuyên qua diện tích S giới hạn bởi vòng dây]" class="max-w-full h-auto mb-2">
+                <p class="text-xs italic">Hình 16.1. Mô tả đường sức từ xuyên qua diện tích S giới hạn bởi vòng dây dẫn kín (C)</p>
+            </div>
+
+            <div class="question-box">
+                <p class="font-semibold italic">Thảo luận 1 (Trang 64): Khi cảm ứng từ \( \vec{B} \) vuông góc với mặt phẳng vòng dây thì \( \alpha = 0 \), hãy so sánh trị số từ thông với độ lớn cảm ứng từ khi diện tích vòng dây là \( 1 \, \text{m}^2 \).</p>
+                <button class="btn-navy mt-2 text-xs" onclick="toggleAnswer('ans-dis-1')">Xem câu trả lời</button>
+                <div id="ans-dis-1" class="answer-box">
+                    Khi \( \alpha = 0 \), \( \cos(0) = 1 \). Nếu \( S = 1 \, \text{m}^2 \), ta có \( \Phi = B \cdot 1 \cdot 1 = B \). Vậy trị số của từ thông bằng độ lớn của cảm ứng từ.
+                </div>
+            </div>
+
+            <div class="question-box">
+                <p class="font-semibold">? Từ công thức (16.1), hãy cho biết khi nào từ thông có giá trị dương, âm hoặc bằng 0.</p>
+		<img src="h2.png" class="max-w-full h-auto mb-2">
+                <button class="btn-navy mt-2 text-xs" onclick="toggleAnswer('ans-1')">Xem câu trả lời</button>
+                <div id="ans-1" class="answer-box">
+                    - \( \Phi > 0 \) khi \( \cos(\alpha) > 0 \) (góc \( \alpha \) nhọn: \( 0 \le \alpha < 90^\circ \)).<br>
+                    - \( \Phi < 0 \) khi \( \cos(\alpha) < 0 \) (góc \( \alpha \) tù: \( 90^\circ < \alpha \le 180^\circ \)).<br>
+                    - \( \Phi = 0 \) khi \( \cos(\alpha) = 0 \) (\( \alpha = 90^\circ \), \( \vec{B} \) song song mặt phẳng S).
+                </div>
+            </div>
+        </section>
+
+        <!-- Section II -->
+        <section class="bg-white p-6 rounded-[12px] shadow-md mb-6">
+            <h2 class="section-title text-xl">II. HIỆN TƯỢNG CẢM ỨNG ĐIỆN TỪ</h2>
+            
+            <h3 class="font-bold mb-4 text-navy-700">1. Thí nghiệm</h3>
+            
+            <!-- Thí nghiệm 1 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 items-center border-b pb-6">
+                <div>
+                    <h4 class="font-bold text-red-600 mb-2 underline">Thí nghiệm 1: Nam châm chuyển động</h4>
+                    <p class="text-sm leading-relaxed">
+                        Cho nam châm chuyển động lại gần hoặc ra xa một cuộn dây dẫn kín được nối với điện kế G. 
+                    </p>
+                    <ul class="list-disc ml-5 text-sm mt-2">
+                        <li><strong>Khi nam châm chuyển động:</strong> Kim điện kế G bị lệch, chứng tỏ trong cuộn dây xuất hiện dòng điện.</li>
+                        <li><strong>Khi nam châm dừng lại:</strong> Kim điện kế G trở về vạch số 0, dòng điện biến mất.</li>
+                    </ul>
+                </div>
+                <div class="image-placeholder">
+                    <img src="h3.png" alt="[Hình 16.2a: Nam châm chuyển động gần cuộn dây]" class="max-w-full h-32 mb-1">
+                    <p class="text-[10px] italic">Hình 16.2a. Thí nghiệm nam châm chuyển động</p>
+                </div>
+            </div>
+
+            <!-- Thí nghiệm 2 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 items-center border-b pb-6">
+                <div class="md:order-2">
+                    <h4 class="font-bold text-red-600 mb-2 underline">Thí nghiệm 2: Thay đổi dòng điện</h4>
+                    <p class="text-sm leading-relaxed">
+                        Thay nam châm vĩnh cửu bằng một nam châm điện đặt gần cuộn dây kín.
+                    </p>
+                    <ul class="list-disc ml-5 text-sm mt-2">
+                        <li><strong>Khi đóng/ngắt mạch:</strong> Hoặc thay đổi cường độ dòng điện qua nam châm điện bằng biến trở, kim điện kế G bị lệch.</li>
+                        <li><strong>Khi dòng điện ổn định:</strong> Kim điện kế G không lệch.</li>
+                    </ul>
+                </div>
+                <div class="md:order-1 image-placeholder">
+                    <img src="h4.png" alt="[Hình 16.2b: Thay đổi dòng điện qua nam châm điện]" class="max-w-full h-32 mb-1">
+                    <p class="text-[10px] italic">Hình 16.2b. Thí nghiệm với nam châm điện</p>
+                </div>
+            </div>
+
+            <!-- Hoạt động -->
+            <div class="note-box bg-white">
+                <p class="mb-2"><strong>Hoạt động (Trang 65):</strong> Dựa vào các thí nghiệm trên, hãy mô tả cách làm biến thiên từ thông và nhận xét sự xuất hiện của dòng điện cảm ứng.</p>
+                <button class="btn-navy text-xs" onclick="toggleAnswer('act-1')">Xem hướng giải quyết</button>
+                <div id="act-1" class="answer-box">
+                    <strong>Mô tả:</strong><br>
+                    - Thí nghiệm 1: Di chuyển nam châm làm thay đổi mật độ đường sức từ qua cuộn dây.<br>
+                    - Thí nghiệm 2: Thay đổi cường độ dòng điện làm thay đổi độ lớn cảm ứng từ B.<br>
+                    <strong>Nhận xét:</strong> Dòng điện cảm ứng chỉ xuất hiện khi từ thông qua cuộn dây biến thiên.
+                </div>
+            </div>
+
+            <h3 class="font-bold mb-2">2. Kết luận</h3>
+            <ul class="list-disc ml-6 space-y-2">
+                <li>Mỗi khi từ thông qua mạch kín biến thiên thì trong mạch kín xuất hiện một dòng điện gọi là <strong>dòng điện cảm ứng</strong>.</li>
+                <li>Hiện tượng xuất hiện dòng điện cảm ứng trong mạch kín gọi là <strong>hiện tượng cảm ứng điện từ</strong>.</li>
+                <li>Hiện tượng cảm ứng điện từ chỉ tồn tại trong khoảng thời gian từ thông qua mạch kín biến thiên.</li>
+            </ul>
+
+            <div class="question-box">
+                <p class="font-semibold italic">Thảo luận 2: Nếu mạch điện không kín thì khi từ thông biến thiên có xuất hiện dòng điện cảm ứng không? Có hiện tượng gì xảy ra?</p>
+                <button class="btn-navy mt-2 text-xs" onclick="toggleAnswer('ans-dis-2')">Xem câu trả lời</button>
+                <div id="ans-dis-2" class="answer-box">
+                    Nếu mạch không kín, dòng điện cảm ứng không xuất hiện. Tuy nhiên, ở hai đầu mạch vẫn xuất hiện một suất điện động cảm ứng.
+                </div>
+            </div>
+        </section>
+
+        <!-- Section III -->
+        <section class="bg-white p-6 rounded-[12px] shadow-md mb-6">
+            <h2 class="section-title text-xl">III. ĐỊNH LUẬT LENZ VỀ CHIỀU DÒNG ĐIỆN CẢM ỨNG</h2>
+            <div class="question-box">
+                <p class="italic">"Dòng điện cảm ứng xuất hiện trong mạch kín có chiều sao cho từ trường cảm ứng có tác dụng chống lại sự biến thiên của từ thông ban đầu qua mạch kín."</p>
+            </div>
+
+            <div class="image-placeholder">
+                <img src="h5.png" alt="[Hình 16.5: Xác định chiều dòng điện cảm ứng theo định luật Lenz]" class="max-w-full h-auto mb-2">
+                <p class="text-xs italic">Hình 16.5. Chiều dòng điện cảm ứng khi nam châm rơi qua vòng dây</p>
+            </div>
+
+            <div class="question-box">
+                <p class="font-semibold italic">Suy nghĩ (Trang 67): Dựa vào định luật Lenz, hãy giải thích tại sao khi từ thông tăng, từ trường cảm ứng lại ngược chiều với từ trường ban đầu?</p>
+                <button class="btn-navy mt-2 text-xs" onclick="toggleAnswer('ans-think-1')">Xem hướng giải quyết</button>
+                <div id="ans-think-1" class="answer-box">
+                    Theo định luật Lenz, dòng điện cảm ứng phải sinh ra từ trường để "chống lại" sự tăng của từ thông. Để làm giảm sự tăng này, từ trường cảm ứng phải có hướng ngược lại để triệt tiêu bớt phần từ trường ban đầu đang tăng lên.
+                </div>
+            </div>
+        </section>
+
+        <!-- Section IV -->
+        <section class="bg-white p-6 rounded-[12px] shadow-md mb-6">
+            <h2 class="section-title text-xl">IV. ĐỊNH LUẬT FARADAY VỀ CẢM ỨNG ĐIỆN TỪ</h2>
+            <p class="mb-4">Độ lớn suất điện động cảm ứng xuất hiện trong mạch kín tỉ lệ với tốc độ biến thiên từ thông qua mạch đó.</p>
+            <div class="bg-gray-50 p-4 rounded text-center my-4 font-bold text-lg border border-gray-200">
+                \( e_c = - \frac{\Delta \Phi}{\Delta t} \)
+            </div>
+            <p>Nếu cuộn dây có N vòng dây:</p>
+            <div class="bg-gray-50 p-4 rounded text-center my-4 font-bold text-lg border border-gray-200">
+                \( e_c = - N \frac{\Delta \Phi}{\Delta t} \)
+            </div>
+            <p class="italic text-sm text-gray-600">Dấu "-" biểu thị định luật Lenz. Trong tính toán độ lớn, ta dùng giá trị tuyệt đối.</p>
+
+            <div class="question-box">
+                <p class="font-semibold italic">Thảo luận 3: Ý nghĩa của dấu trừ trong công thức định luật Faraday là gì?</p>
+                <button class="btn-navy mt-2 text-xs" onclick="toggleAnswer('ans-dis-3')">Xem câu trả lời</button>
+                <div id="ans-dis-3" class="answer-box">
+                    Dấu trừ trong công thức phù hợp với định luật Lenz, chỉ ra rằng suất điện động cảm ứng sinh ra dòng điện có chiều chống lại sự biến thiên từ thông sinh ra nó.
+                </div>
+            </div>
+        </section>
+
+        <div class="note-box em-co-biet">
+            <h4 class="font-bold text-orange-700">EM CÓ BIẾT</h4>
+            <p class="text-sm mt-2 text-justify">Thí nghiệm của Faraday chứng tỏ trọng lực sinh công làm biến thiên từ thông để sinh ra suất điện động. Bản chất là quá trình chuyển hóa cơ năng thành điện năng. Đây là cơ sở cho các máy phát điện hiện đại ngày nay.</p>
+            <div class="image-placeholder" style="min-height: 100px;">
+
+                <img src="h6.png" alt="[Đồ thị suất điện động khi thả nam châm]" class="max-w-full h-auto mb-2">
+            </div>
+        </div>
+
+        <div class="note-box em-co-the">
+            <h4 class="font-bold text-blue-700">EM CÓ THỂ</h4>
+            <p class="text-sm mt-2">Nêu được nguyên tắc hoạt động của máy phát điện dựa trên hiện tượng cảm ứng điện từ: chuyển hóa cơ năng thành điện năng thông qua việc làm biến thiên từ thông qua các cuộn dây.</p>
+        </div>
+
+        <!-- Củng cố: Trắc nghiệm -->
+        <div class="quiz-container">
+            <h2 class="section-title text-xl">V. BÀI TẬP CỦNG CỐ</h2>
+            <div id="quiz-content">
+                <!-- Câu 1 -->
+                <div class="mb-6 p-4 border-b">
+                    <p class="font-bold">Câu 1: Đơn vị của từ thông trong hệ SI là:</p>
+                    <div class="mt-2 space-y-2">
+                        <label class="block cursor-pointer"><input type="radio" name="q1" value="A"> A. Tesla (T)</label>
+                        <label class="block cursor-pointer"><input type="radio" name="q1" value="B"> B. Vêbe (Wb)</label>
+                        <label class="block cursor-pointer"><input type="radio" name="q1" value="C"> C. Ampe (A)</label>
+                        <label class="block cursor-pointer"><input type="radio" name="q1" value="D"> D. Vôn (V)</label>
+                    </div>
+                </div>
+                <!-- Câu 2 -->
+                <div class="mb-6 p-4 border-b">
+                    <p class="font-bold">Câu 2: Từ thông đạt giá trị cực đại khi góc giữa vectơ pháp tuyến của diện tích và vectơ cảm ứng từ là:</p>
+                    <div class="mt-2 space-y-2">
+                        <label class="block cursor-pointer"><input type="radio" name="q2" value="A"> A. 90°</label>
+                        <label class="block cursor-pointer"><input type="radio" name="q2" value="B"> B. 45°</label>
+                        <label class="block cursor-pointer"><input type="radio" name="q2" value="C"> C. 0°</label>
+                        <label class="block cursor-pointer"><input type="radio" name="q2" value="D"> D. 180°</label>
+                    </div>
+                </div>
+                <!-- Câu 3 -->
+                <div class="mb-6 p-4 border-b">
+                    <p class="font-bold">Câu 3: Hiện tượng cảm ứng điện từ xuất hiện trong một mạch kín khi:</p>
+                    <div class="mt-2 space-y-2">
+                        <label class="block cursor-pointer"><input type="radio" name="q3" value="A"> A. Mạch kín nằm trong một từ trường đều.</label>
+                        <label class="block cursor-pointer"><input type="radio" name="q3" value="B"> B. Mạch kín nằm trong một từ trường không đổi.</label>
+                        <label class="block cursor-pointer"><input type="radio" name="q3" value="C"> C. Từ thông qua mạch kín biến thiên theo thời gian.</label>
+                        <label class="block cursor-pointer"><input type="radio" name="q3" value="D"> D. Mạch kín quay quanh một trục nằm trong mặt phẳng của nó.</label>
+                    </div>
+                </div>
+                <!-- Câu 4 -->
+                <div class="mb-6 p-4 border-b">
+                    <p class="font-bold">Câu 4: Theo định luật Lenz, dòng điện cảm ứng có chiều sao cho từ trường mà nó sinh ra có tác dụng:</p>
+                    <div class="mt-2 space-y-2">
+                        <label class="block cursor-pointer"><input type="radio" name="q4" value="A"> A. Chống lại nguyên nhân sinh ra nó.</label>
+                        <label class="block cursor-pointer"><input type="radio" name="q4" value="B"> B. Luôn cùng chiều với từ trường ban đầu.</label>
+                        <label class="block cursor-pointer"><input type="radio" name="q4" value="C"> C. Luôn ngược chiều với từ trường ban đầu.</label>
+                        <label class="block cursor-pointer"><input type="radio" name="q4" value="D"> D. Tăng cường sự biến thiên của từ thông.</label>
+                    </div>
+                </div>
+                <!-- Câu 5 -->
+                <div class="mb-6 p-4 border-b">
+                    <p class="font-bold">Câu 5: Suất điện động cảm ứng xuất hiện trong mạch tỉ lệ thuận với:</p>
+                    <div class="mt-2 space-y-2">
+                        <label class="block cursor-pointer"><input type="radio" name="q5" value="A"> A. Độ lớn của từ thông qua mạch.</label>
+                        <label class="block cursor-pointer"><input type="radio" name="q5" value="B"> B. Tốc độ biến thiên của từ thông qua mạch.</label>
+                        <label class="block cursor-pointer"><input type="radio" name="q5" value="C"> C. Thời gian biến thiên của từ thông.</label>
+                        <label class="block cursor-pointer"><input type="radio" name="q5" value="D"> D. Điện trở của mạch kín.</label>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <button onclick="checkQuiz()" class="header-navy text-white px-8 py-3 rounded-lg font-bold hover:bg-gray-700 uppercase transition-all shadow-md">KIỂM TRA ĐÁP ÁN</button>
+            </div>
+            <div id="quiz-result" class="mt-4 text-center font-bold text-lg hidden p-4 bg-gray-100 rounded"></div>
+            <div id="quiz-explanation" class="hidden mt-4 p-4 bg-blue-50 rounded border border-blue-200">
+                <h4 class="font-bold mb-2">Đáp án chi tiết:</h4>
+                <p>1-B; 2-C; 3-C; 4-A; 5-B.</p>
+            </div>
+        </div>
+
+        <!-- Bài tập vận dụng -->
+        <div class="bg-white p-6 rounded-[12px] shadow-md my-8">
+            <h2 class="section-title text-xl">VI. BÀI TẬP VẬN DỤNG</h2>
+            <div class="mb-6">
+                <p class="font-semibold">Bài 1: Một khung dây phẳng diện tích \( 5 \, \text{cm}^2 \), gồm 50 vòng dây đặt trong từ trường đều \( B = 0,2 \, \text{T} \). Vectơ pháp tuyến hợp với \( \vec{B} \) góc \( 60^\circ \). Tính từ thông qua khung dây.</p>
+                <button class="btn-navy mt-2 text-xs" onclick="toggleAnswer('vd-1')">Xem lời giải</button>
+                <div id="vd-1" class="answer-box">
+                    <strong>Giải:</strong><br>
+                    - Áp dụng công thức: \( \Phi = N \cdot B \cdot S \cdot \cos\alpha \)<br>
+                    - Thay số: \( \Phi = 50 \cdot 0,2 \cdot (5 \cdot 10^{-4}) \cdot \cos(60^\circ) \)<br>
+                    - Kết quả: \( \Phi = 50 \cdot 0,2 \cdot 0,0005 \cdot 0,5 = 0,0025 \, \text{Wb} \).
+                </div>
+            </div>
+            <div class="mb-6">
+                <p class="font-semibold">Bài 2: Từ thông qua một mạch kín biến thiên đều từ \( 0,8 \, \text{Wb} \) đến \( 0,2 \, \text{Wb} \) trong khoảng thời gian \( 0,1 \, \text{s} \). Tính độ lớn suất điện động cảm ứng xuất hiện trong mạch.</p>
+                <button class="btn-navy mt-2 text-xs" onclick="toggleAnswer('vd-2')">Xem lời giải</button>
+                <div id="vd-2" class="answer-box">
+                    <strong>Giải:</strong><br>
+                    - Áp dụng công thức Faraday: \( |e_c| = |\frac{\Delta \Phi}{\Delta t}| \)<br>
+                    - Thay số: \( |e_c| = |\frac{0,2 - 0,8}{0,1}| = |-6| = 6 \, \text{V} \).<br>
+                    - Vậy suất điện động cảm ứng có độ lớn là \( 6 \, \text{V} \).
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function toggleAnswer(id) {
+            const element = document.getElementById(id);
+            if (element.style.display === "block") {
+                element.style.display = "none";
+            } else {
+                element.style.display = "block";
+            }
+        }
+
+        function checkQuiz() {
+            const answers = { q1: "B", q2: "C", q3: "C", q4: "A", q5: "B" };
+            let score = 0;
+            const total = 5;
+            let resultDiv = document.getElementById('quiz-result');
+            let explanationDiv = document.getElementById('quiz-explanation');
+
+            for (let i = 1; i <= total; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected && selected.value === answers[`q${i}`]) {
+                    score++;
+                }
+            }
+
+            resultDiv.classList.remove('hidden');
+            resultDiv.innerHTML = `Kết quả: Bạn trả lời đúng ${score}/${total} câu.`;
+            explanationDiv.classList.remove('hidden');
+            
+            // Cuộn xuống kết quả
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
