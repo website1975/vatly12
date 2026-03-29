@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 14: Từ trường</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- MathJax for rendering math formulas -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'main-bg': '#f4f7f9',
+                        'custom-navy': '#808080',
+                        'navy-dark': '#1e293b',
+                        'q-bg': '#edf2f7',
+                        'tbl-border': '#cbd5e0',
+                        'tbl-header': '#e2e8f0'
+                    },
+                    fontFamily: {
+                        sans: ['Segoe UI', 'Roboto', 'Helvetica Neue', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        'xl': '12px',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+        .section-header {
+            border-bottom: 4px solid #1e293b;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: #1e293b;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .ans-box {
+            display: none;
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 0.75rem;
+            color: #166534;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-5xl mx-auto">
+
+    <!-- Header Section -->
+    <header class="mb-8 shadow-md rounded-xl overflow-hidden">
+        <div class="bg-custom-navy text-white p-3 text-center text-lg md:text-xl font-bold">
+            CHƯƠNG III: TỪ TRƯỜNG
+        </div>
+        <div class="bg-custom-navy text-white p-5 text-center text-2xl md:text-3xl font-bold uppercase border-t border-gray-400">
+            BÀI 14: TỪ TRƯỜNG
+        </div>
+    </header>
+
+    <!-- Intro Box -->
+    <section class="border border-black bg-white italic p-5 rounded-xl shadow-md mb-8">
+        <p>Ta đã biết nam châm và dòng điện đều tác dụng lực lên kim nam châm. Vậy xung quanh dòng điện có tồn tại từ trường không? Tính chất cơ bản của từ trường là gì? Từ trường được biểu diễn như thế nào?</p>
+    </section>
+
+    <!-- Section I: TƯƠNG TÁC TỪ -->
+    <section class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <h2 class="text-xl md:text-2xl section-header">I. TƯƠNG TÁC TỪ</h2>
+        
+        <p class="mb-4">Tương tác giữa nam châm với nam châm, giữa dòng điện với nam châm và giữa dòng điện với dòng điện gọi là <strong>tương tác từ</strong>. Lực tương tác trong các trường hợp đó gọi là <strong>lực từ</strong>.</p>
+
+        <!-- Hoạt động 1 -->
+        <div class="bg-q-bg border-l-4 border-blue-800 p-4 rounded-r-lg mb-6">
+            <div class="flex items-start">
+                <span class="text-blue-800 mr-2 text-xl">✋</span>
+                <p class="font-medium">1. Thí nghiệm về tương tác giữa nam châm với kim nam châm: Khi đưa hai cực cùng tên hay khác tên của một nam châm thẳng và kim nam châm lại gần nhau thì chúng đẩy nhau hay hút nhau?</p>
+            </div>
+            <div class="my-4 border-2 border-dashed border-gray-300 rounded flex justify-center p-4 bg-gray-50 text-gray-400">
+                <img src="h1.png"></img>
+            </div>
+            <button onclick="toggleAnswer('ans-i-1')" class="bg-custom-navy hover:bg-gray-700 text-white px-4 py-2 rounded text-sm transition">Xem hướng giải quyết</button>
+            <div id="ans-i-1" class="ans-box">
+                <strong>Trả lời:</strong> Khi hai cực cùng tên lại gần nhau thì chúng đẩy nhau. Khi hai cực khác tên lại gần nhau thì chúng hút nhau.
+            </div>
+        </div>
+
+        <!-- Hoạt động 2 -->
+        <div class="bg-q-bg border-l-4 border-blue-800 p-4 rounded-r-lg mb-6">
+            <div class="flex items-start">
+                <span class="text-blue-800 mr-2 text-xl">✋</span>
+                <p class="font-medium">2. Thí nghiệm Oersted: Khi cho dòng điện chạy qua dây dẫn ta thấy kim nam châm lệch một góc. Dự đoán điều gì xảy ra nếu ta đổi chiều dòng điện? Kim nam châm có tác dụng lực lên dòng điện không?</p>
+            </div>
+            <div class="my-4 border-2 border-dashed border-gray-300 rounded flex justify-center p-4 bg-gray-50 text-gray-400">
+                                <img src="h2.png"></img>
+            </div>
+            <button onclick="toggleAnswer('ans-i-2')" class="bg-custom-navy hover:bg-gray-700 text-white px-4 py-2 rounded text-sm transition">Xem hướng giải quyết</button>
+            <div id="ans-i-2" class="ans-box">
+                <strong>Trả lời:</strong> Nếu đổi chiều dòng điện, kim nam châm sẽ lệch theo hướng ngược lại. Theo định luật III Newton, kim nam châm cũng tác dụng lực từ lên dòng điện.
+            </div>
+        </div>
+
+        <!-- Hoạt động 3 -->
+        <div class="bg-q-bg border-l-4 border-blue-800 p-4 rounded-r-lg">
+            <div class="flex items-start">
+                <span class="text-blue-800 mr-2 text-xl">✋</span>
+                <p class="font-medium">3. Thí nghiệm tương tác giữa hai dòng điện: Dự đoán hiện tượng nếu dòng điện qua hai tấm kim loại cùng chiều.</p>
+            </div>
+	<div class="my-4 border-2 border-dashed border-gray-300 rounded flex justify-center p-4 bg-gray-50 text-gray-400">
+                                <img src="h3.png"></img>
+            </div>
+            <button onclick="toggleAnswer('ans-i-3')" class="bg-custom-navy hover:bg-gray-700 text-white px-4 py-2 rounded text-sm transition">Xem hướng giải quyết</button>
+            <div id="ans-i-3" class="ans-box">
+                <strong>Trả lời:</strong> Hai dòng điện chạy cùng chiều sẽ hút nhau. Hai dòng điện chạy ngược chiều sẽ đẩy nhau.
+            </div>
+        </div>
+    </section>
+
+    <!-- Section II: TỪ TRƯỜNG -->
+    <section class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <h2 class="text-xl md:text-2xl section-header">II. TỪ TRƯỜNG</h2>
+        
+        <h3 class="font-bold text-lg mb-2">1. Định nghĩa</h3>
+        <p class="mb-4">Từ trường là trường lực gây ra bởi dòng điện hoặc nam châm, là một dạng vật chất tồn tại xung quanh dòng điện hoặc nam châm mà biểu hiện cụ thể là sự xuất hiện của lực từ tác dụng lên một dòng điện hay một nam châm khác đặt trong nó.</p>
+
+        <h3 class="font-bold text-lg mb-2">2. Tính chất cơ bản</h3>
+        <p class="mb-4">Tính chất cơ bản của từ trường là gây ra <strong>lực từ</strong> tác dụng lên một nam châm, một dòng điện hay một hạt mang điện chuyển động đặt trong nó.</p>
+
+        <h3 class="font-bold text-lg mb-2 text-blue-800">3. Cảm ứng từ</h3>
+        <div class="mb-4 bg-blue-50 p-4 rounded-lg border border-blue-100">
+            <p class="mb-2">Để đặc trưng cho từ trường về mặt tác dụng lực, người ta dùng một đại lượng vectơ gọi là <strong>vectơ cảm ứng từ</strong>, kí hiệu là \( \vec{B} \).</p>
+            <ul class="list-disc pl-5 space-y-1 text-sm">
+                <li><strong>Hướng:</strong> Trùng với hướng Nam - Bắc của kim nam châm nhỏ nằm cân bằng tại điểm đó.</li>
+                <li><strong>Độ lớn:</strong> Đặc trưng cho độ mạnh yếu của từ trường.</li>
+                <li><strong>Đơn vị:</strong> Tesla, kí hiệu là \( T \).</li>
+            </ul>
+        </div>
+
+        <!-- Lưu ý Box -->
+        <div class="bg-red-50 border border-red-200 p-4 rounded-xl mb-4">
+            <h4 class="font-bold text-red-700 mb-1">⚠️ Lưu ý</h4>
+            <p class="text-red-900">Từ trường không tồn tại xung quanh các điện tích đứng yên. Chỉ có điện tích chuyển động mới tạo ra từ trường.</p>
+        </div>
+    </section>
+
+    <!-- Section III: ĐƯỜNG SỨC TỪ -->
+    <section class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <h2 class="text-xl md:text-2xl section-header">III. ĐƯỜNG SỨC TỪ</h2>
+
+        <h3 class="font-bold text-lg mb-2">1. Định nghĩa và tính chất</h3>
+        <p class="mb-2 text-sm">Đường sức từ là những đường vẽ ở trong không gian có từ trường sao cho tiếp tuyến với nó tại mỗi điểm trùng với hướng của từ trường tại điểm đó.</p>
+        <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-4 text-xs">
+            <ul class="list-decimal pl-5 space-y-1">
+                <li>Qua mỗi điểm trong không gian chỉ vẽ được một và chỉ một đường sức từ.</li>
+                <li>Các đường sức từ là những đường cong khép kín hoặc vô hạn ở hai đầu.</li>
+                <li>Chiều đường sức từ: Vào cực Nam (S), ra cực Bắc (N).</li>
+                <li>Nơi từ trường mạnh vẽ đường sức mau, nơi từ trường yếu vẽ đường sức thưa.</li>
+            </ul>
+        </div>
+
+        <h3 class="font-bold text-lg mb-2">2. Quy tắc nắm bàn tay phải</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div class="p-3 border rounded">
+                <p class="font-bold text-sm mb-2">a. Đối với dòng điện thẳng:</p>
+                <p class="text-xs italic mb-2">Ngón cái chỉ chiều dòng điện, các ngón tay khum chỉ chiều đường sức từ.</p>
+                <div class="h-32 bg-gray-100 rounded flex items-center justify-center text-xs text-gray-400 border border-dashed border-gray-400">
+
+                                <img src="h4.png" class="max-h-full max-w-full object-contain"></img>
+                    
+                </div>
+            </div>
+            <div class="p-3 border rounded">
+                <p class="font-bold text-sm mb-2">b. Đối với dòng điện tròn/ống dây:</p>
+                <p class="text-xs italic mb-2">Các ngón tay khum theo chiều dòng điện, ngón cái choãi ra chỉ chiều đường sức từ.</p>
+                <div class="h-32 bg-gray-100 rounded flex items-center justify-center text-xs text-gray-400 border border-dashed border-gray-400">
+                                                    <img src="h6.png" class="max-h-full max-w-full object-contain"></img>
+                </div>
+            </div>
+        </div>
+
+        <!-- Câu hỏi ? -->
+        <div class="bg-q-bg border-l-4 border-blue-800 p-4 rounded-r-lg">
+            <div class="flex items-start">
+                <span class="bg-blue-800 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold mr-3 mt-0.5 text-xs">?</span>
+                <div class="h-40 bg-gray-100 rounded flex items-center justify-center text-xs text-gray-400 border border-dashed border-gray-400">
+		<img src="h8.png" class="max-h-full max-w-full object-contain"></img>
+		</div>
+		<p class="font-medium text-sm">Xác định chiều của dòng điện chạy qua dây dẫn ở Hình 14.11.</p>
+            </div>
+            <button onclick="toggleAnswer('ans-iii-2')" class="bg-custom-navy hover:bg-gray-700 text-white px-3 py-1 rounded text-xs mt-3 transition">Xem câu trả lời</button>
+            <div id="ans-iii-2" class="ans-box text-sm">
+                <strong>Trả lời:</strong> Áp dụng quy tắc nắm bàn tay phải, khum các ngón tay theo chiều từ cực Nam sang cực Bắc của kim nam châm, ngón cái sẽ chỉ chiều dòng điện.
+            </div>
+        </div>
+    </section>
+
+    <!-- Các mục đặc biệt -->
+    <section class="space-y-4 mb-8">
+        <div class="bg-purple-50 border-2 border-purple-200 p-5 rounded-xl shadow-sm">
+            <h3 class="font-bold text-purple-800 mb-2">💡 EM CÓ BIẾT</h3>
+            <p class="text-purple-900 text-sm italic">Trái Đất là một nam châm khổng lồ. Cực Bắc địa lý gần cực Nam từ trường, và ngược lại. Nhờ đó ta có thể dùng la bàn để định hướng.</p>
+        </div>
+
+        <div class="bg-emerald-50 border-2 border-emerald-200 p-5 rounded-xl shadow-sm">
+            <h3 class="font-bold text-emerald-800 mb-2">✅ EM CÓ THỂ</h3>
+            <p class="text-emerald-900 text-sm text-xs">Sử dụng quy tắc nắm bàn tay phải để xác định chiều của đường sức từ xung quanh một dây dẫn hoặc xác định cực của một ống dây khi biết chiều dòng điện.</p>
+        </div>
+    </section>
+
+    <!-- TRẮC NGHIỆM CỦNG CỐ -->
+    <section class="bg-white rounded-xl shadow-md p-6 mb-8 border-t-4 border-navy-dark">
+        <h2 class="text-xl font-bold uppercase mb-6 text-center">TRẮC NGHIỆM CỦNG CỐ</h2>
+        <form id="quiz-form" class="space-y-4">
+            <!-- Câu 1 -->
+            <div class="p-4 border rounded-lg bg-gray-50">
+                <p class="font-bold text-sm mb-2">Câu 1: Đại lượng nào sau đây đặc trưng cho từ trường về mặt tác dụng lực?</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                    <label class="flex items-center"><input type="radio" name="q1" value="A" class="mr-2"> A. Cường độ điện trường.</label>
+                    <label class="flex items-center"><input type="radio" name="q1" value="B" class="mr-2"> B. Cảm ứng từ.</label>
+                    <label class="flex items-center"><input type="radio" name="q1" value="C" class="mr-2"> C. Từ thông.</label>
+                    <label class="flex items-center"><input type="radio" name="q1" value="D" class="mr-2"> D. Cường độ dòng điện.</label>
+                </div>
+                <div id="sol-q1" class="hidden mt-2 text-xs text-blue-600 italic">Giải: Vectơ cảm ứng từ B đặc trưng cho từ trường về mặt tác dụng lực.</div>
+            </div>
+            <!-- Câu 2 -->
+            <div class="p-4 border rounded-lg bg-gray-50">
+                <p class="font-bold text-sm mb-2">Câu 2: Đơn vị của cảm ứng từ là:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                    <label class="flex items-center"><input type="radio" name="q2" value="A" class="mr-2"> A. Vôn (V).</label>
+                    <label class="flex items-center"><input type="radio" name="q2" value="B" class="mr-2"> B. Ampe (A).</label>
+                    <label class="flex items-center"><input type="radio" name="q2" value="C" class="mr-2"> C. Tesla (T).</label>
+                    <label class="flex items-center"><input type="radio" name="q2" value="D" class="mr-2"> D. Oat (W).</label>
+                </div>
+                <div id="sol-q2" class="hidden mt-2 text-xs text-blue-600 italic">Giải: Cảm ứng từ có đơn vị là Tesla (T).</div>
+            </div>
+            <!-- Câu 3 -->
+            <div class="p-4 border rounded-lg bg-gray-50">
+                <p class="font-bold text-sm mb-2">Câu 3: Chiều của đường sức từ bên ngoài nam châm thẳng:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                    <label class="flex items-center"><input type="radio" name="q3" value="A" class="mr-2"> A. Vào N, ra S.</label>
+                    <label class="flex items-center"><input type="radio" name="q3" value="B" class="mr-2"> B. Vào S, ra N.</label>
+                    <label class="flex items-center"><input type="radio" name="q3" value="C" class="mr-2"> C. Ngẫu nhiên.</label>
+                    <label class="flex items-center"><input type="radio" name="q3" value="D" class="mr-2"> D. Luôn hướng về cực Bắc địa lý.</label>
+                </div>
+            </div>
+            <!-- Câu 4 -->
+            <div class="p-4 border rounded-lg bg-gray-50">
+                <p class="font-bold text-sm mb-2">Câu 4: Từ trường KHÔNG tồn tại xung quanh:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                    <label class="flex items-center"><input type="radio" name="q4" value="A" class="mr-2"> A. Một electron chuyển động.</label>
+                    <label class="flex items-center"><input type="radio" name="q4" value="B" class="mr-2"> B. Một thanh nam châm.</label>
+                    <label class="flex items-center"><input type="radio" name="q4" value="C" class="mr-2"> C. Một điện tích đứng yên.</label>
+                    <label class="flex items-center"><input type="radio" name="q4" value="D" class="mr-2"> D. Một dây dẫn có dòng điện.</label>
+                </div>
+            </div>
+            <!-- Câu 5 -->
+            <div class="p-4 border rounded-lg bg-gray-50">
+                <p class="font-bold text-sm mb-2">Câu 5: Tại một điểm chỉ vẽ được bao nhiêu đường sức từ?</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                    <label class="flex items-center"><input type="radio" name="q5" value="A" class="mr-2"> A. Một đường duy nhất.</label>
+                    <label class="flex items-center"><input type="radio" name="q5" value="B" class="mr-2"> B. Hai đường.</label>
+                    <label class="flex items-center"><input type="radio" name="q5" value="C" class="mr-2"> C. Vô số đường.</label>
+                    <label class="flex items-center"><input type="radio" name="q5" value="D" class="mr-2"> D. Không vẽ được đường nào.</label>
+                </div>
+            </div>
+
+            <div class="text-center pt-4">
+                <button type="button" onclick="checkQuiz()" class="bg-navy-dark text-white px-8 py-3 rounded-xl font-bold hover:bg-black transition">NỘP BÀI</button>
+            </div>
+            <p id="quiz-result" class="text-center font-bold mt-4"></p>
+        </form>
+    </section>
+
+    <!-- BÀI TẬP VẬN DỤNG -->
+    <section class="bg-white rounded-xl shadow-md p-6 mb-8 border-t-4 border-orange-500">
+        <h2 class="text-xl font-bold uppercase mb-6 text-orange-600 text-center">BÀI TẬP VẬN DỤNG</h2>
+        
+        <div class="space-y-4">
+            <div class="p-4 border rounded bg-gray-50">
+                <p class="font-medium text-sm">Bài 1: Xác định cảm ứng từ \( B \) tại tâm vòng dây tròn bán kính \( R = 10 \text{ cm} \) mang dòng điện \( I = 5 \text{ A} \). (Biết \( B = 2\pi \cdot 10^{-7} \frac{I}{R} \))</p>
+                <button onclick="toggleAnswer('vd-1')" class="mt-2 text-xs text-orange-600 font-bold underline">Xem giải chi tiết</button>
+                <div id="vd-1" class="ans-box text-sm">
+                    Đổi \( R = 10 \text{ cm} = 0,1 \text{ m} \).<br>
+                    Áp dụng công thức: \( B = 2\pi \cdot 10^{-7} \cdot \frac{5}{0,1} = \pi \cdot 10^{-5} \approx 3,14 \cdot 10^{-5} \text{ (T)} \).
+                </div>
+            </div>
+            
+            <div class="p-4 border rounded bg-gray-50">
+                <p class="font-medium text-sm">Bài 2: Kim nam châm tại một điểm trong từ trường chỉ hướng nào?</p>
+                <button onclick="toggleAnswer('vd-2')" class="mt-2 text-xs text-orange-600 font-bold underline">Xem giải chi tiết</button>
+                <div id="vd-2" class="ans-box text-sm">
+                    Kim nam châm sẽ nằm theo hướng trùng với hướng của vectơ cảm ứng từ \( \vec{B} \) tại điểm đó (hướng từ cực Nam sang cực Bắc của kim nam châm).
+                </div>
+            </div>
+
+            <div class="p-4 border rounded bg-gray-50">
+                <p class="font-medium text-sm">Bài 3: Ống dây có dòng điện đi qua, nếu ta tăng số vòng dây trên mỗi mét chiều dài lên 3 lần thì từ trường bên trong ống dây thay đổi thế nào?</p>
+                <button onclick="toggleAnswer('vd-3')" class="mt-2 text-xs text-orange-600 font-bold underline">Xem giải chi tiết</button>
+                <div id="vd-3" class="ans-box text-sm">
+                    Dựa vào công thức \( B = 4\pi \cdot 10^{-7} \cdot n \cdot I \), cảm ứng từ \( B \) tỉ lệ thuận với số vòng dây trên một đơn vị chiều dài \( n \). Khi \( n \) tăng 3 lần thì \( B \) cũng tăng lên 3 lần.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="text-center text-gray-400 text-xs py-8">
+        Hệ thống học tập Vật Lí 12 - Bài 14
+    </footer>
+
+    <script>
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function checkQuiz() {
+            const correct = { q1: 'B', q2: 'C', q3: 'B', q4: 'C', q5: 'A' };
+            let score = 0;
+            const total = 5;
+            
+            for (let i = 1; i <= total; i++) {
+                const name = 'q' + i;
+                const selected = document.querySelector(`input[name="${name}"]:checked`);
+                document.getElementById('sol-' + name)?.classList.remove('hidden');
+                if (selected && selected.value === correct[name]) {
+                    score++;
+                }
+            }
+
+            const res = document.getElementById('quiz-result');
+            res.innerText = `Bạn đạt được ${score}/${total} điểm.`;
+            res.style.color = (score === total) ? 'green' : 'red';
+        }
+    </script>
+</body>
+</html>
