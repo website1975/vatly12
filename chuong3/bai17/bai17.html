@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 17: Máy phát điện xoay chiều</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+    </style>
+</head>
+<body class="p-6">
+    <div class="max-w-5xl mx-auto space-y-6">
+        
+        <div>
+            <div class="bg-[#808080] text-white text-xl font-bold p-3 text-center rounded-t-[12px]">
+                CHƯƠNG III: TỪ TRƯỜNG
+		<hr>
+            </div>
+            <div class="bg-[#808080] text-white text-3xl font-bold p-5 text-center rounded-b-[12px]">
+                BÀI 17: MÁY PHÁT ĐIỆN XOAY CHIỀU
+            </div>
+        </div>
+
+        <div class="border border-black bg-white p-4 text-center">
+            <p class="italic">"Dòng điện xoay chiều được sử dụng rất phổ biến trong đời sống. Dòng điện xoay chiều được tạo ra bằng cách nào?"</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-[12px] shadow-md">
+            <h2 class="text-2xl font-bold border-b-4 border-slate-800 pb-2 mb-4">I. NGUYÊN TẮC TẠO RA DÒNG ĐIỆN XOAY CHIỀU</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <p class="mb-2">Xét một khung dây dẫn \(MNPQ\) có diện tích \(S\), quay đều với tốc độ góc \(\omega\) quanh một trục \(OO'\) vuông góc với các đường cảm ứng của một từ trường đều có cảm ứng từ \(\vec{B}\).</p>
+                    <p class="mb-2">Theo hiện tượng cảm ứng điện từ, trong khung dây xuất hiện một suất điện động biến đổi theo thời gian:</p>
+                    <p class="text-center font-semibold my-2">\(e = E_0 \cos(\omega t + \varphi_0)\)</p>
+                    <ul class="list-disc pl-5 mb-2">
+                        <li>\(E_0 = BS\omega\): suất điện động cực đại trong khung dây.</li>
+                        <li>\(\varphi_0\): pha ban đầu của suất điện động.</li>
+                    </ul>
+                    <p>Nếu khung dây dẫn \(MNPQ\) có \(N\) vòng dây thì suất điện động cực đại của khung dây là \(E_0 = NBS\omega\).</p>
+                    <p class="mt-2">Chu kì \(T\) và tần số \(f\) của suất điện động liên hệ với tần số góc \(\omega\) bởi các công thức:</p>
+                    <p class="text-center font-semibold my-2">\(T = \frac{2\pi}{\omega}\) (s), \(f = \frac{\omega}{2\pi}\) (Hz)</p>
+                </div>
+                <div class="border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 h-70 rounded-[12px]">
+                    <span class="text-gray-500"><img src="h1.png" class="max-h-full max-w-full  h-auto mb-2"></img></span>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="bg-[#edf2f7] border-l-4 border-blue-800 p-4 mb-2">
+                    <p class="font-semibold">Câu hỏi 1: Khung dây dẫn trong Hình 17.2 ở vị trí nào thì suất điện động có giá trị cực đại? Giải thích.</p>
+			<center><span class="text-gray-500"><img src="h2.png" class="max-h-full max-w-full h-auto mb-2"></img></span></center>
+                </div>
+                <button onclick="toggleAnswer('ans-q1')" class="bg-[#808080] text-white px-4 py-2 rounded mb-2">Xem chi tiết</button>
+                <div id="ans-q1" class="hidden bg-green-100 p-4 rounded-[12px]">
+                    Suất điện động có giá trị cực đại khi khung dây ở vị trí mà mặt phẳng khung dây song song với các đường sức từ (vị trí 1 và 5). Khi đó, các cạnh của khung dây cắt các đường sức từ một cách vuông góc nhất, dẫn đến tốc độ biến thiên từ thông đạt cực đại.
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="bg-[#edf2f7] border-l-4 border-blue-800 p-4 mb-2">
+                    <p class="font-semibold">Câu hỏi 2: Giả sử tại thời điểm \(t\), từ thông qua khung dây là \(\Phi = BS \cos \omega t\). Hãy chứng tỏ suất điện động cảm ứng có dạng: \(e = BS\omega \cos(\omega t + \varphi_0)\).</p>
+                </div>
+                <button onclick="toggleAnswer('ans-q2')" class="bg-[#808080] text-white px-4 py-2 rounded mb-2">Xem chi tiết</button>
+                <div id="ans-q2" class="hidden bg-green-100 p-4 rounded-[12px]">
+                    Theo định luật cảm ứng điện từ: \(e = -\frac{d\Phi}{dt} = -(BS \cos \omega t)' = BS\omega \sin(\omega t) = BS\omega \cos(\omega t - \frac{\pi}{2})\).<br>
+                    Đặt \(\varphi_0 = -\frac{\pi}{2}\), ta thu được biểu thức dạng điều hoà mong muốn.
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="bg-[#edf2f7] border-l-4 border-blue-800 p-4 mb-2">
+                    <p class="font-semibold">Thảo luận 1: Làm thế nào để dẫn dòng điện ra mạch ngoài khi khung dây dẫn quay đều trong từ trường?</p>
+                </div>
+                <button onclick="toggleAnswer('ans-t1')" class="bg-[#808080] text-white px-4 py-2 rounded mb-2">Xem câu trả lời</button>
+                <div id="ans-t1" class="hidden bg-green-100 p-4 rounded-[12px]">
+                    Sử dụng bộ phận vành khuyên và chổi quét. Hai vành khuyên gắn cố định vào hai đầu khung dây và tì lên hai chổi quét đứng yên để truyền dòng điện ra ngoài mà không bị rối xoắn dây.
+                </div>
+            </div>
+
+            <div>
+                <div class="bg-[#edf2f7] border-l-4 border-blue-800 p-4 mb-2">
+                    <p class="font-semibold">Thảo luận 2: Thiết kế phương án tạo ra dòng điện xoay chiều.</p>
+                </div>
+                <button onclick="toggleAnswer('ans-t2')" class="bg-[#808080] text-white px-4 py-2 rounded mb-2">Xem câu trả lời</button>
+                <div id="ans-t2" class="hidden bg-green-100 p-4 rounded-[12px]">
+                    Phương án 1: Cho khung dây quay đều trong từ trường đều của nam châm cố định.<br>
+                    Phương án 2: Cho nam châm quay đều trước các cuộn dây đặt cố định.
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-[12px] shadow-md">
+            <h2 class="text-2xl font-bold border-b-4 border-slate-800 pb-2 mb-4">II. DÒNG ĐIỆN XOAY CHIỀU</h2>
+            
+            <h3 class="text-xl font-semibold mb-2">1. Biểu thức dòng điện xoay chiều</h3>
+            <p class="mb-2">Nếu nối hai đầu của khung dây với mạch tiêu thụ điện, giữa hai đầu đoạn mạch có một hiệu điện thế xoay chiều (điện áp xoay chiều):</p>
+            <p class="text-center font-semibold my-2">\(u = U_0 \cos(\omega t + \varphi_u)\)</p>
+            <p class="mb-4">Khi đó, dòng điện chạy qua mạch là dòng điện xoay chiều có cường độ:</p>
+            <p class="text-center font-semibold my-2">\(i = I_0 \cos(\omega t + \varphi_i)\)</p>
+
+            <p class="mb-2"><strong>Giải nghĩa các giá trị:</strong></p>
+            <div class="overflow-x-auto mb-4">
+                <table class="w-full text-center border-collapse border border-[#cbd5e0]">
+                    <thead>
+                        <tr class="bg-[#e2e8f0]">
+                            <th class="border border-[#cbd5e0] p-2">Kí hiệu</th>
+                            <th class="border border-[#cbd5e0] p-2">Ý nghĩa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="border border-[#cbd5e0] p-2">\(u, i\)</td>
+                            <td class="border border-[#cbd5e0] p-2">Giá trị điện áp và cường độ dòng điện tức thời.</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-[#cbd5e0] p-2">\(U_0, I_0\)</td>
+                            <td class="border border-[#cbd5e0] p-2">Giá trị cực đại của điện áp và cường độ dòng điện.</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-[#cbd5e0] p-2">\(\Delta\varphi = \varphi_u - \varphi_i\)</td>
+                            <td class="border border-[#cbd5e0] p-2">Độ lệch pha giữa điện áp và cường độ dòng điện.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="text-xl font-semibold mb-2">2. Giá trị hiệu dụng</h3>
+            <p class="mb-2">Dựa trên tác dụng nhiệt tương đương của dòng điện không đổi, người ta đưa ra các giá trị hiệu dụng:</p>
+            <p class="text-center font-semibold my-2">\(I = \frac{I_0}{\sqrt{2}}\) và \(U = \frac{U_0}{\sqrt{2}}\)</p>
+
+            <div class="mt-4">
+                <div class="bg-[#edf2f7] border-l-4 border-blue-800 p-4 mb-2">
+                    <p class="font-semibold">Thảo luận: Dựa vào đồ thị Hình 17.3, xác định chu kì, tần số, giá trị cực đại và giá trị hiệu dụng của cường độ dòng điện.</p>
+                </div>
+                <div class="border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 h-75 rounded-[12px] mb-2">
+		   <center><span class="text-gray-500"><img src="h3.png" class="max-h-full max-w-full  h-auto mb-2"></img></span></center>
+                </div>
+                <button onclick="toggleAnswer('ans-t3')" class="bg-[#808080] text-white px-4 py-2 rounded mb-2">Xem chi tiết</button>
+                <div id="ans-t3" class="hidden bg-green-100 p-4 rounded-[12px]">
+                    Từ đồ thị (giả lập số liệu tương tự SGK):<br>
+                    - Biên độ cực đại \(I_0 = 4\) A.<br>
+                    - Chu kì \(T = 0,02\) s \(\Rightarrow\) Tần số \(f = 50\) Hz.<br>
+                    - Giá trị hiệu dụng \(I = \frac{4}{\sqrt{2}} = 2\sqrt{2} \approx 2,83\) A.
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-[12px] shadow-md">
+            <h2 class="text-2xl font-bold border-b-4 border-slate-800 pb-2 mb-4">III. MÁY PHÁT ĐIỆN XOAY CHIỀU</h2>
+            
+            <h3 class="text-xl font-semibold mb-2">1. Cấu tạo</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <p class="mb-2">Máy phát điện xoay chiều gồm 2 bộ phận chính:</p>
+                    <ul class="list-disc pl-5 mb-2">
+                        <li><strong>Phần cảm:</strong> Bộ phận tạo ra từ trường (nam châm).</li>
+                        <li><strong>Phần ứng:</strong> Bộ phận xuất hiện suất điện động cảm ứng (cuộn dây dẫn).</li>
+                    </ul>
+                    <p>Bộ phận đứng yên được gọi là <strong>stato</strong>, bộ phận quay được gọi là <strong>rôto</strong>.</p>
+                </div>
+                <div class="border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 h-40 rounded-[12px]">
+                <span class="text-gray-500"><img src="h5.png" class="max-h-full max-w-full  h-auto mb-2"></img></span>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-semibold mb-2">2. Nguyên tắc hoạt động</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <p class="mb-2">Hoạt động hoàn toàn dựa trên hiện tượng cảm ứng điện từ. Khi nam châm hoặc cuộn dây quay, từ thông qua cuộn dây biến thiên điều hòa theo thời gian, sinh ra dòng điện xoay chiều trong mạch.</p>
+                </div>
+                <div class="border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 h-50 rounded-[12px]">
+                    <span class="text-gray-500"><img src="h4.png" class="max-h-full max-w-full  h-auto mb-2"></img></span>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="bg-[#edf2f7] border-l-4 border-blue-800 p-4 mb-2">
+                    <p class="font-semibold">Thảo luận 1: Hãy viết biểu thức suất điện động của máy phát điện xoay chiều khi khung dây có N vòng quay đều tốc độ \(\omega\).</p>
+                </div>
+                <button onclick="toggleAnswer('ans-t4')" class="bg-[#808080] text-white px-4 py-2 rounded mb-2">Xem chi tiết</button>
+                <div id="ans-t4" class="hidden bg-green-100 p-4 rounded-[12px]">
+                    Biểu thức: \(e = NBS\omega \cos(\omega t + \varphi_0)\).
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="bg-[#edf2f7] border-l-4 border-blue-800 p-4 mb-2">
+                    <p class="font-semibold">Thảo luận 2: Vì sao cần vành khuyên và chổi quét đối với máy phát điện loại 1 (khung dây quay)?</p>
+                </div>
+                <button onclick="toggleAnswer('ans-t5')" class="bg-[#808080] text-white px-4 py-2 rounded mb-2">Xem chi tiết</button>
+                <div id="ans-t5" class="hidden bg-green-100 p-4 rounded-[12px]">
+                    Để truyền tải dòng điện từ khung dây đang quay ra mạch ngoài cố định mà không làm chéo đứt dây điện.
+                </div>
+            </div>
+
+            <div class="bg-blue-50 p-4 rounded-[12px] mt-4">
+                <p class="font-bold text-blue-800">EM CÓ BIẾT</p>
+                <p class="text-blue-900">Khi khung dây quay tốc độ cao thì vành khuyên và chổi quét rất nhanh mòn. Vì vậy, các máy công suất lớn thường thiết kế rôto là nam châm và stato là cuộn dây cố định để loại bỏ linh kiện này.</p>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-[12px] shadow-md">
+            <h2 class="text-2xl font-bold border-b-4 border-slate-800 pb-2 mb-4">IV. ỨNG DỤNG VÀ QUY TẮC AN TOÀN KHI SỬ DỤNG DÒNG ĐIỆN XOAY CHIỀU</h2>
+            
+            <h3 class="text-xl font-semibold mb-2">1. Ứng dụng của dòng điện xoay chiều trong cuộc sống</h3>
+            <p class="mb-4">Dòng điện xoay chiều có ưu thế rất lớn trong truyền tải điện năng đi xa nhằm giảm hao phí bằng các máy biến áp. Chúng phục vụ rộng rãi trong thắp sáng, vận hành máy móc sản xuất, và ứng dụng lớn trong y học (máy chụp MRI, X-quang...).</p>
+            
+            <div class="mb-4">
+                <div class="bg-[#edf2f7] border-l-4 border-blue-800 p-4 mb-2">
+                    <p class="font-semibold">Thảo luận 1: Ngoài thắp sáng và chạy máy thì dòng điện xoay chiều còn dùng làm gì?</p>
+                </div>
+                <button onclick="toggleAnswer('ans-t6')" class="bg-[#808080] text-white px-4 py-2 rounded mb-2">Xem</button>
+                <div id="ans-t6" class="hidden bg-green-100 p-4 rounded-[12px]">
+                    Ứng dụng trong y tế để chẩn đoán hình ảnh, điều trị sốc tim, ứng dụng sưởi ấm trong lò nung cảm ứng công nghiệp.
+                </div>
+            </div>
+
+            <h3 class="text-xl font-semibold mb-2 mt-4">2. Quy tắc an toàn</h3>
+            <p class="mb-2">Một số quy tắc bắt buộc để đảm bảo an toàn:</p>
+            <ul class="list-disc pl-5 mb-4">
+                <li>Tuân thủ các biển báo nguy hiểm.</li>
+                <li>Không chạm trực tiếp vào các phần dây hở.</li>
+                <li>Không sử dụng thiết bị trong lúc đang sạc pin.</li>
+                <li>Ngắt nguồn điện tổng khi có thiên tai, bão sét.</li>
+            </ul>
+
+            <div class="space-y-3">
+                <div>
+                    <div class="bg-[#edf2f7] border-l-4 border-blue-800 p-2 mb-1">
+                        <p class="font-semibold text-sm">Thảo luận 1: Nhận biết ý nghĩa của các biển báo an toàn điện.</p>
+                    </div>
+                    <button onclick="toggleAnswer('ans-at1')" class="bg-[#808080] text-white text-xs px-2 py-1 rounded">Xem</button>
+                    <div id="ans-at1" class="hidden bg-green-100 p-2 rounded-[12px] text-sm mt-1">Biển báo giúp người dân cảnh giác các vùng điện áp cao thế nguy hiểm chết người.</div>
+                </div>
+                <div>
+                    <div class="bg-[#edf2f7] border-l-4 border-blue-800 p-2 mb-1">
+                        <p class="font-semibold text-sm">Thảo luận 2: Vì sao không nên sử dụng thiết bị điện trong quá trình sạc pin?</p>
+                    </div>
+                    <button onclick="toggleAnswer('ans-at2')" class="bg-[#808080] text-white text-xs px-2 py-1 rounded">Xem</button>
+                    <div id="ans-at2" class="hidden bg-green-100 p-2 rounded-[12px] text-sm mt-1">Vừa sạc vừa dùng sinh ra lượng nhiệt rất lớn, gây chai pin và tăng nguy cơ chập mạch gây nổ.</div>
+                </div>
+                <div>
+                    <div class="bg-[#edf2f7] border-l-4 border-blue-800 p-2 mb-1">
+                        <p class="font-semibold text-sm">Thảo luận 3: Vì sao cần lắp cầu dao đóng ngắt ở vị trí phù hợp, dễ tiếp cận?</p>
+                    </div>
+                    <button onclick="toggleAnswer('ans-at3')" class="bg-[#808080] text-white text-xs px-2 py-1 rounded">Xem</button>
+                    <div id="ans-at3" class="hidden bg-green-100 p-2 rounded-[12px] text-sm mt-1">Để kịp thời dập nguồn điện tổng khi xảy ra sự cố chập điện khẩn cấp tại gia đình.</div>
+                </div>
+                <div>
+                    <div class="bg-[#edf2f7] border-l-4 border-blue-800 p-2 mb-1">
+                        <p class="font-semibold text-sm">Thảo luận 4: Vì sao cần lựa chọn thiết bị điện có công suất phù hợp với mạng lưới điện?</p>
+                    </div>
+                    <button onclick="toggleAnswer('ans-at4')" class="bg-[#808080] text-white text-xs px-2 py-1 rounded">Xem</button>
+                    <div id="ans-at4" class="hidden bg-green-100 p-2 rounded-[12px] text-sm mt-1">Tránh việc dùng thiết bị quá công suất tải của dây dẫn, gây nóng chảy và cháy nổ hệ thống âm tường.</div>
+                </div>
+                <div>
+                    <div class="bg-[#edf2f7] border-l-4 border-blue-800 p-2 mb-1">
+                        <p class="font-semibold text-sm">Thảo luận 5: Nêu tầm quan trọng của việc tuân thủ quy tắc an toàn điện.</p>
+                    </div>
+                    <button onclick="toggleAnswer('ans-at5')" class="bg-[#808080] text-white text-xs px-2 py-1 rounded">Xem</button>
+                    <div id="ans-at5" class="hidden bg-green-100 p-2 rounded-[12px] text-sm mt-1">Trực tiếp bảo vệ an toàn tính mạng con người và phòng chống hỏa hoạn nhà ở quy mô lớn.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-[12px] shadow-md">
+            <h2 class="text-2xl font-bold border-b-4 border-slate-800 pb-2 mb-4">V. CỦNG CỐ</h2>
+            
+            <div class="bg-blue-50 p-4 rounded-[12px] mb-4">
+                <p class="font-bold text-blue-800">EM CÓ THỂ</p>
+                <p class="text-blue-900">- Giải thích cách tạo ra dòng điện xoay chiều trong nhà máy thuỷ điện (dùng sức nước đẩy rôto là tuabin nam châm quay).<br>- Đề xuất một số biện pháp sử dụng điện an toàn trong gia đình.</p>
+            </div>
+
+            <div class="bg-yellow-50 p-4 rounded-[12px] mb-6">
+                <p class="font-bold text-yellow-800">EM CÓ BIẾT</p>
+                <p class="text-yellow-900">Máy phát điện 3 pha sử dụng 1 rôto nam châm quay trước 3 cuộn dây đặt lệch nhau một góc \(120^\circ\). Ba suất điện động sinh ra có đồ thị dao động giống nhau nhưng lệch pha nhau \(\frac{2\pi}{3}\) rad.</p>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold mb-2">Trắc nghiệm nhanh</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <p class="font-medium">Câu 1: Nguyên tắc tạo ra dòng điện xoay chiều dựa trên hiện tượng nào?</p>
+                        <div class="ml-4 space-y-1">
+                            <label class="block"><input type="radio" name="q1" value="a" class="mr-2">A. Hiện tượng cảm ứng điện từ</label>
+                            <label class="block"><input type="radio" name="q1" value="b" class="mr-2">B. Hiện tượng tự cảm</label>
+                            <label class="block"><input type="radio" name="q1" value="c" class="mr-2">C. Hiện tượng nhiệt điện</label>
+                            <label class="block"><input type="radio" name="q1" value="d" class="mr-2">D. Hiện tượng quang điện</label>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="font-medium">Câu 2: Trong máy phát điện xoay chiều, bộ phận đứng yên được gọi là:</p>
+                        <div class="ml-4 space-y-1">
+                            <label class="block"><input type="radio" name="q2" value="a" class="mr-2">A. Rôto</label>
+                            <label class="block"><input type="radio" name="q2" value="b" class="mr-2">B. Stato</label>
+                            <label class="block"><input type="radio" name="q2" value="c" class="mr-2">C. Vành khuyên</label>
+                            <label class="block"><input type="radio" name="q2" value="d" class="mr-2">D. Chổi quét</label>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="font-medium">Câu 3: Công thức liên hệ cường độ hiệu dụng và cường độ cực đại là:</p>
+                        <div class="ml-4 space-y-1">
+                            <label class="block"><input type="radio" name="q3" value="a" class="mr-2">A. \(I = I_0 \sqrt{2}\)</label>
+                            <label class="block"><input type="radio" name="q3" value="b" class="mr-2">B. \(I = \frac{I_0}{2}\)</label>
+                            <label class="block"><input type="radio" name="q3" value="c" class="mr-2">C. \(I = \frac{I_0}{\sqrt{2}}\)</label>
+                            <label class="block"><input type="radio" name="q3" value="d" class="mr-2">D. \(I = 2I_0\)</label>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="font-medium">Câu 4: Tần số dòng điện tiêu chuẩn xoay chiều tại Việt Nam là bao nhiêu?</p>
+                        <div class="ml-4 space-y-1">
+                            <label class="block"><input type="radio" name="q4" value="a" class="mr-2">A. 100 Hz</label>
+                            <label class="block"><input type="radio" name="q4" value="b" class="mr-2">B. 60 Hz</label>
+                            <label class="block"><input type="radio" name="q4" value="c" class="mr-2">C. 220 Hz</label>
+                            <label class="block"><input type="radio" name="q4" value="d" class="mr-2">D. 50 Hz</label>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="font-medium">Câu 5: Suất điện động cực đại \(E_0\) trong khung dây tỉ lệ thuận trực tiếp với đại lượng nào?</p>
+                        <div class="ml-4 space-y-1">
+                            <label class="block"><input type="radio" name="q5" value="a" class="mr-2">A. Tốc độ góc \(\omega\)</label>
+                            <label class="block"><input type="radio" name="q5" value="b" class="mr-2">B. Thời gian \(t\)</label>
+                            <label class="block"><input type="radio" name="q5" value="c" class="mr-2">C. Pha ban đầu \(\varphi_0\)</label>
+                            <label class="block"><input type="radio" name="q5" value="d" class="mr-2">D. Độ dời trục quay</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="checkQuiz()" class="bg-[#0f172a] text-white font-bold px-6 py-2 rounded mt-4 hover:bg-slate-800 transition">NỘP BÀI</button>
+                <div id="quiz-result"></div>
+            </div>
+
+            <div>
+                <h3 class="text-xl font-semibold mb-2">Bài tập vận dụng</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <div class="bg-[#edf2f7] border-l-4 border-blue-800 p-3 mb-2">
+                            <p><strong>Bài 1:</strong> Một khung dây có \(100\) vòng quay với tốc độ \(50\) vòng/s trong từ trường đều \(B = 0,1\) T. Diện tích mỗi vòng dây là \(200\text{ cm}^2\). Tính suất điện động cực đại.</p>
+                        </div>
+                        <button onclick="toggleAnswer('ans-bt1')" class="bg-[#808080] text-white px-4 py-2 rounded mb-2">Xem lời giải</button>
+                        <div id="ans-bt1" class="hidden bg-green-100 p-4 rounded-[12px]">
+                            - Đổi đơn vị: \(S = 200\text{ cm}^2 = 0,02\text{ m}^2\).<br>
+                            - Tính tần số góc: \(\omega = 2\pi \cdot 50 = 100\pi\) (rad/s).<br>
+                            - Áp dụng công thức: \(E_0 = NBS\omega = 100 \cdot 0,1 \cdot 0,02 \cdot 100\pi = 20\pi \approx 62,8\) (V).
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="bg-[#edf2f7] border-l-4 border-blue-800 p-3 mb-2">
+                            <p><strong>Bài 2:</strong> Một quạt điện xoay chiều sử dụng mức điện thế hiệu dụng \(220\) V. Tìm giá trị cực đại của mức điện áp này.</p>
+                        </div>
+                        <button onclick="toggleAnswer('ans-bt2')" class="bg-[#808080] text-white px-4 py-2 rounded mb-2">Xem lời giải</button>
+                        <div id="ans-bt2" class="hidden bg-green-100 p-4 rounded-[12px]">
+                            - Áp dụng công thức: \(U_0 = U \cdot \sqrt{2}\).<br>
+                            - Thay số: \(U_0 = 220 \cdot \sqrt{2} \approx 311\) (V).
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="bg-[#edf2f7] border-l-4 border-blue-800 p-3 mb-2">
+                            <p><strong>Bài 3:</strong> Cường độ dòng điện qua điện trở \(R = 100\ \Omega\) có biểu thức \(i = 2\cos(100\pi t)\) (A). Tính nhiệt lượng toả ra trên điện trở trong thời gian \(1\) phút.</p>
+                        </div>
+                        <button onclick="toggleAnswer('ans-bt3')" class="bg-[#808080] text-white px-4 py-2 rounded mb-2">Xem lời giải</button>
+                        <div id="ans-bt3" class="hidden bg-green-100 p-4 rounded-[12px]">
+                            - Cường độ hiệu dụng: \(I = \frac{I_0}{\sqrt{2}} = \frac{2}{\sqrt{2}} = \sqrt{2}\) (A).<br>
+                            - Thời gian: \(t = 1\text{ phút} = 60\) s.<br>
+                            - Nhiệt lượng: \(Q = I^2 \cdot R \cdot t = (\sqrt{2})^2 \cdot 100 \cdot 60 = 12000\) J = \(12\) kJ.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAnswer(id) {
+            const element = document.getElementById(id);
+            element.classList.toggle('hidden');
+        }
+
+        function checkQuiz() {
+            const answers = {
+                q1: 'a',
+                q2: 'b',
+                q3: 'c',
+                q4: 'd',
+                q5: 'a'
+            };
+            let score = 0;
+            const total = 5;
+            
+            for (let i = 1; i <= total; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected && selected.value === answers[`q${i}`]) {
+                    score++;
+                }
+            }
+            
+            const resultDiv = document.getElementById('quiz-result');
+            if (score === total) {
+                resultDiv.className = 'text-green-600 font-bold mt-4 p-3 bg-green-50 rounded';
+                resultDiv.innerHTML = `Chúc mừng! Bạn đã đúng tuyệt đối ${score}/${total} câu.`;
+            } else {
+                resultDiv.className = 'text-red-600 font-bold mt-4 p-3 bg-red-50 rounded';
+                resultDiv.innerHTML = `Bạn đã trả lời đúng ${score}/${total} câu. Hãy rà soát lại kiến thức để chọn lại nhé!`;
+            }
+        }
+    </script>
+</body>
+</html>
