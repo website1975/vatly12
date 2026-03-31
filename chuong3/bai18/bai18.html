@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 18: Ứng dụng hiện tượng cảm ứng điện từ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        .header-box {
+            background-color: #808080;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 0rem;
+        }
+        .section-header {
+            border-bottom: 4px solid #1a202c;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .content-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .intro-box {
+            border: 1px solid #000;
+            background-color: #fff;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+        }
+        .question-box {
+            background-color: #edf2f7;
+            border-left: 5px solid #2b6cb0;
+            padding: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .answer-box {
+            background-color: #f0fff4;
+            border-left: 5px solid #38a169;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .btn-primary {
+            background-color: #808080;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: opacity 0.2s;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            border: 1px solid #cbd5e0;
+            padding: 0.75rem;
+            text-align: center;
+        }
+        th {
+            background-color: #e2e8f0;
+        }
+        .quiz-option {
+            display: block;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .quiz-option:hover {
+            background-color: #f7fafc;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="header-box shadow-md rounded-t-[12px] ">
+            <h2 class="text-xl font-semibold">CHƯƠNG III: TỪ TRƯỜNG</h2>
+        </div>
+        <hr>
+        <div class="header-box shadow-md mb-8 rounded-b-[12px]">
+            <h1 class="text-2xl font-bold">BÀI 18: ỨNG DỤNG HIỆN TƯỢNG CẢM ỨNG ĐIỆN TỪ</h1>
+        </div>
+
+        <!-- Intro Box -->
+        <div class="intro-box">
+            <p class="italic text-center">
+                "Sạc điện không dây ngày càng được sử dụng rộng rãi để sạc điện thoại, đồng hồ thông minh, máy hút bụi.... Sạc điện hoạt động dựa trên hiện tượng nào để truyền điện từ nguồn điện đến điện thoại?"
+            </p>
+        </div>
+
+        <!-- Section I -->
+        <div class="content-card">
+            <h2 class="section-header text-xl text-slate-800">I. Máy biến áp</h2>
+            
+            <div class="flex flex-col md:flex-row gap-6 mb-6">
+                <div class="flex-1">
+                    <h3 class="font-bold mb-2">1. Cấu tạo</h3>
+                    <p class="mb-4">Máy biến áp gồm hai cuộn dây có số vòng khác nhau quấn trên một lõi kín (lõi biến áp).</p>
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>Lõi biến áp:</strong> Thường làm bằng các lá sắt hoặc thép pha silicon, ghép cách điện với nhau để giảm hao phí do dòng điện Foucault.</li>
+                        <li><strong>Cuộn dây:</strong> Làm bằng đồng có phủ lớp cách điện.
+                            <ul class="list-circle ml-5">
+                                <li>Cuộn sơ cấp (\(N_1\)): Nối với nguồn điện xoay chiều.</li>
+                                <li>Cuộn thứ cấp (\(N_2\)): Nối với tải tiêu thụ.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="w-full md:w-64 border-2 border-dashed border-gray-300 p-2 rounded-lg flex flex-col items-center justify-center bg-gray-50">
+                    <div class="text-center italic text-sm mb-2 text-gray-500">[Sơ đồ cấu tạo máy biến áp]</div>
+                    <img src="h1.png" alt="Máy biến áp" class="rounded shadow-sm">
+                </div>
+            </div>
+
+            <h3 class="font-bold mb-2">2. Nguyên lý làm việc</h3>
+            <p>Hoạt động dựa trên <strong>hiện tượng cảm ứng điện từ</strong>. Dòng điện xoay chiều ở cuộn sơ cấp gây ra từ thông biến thiên qua cuộn thứ cấp, làm xuất hiện suất điện động cảm ứng xoay chiều ở cuộn thứ cấp.</p>
+
+            <!-- Thảo luận Section -->
+            <div class="mt-6">
+                <h4 class="font-bold text-blue-800">Thảo luận:</h4>
+                <div class="question-box">
+                    <p><strong>Nội dung 1:</strong> Dựa vào biểu thức suất điện động cảm ứng \(e_c = -N \frac{\Delta\Phi}{\Delta t}\), hãy chứng tỏ mối liên hệ: \(\frac{U_1}{U_2} = \frac{N_1}{N_2}\).</p>
+                </div>
+                <div class="question-box">
+                    <p><strong>Nội dung 2:</strong> Giải thích nguyên nhân xuất hiện điện áp \(u_2\) ở hai đầu cuộn thứ cấp.</p>
+                </div>
+                <button onclick="toggleAnswer('ans1')" class="btn-primary mb-4">Xem lời giải</button>
+                <div id="ans1" class="answer-box">
+                    <p><strong>Hướng dẫn:</strong></p>
+                    <p>1. Vì từ thông qua mỗi vòng dây là như nhau: \(e_1 = -N_1 \frac{\Delta\Phi}{\Delta t}\) và \(e_2 = -N_2 \frac{\Delta\Phi}{\Delta t}\). Lập tỉ số ta có \(\frac{e_1}{e_2} = \frac{N_1}{N_2}\). Với máy biến áp lý tưởng, điện áp hiệu dụng xấp xỉ bằng suất điện động hiệu dụng: \(\frac{U_1}{U_2} = \frac{N_1}{N_2}\).</p>
+                    <p>2. Do từ thông biến thiên xuyên qua cuộn thứ cấp tạo ra suất điện động cảm ứng theo định luật Faraday.</p>
+                </div>
+            </div>
+
+            <!-- Em có biết (Sạc không dây) -->
+            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 mt-8">
+                <div class="flex flex-col md:flex-row gap-4 items-center">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-blue-900 border-b border-blue-200 mb-2 uppercase">Em có biết: Sạc điện thoại không dây</h4>
+                        <p class="text-sm">Hoạt động tương tự máy biến áp. Đế sạc chứa cuộn sơ cấp nối điện xoay chiều. Mặt lưng điện thoại chứa cuộn thứ cấp nối với pin. Khi đặt cạnh nhau, từ trường biến thiên từ đế sạc cảm ứng sang cuộn dây trong điện thoại để sạc pin.</p>
+                    </div>
+                    <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center border-4 border-blue-100 shadow-inner overflow-hidden">
+                         <img src="https://images.unsplash.com/photo-1586953208448-b95a79798f07?q=80&w=150" alt="Sạc không dây" class="object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section II -->
+        <div class="content-card">
+            <h2 class="section-header text-xl text-slate-800">II. Đàn ghi ta điện</h2>
+            
+            <div class="flex flex-col md:flex-row gap-6 mb-6">
+                <div class="flex-1">
+                    <h3 class="font-bold mb-2">1. Cấu tạo</h3>
+                    <p>Đàn ghi ta điện không có hộp cộng hưởng. Âm thanh được tạo ra nhờ các <strong>cuộn dây cảm ứng</strong> (pick-up) đặt dưới dây đàn.</p>
+                    <p>Mỗi pick-up gồm một nam châm vĩnh cửu nhỏ đặt bên trong một cuộn dây dẫn nối với máy tăng âm.</p>
+                </div>
+                <div class="w-full md:w-64 border-2 border-gray-200 p-2 rounded-lg bg-gray-50 text-center">
+		<span class="text-xs text-gray-400"><img src="h2.png" class="max-h-full max-w-full object-contain"></img></span>
+                </div>
+            </div>
+
+            <h3 class="font-bold mb-2">2. Nguyên lý làm việc</h3>
+            <p>Khi gảy, dây đàn bằng thép dao động làm từ trường của nó biến thiên. Sự biến thiên này tạo ra từ thông biến thiên qua cuộn dây cảm ứng, sinh ra dòng điện cảm ứng có cùng tần số với âm thanh.</p>
+
+            <div class="mt-6">
+                <h4 class="font-bold">Thảo luận & Câu hỏi:</h4>
+                <div class="question-box">
+                    <ol class="list-decimal ml-5 space-y-2">
+                        <li>Tại sao dây đàn ghi ta điện cần làm bằng thép?</li>
+                        <li>Vì sao không có hộp cộng hưởng mà ta vẫn nghe được âm thanh?</li>
+                        <li>Giải thích vì sao gảy mạnh thì âm to dựa vào \(e_c = -N \frac{\Delta\Phi}{\Delta t}\)?</li>
+                    </ol>
+                </div>
+                <button onclick="toggleAnswer('ans2')" class="btn-primary">Xem hướng dẫn giải thích</button>
+                <div id="ans2" class="answer-box mt-4">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>1.</strong> Thép là vật liệu từ tính, dễ bị từ hóa bởi nam châm trong pick-up để tạo ra từ trường riêng.</li>
+                        <li><strong>2.</strong> Nhờ máy tăng âm (amplifier) và loa khuếch đại tín hiệu điện từ dòng cảm ứng.</li>
+                        <li><strong>3.</strong> Gảy mạnh làm biên độ dao động lớn -> tốc độ biến thiên từ thông \(\frac{\Delta\Phi}{\Delta t}\) lớn -> suất điện động cảm ứng lớn -> tín hiệu điện mạnh -> âm to.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section III: Củng cố -->
+        <div class="content-card">
+            <h2 class="section-header text-xl text-slate-800">III. Củng cố</h2>
+            
+            <div class="grid md:grid-cols-3 gap-4 mb-8">
+                <div class="bg-amber-50 p-4 rounded-lg border-l-4 border-amber-400">
+                    <h4 class="font-bold mb-2">Em đã học</h4>
+                    <p class="text-sm">Nguyên tắc máy biến áp, đàn ghi ta điện dựa trên hiện tượng cảm ứng điện từ và định luật Faraday.</p>
+                </div>
+                <div class="bg-emerald-50 p-4 rounded-lg border-l-4 border-emerald-400">
+                    <h4 class="font-bold mb-2">Em có thể</h4>
+                    <p class="text-sm">Giải thích ứng dụng: phanh điện từ, bếp từ, sạc không dây bằng định luật Faraday và Lenz.</p>
+                </div>
+                <div class="bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-400">
+                    <h4 class="font-bold mb-2">Em có biết</h4>
+                    <p class="text-sm">Dòng điện Foucault là dòng điện cảm ứng trong khối vật dẫn, có tính chất xoáy và gây tác dụng nhiệt.</p>
+                </div>
+            </div>
+
+            <!-- Quiz Section -->
+            <div class="mb-10">
+                <h3 class="text-lg font-bold mb-4">Câu hỏi trắc nghiệm</h3>
+                <div id="quiz-container" class="space-y-6">
+                    <!-- Q1 -->
+                    <div class="quiz-item">
+                        <p class="font-medium mb-2">Câu 1: Máy biến áp hoạt động dựa trên hiện tượng nào?</p>
+                        <div class="ml-4">
+                            <label class="quiz-option"><input type="radio" name="q1" value="a"> A. Hiện tượng tự cảm</label>
+                            <label class="quiz-option"><input type="radio" name="q1" value="b"> B. Hiện tượng cảm ứng điện từ</label>
+                            <label class="quiz-option"><input type="radio" name="q1" value="c"> C. Hiện tượng cộng hưởng</label>
+                            <label class="quiz-option"><input type="radio" name="q1" value="d"> D. Hiện tượng nhiệt điện</label>
+                        </div>
+                    </div>
+                    <!-- Q2 -->
+                    <div class="quiz-item">
+                        <p class="font-medium mb-2">Câu 2: Để giảm hao phí do dòng điện Foucault trong máy biến áp, người ta dùng:</p>
+                        <div class="ml-4">
+                            <label class="quiz-option"><input type="radio" name="q2" value="a"> A. Lõi thép liền khối</label>
+                            <label class="quiz-option"><input type="radio" name="q2" value="b"> B. Dây dẫn bằng bạc</label>
+                            <label class="quiz-option"><input type="radio" name="q2" value="c"> C. Các lá thép mỏng ghép cách điện</label>
+                            <label class="quiz-option"><input type="radio" name="q2" value="d"> D. Tăng cường độ dòng điện</label>
+                        </div>
+                    </div>
+                    <!-- Q3 -->
+                    <div class="quiz-item">
+                        <p class="font-medium mb-2">Câu 3: Một máy biến áp có \(N_1 = 1000\) vòng, \(N_2 = 2000\) vòng. Đây là máy:</p>
+                        <div class="ml-4">
+                            <label class="quiz-option"><input type="radio" name="q3" value="a"> A. Máy hạ áp</label>
+                            <label class="quiz-option"><input type="radio" name="q3" value="b"> B. Máy tăng áp</label>
+                            <label class="quiz-option"><input type="radio" name="q3" value="c"> C. Máy phát điện</label>
+                            <label class="quiz-option"><input type="radio" name="q3" value="d"> D. Động cơ điện</label>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="checkQuiz()" class="mt-6 bg-slate-800 text-white px-6 py-2 rounded hover:bg-slate-700 font-bold uppercase">Nộp bài</button>
+                <div id="quiz-result" class="mt-4 font-bold text-lg"></div>
+            </div>
+
+            <!-- Tự luận Section -->
+            <div class="border-t pt-6">
+                <h3 class="text-lg font-bold mb-4">Bài tập tự luận</h3>
+                <div class="space-y-4">
+                    <p><strong>BT 1:</strong> Tính số vòng dây cuộn thứ cấp của một máy hạ áp từ 220V xuống 12V, biết cuộn sơ cấp có 1100 vòng.</p>
+                    <p><strong>BT 2:</strong> Giải thích tại sao máy biến áp không hoạt động được với dòng điện một chiều không đổi?</p>
+                    <p><strong>BT 3:</strong> Tại sao trong các bếp từ, nồi nấu phải có đáy làm bằng vật liệu nhiễm từ (sắt, inox hít nam châm)?</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAnswer(id) {
+            const ans = document.getElementById(id);
+            if (ans.style.display === "none" || ans.style.display === "") {
+                ans.style.display = "block";
+            } else {
+                ans.style.display = "none";
+            }
+        }
+
+        function checkQuiz() {
+            const answers = {
+                q1: 'b',
+                q2: 'c',
+                q3: 'b'
+            };
+            let score = 0;
+            let total = 3;
+
+            for (let i = 1; i <= total; i++) {
+                const qName = 'q' + i;
+                const selected = document.querySelector(`input[name="${qName}"]:checked`);
+                if (selected && selected.value === answers[qName]) {
+                    score++;
+                }
+            }
+
+            const resultDiv = document.getElementById('quiz-result');
+            if (score === total) {
+                resultDiv.style.color = "#38a169";
+                resultDiv.innerHTML = `Chúc mừng! Bạn đã trả lời đúng tuyệt đối: ${score}/${total}`;
+            } else {
+                resultDiv.style.color = "#e53e3e";
+                resultDiv.innerHTML = `Kết quả của bạn: ${score}/${total}. Hãy thử lại nhé!`;
+            }
+        }
+    </script>
+</body>
+</html>
