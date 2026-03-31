@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 10: Điện từ trường. Mô hình sóng điện từ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        .header-bg { background-color: #808080; }
+        .section-header {
+            border-bottom: 3px solid #2d3748;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .rounded-12 { border-radius: 12px; }
+        .answer-box { display: none; }
+        .quiz-container input[type="radio"] { margin-right: 0.5rem; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="header-bg text-white text-center py-2 rounded-t-[12px] font-bold uppercase tracking-wider">
+                Chương III: Từ trường
+            </div>
+            <hr>
+            <div class="header-bg text-white text-center py-6 rounded-b-[12px] shadow-lg">
+                <h1 class="text-2xl md:text-3xl font-extrabold">BÀI 19: ĐIỆN TỪ TRƯỜNG. MÔ HÌNH SÓNG ĐIỆN TỪ</h1>
+            </div>
+        </header>
+
+        <!-- Intro Box -->
+        <div class="bg-white border border-gray-300 p-6 rounded-[12px] shadow-md mb-8 italic text-gray-700">
+            Thang sóng điện từ bao gồm rất nhiều vùng như hồng ngoại, tử ngoại, ánh sáng nhìn thấy,... Sóng điện từ được tạo thành và lan truyền như thế nào?
+        </div>
+
+        <!-- Section I -->
+        <section class="bg-white p-6 rounded-[12px] shadow-md mb-8">
+            <h2 class="section-header text-xl">I. Liên hệ giữa điện trường biến thiên và từ trường biến thiên</h2>
+            
+            <div class="mb-6">
+                <h3 class="font-bold text-lg mb-2">1. Từ trường biến thiên và điện trường xoáy</h3>
+                <div class="flex flex-col md:flex-row gap-4 mb-4">
+                    <div class="flex-1">
+                        <p class="mb-2 text-justify"><strong>Thí nghiệm:</strong> Khi cho nam châm rơi qua ống dây kín, từ thông qua ống dây biến thiên làm xuất hiện dòng điện cảm ứng. Điều này chứng tỏ trong dây dẫn xuất hiện một điện trường có đường sức là các đường cong kín.</p>
+                        <p class="mb-2 text-justify italic">Maxwell khẳng định: Điện trường xoáy vẫn xuất hiện ngay cả khi không có ống dây.</p>
+                    </div>
+                    <div class="w-full md:w-1/3 border border-dashed border-gray-400 flex items-center justify-center p-4 bg-gray-50 rounded-lg">
+                        <div class="text-center">
+                            <img src="h1.png" alt="Nam châm" class="mx-auto mb-2 opacity-50">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-blue-50 border-l-4 border-gray-500 p-4 mb-4">
+                    <p><strong>Kết luận:</strong> Trong vùng không gian có từ trường biến thiên theo thời gian thì trong vùng đó xuất hiện một điện trường xoáy.</p>
+                </div>
+
+                <!-- Thảo luận 1 -->
+                <div class="bg-[#edf2f7] border-l-4 border-blue-600 p-4 rounded-r-lg mb-4">
+                    <p class="font-semibold text-blue-800 mb-2">Thảo luận: So sánh sự giống nhau và khác nhau giữa điện trường gây ra bởi điện tích đứng yên và điện trường xoáy.</p>
+                    <button onclick="toggleAnswer('ans1')" class="bg-[#808080] text-white px-4 py-1 rounded hover:bg-gray-700 transition">Xem hướng giải quyết</button>
+                    <div id="ans1" class="answer-box mt-3 p-3 bg-green-50 border border-green-200 rounded text-sm text-green-800">
+                        - <strong>Giống:</strong> Đều là trường lực tác dụng lên điện tích đặt trong đó.<br>
+                        - <strong>Khác:</strong> Điện trường tĩnh có đường sức là đường không kín (bắt đầu từ (+) và kết thúc ở (-)), còn điện trường xoáy có các đường sức là các đường cong kín bao quanh các đường sức từ.
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="font-bold text-lg mb-2">2. Điện trường biến thiên và từ trường</h3>
+                <p class="mb-4 text-justify">Thí nghiệm với dòng điện xoay chiều qua tụ điện cho thấy giữa hai bản tụ có một điện trường biến thiên (dòng điện dịch). Chính điện trường biến thiên này đã gây ra từ trường xung quanh nó.</p>
+                <div class="bg-blue-50 border-l-4 border-gray-500 p-4">
+                    <p><strong>Kết luận:</strong> Nếu tại một nơi có điện trường biến thiên theo thời gian thì tại nơi đó xuất hiện một từ trường. Đường sức của từ trường bao giờ cũng khép kín.</p>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="font-bold text-lg mb-2">3. Điện từ trường</h3>
+                <div class="flex flex-col md:flex-row gap-4 mb-4">
+                    <div class="flex-1">
+                        <p class="mb-4 text-justify">Điện trường biến thiên và từ trường biến thiên cùng tồn tại trong không gian, có thể chuyển hóa lẫn nhau trong một trường thống nhất gọi là <strong>điện từ trường</strong>.</p>
+                    </div>
+                    <div class="w-full md:w-1/3 border border-gray-300 rounded-lg p-2 bg-gray-50 text-center">
+                        <img src="h2.png" alt="Điện từ trường" class="mx-auto opacity-40">
+                        <p class="text-xs text-gray-500">[Hình 19.4: Mô hình Điện từ trường]</p>
+                    </div>
+                </div>
+                <div class="bg-[#edf2f7] border-l-4 border-blue-600 p-4 rounded-r-lg">
+                    <p class="font-semibold text-blue-800 mb-2">Câu hỏi: So sánh điểm khác nhau cơ bản giữa điện từ trường với điện trường, từ trường.</p>
+                    <button onclick="toggleAnswer('ans2')" class="bg-[#808080] text-white px-4 py-1 rounded hover:bg-gray-700 transition">Xem trả lời</button>
+                    <div id="ans2" class="answer-box mt-3 p-3 bg-green-50 border border-green-200 rounded text-sm text-green-800">
+                        Điện trường và từ trường riêng lẻ là các thành phần của điện từ trường. Điện trường tĩnh hoặc từ trường không đổi chỉ tồn tại riêng biệt, nhưng khi một trong hai biến thiên theo thời gian, chúng sẽ tự động sinh ra loại kia tạo thành điện từ trường thống nhất.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section II -->
+        <section class="bg-white p-6 rounded-[12px] shadow-md mb-8">
+            <h2 class="section-header text-xl">II. Mô hình sóng điện từ</h2>
+            
+            <div class="mb-8">
+                <h3 class="font-bold text-lg mb-2 text-blue-900">1. Sự tạo thành sóng điện từ</h3>
+                <p class="mb-4 text-justify">Khi một điện trường biến thiên sinh ra một từ trường biến thiên ở vùng lân cận, từ trường này lại sinh ra điện trường biến thiên tiếp theo. Quá trình lan truyền này gọi là <strong>sóng điện từ</strong>.</p>
+                <div class="border border-gray-200 rounded-lg p-4 bg-gray-50 mb-4 text-center">
+                    <p class="text-blue-600 font-mono mb-2">\( \vec{E} \) biến thiên \( \rightarrow \) \( \vec{B} \) biến thiên \( \rightarrow \) \( \vec{E} \) biến thiên \( \dots \)</p>
+                    <center><img src="h3.png" class="max-h-full max-w-full object-contain"></img></center>
+                    <p class="text-xs text-gray-400">[Hình 19.5: Lan truyền sóng điện từ]</p>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="font-bold text-lg mb-2 text-blue-900">2. Sự lan truyền sóng điện từ</h3>
+                <ul class="list-disc ml-6 mb-4 space-y-2">
+                    <li><strong>Tính chất ngang:</strong> Vectơ \( \vec{E} \), \( \vec{B} \) và phương truyền sóng \( \vec{v} \) đôi một vuông góc.</li>
+                    <li><strong>Đồng pha:</strong> Tại mỗi điểm, \( \vec{E} \) và \( \vec{B} \) luôn biến thiên đồng pha.</li>
+                    <li><strong>Môi trường:</strong> Truyền được trong chân không và mọi môi trường vật chất.</li>
+                </ul>
+
+                <div class="bg-gray-100 p-6 rounded-lg text-center mb-6">
+                    <p class="text-xl font-bold mb-2">Công thức bước sóng trong chân không:</p>
+                    <p class="text-2xl text-red-700">\( \lambda = c \cdot T = \frac{c}{f} \)</p>
+                    <p class="text-sm mt-2">Trong đó \( c \approx 3 \cdot 10^8 \) m/s (tốc độ ánh sáng)</p>
+                </div>
+
+                <div class="bg-[#edf2f7] border-l-4 border-blue-600 p-4 rounded-r-lg mb-6">
+                    <h4 class="font-bold mb-3">Thảo luận & Câu hỏi:</h4>
+                    <div class="space-y-4">
+                        <p>1. Nêu mô hình sóng điện từ.</p>
+                        <p>2. Dựa vào mô hình, chứng tỏ sóng điện từ là sóng ngang.</p>
+                        <p>3. Sóng điện từ khác sóng cơ ở điểm nào?</p>
+                    </div>
+                    <button onclick="toggleAnswer('ans3')" class="mt-4 bg-[#808080] text-white px-4 py-1 rounded hover:bg-gray-700 transition">Xem trả lời</button>
+                    <div id="ans3" class="answer-box mt-3 p-3 bg-green-50 border border-green-200 rounded text-sm text-green-800">
+                        1. Mô hình: Sóng điện từ là điện từ trường lan truyền trong không gian dưới dạng sóng.<br>
+                        2. Sóng ngang: Vì hai thành phần \( \vec{E} \) và \( \vec{B} \) luôn vuông góc với phương truyền sóng.<br>
+                        3. Khác sóng cơ: Sóng điện từ lan truyền được trong chân không, còn sóng cơ thì không.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section III -->
+        <section class="bg-white p-6 rounded-[12px] shadow-md mb-8">
+            <h2 class="section-header text-xl">III. Củng cố</h2>
+            
+            <div class="grid md:grid-cols-2 gap-4 mb-8">
+                <div class="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                    <h3 class="font-bold text-orange-800 mb-2 underline">Em đã học</h3>
+                    <ul class="text-sm space-y-1 list-disc ml-4">
+                        <li>Từ trường biến thiên sinh ra điện trường xoáy.</li>
+                        <li>Điện trường biến thiên sinh ra từ trường.</li>
+                        <li>Sóng điện từ là sóng ngang, lan truyền được trong chân không.</li>
+                        <li>\( \vec{E} \) và \( \vec{B} \) vuông góc nhau và đồng pha.</li>
+                    </ul>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <h3 class="font-bold text-green-800 mb-2 underline">Em có thể</h3>
+                    <ul class="text-sm space-y-1 list-disc ml-4">
+                        <li>Mô tả sự lan truyền sóng điện từ trong không gian.</li>
+                        <li>Sử dụng mô hình để giải thích các tính chất vật lý của sóng.</li>
+                        <li>Tính toán bước sóng, tần số sóng điện từ.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Quiz -->
+            <div class="quiz-container mb-8">
+                <h3 class="font-bold text-lg mb-4 text-gray-700">Trắc nghiệm nhanh</h3>
+                <div class="space-y-6">
+                    <div class="quiz-item">
+                        <p class="font-medium">Câu 1: Phát biểu nào sau đây là SAI về sóng điện từ?</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q1" value="A"> A. Sóng điện từ là điện từ trường lan truyền.</label>
+                            <label class="block"><input type="radio" name="q1" value="B"> B. Sóng điện từ không truyền được trong chân không.</label>
+                            <label class="block"><input type="radio" name="q1" value="C"> C. Sóng điện từ là sóng ngang.</label>
+                            <label class="block"><input type="radio" name="q1" value="D"> D. Vectơ \( \vec{E} \) và \( \vec{B} \) luôn đồng pha.</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <p class="font-medium">Câu 2: Tại một điểm, vectơ \( \vec{E} \) và \( \vec{B} \) có đặc điểm gì?</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q2" value="A"> A. Cùng phương, cùng độ lớn.</label>
+                            <label class="block"><input type="radio" name="q2" value="B"> B. Vuông góc phương truyền và lệch pha \( \pi/2 \).</label>
+                            <label class="block"><input type="radio" name="q2" value="C"> C. Vuông góc nhau và đồng pha.</label>
+                            <label class="block"><input type="radio" name="q2" value="D"> D. Song song nhau.</label>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="checkQuiz()" class="mt-6 bg-[#2d3748] text-white px-8 py-2 rounded-lg font-bold hover:bg-black transition">NỘP BÀI</button>
+                <div id="quiz-result" class="mt-4 font-bold"></div>
+            </div>
+
+            <!-- Tự luận -->
+            <div>
+                <h3 class="font-bold text-lg mb-4 text-gray-700">Bài tập tự luận</h3>
+                <div class="space-y-4">
+                    <div class="p-3 border rounded">
+                        <p><strong>Bài 1:</strong> Tính bước sóng của một sóng vô tuyến có tần số 100 MHz truyền trong chân không.</p>
+                        <button onclick="toggleAnswer('sol1')" class="text-blue-600 text-sm underline mt-1">Xem hướng dẫn</button>
+                        <div id="sol1" class="answer-box text-sm p-2 bg-gray-50 mt-2">
+                            \( \lambda = c/f = (3 \cdot 10^8) / (100 \cdot 10^6) = 3 \) m.
+                        </div>
+                    </div>
+                    <div class="p-3 border rounded">
+                        <p><strong>Bài 2:</strong> Tại sao điện trường của điện tích tĩnh không gọi là điện trường xoáy?</p>
+                        <button onclick="toggleAnswer('sol2')" class="text-blue-600 text-sm underline mt-1">Xem hướng dẫn</button>
+                        <div id="sol2" class="answer-box text-sm p-2 bg-gray-50 mt-2">
+                            Vì đường sức của điện trường tĩnh không khép kín, nó bắt đầu ở điện tích dương và kết thúc ở điện tích âm hoặc vô cùng.
+                        </div>
+                    </div>
+                    <div class="p-3 border rounded">
+                        <p><strong>Bài 3:</strong> Sóng điện từ có tốc độ bao nhiêu khi truyền trong chân không?</p>
+                        <button onclick="toggleAnswer('sol3')" class="text-blue-600 text-sm underline mt-1">Xem hướng dẫn</button>
+                        <div id="sol3" class="answer-box text-sm p-2 bg-gray-50 mt-2">
+                            Bằng tốc độ ánh sáng: \( c \approx 3 \cdot 10^8 \) m/s.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-500 text-sm pb-8">
+            &copy; 2024 Học liệu Vật lý 12 - Kết nối tri thức
+        </footer>
+    </div>
+
+    <script>
+        function toggleAnswer(id) {
+            const box = document.getElementById(id);
+            if (box.style.display === "block") {
+                box.style.display = "none";
+            } else {
+                box.style.display = "block";
+            }
+        }
+
+        function checkQuiz() {
+            const answers = {
+                q1: "B",
+                q2: "C"
+            };
+            let score = 0;
+            let total = 2;
+            let resultText = "";
+
+            for (let i = 1; i <= total; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected && selected.value === answers[`q${i}`]) {
+                    score++;
+                }
+            }
+
+            const resultDiv = document.getElementById('quiz-result');
+            if (score === total) {
+                resultDiv.style.color = "green";
+                resultText = `Tuyệt vời! Bạn trả lời đúng ${score}/${total} câu.`;
+            } else {
+                resultDiv.style.color = "red";
+                resultText = `Bạn đúng ${score}/${total} câu. Hãy ôn tập lại nhé!`;
+            }
+            resultDiv.innerText = resultText;
+        }
+    </script>
+</body>
+</html>
