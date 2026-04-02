@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 22: Phản ứng hạt nhân và Năng lượng liên kết</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#660000', // Màu chủ đạo
+              accent: '#1a202c',  // Màu xanh đen
+              darkblue: '#000080', // Màu xanh dương đậm
+            }
+          }
+        }
+      }
+    </script>
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['\\(', '\\)']],
+          displayMath: [['\\[', '\\]']]
+        }
+      };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f7f9;
+      }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto mb-6">
+        <div class="bg-primary text-white text-lg font-bold p-3 text-center rounded-t-[12px] mb-0">
+            CHƯƠNG III: VẬT LÝ HẠT NHÂN
+        </div>
+	<hr>
+        <div class="bg-primary text-white text-2xl font-bold p-5 text-center rounded-b-[12px]">
+            BÀI 22: PHẢN ỨNG HẠT NHÂN VÀ NĂNG LƯỢNG LIÊN KẾT
+        </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto bg-white border border-black p-4 mb-6">
+        <p class="italic">
+            Chiếc tem thư phát hành năm 1971 có in hình Rutherford và phương trình phản ứng hạt nhân được thực hiện lần đầu tiên trên thế giới vào năm 1909. Người ta đã thực hiện thí nghiệm phát hiện phản ứng hạt nhân như thế nào? Các hạt nhân có thể biến đổi thành các hạt nhân khác không?
+        </p>
+    </div>
+
+    <div class="max-w-5xl mx-auto bg-white rounded-[12px] shadow-md p-6 mb-6">
+        <h2 class="text-xl font-bold uppercase border-b-4 border-accent mb-4 pb-1">I. PHẢN ỨNG HẠT NHÂN</h2>
+        
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">1. Thí nghiệm</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-center">
+                <div class="md:col-span-2">
+                    <p class="font-semibold">Thí nghiệm Rutherford:</p>
+                    <p>Rutherford đã cho chùm hạt alpha \( ({}_2^4\text{He}) \), phóng ra từ nguồn phóng xạ \( {}_{84}^{210}\text{Po} \) đặt tại P, bắn phá hạt nhân \( {}_7^{14}\text{N} \) có trong không khí được dẫn theo đường nạp và hút khí A. Từ kết quả thí nghiệm, ông cho rằng có hạt nhân H trong sản phẩm.</p>
+                </div>
+                <div class="border border-gray-300 rounded p-4 text-center text-sm text-gray-500 bg-gray-50 h-32 flex items-center justify-center">
+		 <img src="h1.png" class="max-h-full max-w-full object-contain"></img>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-center">
+                <div class="md:col-span-2">
+                    <p class="font-semibold">Thí nghiệm Blackett:</p>
+                    <p>Năm 1925, Patrick Blackett đã sử dụng buồng sương để chụp được dấu vết tương tác này. Kết quả giúp ông đi tới kết luận: Trong một số trường hợp, hạt He bắn phá vào hạt nhân \( {}_7^{14}\text{N} \) đã tạo ra hai hạt nhân mới đó là \( {}_8^{17}\text{O} \) và \( {}_1^1\text{H} \).</p>
+                </div>
+                <div class="border border-gray-300 rounded p-4 text-center text-sm text-gray-500 bg-gray-50 h-32 flex items-center justify-center">
+		 <img src="h2.png" class="max-h-full max-w-full object-contain"></img>
+                </div>
+            </div>
+
+            <div class="bg-[#edf2f7] border-l-4 border-darkblue p-4 mb-4">
+                <p class="font-semibold">Thảo luận:</p>
+                <p>So sánh tổng số điện tích, tổng số nucleon của các hạt nhân trước và sau khi tương tác trong thí nghiệm của Blackett.</p>
+                <button onclick="toggleAnswer('ans-tl1')" class="mt-2 bg-primary text-white px-3 py-1 rounded text-sm hover:opacity-90">Xem lời giải</button>
+                <div id="ans-tl1" class="hidden mt-2 p-3 bg-green-50 rounded text-sm text-green-800">
+                    - Trước tương tác: Tổng số khối \( A = 4 + 14 = 18 \); Tổng điện tích \( Z = 2 + 7 = 9 \). <br>
+                    - Sau tương tác: Tổng số khối \( A = 17 + 1 = 18 \); Tổng điện tích \( Z = 8 + 1 = 9 \). <br>
+                    => Số khối và điện tích đều được bảo toàn.
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">2. Các loại phản ứng</h3>
+            <p><span class="font-semibold">Định nghĩa:</span> Quá trình biến đổi hạt nhân này thành hạt nhân khác là phản ứng hạt nhân.</p>
+            <p class="mt-1 font-semibold">Ví dụ phương trình:</p>
+            <p class="ml-4">\( {}_2^4\text{He} + {}_7^{14}\text{N} \rightarrow {}_{8}^{17}\text{O} + {}_1^1\text{H} \)</p>
+            
+            <p class="mt-2 font-semibold">Phân loại phản ứng hạt nhân:</p>
+            <ul class="list-disc ml-6">
+                <li><span class="font-semibold">Phản ứng hạt nhân kích thích:</span> Quá trình các hạt nhân tương tác với các hạt khác để tạo ra hạt nhân mới. (Ví dụ: Phản ứng phân hạch).</li>
+                <li><span class="font-semibold">Phản ứng hạt nhân tự phát:</span> Quá trình tự phân rã của một hạt nhân không bền vững thành các hạt nhân mới. (Ví dụ: Hiện tượng phóng xạ tự phát của \( {}_{92}^{238}\text{U} \)).</li>
+            </ul>
+
+            <div class="bg-[#edf2f7] border-l-4 border-darkblue p-4 mt-4">
+                <p class="font-semibold">Câu hỏi:</p>
+                <p>Hãy trình bày sự khác nhau giữa phản ứng hạt nhân và phản ứng hóa học.</p>
+                <button onclick="toggleAnswer('ans-ch1')" class="mt-2 bg-primary text-white px-3 py-1 rounded text-sm hover:opacity-90">Xem lời giải</button>
+                <div id="ans-ch1" class="hidden mt-2 p-3 bg-green-50 rounded text-sm text-green-800">
+                    Phản ứng hóa học chỉ làm thay đổi liên kết giữa các nguyên tử ở lớp vỏ electron. Phản ứng hạt nhân làm thay đổi cấu tạo hạt nhân, dẫn đến biến đổi từ nguyên tố này thành nguyên tố khác.
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-lg font-semibold mb-3">3. Định luật bảo toán số khối và điện tích</h3>
+            <p><span class="font-semibold">Định luật bảo toàn số nucleon (số khối A):</span> Tổng số nucleon của các hạt trước phản ứng bằng tổng số nucleon của các hạt sau phản ứng.</p>
+            <p class="mt-1"><span class="font-semibold">Định luật bảo toàn điện tích:</span> Tổng đại số các điện tích của các hạt trước phản ứng bằng tổng đại số các điện tích của các hạt sau phản ứng.</p>
+
+            <div class="bg-[#edf2f7] border-l-4 border-darkblue p-4 mt-4">
+                <p class="font-semibold">Thảo luận:</p>
+                <p><span class="font-semibold">Nội dung 1:</span> Viết biểu thức liên hệ giữa các số khối và điện tích cho phương trình: \( {}_{Z_1}^{A_1}\text{X}_1 + {}_{Z_2}^{A_2}\text{X}_2 \rightarrow {}_{Z_3}^{A_3}\text{X}_3 + {}_{Z_4}^{A_4}\text{X}_4 \)</p>
+                <p class="mt-1"><span class="font-semibold">Nội dung 2:</span> Khi bắn phá \( {}_{92}^{235}\text{U} \) bằng neutron \( ({}_0^1\text{n}) \), chúng tạo thành hạt nhân X, ngay sau đó X phân rã thành \( {}_{42}^{99}\text{Mo} \), 3 hạt neutron và một hạt nhân Y. Xác định Y.</p>
+                
+                <button onclick="toggleAnswer('ans-tl2')" class="mt-2 bg-primary text-white px-3 py-1 rounded text-sm hover:opacity-90">Xem lời giải</button>
+                <div id="ans-tl2" class="hidden mt-2 p-3 bg-green-50 rounded text-sm text-green-800">
+                    - Lời giải ND1: \( A_1 + A_2 = A_3 + A_4 \) và \( Z_1 + Z_2 = Z_3 + Z_4 \). <br>
+                    - Lời giải ND2: Phương trình: \( {}_0^1\text{n} + {}_{92}^{235}\text{U} \rightarrow {}_{42}^{99}\text{Mo} + 3{}_0^1\text{n} + {}_{Z}^{A}\text{Y} \). <br>
+                    Bảo toàn A: \( 1 + 235 = 99 + 3 + A \Rightarrow A = 134 \). <br>
+                    Bảo toàn Z: \( 0 + 92 = 42 + 0 + Z \Rightarrow Z = 50 \). Tra bảng tuần hoàn, nguyên tố Y là Thiếc \( ({}_{50}^{134}\text{Sn}) \).
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto bg-white rounded-[12px] shadow-md p-6 mb-6">
+        <h2 class="text-xl font-bold uppercase border-b-4 border-accent mb-4 pb-1">II. NĂNG LƯỢNG LIÊN KẾT</h2>
+        
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">1. Lực hạt nhân và Năng lượng liên kết</h3>
+            <p>Lực tương tác giữa các nucleon trong hạt nhân là lực hút, gọi là lực hạt nhân. Lực hạt nhân có cường độ rất lớn và bán kính tác dụng rất ngắn (cỡ \( 10^{-15}\text{ m} \)). Năng lượng tối thiểu dùng để tách toàn bộ số nucleon ra khỏi hạt nhân bằng năng lượng liên kết hạt nhân \( E_{\text{lk}} \).</p>
+            <span class = " font-bold" >Năng lượng liên kết riêng:</span>là năng lượng tính trên 1 nucleon<br>
+		Công thức: \(E_{lk}=\frac{E_{lk}}{A}\)</p>
+	        <p class="mt-1">Năng lượng liên kết riêng quyết định độ bền vững của hạt nhân. \( E_{\text{lkv}} \) càng lớn, hạt nhân càng bền.</p>
+            <div class="bg-[#edf2f7] border-l-4 border-darkblue p-4 mt-4">
+                <p class="font-semibold">Câu hỏi:</p>
+                <p>Vì sao để tách được các nucleon ra khỏi hạt nhân cần một năng lượng lớn?</p>
+                <button onclick="toggleAnswer('ans-ch2')" class="mt-2 bg-primary text-white px-3 py-1 rounded text-sm hover:opacity-90">Xem lời giải</button>
+                <div id="ans-ch2" class="hidden mt-2 p-3 bg-green-50 rounded text-sm text-green-800">
+                    Vì cường độ của lực hạt nhân là vô cùng lớn, nên cần phải cung cấp một năng lượng đủ lớn thắng được lực này để tách các nucleon.
+                </div>
+		
+            </div>
+
+            <div class="bg-[#edf2f7] border-l-4 border-darkblue p-4 mt-4">
+                <p class="font-semibold">Thảo luận:</p>
+                <p>Liệt kê đầy đủ nội dung liên quan đến đồ thị năng lượng liên kết riêng ở hình dưới.</p>
+			<center> <img src="h3.png" class="max-h-full max-w-full object-contain"></img></center>
+                <button onclick="toggleAnswer('ans-tl3')" class="mt-2 bg-primary text-white px-3 py-1 rounded text-sm hover:opacity-90">Xem tham khảo</button>
+                <div id="ans-tl3" class="hidden mt-2 p-3 bg-green-50 rounded text-sm text-green-800">
+                    Dựa vào đồ thị SGK: Các hạt nhân có số khối trung bình \( (50 < A < 80) \) có năng lượng liên kết riêng lớn nhất (khoảng \( 8,8\text{ MeV/nucleon} \)) nên bền vững nhất.
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">2. Độ hụt khối</h3>
+            <p>Khối lượng của hạt nhân luôn nhỏ hơn tổng khối lượng của các nucleon tạo thành hạt nhân đó.</p>
+            <p class="mt-1 font-semibold">Công thức:</p>
+            <p class="ml-4">\( \Delta m = [Zm_p + (A - Z)m_n] - m_X \)</p>
+
+            <div class="bg-[#edf2f7] border-l-4 border-darkblue p-4 mt-4">
+                <p class="font-semibold">Câu hỏi:</p>
+                <p>Hãy tính độ hụt khối của hạt nhân Oxygen \( ({}_8^{16}\text{O}) \), biết khối lượng hạt nhân là \( 15,99492\text{ amu} \). (Cho \( m_p = 1,00728\text{ amu} \); \( m_n = 1,00866\text{ amu} \)).</p>
+                <button onclick="toggleAnswer('ans-ch3')" class="mt-2 bg-primary text-white px-3 py-1 rounded text-sm hover:opacity-90">Xem lời giải</button>
+                <div id="ans-ch3" class="hidden mt-2 p-3 bg-green-50 rounded text-sm text-green-800">
+                    \( \Delta m = [8 \times 1,00728 + 8 \times 1,00866] - 15,99492 = 0,1326\text{ amu} \).
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-lg font-semibold mb-3">3. Mối liên hệ giữa năng lượng và khối lượng</h3>
+            
+            <div class="bg-yellow-50 border border-yellow-200 p-4 mb-4 rounded">
+                <p class="italic"><span class="font-semibold">Thuyết tương đối Einstein:</span> Một vật có khối lượng \( m \) thì cũng có năng lượng tương ứng là \( E \) và ngược lại: \( E = mc^2 \).</p>
+            </div>
+
+            <div class="bg-yellow-50 border border-yellow-200 p-4 mb-4 rounded">
+	    <p class = " font-bold" >Biểu thức Năng lượng liên kết: \(E_{lk}=\Delta m.c^2\)</p><br>
+	    </div>
+            <div class="bg-[#edf2f7] border-l-4 border-darkblue p-4 mt-4">
+                <p class="font-semibold">Thảo luận:</p>
+                <p>Tìm hệ số chuyển đổi giữa các đơn vị amu và \( \text{MeV}/c^2 \).</p>
+                <button onclick="toggleAnswer('ans-tl4')" class="mt-2 bg-primary text-white px-3 py-1 rounded text-sm hover:opacity-90">Xem lời giải</button>
+                <div id="ans-tl4" class="hidden mt-2 p-3 bg-green-50 rounded text-sm text-green-800">
+                    Hệ số chuyển đổi chuẩn là: \( 1\text{ amu} \approx 931,5\text{ MeV}/c^2 \).
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto bg-white rounded-[12px] shadow-md p-6 mb-6">
+        <h2 class="text-xl font-bold uppercase border-b-4 border-accent mb-4 pb-1">III. PHẢN ỨNG PHÂN HẠCH</h2>
+        
+                <p>Sự phân bố năng lượng liên kết riêng cho thấy các hạt nhân nặng có xu hướng vỡ thành các hạt nhân trung bình để đạt trạng thái bền vững hơn.</p>
+	            <div class="border border-gray-300 rounded p-4 text-center text-sm text-gray-500 bg-gray-50 h-50 w-50 flex items-center justify-center">
+			 <img src="h3.png" class="max-h-full max-w-full object-contain"></img>
+
+	            </div>
+
+                <p class="mt-1"><span class="font-bold">Định nghĩa:</span> Phản ứng phân hạch là phản ứng hạt nhân trong đó một hạt nhân nặng vỡ thành hai hạt nhân nhẹ hơn.</p>
+
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">1. Phân hạch Uranium</h3>
+            <p>Năm 1939, Otto Hahn làm thí nghiệm dùng neutron nhiệt bắn vào Uranium-235.</p>
+            <p class="mt-1 font-semibold">Phương trình:</p>
+            <p class="ml-4">\( {}_0^1\text{n} + {}_{92}^{235}\text{U} \rightarrow {}_{92}^{236}\text{U}^* \rightarrow {}_{39}^{95}\text{Y} + {}_{53}^{138}\text{I} + 3{}_0^1\text{n} \)</p>
+            <p class="mt-2"><span class="font-semibold">Đặc điểm phản ứng:</span> Phản ứng toả ra năng lượng khoảng \( 200\text{ MeV} \).</p>
+            <p class="mt-2"><span class="font-semibold">Lưu ý:</span> Phản ứng phân hạch phải qua trạng thái kích thích không bền vững.</p>
+
+            <div class="bg-[#edf2f7] border-l-4 border-darkblue p-4 mt-4">
+                <p class="font-semibold">Thảo luận:</p>
+                <p>Nêu đặc điểm phản ứng phân hạch của Uranium.</p>
+                <button onclick="toggleAnswer('ans-tl5')" class="mt-2 bg-primary text-white px-3 py-1 rounded text-sm hover:opacity-90">Xem lời giải</button>
+                <div id="ans-tl5" class="hidden mt-2 p-3 bg-green-50 rounded text-sm text-green-800">
+                    Tỏa ra năng lượng rất lớn và giải phóng thêm các neutron mới (từ 2 đến 3 hạt).
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">2. Phản ứng phân hạch dây chuyền</h3>
+            <p>Các neutron sinh ra sau mỗi phân hạch có thể kích thích các hạt nhân Uranium khác tạo ra phản ứng tiếp diễn liên tục.</p>
+
+            <div class="bg-[#edf2f7] border-l-4 border-darkblue p-4 mt-4">
+                <p class="font-semibold">Câu hỏi:</p>
+                <p><span class="font-semibold">1.</span> Nêu đặc điểm của phản ứng phân hạch dây chuyền.</p>
+                <p><span class="font-semibold">2.</span> Tính năng lượng toả ra khi phân hạch hoàn toàn \( 1\text{ kg } {}_{92}^{235}\text{U} \). Biết mỗi phân hạch tỏa \( 200\text{ MeV} \).</p>
+                <button onclick="toggleAnswer('ans-ch4')" class="mt-2 bg-primary text-white px-3 py-1 rounded text-sm hover:opacity-90">Xem lời giải</button>
+                <div id="ans-ch4" class="hidden mt-2 p-3 bg-green-50 rounded text-sm text-green-800">
+                    1. Số neutron mới sinh ra phải kích thích được ít nhất 1 hạt nhân tiếp theo (hệ số nhân \( k \ge 1 \)). <br>
+                    2. Số hạt trong \( 1\text{ kg} \): \( N = \frac{1000}{235} \times 6,02 \times 10^{23} \approx 2,56 \times 10^{24} \) hạt. Năng lượng: \( E \approx 5,12 \times 10^{26}\text{ MeV} \).
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-darkblue text-white p-4 rounded mb-4">
+            <p class="font-bold">Em có biết:</p>
+            <p>Gọi \( k \) là số neutron trung bình giải phóng sau mỗi phân hạch. Khi \( k < 1 \), phản ứng dây chuyền tắt dần; \( k = 1 \), phản ứng tự duy trì ổn định; \( k > 1 \), phản ứng bùng nổ vượt tầm kiểm soát (ứng dụng trong bom hạt nhân). Để xảy ra phản ứng dây chuyền, khối lượng chất phân hạch phải lớn hơn khối lượng tới hạn \( m_{\text{th}} \).</p>
+        </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto bg-white rounded-[12px] shadow-md p-6 mb-6">
+        <h2 class="text-xl font-bold uppercase border-b-4 border-accent mb-4 pb-1">IV. PHẢN ỨNG TỔNG HỢP</h2>
+        
+        <p><span class="font-semibold">Định nghĩa:</span> Phản ứng tổng hợp hạt nhân là phản ứng hạt nhân trong đó hai hay nhiều hạt nhân nhẹ tổng hợp lại thành một hạt nhân nặng hơn.</p>
+        <p class="mt-2 font-semibold">Phương trình đầu tiên trên thế giới (1927):</p>
+        <p class="ml-4">\( {}_1^2\text{H} + {}_1^2\text{H} \rightarrow {}_2^3\text{He} + {}_0^1\text{n} \)</p>
+        <p class="mt-2"><span class="font-semibold">Đặc điểm phản ứng nhiệt hạch:</span> Vì các hạt nhân đều mang điện dương nên cần cung cấp động năng cực lớn (ở nhiệt độ từ \( 10^7 \) đến \( 10^8\text{ K} \)) để chúng thắng được lực đẩy tĩnh điện Coulomb và kết hợp lại.</p>
+
+        <div class="bg-yellow-50 border border-yellow-200 p-4 my-4 rounded">
+            <p class="font-bold">Em có biết:</p>
+            <p>Điều kiện của phản ứng nhiệt hạch cần thỏa mãn tiêu chuẩn Lawson về mật độ hạt nhân và thời gian duy trì plasma cao độ: \( n \cdot \Delta t > 10^{14}\text{ s/cm}^3 \).</p>
+        </div>
+
+        <div class="bg-[#edf2f7] border-l-4 border-darkblue p-4 mt-4">
+            <p class="font-semibold">Câu hỏi:</p>
+            <p>So sánh định tính phản ứng tổng hợp hạt nhân và phản ứng phân hạch về: nhiên liệu và điều kiện xảy ra.</p>
+            <button onclick="toggleAnswer('ans-ch5')" class="mt-2 bg-primary text-white px-3 py-1 rounded text-sm hover:opacity-90">Xem lời giải</button>
+            <div id="ans-ch5" class="hidden mt-2 p-3 bg-green-50 rounded text-sm text-green-800">
+                <table class="w-full text-center border-collapse border border-[#cbd5e0] mt-2">
+                    <thead>
+                        <tr class="bg-[#e2e8f0]">
+                            <th class="border border-[#cbd5e0] p-2">Đặc điểm</th>
+                            <th class="border border-[#cbd5e0] p-2">Phản ứng phân hạch</th>
+                            <th class="border border-[#cbd5e0] p-2">Phản ứng tổng hợp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="border border-[#cbd5e0] p-2 font-semibold">Nhiên liệu</td>
+                            <td class="border border-[#cbd5e0] p-2">Các hạt nhân rất nặng (\( \text{U}, \text{Pu} \))</td>
+                            <td class="border border-[#cbd5e0] p-2">Các hạt nhân rất nhẹ (\( \text{H}, \text{D}, \text{T} \))</td>
+                        </tr>
+                        <tr>
+                            <td class="border border-[#cbd5e0] p-2 font-semibold">Điều kiện</td>
+                            <td class="border border-[#cbd5e0] p-2">Cần neutron kích thích ban đầu</td>
+                            <td class="border border-[#cbd5e0] p-2">Cần nhiệt độ cực kỳ cao</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto bg-white rounded-[12px] shadow-md p-6 mb-6">
+        <h2 class="text-xl font-bold uppercase border-b-4 border-accent mb-4 pb-1">III. CỦNG CỐ</h2>
+        
+        <div class="bg-teal-50 p-4 rounded mb-4">
+            <p class="font-bold text-teal-800">Em đã học:</p>
+            <ul class="list-disc ml-6 text-teal-900">
+                <li>Phản ứng hạt nhân bảo toàn số khối và điện tích.</li>
+                <li>Hạt nhân càng có \( E_{\text{lkv}} \) lớn thì càng bền vững.</li>
+                <li>Phản ứng phân hạch và tổng hợp đều là phản ứng tỏa năng lượng.</li>
+            </ul>
+        </div>
+
+        <div class="bg-pink-50 p-4 rounded mb-6">
+            <p class="font-bold text-pink-800">Em có thể:</p>
+            <ul class="list-disc ml-6 text-pink-900">
+                <li>Giải thích được nguồn gốc năng lượng khổng lồ từ mặt trời.</li>
+                <li>Nắm được nguyên tắc cơ bản của các lò phản ứng hạt nhân hiện nay.</li>
+            </ul>
+        </div>
+
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-3">Câu hỏi trắc nghiệm</h3>
+            
+            <div class="mb-4">
+                <p><span class="font-semibold">Câu 1 (Biết):</span> Lực hạt nhân là lực nào dưới đây?</p>
+                <div class="ml-4">
+                    <label class="block"><input type="radio" name="q1" value="0"> A. Lực tĩnh điện Coulomb</label>
+                    <label class="block"><input type="radio" name="q1" value="1"> B. Lực tương tác mạnh giữa các nucleon</label>
+                    <label class="block"><input type="radio" name="q1" value="0"> C. Lực hấp dẫn</label>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <p><span class="font-semibold">Câu 2 (Biết):</span> Đại lượng nào sau đây KHÔNG được bảo toàn trong phản ứng hạt nhân?</p>
+                <div class="ml-4">
+                    <label class="block"><input type="radio" name="q2" value="0"> A. Số khối \( A \)</label>
+                    <label class="block"><input type="radio" name="q2" value="1"> B. Khối lượng nghỉ</label>
+                    <label class="block"><input type="radio" name="q2" value="0"> C. Điện tích \( Z \)</label>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <p><span class="font-semibold">Câu 3 (Hiểu):</span> Phản ứng phân hạch Uranium-235 tỏa năng lượng chủ yếu dưới dạng:</p>
+                <div class="ml-4">
+                    <label class="block"><input type="radio" name="q3" value="1"> A. Động năng của các hạt nhân sản phẩm</label>
+                    <label class="block"><input type="radio" name="q3" value="0"> B. Bức xạ gamma</label>
+                    <label class="block"><input type="radio" name="q3" value="0"> C. Năng lượng ánh sáng</label>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <p><span class="font-semibold">Câu 4 (Hiểu):</span> Điều kiện cần để xảy ra phản ứng nhiệt hạch là:</p>
+                <div class="ml-4">
+                    <label class="block"><input type="radio" name="q4" value="0"> A. Khối lượng Uranium đạt tới hạn</label>
+                    <label class="block"><input type="radio" name="q4" value="1"> B. Nhiệt độ siêu cao cỡ hàng triệu độ</label>
+                    <label class="block"><input type="radio" name="q4" value="0"> C. Bắn phá bằng dòng hạt alpha</label>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <p><span class="font-semibold">Câu 5 (Hiểu):</span> Hạt nhân càng bền vững khi có:</p>
+                <div class="ml-4">
+                    <label class="block"><input type="radio" name="q5" value="0"> A. Độ hụt khối càng nhỏ</label>
+                    <label class="block"><input type="radio" name="q5" value="0"> B. Khối lượng hạt nhân càng lớn</label>
+                    <label class="block"><input type="radio" name="q5" value="1"> C. Năng lượng liên kết riêng càng lớn</label>
+                </div>
+            </div>
+
+            <button onclick="checkQuiz()" class="mt-2 bg-accent text-white font-bold px-4 py-2 rounded hover:opacity-90">NỘP BÀI</button>
+            <p id="quiz-result" class="mt-3 font-semibold"></p>
+        </div>
+
+        <div>
+            <h3 class="text-lg font-semibold mb-3">Bài tập tự luận (Mức độ Khó)</h3>
+            
+            <div class="mb-4">
+                <p><span class="font-semibold">Bài 1:</span> Tính năng lượng tỏa ra trong phản ứng \( {}_1^2\text{H} + {}_1^3\text{H} \rightarrow {}_2^4\text{He} + {}_0^1\text{n} \). Cho khối lượng các hạt là: \( m_D = 2,0140\text{ amu} \); \( m_T = 3,0160\text{ amu} \); \( m_{He} = 4,0015\text{ amu} \); \( m_n = 1,0087\text{ amu} \).</p>
+                <button onclick="toggleAnswer('ans-tl6')" class="mt-2 bg-primary text-white px-3 py-1 rounded text-sm hover:opacity-90">Xem giải chi tiết</button>
+                <div id="ans-tl6" class="hidden mt-2 p-3 bg-green-50 rounded text-sm text-green-800">
+                    - Tổng khối lượng trước: \( 2,0140 + 3,0160 = 5,0300\text{ amu} \). <br>
+                    - Tổng khối lượng sau: \( 4,0015 + 1,0087 = 5,0102\text{ amu} \). <br>
+                    - Độ hụt khối lượng phản ứng: \( \Delta m = 5,0300 - 5,0102 = 0,0198\text{ amu} \). <br>
+                    - Năng lượng tỏa ra: \( E = 0,0198 \times 931,5 \approx 18,44\text{ MeV} \).
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <p><span class="font-semibold">Bài 2:</span> Phân hạch hoàn toàn \( 1\text{ g } {}_{92}^{235}\text{U} \) tỏa ra bao nhiêu năng lượng tương ứng theo đơn vị Jun (J)? Giả sử mỗi phân hạch tỏa ra \( 200\text{ MeV} \).</p>
+                <button onclick="toggleAnswer('ans-tl7')" class="mt-2 bg-primary text-white px-3 py-1 rounded text-sm hover:opacity-90">Xem giải chi tiết</button>
+                <div id="ans-tl7" class="hidden mt-2 p-3 bg-green-50 rounded text-sm text-green-800">
+                    - Số hạt nhân trong \( 1\text{ g} \): \( N = \frac{1}{235} \times 6,02 \times 10^{23} \approx 2,56 \times 10^{21} \) hạt. <br>
+                    - Tổng năng lượng: \( E = N \times 200\text{ MeV} = 5,12 \times 10^{23}\text{ MeV} \). <br>
+                    - Đổi sang J: \( 5,12 \times 10^{23} \times (1,6 \times 10^{-13}\text{ J}) \approx 8,19 \times 10^{10}\text{ J} \) (Tương đương đốt cháy hàng chục tấn than đá).
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <p><span class="font-semibold">Bài 3:</span> Một lò phản ứng nhiệt hạch thử nghiệm đang cố gắng tạo ra mật độ plasma là \( 2 \times 10^{14}\text{ hạt/cm}^3 \). Tính thời gian plasma cần được duy trì tối thiểu để đạt tiêu chuẩn Lawson.</p>
+                <button onclick="toggleAnswer('ans-tl8')" class="mt-2 bg-primary text-white px-3 py-1 rounded text-sm hover:opacity-90">Xem giải chi tiết</button>
+                <div id="ans-tl8" class="hidden mt-2 p-3 bg-green-50 rounded text-sm text-green-800">
+                    Theo hệ thức Lawson: \( n \cdot \Delta t > 10^{14}\text{ s/cm}^3 \). <br>
+                    Thay số: \( (2 \times 10^{14}) \cdot \Delta t > 10^{14} \Rightarrow \Delta t > 0,5\text{ giây} \).
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hàm ẩn/hiện lời giải
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        // Hàm kiểm tra đáp án trắc nghiệm
+        function checkQuiz() {
+            const correctAnswers = { q1: '1', q2: '1', q3: '1', q4: '1', q5: '1' };
+            let score = 0;
+            const total = 5;
+
+            for (let i = 1; i <= total; i++) {
+                const checkedOption = document.querySelector(`input[name="q${i}"]:checked`);
+                if (checkedOption && checkedOption.value === correctAnswers[`q${i}`]) {
+                    score++;
+                }
+            }
+
+            const resultText = document.getElementById('quiz-result');
+            resultText.innerText = `Bạn đã trả lời đúng ${score}/${total} câu.`;
+            
+            if (score === total) {
+                resultText.className = "mt-3 font-semibold text-green-600";
+            } else {
+                resultText.className = "mt-3 font-semibold text-red-600";
+            }
+        }
+    </script>
+</body>
+</html>
