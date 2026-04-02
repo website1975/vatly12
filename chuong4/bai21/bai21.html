@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 21: Cấu Trúc Hạt Nhân</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        .header-navy {
+            background-color: #808080;
+        }
+        .rounded-12 {
+            border-radius: 12px;
+        }
+        .section-underline {
+            border-bottom: 4px solid #4a5568;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        .question-box {
+            background-color: #edf2f7;
+            border-left: 4px solid #2b6cb0;
+        }
+        .answer-box {
+            background-color: #f0fff4;
+            display: none;
+        }
+        .btn-navy {
+            background-color: #808080;
+            color: white;
+            transition: all 0.3s;
+        }
+        .btn-navy:hover {
+            background-color: #666666;
+            transform: translateY(-1px);
+        }
+        table, th, td {
+            border: 1px solid #cbd5e0;
+        }
+        th {
+            background-color: #e2e8f0;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Header Section -->
+    <header class="max-w-4xl mx-auto mb-8">
+        <div class="header-navy text-white p-3 text-center rounded-t-[12px] font-bold text-lg">
+            CHƯƠNG IV: VẬT LÝ HẠT NHÂN VÀ PHÓNG XẠ
+        </div>
+        <hr>
+        <div class="header-navy text-white p-6 text-center rounded-b-[12px] shadow-lg">
+            <h1 class="text-3xl font-bold uppercase tracking-widest">Bài 21: CẤU TRÚC HẠT NHÂN</h1>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto space-y-8">
+        
+        <!-- Intro Box -->
+        <section class="bg-white p-6 rounded-12 shadow-md border border-black">
+            <p class="italic text-gray-700 leading-relaxed">
+                Kích thước nguyên tử nhỏ tới mức kính hiển vi quang học hiện đại nhất cũng không thể giúp chúng ta quan sát rõ. Hạt nhân có kích thước còn nhỏ hơn rất nhiều (khoảng 0,0001 lần) so với nguyên tử. Các nhà khoa học đã làm thế nào để phát hiện ra điều đó?
+            </p>
+        </section>
+
+        <!-- Section I -->
+        <section class="bg-white p-6 rounded-12 shadow-md">
+            <h2 class="text-2xl font-bold uppercase section-underline">I. THÍ NGHIỆM TÁN XẠ HẠT ALPHA</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6 my-6">
+                <div class="border p-4 rounded-lg bg-gray-50 text-center">
+                    <p class="font-bold mb-2">1. Mô hình Thomson (Mô hình bánh mận)</p>
+                    <div class="h-40 flex items-center justify-center bg-white border rounded mb-2">
+			<img src="h1.png" class="max-h-full max-w-full object-contain"></img>
+                    </div>
+                    <p class="text-sm italic">Electron như những quả mận đặt trong khối điện dương.</p>
+                </div>
+                <div class="border p-4 rounded-lg bg-gray-50 text-center">
+                    <p class="font-bold mb-2">2. Mô hình Rutherford</p>
+                    <div class="h-40 flex items-center justify-center bg-white border rounded mb-2">
+                         <img src="h2.png" class="max-h-full max-w-full object-contain"></img>
+                    </div>
+                    <button onclick="toggleAnswer('history')" class="btn-navy px-4 py-2 rounded text-sm mt-2">Xem: Lịch sử thí nghiệm nổi tiếng này</button>
+                    <div id="history" class="answer-box p-3 mt-2 text-left text-sm rounded">
+                        Năm 1911, Ernest Rutherford thực hiện thí nghiệm bắn phá lá vàng mỏng bằng hạt alpha (\(\alpha\)). Kết quả bất ngờ khi một số hạt bị bật ngược lại đã dẫn đến việc bác bỏ mô hình Thomson và khai sinh ra mô hình hành tinh nguyên tử.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Path of Alpha particles -->
+            <div class="border-2 border-dashed border-gray-300 p-6 rounded-lg text-center my-6">
+                <p class="font-bold mb-4">Minh họa đường đi các hạt Alpha</p>
+                <div class="flex justify-center">
+			<img src="h3.png" class="max-h-full max-w-full object-contain"></img>
+                </div>
+                <p class="text-sm mt-4 text-gray-600">Hầu hết đi thẳng, một số ít lệch hướng, và cực ít (1/10.000) bị bật ngược lại.</p>
+            </div>
+
+            <!-- Discussion Questions -->
+            <div class="space-y-4">
+                <div class="question-box p-4 rounded">
+                    <p class="font-semibold">Thảo luận:</p>
+                    <ol class="list-decimal ml-6 space-y-2">
+                        <li>Tại sao phần lớn các hạt alpha đi xuyên thẳng qua lá vàng?</li>
+                        <li>Việc một số ít hạt alpha bị lệch hướng hơn 90° chứng tỏ điều gì về cấu trúc nguyên tử?</li>
+                    </ol>
+                    <button onclick="toggleAnswer('disc-sol')" class="mt-3 text-blue-700 underline text-sm">Xem hướng giải quyết</button>
+                    <div id="disc-sol" class="answer-box p-4 mt-2 rounded border border-green-200">
+                        1. Chứng tỏ nguyên tử có cấu tạo rỗng.<br>
+                        2. Chứng tỏ ở tâm nguyên tử có một hạt nhân tích điện dương, kích thước rất nhỏ nhưng tập trung hầu hết khối lượng nguyên tử.
+	                <div class="flex justify-center">
+			<img src="h4.png" class="max-h-full max-w-full object-contain"></img>
+        	        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-yellow-50 p-4 mt-6 rounded-lg border-l-4 border-yellow-400">
+                <p class="font-bold text-yellow-800">Em có biết:</p>
+                <p class="text-sm">
+Mẫu hành tinh nguyên tử của Rutherford không giải thích được tính bền vững của các nguyên tử và sự tạo thành quang phổ vạch của các nguyên tử. Năm 1913
+, Bohr (Bo) đã dựa trên mô hình nguyên tử của Rutherford và vận dụng thuyết lượng tử ánh sáng để đề xuất mẫu nguyên tử mới gọi là mẫu nguyên tử Bohr. 
+Trong mẫu này, Bohr vẫn giữ mô hình hành tinh nguyên tử của Rutherford nhưng đã bổ sung các tiên đề về cấu trúc nguyên tử. Mẫu này đã giải thích được 
+sự tạo thành quang phổ vạch của các nguyên tử, đặc biệt là của nguyên tử hydrogen. Tuy nhiên, mô hình nguyên tử của Bohr không giải thích được nhiều 
+tính chất của các nguyên tử khác. Hiện nay, người ta vận dụng các lí thuyết của Erwin Schrödinger (Ê-uyn Srô-đin-gơ) để đưa ra mô hình đám mây điện tử. 
+Trong mô hình này, các electron có thể xuất hiện ở mọi vị trí trong không gian nguyên tử với xác suất nào đó và mật độ xác suất có mặt của
+ electron được biểu diễn bằng các đám mây electron. Mô hình này có thể giải thích được quang phổ vạch của các loại nguyên tử.</p>
+            </div>
+        </section>
+
+        <!-- Section II -->
+        <section class="bg-white p-6 rounded-12 shadow-md">
+            <h2 class="text-2xl font-bold uppercase section-underline">II. NUCLEON VÀ KÍ HIỆU HẠT NHÂN</h2>
+            
+            <h3 class="text-xl font-bold mb-3">1. Nucleon</h3>
+            <div class="space-y-4">
+                <p>Hạt nhân được tạo thành bởi hai loại hạt là <strong>proton</strong> và <strong>neutron</strong>, gọi chung là <strong>nucleon</strong>.</p>
+                <ul class="list-disc ml-8">
+                    <li><strong>Proton (p):</strong> \(m_p \approx 1,67262.10^{-27}\) kg, điện tích \(q = +e\).</li>
+                    <li><strong>Neutron (n):</strong> \(m_n \approx 1,67493.10^{-27}\) kg, trung hòa về điện.</li>
+                </ul>
+			<div class="flex justify-center">
+			<img src="h5.png" class="max-h-full max-w-full object-contain"></img>
+        	        </div>
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <p class="font-bold">Đơn vị khối lượng nguyên tử (amu):</p>
+                    <p class="text-center py-2 text-xl font-mono">1 amu \( \approx 1,66054.10^{-27} \) kg</p>
+                    <p class="text-sm italic">(Bằng 1/12 khối lượng nguyên tử đồng vị Carbon-12)</p>
+                </div>
+
+                <div class="question-box p-4 rounded">
+                    <p>Xác định khối lượng của proton và neutron theo đơn vị amu?</p>
+                    <button onclick="toggleAnswer('amu-sol')" class="btn-navy px-3 py-1 rounded text-xs mt-2">Xem trả lời</button>
+                    <div id="amu-sol" class="answer-box p-3 mt-2 rounded">
+                        \(m_p \approx 1,00728\) amu; \(m_n \approx 1,00866\) amu.
+                    </div>
+                </div>
+
+                <div class="border-t pt-4">
+                    <p class="font-bold mb-2">Bán kính hạt nhân:</p>
+                    <p class="bg-blue-50 p-3 rounded text-center font-serif italic text-lg">
+                        \( R = 1,2.10^{-15} \cdot A^{1/3} \) (m)
+                    </p>
+                    <div class="question-box p-4 rounded mt-4">
+                        <p>Dựa vào công thức, bán kính hạt nhân phụ thuộc vào đại lượng nào?</p>
+                        <button onclick="toggleAnswer('r-sol')" class="btn-navy px-3 py-1 rounded text-xs mt-2">Xem trả lời</button>
+                        <div id="r-sol" class="answer-box p-3 mt-2 rounded">
+                            Phụ thuộc vào số khối A (tổng số nucleon).
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="overflow-x-auto my-6">
+                    <table class="w-full text-center">
+                        <thead>
+                            <tr>
+                                <th class="p-2">Tên nguyên tố</th>
+                                <th class="p-2">Số khối (A)</th>
+                                <th class="p-2">Bán kính nguyên tử (\(10^{-10}m\))</th>
+                                <th class="p-2">Bán kính hạt nhân (\(10^{-15}m\))</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Hydrogen</td><td>1</td><td>1,2</td><td>0,9</td></tr>
+                            <tr><td>Oxygen</td><td>16</td><td>1,5</td><td>2,7</td></tr>
+                            <tr><td>Sắt</td><td>56</td><td>1,9</td><td>3,7</td></tr>
+                            <tr><td>Vàng</td><td>197</td><td>1,7</td><td>5,4</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="bg-blue-50 p-4 rounded-lg italic text-sm">
+                    <strong>Em có biết:</strong> Nucleon vẫn chưa phải hạt nhỏ nhất, chúng được cấu tạo từ các hạt <strong>quark</strong>.
+			<div class="flex justify-center">
+			<img src="h6.png" class="max-h-full max-w-full object-contain"></img>
+        	        </div>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-bold mt-8 mb-3">2. Kí hiệu hạt nhân</h3>
+            <p class="mb-4">Hạt nhân của nguyên tố X được kí hiệu: <span class="text-2xl font-bold ml-4">\( {}_{Z}^{A}X \)</span></p>
+            <ul class="list-none space-y-2 ml-4">
+                <li>- <strong>X:</strong> Kí hiệu hóa học.</li>
+                <li>- <strong>A:</strong> Số khối (Tổng số nucleon).</li>
+                <li>- <strong>Z:</strong> Số hiệu nguyên tử (Số proton).</li>
+                <li>- <strong>N = A - Z:</strong> Số neutron.</li>
+            </ul>
+
+            <div class="question-box p-4 rounded mt-4">
+                <p>Viết kí hiệu hạt nhân vàng (Au) biết số nucleon là 197 và số proton là 79?</p>
+                <button onclick="toggleAnswer('au-sol')" class="btn-navy px-3 py-1 rounded text-xs mt-2">Xem trả lời</button>
+                <div id="au-sol" class="answer-box p-3 mt-2 rounded">
+                    Kí hiệu: \( {}_{79}^{197}Au \)
+                </div>
+            </div>
+        </section>
+
+        <!-- Section III: Consolidation -->
+        <section class="bg-white p-6 rounded-12 shadow-md border-t-8 border-gray-500">
+            <h2 class="text-2xl font-bold uppercase section-underline">III. CỦNG CỐ</h2>
+            
+            <div class="grid md:grid-cols-2 gap-4 mb-8">
+                <div class="bg-indigo-50 p-4 rounded-lg">
+                    <p class="font-bold text-indigo-800 mb-2">Em đã học</p>
+                    <ul class="text-sm space-y-1">
+                        <li>- Hạt nhân rất nhỏ so với nguyên tử (\(10^{-4}\) lần).</li>
+                        <li>- Cấu tạo từ proton và neutron.</li>
+                        <li>- Kí hiệu hạt nhân \( {}_{Z}^{A}X \).</li>
+                    </ul>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <p class="font-bold text-green-800 mb-2">Em có thể</p>
+                    <ul class="text-sm space-y-1">
+                        <li>- Giải thích cấu tạo thế giới vi mô.</li>
+                        <li>- Tính toán kích thước, khối lượng hạt nhân.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Quiz -->
+            <div class="space-y-6">
+                <h3 class="text-xl font-bold border-b-2 pb-2">Trắc nghiệm</h3>
+                <form id="quizForm" class="space-y-6">
+                    <!-- Q1 -->
+                    <div>
+                        <p class="font-semibold text-blue-800">[Biết] Câu 1: Hạt nhân nguyên tử được cấu tạo bởi các hạt:</p>
+                        <div class="ml-4 space-y-1 mt-2">
+                            <label class="block"><input type="radio" name="q1" value="a"> A. Proton và electron</label>
+                            <label class="block"><input type="radio" name="q1" value="b"> B. Proton và neutron</label>
+                            <label class="block"><input type="radio" name="q1" value="c"> C. Neutron và electron</label>
+                        </div>
+                    </div>
+                    <!-- Q2 -->
+                    <div>
+                        <p class="font-semibold text-blue-800">[Biết] Câu 2: Đơn vị amu có giá trị bằng bao nhiêu khối lượng Carbon-12?</p>
+                        <div class="ml-4 space-y-1 mt-2">
+                            <label class="block"><input type="radio" name="q2" value="a"> A. 1/12</label>
+                            <label class="block"><input type="radio" name="q2" value="b"> B. 1/14</label>
+                            <label class="block"><input type="radio" name="q2" value="c"> C. 1</label>
+                        </div>
+                    </div>
+                    <!-- Q3 -->
+                    <div>
+                        <p class="font-semibold text-green-800">[Hiểu] Câu 3: Một hạt nhân có kí hiệu \( {}_{11}^{23}Na \). Số neutron là:</p>
+                        <div class="ml-4 space-y-1 mt-2">
+                            <label class="block"><input type="radio" name="q3" value="a"> A. 11</label>
+                            <label class="block"><input type="radio" name="q3" value="b"> B. 23</label>
+                            <label class="block"><input type="radio" name="q3" value="c"> C. 12</label>
+                        </div>
+                    </div>
+                    <!-- Q4 -->
+                    <div>
+                        <p class="font-semibold text-green-800">[Hiểu] Câu 4: Thí nghiệm của Rutherford chứng tỏ hạt nhân:</p>
+                        <div class="ml-4 space-y-1 mt-2">
+                            <label class="block"><input type="radio" name="q4" value="a"> A. Chiếm phần lớn thể tích</label>
+                            <label class="block"><input type="radio" name="q4" value="b"> B. Tích điện âm</label>
+                            <label class="block"><input type="radio" name="q4" value="c"> C. Kích thước cực nhỏ, tập trung khối lượng</label>
+                        </div>
+                    </div>
+                     <!-- Q5 -->
+                     <div>
+                        <p class="font-semibold text-blue-800">[Biết] Câu 5: Điện tích của hạt neutron là:</p>
+                        <div class="ml-4 space-y-1 mt-2">
+                            <label class="block"><input type="radio" name="q5" value="a"> A. +1,6.10^-19 C</label>
+                            <label class="block"><input type="radio" name="q5" value="b"> B. 0</label>
+                            <label class="block"><input type="radio" name="q5" value="c"> C. -1,6.10^-19 C</label>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="checkQuiz()" class="btn-navy px-8 py-3 rounded-lg font-bold">NỘP BÀI</button>
+                    <div id="quizResult" class="mt-4 font-bold text-lg"></div>
+                </form>
+            </div>
+
+            <!-- Problems -->
+            <div class="mt-12 space-y-6">
+                <h3 class="text-xl font-bold border-b-2 pb-2">Bài tập tự luận (Nâng cao)</h3>
+                
+                <div class="p-4 border rounded-lg">
+                    <p class="font-bold">Bài 1: Tính khối lượng riêng của hạt nhân sắt (\(A=56\))? Coi hạt nhân là hình cầu.</p>
+                    <button onclick="toggleAnswer('prob1')" class="text-blue-600 text-sm underline mt-2">Xem giải chi tiết</button>
+                    <div id="prob1" class="answer-box p-4 mt-2 rounded border border-green-300">
+                        - Bán kính: \(R = 1,2.10^{-15} \cdot 56^{1/3} \approx 4,6.10^{-15}\) m.<br>
+                        - Thể tích: \(V = \frac{4}{3}\pi R^3 \approx 4,07.10^{-43}\) m³.<br>
+                        - Khối lượng: \(m \approx 56 \cdot 1,66.10^{-27} \approx 9,3.10^{-26}\) kg.<br>
+                        - Khối lượng riêng: \(D = m/V \approx 2,3.10^{17}\) kg/m³. (Cực lớn!)
+                    </div>
+                </div>
+
+                <div class="p-4 border rounded-lg">
+                    <p class="font-bold">Bài 2: Tính lực đẩy Coulomb giữa hai proton trong hạt nhân Helium cách nhau \(10^{-15}\) m?</p>
+                    <button onclick="toggleAnswer('prob2')" class="text-blue-600 text-sm underline mt-2">Xem giải chi tiết</button>
+                    <div id="prob2" class="answer-box p-4 mt-2 rounded border border-green-300">
+                        Áp dụng định luật Coulomb: \(F = k \frac{|q_1 q_2|}{r^2}\).<br>
+                        Với \(q_1 = q_2 = 1,6.10^{-19}\) C, \(r = 10^{-15}\) m.<br>
+                        \(F = 9.10^9 \cdot \frac{(1,6.10^{-19})^2}{(10^{-15})^2} \approx 230\) N.
+                    </div>
+                </div>
+
+                <div class="p-4 border rounded-lg">
+                    <p class="font-bold">Bài 3: Giải thích tại sao nguyên tử trung hòa về điện nhưng hạt nhân lại tích điện dương?</p>
+                    <button onclick="toggleAnswer('prob3')" class="text-blue-600 text-sm underline mt-2">Xem giải chi tiết</button>
+                    <div id="prob3" class="answer-box p-4 mt-2 rounded border border-green-300">
+                        Hạt nhân chứa proton (+) và neutron (không điện), nên hạt nhân tích điện dương. Tuy nhiên, nguyên tử còn lớp vỏ electron (-) có tổng điện tích âm bằng đúng điện tích dương của hạt nhân, dẫn đến tổng điện tích nguyên tử bằng 0.
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center py-8 text-gray-500 text-sm">
+        &copy; 2024 - Bài giảng Vật lý 12 - Cấu trúc hạt nhân
+    </footer>
+
+    <script>
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === 'block') {
+                el.style.display = 'none';
+            } else {
+                el.style.display = 'block';
+            }
+        }
+
+        function checkQuiz() {
+            const answers = {
+                q1: 'b',
+                q2: 'a',
+                q3: 'c',
+                q4: 'c',
+                q5: 'b'
+            };
+            
+            let score = 0;
+            const form = document.getElementById('quizForm');
+            const formData = new FormData(form);
+            
+            for (let [key, value] of Object.entries(answers)) {
+                if (formData.get(key) === value) {
+                    score++;
+                }
+            }
+            
+            const resultDiv = document.getElementById('quizResult');
+            if (score === 5) {
+                resultDiv.innerHTML = `<span class="text-green-600">Tuyệt vời! Bạn đúng ${score}/5 câu.</span>`;
+            } else {
+                resultDiv.innerHTML = `<span class="text-red-600">Bạn đúng ${score}/5 câu. Hãy kiểm tra lại kiến thức nhé!</span>`;
+            }
+        }
+    </script>
+</body>
+</html>
