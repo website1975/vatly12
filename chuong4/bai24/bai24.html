@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 24: CÔNG NGHIỆP HẠT NHÂN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2d3748;
+        }
+        .main-header {
+            background-color: #660000;
+            color: white;
+            border-radius: 12px;
+        }
+        .content-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            padding: 2rem;
+        }
+        .intro-box {
+            border: 1px solid #000;
+            background-color: white;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .section-header {
+            color: #660000;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 3px solid #2d3748;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+        }
+        .question-box {
+            background-color: #edf2f7;
+            border-left: 4px solid #2b6cb0;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .answer-box {
+            background-color: #f0fff4;
+            border-left: 4px solid #38a169;
+            padding: 1rem;
+            margin: 1rem 0;
+            display: none;
+        }
+        .info-box {
+            background-color: #fffaf0;
+            border: 1px solid #feebc8;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .can-box {
+            background-color: #ebf8ff;
+            border: 1px solid #bee3f8;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .btn-toggle {
+            background-color: #660000;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-toggle:hover {
+            background-color: #800000;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            border: 1px solid #cbd5e0;
+            padding: 0.75rem;
+            text-align: center;
+        }
+        th {
+            background-color: #e2e8f0;
+        }
+        .quiz-container {
+            background-color: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        .btn-submit {
+            background-color: #1a202c;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="main-header p-6 text-center mb-8">
+            <p class="text-sm uppercase tracking-widest mb-2 font-semibold">Chương IV: Vật lí hạt nhân và phóng xạ</p>
+            <hr>
+            <h1 class="text-3xl font-bold">BÀI 24: CÔNG NGHIỆP HẠT NHÂN</h1>
+        </header>
+
+        <!-- Intro Box -->
+        <div class="intro-box">
+            <p class="italic">
+                Nhà máy điện hạt nhân có thể giải quyết vấn đề thiếu hụt năng lượng. Tuy vậy, một số quốc gia phát triển dự định sẽ đóng cửa các nhà máy điện hạt nhân trong tương lai. Nhà máy điện hạt nhân có những ưu điểm và nhược điểm gì?
+            </p>
+        </div>
+
+        <!-- Section I -->
+        <section class="content-card">
+            <h2 class="section-header">I. NHÀ MÁY ĐIỆN HẠT NHÂN</h2>
+            <p class="mb-4">Năng lượng toả ra trong các phản ứng hạt nhân thường được chuyển hoá thành điện năng thông qua hệ thống lò phản ứng hạt nhân, tua bin và máy phát điện để hoà vào lưới điện hoặc cung cấp năng lượng cho tàu ngầm, tàu phá băng.... Hệ thống khai thác năng lượng hạt nhân có thể hoạt động trong thời gian dài mà không cần bổ sung nhiên liệu.</p>
+            
+            <div class="my-6 border-2 border-dashed border-gray-300 p-4 rounded text-center">
+                <p class="text-gray-500 italic"><img src="h1.png" class="max-h-full max-w-full object-contain"></img></p>
+                <!-- <img src="path_to_image_24_1.jpg" alt="Sơ đồ nhà máy điện hạt nhân"> -->
+            </div>
+
+            <p class="mb-4">Bộ phận chính của nhà máy điện hạt nhân là lò phản ứng hạt nhân. Chất tải nhiệt sơ cấp, sau khi chạy qua vùng tâm lò, sẽ chảy qua bộ trao đổi nhiệt, cung cấp nhiệt cho lò sinh hơi. Hơi nước làm chạy tua bin phát điện giống như trong nhà máy điện thông thường.</p>
+
+            <div class="info-box border-l-4 border-yellow-500">
+                <h3 class="font-bold text-yellow-800 mb-2 underline">Lưu ý về môi trường:</h3>
+                <p>Nhà máy điện hạt nhân không trực tiếp phát khí thải ô nhiễm môi trường như \( CO \), \( CO_2 \),... và có thể phát điện liên tục nhiều năm cho tới khi phải thay nhiên liệu mới.</p>
+            </div>
+
+            <p class="mb-4">Tuy nhiên, việc xử lí chất thải hạt nhân đòi hỏi công nghệ phức tạp với chi phí cao. Vật liệu chứa chất thải hạt nhân cần có độ bền rất cao để bảo quản cất giữ hàng trăm năm vì chu kì bán rã của một số đồng vị như \( {}^{90}Sr \), \( {}^{137}Cs \) là rất lớn (khoảng 30 năm).</p>
+
+            <div class="my-6 border-2 border-dashed border-gray-300 p-4 rounded text-center">
+                <center><p class="text-gray-500 italic"><img src="h2.png" class="max-h-full max-w-full object-contain"></img></p></center>
+            </div>
+
+            <!-- Câu hỏi 1 & 2 -->
+            <div class="question-box">
+                <p class="font-bold">? 1. Vì sao các nhà máy điện hạt nhân thường được xây dựng cạnh hồ, sông và bờ biển?</p>
+                <button onclick="toggleAnswer('ans1')" class="btn-toggle mt-2">Xem câu trả lời</button>
+                <div id="ans1" class="answer-box">
+                    Do nhà máy điện hạt nhân cần một lượng nước rất lớn để làm mát hệ thống ngưng tụ hơi nước (chu trình thứ hai) và duy trì nhiệt độ ổn định cho lò phản ứng.
+                </div>
+            </div>
+
+            <div class="question-box">
+                <p class="font-bold">? 2. Liệt kê các nguy cơ ảnh hưởng tới sức khoẻ con người và môi trường nếu không may xảy ra sự cố tại lò phản ứng hạt nhân.</p>
+                <button onclick="toggleAnswer('ans2')" class="btn-toggle mt-2">Xem câu trả lời</button>
+                <div id="ans2" class="answer-box">
+                    Nguy cơ rò rỉ chất phóng xạ gây nhiễm độc phóng xạ cấp tính, ung thư, đột biến gen cho con người; gây ô nhiễm đất, nước và không khí lâu dài, phá hủy hệ sinh thái khu vực xung quanh.
+                </div>
+            </div>
+
+            <!-- Hoạt động thảo luận -->
+            <div class="bg-gray-100 p-4 rounded-lg border-l-4 border-gray-800 my-4">
+                <p class="font-bold mb-2">✋ Thảo luận để thực hiện các yêu cầu sau:</p>
+                <ol class="list-decimal ml-6">
+                    <li>Nêu vai trò của các nhà máy điện hạt nhân trong đời sống.</li>
+                    <li>Đánh giá các ưu điểm, nhược điểm và cơ hội phát triển.</li>
+                </ol>
+                <button onclick="toggleAnswer('act1')" class="btn-toggle mt-2">Xem hướng giải quyết</button>
+                <div id="act1" class="answer-box">
+                    <strong>Hướng giải quyết:</strong><br>
+                    - Vai trò: Cung cấp điện năng quy mô lớn, ổn định, phục vụ công nghiệp và dân dụng.<br>
+                    - Ưu điểm: Hiệu suất cao, không phát thải khí nhà kính.<br>
+                    - Nhược điểm: Rác thải phóng xạ khó xử lý, nguy cơ sự cố nghiêm trọng.<br>
+                    - Cơ hội: Công nghệ lò phản ứng thế hệ mới an toàn hơn.
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3 class="font-bold mb-2">💡 EM CÓ BIẾT: Lò phản ứng hạt nhân</h3>
+                <p class="text-sm italic">Năm 1942, Fermi và các cộng sự đã lần đầu tiên thực hiện thành công các chuỗi phản ứng phân hạch duy trì điều khiển được trong lò phản ứng ở trường đại học Chicago (Mĩ). Lò phản ứng hạt nhân là một hệ thống được sử dụng để khởi tạo và điều khiển chuỗi phản ứng phân hạch hạt nhân dây chuyền. Phần lớn các lò phản ứng hạt nhân đều có nhiều bộ phận chức năng giống nhau (Hình 243). Nhiên liệu phân hạch trong phần lớn các lò phản ứng là 235U hay 239Pu. Để đảm bảo cho k = 1, trong các lò phản ứng người ta dùng các thanh điều khiển có chứa Bo hay Cd, là các chất có tác dụng hấp thụ neutron nhiệt (động năng dưới 0,1 eV). Khi số neutron trong lò tăng lên quá nhiều (k > 1), người ta cho các thanh điều khiển ngập sâu vào khu vực chứa nhiên liệu phân hạch để hấp thụ số neutron thừa. Nhờ vậy, năng lượng toả ra từ lò phản ứng không đổi theo thời gian.</p>
+                <div class="my-4 border-2 border-dashed border-gray-200 p-2 text-center text-xs">
+                    <center><img src="h3.png" class="max-h-full max-w-full object-contain"></img></center>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section II -->
+        <section class="content-card">
+            <h2 class="section-header">II. Y HỌC HẠT NHÂN</h2>
+            <p class="mb-4">Trong y học người ta khai thác các tính chất của tia phóng xạ để chẩn đoán và điều trị bệnh.</p>
+            
+            <h3 class="font-bold text-lg mb-2">1. Chẩn đoán thông qua chụp ảnh phóng xạ cắt lớp bên trong cơ thể</h3>
+            <p class="mb-4">Người ta đưa các đồng vị phóng xạ vào cơ thể thông qua dược chất phóng xạ. Sử dụng thiết bị phát hiện tia phóng xạ (phương pháp theo dõi vết) để quan sát chức năng các cơ quan.</p>
+
+            <div class="info-box">
+                <h3 class="font-bold mb-2">💡 EM CÓ BIẾT: SPECT và PET</h3>
+                <p class="text-sm">Kĩ thuật SPECT và PET thường được phối hợp với CT, MRI để tăng độ chi tiết hình ảnh. SPECT giúp theo dõi sự luân chuyển chất, chẩn đoán bệnh chính xác hơn.</p>
+                <div class="my-4 border-2 border-dashed border-gray-200 p-2 text-center text-xs">
+                    <center><img src="h4.png" class="max-h-full max-w-full object-contain"></img></center>
+                </div>
+            </div>
+
+            <!-- Câu hỏi thảo luận y học 1 -->
+            <div class="bg-gray-100 p-4 rounded-lg border-l-4 border-gray-800 my-4">
+                <p class="font-bold mb-2">✋ Thảo luận:</p>
+                <p>1. Tại sao người ta sử dụng tia gamma trong chụp ảnh phóng xạ cắt lớp bên trong cơ thể?</p>
+                <button onclick="toggleAnswer('act2')" class="btn-toggle mt-2">Xem hướng giải quyết</button>
+                <div id="act2" class="answer-box">
+                    Tia gamma có khả năng đâm xuyên mạnh, có thể đi xuyên qua các mô cơ thể ra ngoài để các thiết bị đầu dò (gamma camera) phát hiện và dựng ảnh mà không bị hấp thụ hoàn toàn bên trong.
+                </div>
+            </div>
+
+            <h3 class="font-bold text-lg mb-2 mt-6">2. Điều trị bệnh</h3>
+            <p class="mb-4">Trong điều trị ung thư, bệnh nhân dùng dược chất chứa đồng vị phóng xạ (ví dụ \( {}^{223}_{88}Ra \), \( {}^{177}_{71}Lu \)). Tế bào ung thư chết do hấp thụ bức xạ. Ngoài ra còn dùng máy xạ trị chiếu từ bên ngoài.</p>
+
+            <div class="question-box">
+                <p class="font-bold">? Khi sử dụng máy xạ trị để chữa bệnh, tia phóng xạ có tác động lên các tế bào khoẻ mạnh không? Hãy tìm thông tin về các triệu chứng sau xạ trị.</p>
+                <button onclick="toggleAnswer('ans3')" class="btn-toggle mt-2">Xem câu trả lời</button>
+                <div id="ans3" class="answer-box">
+                    Có, tia phóng xạ có thể làm tổn thương các tế bào khỏe mạnh nằm trên đường đi của tia. Triệu chứng thường gặp: mệt mỏi, rụng tóc, viêm da vùng chiếu xạ, buồn nôn, giảm bạch cầu.
+                </div>
+            </div>
+        </section>
+
+        <!-- Section III -->
+        <section class="content-card">
+            <h2 class="section-header">III. ỨNG DỤNG PHÓNG XẠ TRONG CÔNG NGHỆ SINH HỌC VÀ BẢO QUẢN THỰC PHẨM</h2>
+            <p class="mb-4">Tia phóng xạ hỗ trợ nghiên cứu gây đột biến gene tạo giống cây trồng năng suất cao, kháng sâu bệnh. Tuy nhiên, thực phẩm biến đổi gene cần được đánh giá kỹ về tác động hệ sinh thái.</p>
+
+            <div class="my-6 border-2 border-dashed border-gray-300 p-4 rounded text-center">
+                <p class="text-gray-500 italic"><center><img src="h5.png" class="max-h-full max-w-full object-contain"></img></center></p>
+            </div>
+
+            <p class="mb-4">Phương pháp đánh dấu bằng đồng vị \( {}^{32}_{15}P \) (phóng xạ \( \beta \)) giúp nghiên cứu đường đi của phân bón trong cây.</p>
+            
+            <p class="mb-4">Chiếu xạ thực phẩm giúp diệt vi trùng, kéo dài thời gian bảo quản, ngăn mọc mầm. Nhược điểm: có thể đổi màu, hương vị và giá thành cao.</p>
+
+            <div class="bg-gray-100 p-4 rounded-lg border-l-4 border-gray-800 my-4">
+                <p class="font-bold mb-2">✋ Thảo luận vai trò và đánh giá:</p>
+                <button onclick="toggleAnswer('act3')" class="btn-toggle mt-2">Xem hướng giải quyết</button>
+                <div id="act3" class="answer-box">
+                    - Vai trò: Đảm bảo an ninh lương thực, tạo giống cây ưu việt, bảo quản xuất khẩu.<br>
+                    - Ưu điểm: Giảm dùng thuốc trừ sâu, bảo quản lâu không cần hóa chất.<br>
+                    - Nhược điểm: Chi phí đầu tư thiết bị cao, tâm lý người tiêu dùng còn e ngại.
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary boxes -->
+        <div class="info-box bg-green-50 border-green-200">
+            <h3 class="font-bold text-green-800 mb-2 underline">✅ EM ĐÃ HỌC:</h3>
+            <ul class="list-disc ml-6">
+                <li>Ứng dụng công nghiệp: Nhà máy điện hạt nhân.</li>
+                <li>Ứng dụng y học: Chẩn đoán và điều trị (SPECT, PET, xạ trị).</li>
+                <li>Ứng dụng sinh học & thực phẩm: Gây đột biến, bảo quản chiếu xạ.</li>
+            </ul>
+        </div>
+
+        <div class="can-box">
+            <h3 class="font-bold text-blue-800 mb-2 underline">🚀 EM CÓ THỂ:</h3>
+            <ul class="list-disc ml-6">
+                <li>Nêu ví dụ vai trò ứng dụng phóng xạ trong đời sống.</li>
+                <li>Giải thích lý do khai thác năng lượng hạt nhân vì mục đích hòa bình.</li>
+            </ul>
+        </div>
+
+        <!-- Quiz Section -->
+        <section class="content-card">
+            <h2 class="section-header">BÀI TẬP CỦNG CỐ</h2>
+            
+            <div id="quiz" class="quiz-container">
+                <!-- Question 1 -->
+                <div class="mb-6">
+                    <p class="font-bold">Câu 1: Trong nhà máy điện hạt nhân, năng lượng hạt nhân được chuyển hóa trực tiếp thành loại năng lượng nào trước khi làm quay tua bin?</p>
+                    <div class="ml-4 mt-2">
+                        <label class="block"><input type="radio" name="q1" value="a"> A. Điện năng</label>
+                        <label class="block"><input type="radio" name="q1" value="b"> B. Nhiệt năng</label>
+                        <label class="block"><input type="radio" name="q1" value="c"> C. Hóa năng</label>
+                        <label class="block"><input type="radio" name="q1" value="d"> D. Quang năng</label>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="mb-6">
+                    <p class="font-bold">Câu 2: Chất nào sau đây thường được dùng làm thanh điều khiển trong lò phản ứng hạt nhân?</p>
+                    <div class="ml-4 mt-2">
+                        <label class="block"><input type="radio" name="q2" value="a"> A. Uranium-235</label>
+                        <label class="block"><input type="radio" name="q2" value="b"> B. Than chì</label>
+                        <label class="block"><input type="radio" name="q2" value="c"> C. Cadmium (Cd)</label>
+                        <label class="block"><input type="radio" name="q2" value="d"> D. Nước nhẹ</label>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="mb-6">
+                    <p class="font-bold">Câu 3: Mục đích chính của việc chiếu xạ thực phẩm là gì?</p>
+                    <div class="ml-4 mt-2">
+                        <label class="block"><input type="radio" name="q3" value="a"> A. Làm thực phẩm chín nhanh hơn</label>
+                        <label class="block"><input type="radio" name="q3" value="b"> B. Tăng hàm lượng vitamin</label>
+                        <label class="block"><input type="radio" name="q3" value="c"> C. Diệt vi khuẩn và kéo dài thời gian bảo quản</label>
+                        <label class="block"><input type="radio" name="q3" value="d"> D. Thay đổi màu sắc cho đẹp mắt</label>
+                    </div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="mb-6">
+                    <p class="font-bold">Câu 4: Đồng vị \( {}^{137}Cs \) có chu kì bán rã khoảng 30 năm. Sau bao nhiêu năm thì lượng chất này còn lại 1/4 so với ban đầu?</p>
+                    <div class="ml-4 mt-2">
+                        <label class="block"><input type="radio" name="q4" value="a"> A. 30 năm</label>
+                        <label class="block"><input type="radio" name="q4" value="b"> B. 60 năm</label>
+                        <label class="block"><input type="radio" name="q4" value="c"> C. 90 năm</label>
+                        <label class="block"><input type="radio" name="q4" value="d"> D. 120 năm</label>
+                    </div>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="mb-6">
+                    <p class="font-bold">Câu 5: Trong kỹ thuật PET, người ta sử dụng loại hạt nào sau đây phát ra từ dược chất phóng xạ?</p>
+                    <div class="ml-4 mt-2">
+                        <label class="block"><input type="radio" name="q5" value="a"> A. Electron</label>
+                        <label class="block"><input type="radio" name="q5" value="b"> B. Positron</label>
+                        <label class="block"><input type="radio" name="q5" value="c"> C. Hạt Alpha</label>
+                        <label class="block"><input type="radio" name="q5" value="d"> D. Neutron</label>
+                    </div>
+                </div>
+
+                <button onclick="checkQuiz()" class="btn-submit">NỘP BÀI</button>
+                <div id="quiz-result" class="mt-4 font-bold text-lg"></div>
+                <div id="quiz-explanation" class="mt-2 hidden p-4 bg-blue-50 rounded">
+                    <h4 class="font-bold border-b border-blue-200 mb-2">Lời giải chi tiết:</h4>
+                    <p>1-B: Phản ứng hạt nhân tỏa nhiệt năng làm nóng chất tải nhiệt.</p>
+                    <p>2-C: Bo và Cd hấp thụ neutron để điều khiển tốc độ phản ứng.</p>
+                    <p>3-C: Tia phóng xạ diệt vi sinh vật gây hại.</p>
+                    <p>4-B: Còn 1/4 tương ứng với 2 chu kì bán rã: \( 2 \times 30 = 60 \) năm.</p>
+                    <p>5-B: PET là viết tắt của Positron Emission Tomography.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Computational Exercises -->
+        <section class="content-card">
+            <h2 class="section-header">BÀI TẬP VẬN DỤNG</h2>
+            
+            <div class="mb-6 p-4 border rounded">
+                <p class="font-bold">Bài 1: Một lò phản ứng hạt nhân có công suất nhiệt \( 3000 \, MW \). Nếu hiệu suất chuyển hóa nhiệt thành điện là \( 33\% \), tính công suất điện đầu ra của nhà máy.</p>
+                <button onclick="toggleAnswer('calc1')" class="btn-toggle mt-2">Xem lời giải</button>
+                <div id="calc1" class="answer-box">
+                    Công suất điện: \( P_{điện} = P_{nhiệt} \times H = 3000 \times 0,33 = 990 \, MW \).
+                </div>
+            </div>
+
+            <div class="mb-6 p-4 border rounded">
+                <p class="font-bold">Bài 2: Một mẫu rác thải chứa \( 100 \, g \) chất phóng xạ \( {}^{90}Sr \) (\( T = 28 \) năm). Sau 84 năm, khối lượng \( {}^{90}Sr \) còn lại là bao nhiêu?</p>
+                <button onclick="toggleAnswer('calc2')" class="btn-toggle mt-2">Xem lời giải</button>
+                <div id="calc2" class="answer-box">
+                    Số chu kì bán rã: \( n = \frac{t}{T} = \frac{84}{28} = 3 \).<br>
+                    Khối lượng còn lại: \( m = m_0 \cdot 2^{-n} = 100 \cdot 2^{-3} = \frac{100}{8} = 12,5 \, g \).
+                </div>
+            </div>
+
+            <div class="mb-6 p-4 border rounded">
+                <p class="font-bold">Bài 3: Mỗi phân hạch hạt nhân \( {}^{235}U \) tỏa ra năng lượng \( 200 \, MeV \). Tính năng lượng tỏa ra khi \( 1 \, g \) \( {}^{235}U \) phân hạch hoàn toàn. (Biết \( N_A = 6,02 \cdot 10^{23} \, mol^{-1} \)).</p>
+                <button onclick="toggleAnswer('calc3')" class="btn-toggle mt-2">Xem lời giải</button>
+                <div id="calc3" class="answer-box">
+                    Số hạt trong \( 1 \, g \): \( N = \frac{m}{A} \cdot N_A = \frac{1}{235} \cdot 6,02 \cdot 10^{23} \approx 2,56 \cdot 10^{21} \) hạt.<br>
+                    Tổng năng lượng: \( E = N \cdot 200 \, MeV \approx 5,12 \cdot 10^{23} \, MeV \).<br>
+                    Đổi ra Joule: \( E \approx 5,12 \cdot 10^{23} \cdot 1,6 \cdot 10^{-13} \approx 8,2 \cdot 10^{10} \, J \).
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function toggleAnswer(id) {
+            const element = document.getElementById(id);
+            if (element.style.display === "none" || element.style.display === "") {
+                element.style.display = "block";
+            } else {
+                element.style.display = "none";
+            }
+        }
+
+        function checkQuiz() {
+            const answers = {
+                q1: "b",
+                q2: "c",
+                q3: "c",
+                q4: "b",
+                q5: "b"
+            };
+            
+            let score = 0;
+            let total = 5;
+            
+            for (let i = 1; i <= total; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected && selected.value === answers[`q${i}`]) {
+                    score++;
+                }
+            }
+            
+            const resultDiv = document.getElementById("quiz-result");
+            const expDiv = document.getElementById("quiz-explanation");
+            
+            resultDiv.innerHTML = `Kết quả: ${score}/${total} câu đúng.`;
+            if (score === total) {
+                resultDiv.className = "mt-4 font-bold text-lg text-green-600";
+            } else {
+                resultDiv.className = "mt-4 font-bold text-lg text-red-600";
+            }
+            
+            expDiv.classList.remove("hidden");
+        }
+    </script>
+</body>
+</html>
