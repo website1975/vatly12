@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 23: Hiện tượng phóng xạ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2d3748;
+        }
+        .header-main { background-color: #660000; }
+        .section-title {
+            border-bottom: 4px solid #1a202c;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding-bottom: 4px;
+        }
+        .btn-primary {
+            background-color: #660000;
+            color: white;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #4d0000;
+            transform: translateY(-1px);
+        }
+        .question-box {
+            background-color: #edf2f7;
+            border-left: 5px solid #2b6cb0;
+        }
+        .answer-box {
+            background-color: #f0fff4;
+            border-left: 5px solid #38a169;
+            display: none;
+        }
+        .rounded-12 { border-radius: 12px; }
+        .em-co-biet { background-color: #fefcbf; }
+        .em-da-hoc { background-color: #e0feff; }
+        .em-co-the { background-color: #edf2f7; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { border: 1px solid #cbd5e0; padding: 12px; text-align: center; }
+        th { background-color: #e2e8f0; font-weight: bold; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="header-main text-white text-center py-3 rounded-t-[12px] font-bold text-lg">
+                CHƯƠNG IV: VẬT LÝ HẠT NHÂN
+            </div>
+		<hr>
+            <div class="header-main text-white text-center py-6 rounded-b-[12px] mt-0 shadow-lg">
+                <h1 class="text-3xl font-extrabold tracking-widest">BÀI 23: HIỆN TƯỢNG PHÓNG XẠ</h1>
+            </div>
+        </header>
+
+        <!-- Intro Box -->
+        <div class="bg-white border border-gray-300 p-6 rounded-12 shadow-md mb-8">
+            <p class="italic text-gray-700">
+                "Khi gói miếng kim loại hình chữ thập cùng một hòn đá có chứa uranium bằng tấm phim và để trong bóng tối vài ngày, Becquerel đã phát hiện trên tấm phim có vết sáng giống dấu chữ thập. Nguyên nhân nào gây tác dụng lên phim dù nó được để trong bóng tối?"
+            </p>
+        </div>
+
+        <!-- Section I -->
+        <section class="bg-white p-6 rounded-12 shadow-md mb-8">
+            <h2 class="section-title text-2xl font-bold">I. HIỆN TƯỢNG PHÓNG XẠ</h2>
+            
+            <div class="mb-6">
+                <h3 class="font-bold text-lg mb-2">1. Định nghĩa hiện tượng phóng xạ</h3>
+                <p class="mb-4"><strong>Thí nghiệm:</strong> Sử dụng buồng sương để quan sát vết quỹ đạo của các tia phát ra từ mẫu uranium.</p>
+                <div class="bg-gray-100 p-4 rounded mb-4 text-center">
+		<center><img src="h2.png" class="max-h-full max-w-full object-contain"></img></center>
+                </div>
+                <p class="bg-yellow-50 p-4 border-l-4 border-yellow-500 mb-4">
+                    <strong>Định nghĩa:</strong> Hiện tượng một hạt nhân không bền vững tự phát biến đổi thành một hạt nhân khác đồng thời phát ra tia phóng xạ gọi là hiện tượng phóng xạ.
+                </p>
+
+                <div class="question-box p-4 rounded-r-lg mb-2">
+                    <p class="font-bold">Thảo luận:</p>
+                    <ol class="list-decimal ml-5">
+                        <li>Nêu các tác dụng chính của tia phóng xạ mà em biết?</li>
+                        <li>Tại sao hiện tượng phóng xạ lại được coi là quá trình biến đổi hạt nhân?</li>
+                    </ol>
+                    <button onclick="toggleAnswer('ans1')" class="btn-primary px-4 py-1 mt-3 rounded text-sm">Xem giải quyết</button>
+                </div>
+                <div id="ans1" class="answer-box p-4 rounded-r-lg mb-4">
+                    1. Tác dụng: Ion hóa không khí, làm đen kính ảnh, đâm xuyên, hủy diệt tế bào...<br>
+                    2. Vì kết quả của quá trình là tạo ra hạt nhân mới khác với hạt nhân ban đầu.
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="font-bold text-lg mb-2">2. Tính ngẫu nhiên của phân rã phóng xạ</h3>
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div class="border p-3 rounded bg-gray-50 flex items-center justify-center">
+                        <div class="italic text-center"><center><img src="h1.png" class="max-h-full max-w-full object-contain"></img></center></div>
+                    </div>
+                    <div>
+                        <p>Thí nghiệm cho thấy không thể dự đoán chính xác thời điểm một hạt nhân cụ thể sẽ phân rã.</p>
+                        <table>
+                            <thead>
+                                <tr><th>Thời gian</th><th>Số hạt còn lại</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>0</td><td>N₀</td></tr>
+                                <tr><td>T</td><td>N₀/2</td></tr>
+                                <tr><td>2T</td><td>N₀/4</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <p class="font-semibold italic">Kết luận: Quá trình phóng xạ mang tính chất ngẫu nhiên và thống kê.Sau mỗi chu kỳ T thì số hạt nhân giảm một nữa</p>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="font-bold text-lg mb-2">3. Các dạng phóng xạ</h3>
+                
+                <!-- Alpha -->
+                <div class="mb-6 border-b pb-4">
+                    <h4 class="font-bold text-blue-900 italic">a) Phóng xạ alpha (\(\alpha\))</h4>
+                    <p class="my-2">Phương trình tổng quát: \(_{Z}^{A}X \rightarrow _{Z-2}^{A-4}Y + _{2}^{4}He\)</p>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-blue-50 p-3 rounded border border-blue-100">
+                            <strong>Đặc điểm tia \(\alpha\):</strong>
+                            <ul class="list-disc ml-5 text-sm">
+                                <li>Là dòng hạt nhân \(_{2}^{4}He\).</li>
+                                <li>Tốc độ khoảng \(2.10^7\) m/s.</li>
+                                <li>Làm ion hóa mạnh môi trường.</li>
+                                <li>Khả năng đâm xuyên yếu (vài cm trong không khí).</li>
+                            </ul>
+                        </div>
+                        <div class="border p-2 rounded flex items-center justify-center italic text-xs"><center><img src="h4.png" class="max-h-full max-w-full object-contain"></img></center></div>
+                    </div>
+                    <div class="question-box p-4 rounded-r-lg mt-4">
+                        <p>1. Tại sao tia \(\alpha\) có khả năng ion hóa mạnh?<br>2. Viết phương trình phân rã \(\alpha\) của \(_{92}^{238}U\)?</p>
+                        <button onclick="toggleAnswer('ans-alpha')" class="btn-primary px-4 py-1 mt-2 rounded text-sm">Xem trả lời</button>
+                    </div>
+                    <div id="ans-alpha" class="answer-box p-4 rounded-r-lg">
+                        1. Do có kích thước lớn và điện tích +2e.<br>
+                        2. \(_{92}^{238}U \rightarrow _{90}^{234}Th + _{2}^{4}He\).
+                    </div>
+                </div>
+
+                <!-- Beta -->
+                <div class="mb-6 border-b pb-4">
+                    <h4 class="font-bold text-blue-900 italic">b) Phóng xạ beta (\(\beta\))</h4>
+                    <p>Có hai loại phóng xạ beta:</p>
+                    <ul class="list-disc ml-8 my-2">
+                        <li>\(\beta^-\): \(_{Z}^{A}X \rightarrow _{Z+1}^{A}Y + _{-1}^{0}e + \bar{\nu}\)</li>
+                        <li>\(\beta^+\): \(_{Z}^{A}X \rightarrow _{Z-1}^{A}Y + _{1}^{0}e + \nu\)</li>
+                    </ul>
+                    <p><strong>Đặc điểm:</strong> Tốc độ xấp xỉ tốc độ ánh sáng, đâm xuyên mạnh hơn tia \(\alpha\).</p>
+                    <p class="text-sm bg-gray-50 p-2 rounded mt-2"><strong>Hạt neutrino (\(\nu\)):</strong> Hạt không điện tích, khối lượng nghỉ rất nhỏ, chuyển động với tốc độ xấp xỉ ánh sáng.</p>
+                    <div class="question-box p-4 rounded-r-lg mt-4">
+                        <p>1. Tia \(\beta^-\) là dòng các hạt nào?<br>2. So sánh khả năng đâm xuyên của \(\beta\) và \(\alpha\)?</p>
+                        <button onclick="toggleAnswer('ans-beta')" class="btn-primary px-4 py-1 mt-2 rounded text-sm">Xem trả lời</button>
+                    </div>
+                    <div id="ans-beta" class="answer-box p-4 rounded-r-lg">
+                        1. Dòng các electron (\(e^-\)).<br>
+                        2. Tia \(\beta\) đâm xuyên mạnh hơn tia \(\alpha\) rất nhiều lần.
+                    </div>
+                </div>
+
+                <!-- Gamma -->
+                <div class="mb-6">
+                    <h4 class="font-bold text-blue-900 italic">c) Phóng xạ gamma (\(\gamma\))</h4>
+                    <p>Hạt nhân ở trạng thái kích thích chuyển về mức năng lượng thấp hơn: \(_{Z}^{A}X^* \rightarrow _{Z}^{A}X + \gamma\)</p>
+                    <p><strong>Đặc điểm:</strong> Là sóng điện từ bước sóng cực ngắn (\(< 10^{-11}\) m), không làm biến đổi số khối hay điện tích, đâm xuyên cực mạnh (qua được lớp chì dày).</p>
+                    <div class="question-box p-4 rounded-r-lg mt-4">
+                        <p>1. Tia \(\gamma\) có bị lệch trong điện trường không?<br>2. Nêu ứng dụng của tia \(\gamma\) trong y học?</p>
+                        <button onclick="toggleAnswer('ans-gamma')" class="btn-primary px-4 py-1 mt-2 rounded text-sm">Xem trả lời</button>
+                    </div>
+                    <div id="ans-gamma" class="answer-box p-4 rounded-r-lg">
+                        1. Không, vì nó không mang điện.<br>
+                        2. Dùng để diệt tế bào ung thư, tiệt trùng dụng cụ y tế...
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section II -->
+        <section class="bg-white p-6 rounded-12 shadow-md mb-8">
+            <h2 class="section-title text-2xl font-bold uppercase">II. ĐỊNH LUẬT PHÓNG XẠ, ĐỘ PHÓNG XẠ</h2>
+            
+            <div class="mb-6">
+                <h3 class="font-bold text-lg mb-2">1. Định luật phóng xạ</h3>
+                <p><strong>a) Phát biểu:</strong> Trong quá trình phân rã, số hạt nhân chưa bị phân rã giảm dần theo hàm số mũ theo thời gian.</p>
+                <div class="grid md:grid-cols-2 gap-6 items-center">
+                    <div>
+                        <strong>b) Công thức:</strong>
+                        <div class="bg-gray-50 p-4 my-2 border rounded font-mono text-center">
+                            \(N_t = N_0 . e^{-\lambda t} = N_0 . 2^{-\frac{t}{T}}\)
+                        </div>
+                        <ul class="text-sm">
+                            <li>\(N_0\): Số hạt ban đầu</li>
+                            <li>\(N_t\): Số hạt còn lại ở thời điểm \(t\)</li>
+                            <li>\(T\): Chu kỳ bán rã (đơn vị: s, h, ngày, năm...)</li>
+                            <li>\(\lambda = \frac{\ln 2}{T}\): Hằng số phóng xạ (\(s^{-1}\))</li>
+                        </ul>
+                    </div>
+                    <div class="text-center italic border p-4 rounded bg-white">
+			<img src="h5.png" class="max-h-full max-w-full object-contain"></img>
+                    </div>
+                </div>
+                
+                <h4 class="font-bold mt-4">c) Bảng chu kỳ bán rã của một số chất</h4>
+                <table>
+                    <thead>
+                        <tr><th>Chất phóng xạ</th><th>Chu kỳ bán rã (T)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Poloni \(_{84}^{212}Po\)</td><td>\(3.10^{-7}\) s</td></tr>
+                        <tr><td>Radon \(_{86}^{222}Rn\)</td><td>3,8 ngày</td></tr>
+                        <tr><td>Urani \(_{92}^{238}U\)</td><td>\(4,5.10^9\) năm</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="font-bold text-lg mb-2">2. Độ phóng xạ</h3>
+                <p><strong>a) Định nghĩa:</strong> Đặc trưng cho tính phóng xạ mạnh hay yếu của mẫu chất, bằng số hạt nhân phân rã trong 1 giây.</p>
+                <p><strong>b) Công thức:</strong> \(H_t = \lambda N_t = H_0 . e^{-\lambda t}\)</p>
+                <p><strong>Đơn vị:</strong> Becquerel (Bq) hoặc Curi (Ci). \(1 \text{ Ci} = 3,7.10^{10} \text{ Bq}\).</p>
+                <div class="question-box p-4 rounded-r-lg mt-4">
+                    <p>Tính số hạt nhân bị phân rã sau thời gian \(t = 2T\)?</p>
+                    <button onclick="toggleAnswer('ans-calc')" class="btn-primary px-4 py-1 mt-2 rounded text-sm">Xem trả lời</button>
+                </div>
+                <div id="ans-calc" class="answer-box p-4 rounded-r-lg">
+                    Số hạt còn lại: \(N = N_0 / 2^2 = N_0 / 4\). <br>
+                    Số hạt bị phân rã: \(\Delta N = N_0 - N = 3N_0 / 4 = 75\% N_0\).
+                </div>
+            </div>
+
+            <div class="em-co-biet rounded-12 flex items-center mt-6">
+                <div class="flex-1">
+                    <h4 class="font-bold text-red-800 text-top">Em có biết?</h4>
+                    <p class="text-sm font-semibold">Đồng vị Carbon \(^{14} C\), đồng hồ của Trái Đất</p>
+		    <button onclick="toggleAnswer('detail-calc')" class="btn-primary px-4 py-1 mt-2 rounded text-sm">Xem chi tiết</button>
+                </div>
+	          
+            </div>
+		<div id="detail-calc" class="answer-box p-4 rounded-r-lg">
+			Năm 1947, Willand Frank Libby (Uy-lan | Phờ-ranh Líp-bi) đã tìm ra phương pháp xác định niên đại của các cổ vật gốc hữu cơ, dựa vào các đặc tính của đồng vị phóng xạ carbon \(^{14}C\). Đồng vị \(^{14}C\) có chu kì bán rã là 5 730 năm. Sự phân rã này cân bằng với sự tạo ra C trong khí quyển (Hình 23.6), nên từ hàng vạn năm nay, mật độ của \(^{14}C\) trong khí quyển không đổi. Kí hiệu K (14) là tỉ lệ số nguyên tử của tất cả đồng vị carbon và số nguyên tử đồng vị \(^{14}C\) của một mẫu chất. Trong không khí K (14) ~ \(10^{12}\), tỉ lệ này giữ không đổi trong các sinh vật còn sống.
+			<div class="w-50 h-50 bg-white border rounded flex items-center justify-center italic text-center text-xs">
+		<img src="h6.png" class="max-h-full max-w-full object-contain"></img>
+                </div></div>
+        </section>
+
+        <!-- Section III -->
+        <section class="bg-white p-6 rounded-12 shadow-md mb-8">
+            <h2 class="section-title text-2xl font-bold uppercase">III. ẢNH HƯỞNG PHÓNG XẠ, BIỂN CẢNH BÁO</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="font-bold mb-2">1. Ảnh hưởng phóng xạ</h3>
+                    <ul class="space-y-2">
+                        <li class="p-2 border-l-4 border-red-400 bg-red-50 text-sm"><strong>Tia \(\alpha\):</strong> Nguy hiểm nhất khi hít hoặc nuốt phải.</li>
+                        <li class="p-2 border-l-4 border-orange-400 bg-orange-50 text-sm"><strong>Tia \(\beta\):</strong> Gây bỏng da, tổn thương mắt.</li>
+                        <li class="p-2 border-l-4 border-red-600 bg-red-100 text-sm"><strong>Tia \(\gamma\):</strong> Xuyên sâu, phá hủy nội tạng và DNA.</li>
+                    </ul>
+                </div>
+                <div class="text-center">
+                    <h3 class="font-bold mb-2">2. Biển cảnh báo</h3>
+                    <div class="border p-4 rounded inline-block bg-white shadow-sm">
+                        <div class="text-4xl"><img src="h3.png" class="max-h-full max-w-full object-contain"></img></div>
+                        <p class="text-xs mt-2 italic">[Hình: Biển báo nguy hiểm phóng xạ]</p>
+                    </div>
+                    <p class="text-sm mt-3">Mục đích: Cảnh báo khu vực có nguồn phóng xạ để con người tránh xa hoặc sử dụng đồ bảo hộ.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section IV -->
+        <section class="bg-white p-6 rounded-12 shadow-md mb-8">
+            <div class="grid md:grid-cols-2 gap-6 items-center">
+                <div>
+                    <h2 class="section-title text-2xl font-bold uppercase">IV. NGUYÊN TẮC AN TOÀN</h2>
+                    <ul class="list-decimal ml-6 space-y-2">
+                        <li><strong>Khoảng cách:</strong> Giữ khoảng cách càng xa nguồn càng tốt.</li>
+                        <li><strong>Thời gian:</strong> Giảm tối đa thời gian tiếp xúc.</li>
+                        <li><strong>Che chắn:</strong> Sử dụng vật liệu chắn phù hợp (chì, bê tông).</li>
+                        <li><strong>Bảo hộ:</strong> Mặc quần áo chuyên dụng, đeo khẩu trang.</li>
+                    </ul>
+                </div>
+                <div class="border p-4 rounded italic bg-gray-50 flex items-center justify-center">
+                    <img src="h7.png" class="max-h-full max-w-full object-contain"></img>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Củng cố -->
+        <section class="bg-white p-6 rounded-12 shadow-md mb-8">
+            <h2 class="section-title text-2xl font-bold uppercase">IV. CỦNG CỐ</h2>
+            
+            <div class="grid md:grid-cols-3 gap-4 mb-8">
+                <div class="em-co-biet p-4 rounded-lg shadow-sm">
+                    <h4 class="font-bold mb-2 underline">Em có biết</h4>
+                    <p class="text-xs">Đơn vị Becquerel đặt theo tên Henri Becquerel - người phát hiện ra phóng xạ năm 1896.</p>
+                </div>
+                <div class="em-da-hoc p-4 rounded-lg shadow-sm">
+                    <h4 class="font-bold mb-2 underline">Em đã học</h4>
+                    <p class="text-xs">Định nghĩa phóng xạ, đặc điểm các loại tia, định luật và công thức độ phóng xạ.</p>
+                </div>
+                <div class="em-co-the p-4 rounded-lg shadow-sm">
+                    <h4 class="font-bold mb-2 underline">Em có thể</h4>
+                    <p class="text-xs">Giải thích cơ chế hoạt động của máy dò khói hoặc máy đo tuổi cổ vật bằng C-14.</p>
+                </div>
+            </div>
+
+            <!-- Quiz -->
+            <div id="quiz-container" class="mb-8 border-t pt-6">
+                <h3 class="text-xl font-bold mb-4 text-red-900">KIỂM TRA TRẮC NGHIỆM</h3>
+                
+                <div class="space-y-6">
+                    <div class="quiz-item">
+                        <p class="font-semibold text-blue-800">[Biết] Câu 1: Tia nào sau đây không mang điện tích?</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q1" value="A"> A. Tia \(\alpha\)</label>
+                            <label class="block"><input type="radio" name="q1" value="B"> B. Tia \(\beta^+\)</label>
+                            <label class="block"><input type="radio" name="q1" value="C"> C. Tia \(\gamma\)</label>
+                            <label class="block"><input type="radio" name="q1" value="D"> D. Tia \(\beta^-\)</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <p class="font-semibold text-blue-800">[Biết] Câu 2: Đơn vị của độ phóng xạ là gì?</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q2" value="A"> A. Jun (J)</label>
+                            <label class="block"><input type="radio" name="q2" value="B"> B. Becquerel (Bq)</label>
+                            <label class="block"><input type="radio" name="q2" value="C"> C. Tesla (T)</label>
+                            <label class="block"><input type="radio" name="q2" value="D"> D. Niuton (N)</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <p class="font-semibold text-green-800">[Hiểu] Câu 3: Sau 2 chu kỳ bán rã, lượng chất phóng xạ còn lại bao nhiêu?</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q3" value="A"> A. 50%</label>
+                            <label class="block"><input type="radio" name="q3" value="B"> B. 75%</label>
+                            <label class="block"><input type="radio" name="q3" value="C"> C. 25%</label>
+                            <label class="block"><input type="radio" name="q3" value="D"> D. 12,5%</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <p class="font-semibold text-green-800">[Hiểu] Câu 4: Bản chất của tia \(\alpha\) là gì?</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q4" value="A"> A. Dòng các electron</label>
+                            <label class="block"><input type="radio" name="q4" value="B"> B. Dòng các hạt nhân Heli</label>
+                            <label class="block"><input type="radio" name="q4" value="C"> C. Sóng điện từ</label>
+                            <label class="block"><input type="radio" name="q4" value="D"> D. Dòng các photon</label>
+                        </div>
+                    </div>
+
+                    <div class="quiz-item">
+                        <p class="font-semibold text-green-800">[Hiểu] Câu 5: Công thức liên hệ giữa hằng số phóng xạ và chu kỳ bán rã?</p>
+                        <div class="ml-4 mt-2">
+                            <label class="block"><input type="radio" name="q5" value="A"> A. \(\lambda = T / \ln 2\)</label>
+                            <label class="block"><input type="radio" name="q5" value="B"> B. \(\lambda = \ln 2 / T\)</label>
+                            <label class="block"><input type="radio" name="q5" value="C"> C. \(\lambda = \ln 2 . T\)</label>
+                            <label class="block"><input type="radio" name="q5" value="D"> D. \(\lambda = T^2\)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="checkQuiz()" class="mt-8 px-6 py-3 bg-slate-800 text-white font-bold rounded-lg hover:bg-slate-900">NỘP BÀI</button>
+                <div id="quiz-result" class="mt-4 font-bold text-lg"></div>
+            </div>
+
+            <!-- Bài tập tự luận -->
+            <div class="mt-10 border-t pt-6">
+                <h3 class="text-xl font-bold mb-4 text-red-900">BÀI TẬP TỰ LUẬN (Mức độ Khó)</h3>
+                <div class="space-y-6">
+                    <div class="p-4 border rounded shadow-sm">
+                        <p><strong>Bài 1:</strong> Một mẫu phóng xạ có \(10^{10}\) hạt nhân. Sau 12 giờ, số hạt còn lại là \(2,5.10^9\). Tính chu kỳ bán rã của chất này?</p>
+                        <button onclick="toggleAnswer('tl1')" class="btn-primary px-4 py-1 mt-2 rounded text-sm">Xem giải chi tiết</button>
+                        <div id="tl1" class="answer-box p-4 mt-2 rounded">
+                            Ta có \(N_t / N_0 = 1/4 = 2^{-2} \Rightarrow t/T = 2\). <br>
+                            Vậy \(T = t/2 = 12/2 = 6\) giờ.
+                        </div>
+                    </div>
+                    <div class="p-4 border rounded shadow-sm">
+                        <p><strong>Bài 2:</strong> Tính độ phóng xạ của 1 gram \(_{88}^{226}Ra\) biết chu kỳ bán rã là 1600 năm?</p>
+                        <button onclick="toggleAnswer('tl2')" class="btn-primary px-4 py-1 mt-2 rounded text-sm">Xem giải chi tiết</button>
+                        <div id="tl2" class="answer-box p-4 mt-2 rounded">
+                            1. Tính \(\lambda = \ln 2 / (1600.365.24.3600) \approx 1,37.10^{-11} s^{-1}\). <br>
+                            2. Tính số hạt \(N = (m/A).N_A = (1/226).6,022.10^{23} \approx 2,66.10^{21}\) hạt. <br>
+                            3. \(H = \lambda N \approx 3,65.10^{10}\) Bq (xấp xỉ 1 Ci).
+                        </div>
+                    </div>
+                    <div class="p-4 border rounded shadow-sm">
+                        <p><strong>Bài 3:</strong> Tại sao trong các vụ tai nạn hạt nhân, người ta thường phát thuốc Iod (I-131) cho người dân xung quanh?</p>
+                        <button onclick="toggleAnswer('tl3')" class="btn-primary px-4 py-1 mt-2 rounded text-sm">Xem giải chi tiết</button>
+                        <div id="tl3" class="answer-box p-4 mt-2 rounded">
+                            Để làm bão hòa tuyến giáp bằng Iod ổn định, ngăn chặn tuyến giáp hấp thụ Iod phóng xạ (I-131) từ môi trường, giảm nguy cơ ung thư tuyến giáp.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-500 py-8 italic border-t">
+            &copy; 2024 - Bài giảng Vật lý Hạt nhân
+        </footer>
+    </div>
+
+    <script>
+        function toggleAnswer(id) {
+            const element = document.getElementById(id);
+            if (element.style.display === "block") {
+                element.style.display = "none";
+            } else {
+                element.style.display = "block";
+            }
+        }
+
+        function checkQuiz() {
+            const answers = {
+                q1: 'C',
+                q2: 'B',
+                q3: 'C',
+                q4: 'B',
+                q5: 'B'
+            };
+            let score = 0;
+            let total = 5;
+            let resultDiv = document.getElementById('quiz-result');
+
+            for (let i = 1; i <= total; i++) {
+                let radios = document.getElementsByName('q' + i);
+                let selected = false;
+                for (let radio of radios) {
+                    if (radio.checked) {
+                        selected = true;
+                        if (radio.value === answers['q' + i]) {
+                            score++;
+                        }
+                    }
+                }
+            }
+
+            if (score === total) {
+                resultDiv.style.color = "green";
+                resultDiv.innerHTML = `Chúc mừng! Bạn đã trả lời đúng tất cả các câu: ${score}/${total}`;
+            } else {
+                resultDiv.style.color = "red";
+                resultDiv.innerHTML = `Kết quả của bạn là: ${score}/${total}. Hãy xem lại bài nhé!`;
+            }
+        }
+    </script>
+</body>
+</html>
