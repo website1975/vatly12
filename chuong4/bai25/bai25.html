@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 25: Bài tập về Vật lí hạt nhân</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .header-bg {
+            background-color: #660000;
+        }
+        .section-header {
+            color: #1a202c;
+            border-bottom: 4px solid #2d3748;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .rounded-12px {
+            border-radius: 12px;
+        }
+        .intro-box {
+            border: 1px solid #000;
+            background-color: #ffffff;
+        }
+        .question-box {
+            background-color: #edf2f7;
+            border-left: 4px solid #2b6cb0;
+        }
+        .answer-box {
+            background-color: #f0fff4;
+            display: none;
+        }
+        .note-box {
+            background-color: #fffaf0;
+            border: 1px solid #feebc8;
+        }
+        .can-do-box {
+            background-color: #ebf8ff;
+            border: 1px solid #bee3f8;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #cbd5e0;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #e2e8f0;
+        }
+        .btn-primary {
+            background-color: #660000;
+            color: white;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="header-bg text-white p-6 rounded-12px shadow-lg mb-8 text-center">
+            <p class="text-sm uppercase tracking-widest mb-2">Chương IV – Vật lí hạt nhân và phóng xạ</p>
+            <h1 class="text-3xl font-bold uppercase">Bài 25: BÀI TẬP VỀ VẬT LÍ HẠT NHÂN</h1>
+        </header>
+
+        <!-- Intro Box -->
+        <div class="intro-box p-4 rounded-lg mb-8 shadow-sm italic">
+            Cần vận dụng những kiến thức cơ bản nào để giải những bài tập về vật lí hạt nhân?
+        </div>
+
+        <!-- Section I -->
+        <section class="bg-white p-6 rounded-12px shadow-md mb-8">
+            <h2 class="section-header text-xl">I. MỘT SỐ LƯU Ý TRONG VIỆC GIẢI BÀI TẬP VỀ VẬT LÍ HẠT NHÂN</h2>
+            <p class="mb-4">Phần vật lí hạt nhân bao gồm bốn nội dung chính: cấu trúc hạt nhân, phản ứng hạt nhân, phóng xạ và ứng dụng công nghiệp hạt nhân.</p>
+            
+            <div class="space-y-4">
+                <div class="pl-4">
+                    <h3 class="font-bold">1. Lưu ý khi giải bài tập định tính</h3>
+                    <p>Các bài tập này thường yêu cầu mô tả cấu tạo hạt nhân, đặc điểm của hạt nhân tham gia phản ứng hạt nhân, tính chất của các tia phóng xạ, giải thích các ứng dụng của vật lí hạt nhân trong đời sống và trong kĩ thuật.</p>
+                </div>
+                <div class="pl-4">
+                    <h3 class="font-bold">2. Lưu ý khi giải bài tập định lượng</h3>
+                    <p>Các bài tập này thường yêu cầu vận dụng công thức xác định số lượng và loại nucleon; khối lượng, số lượng hạt nhân hoặc thời gian thực hiện phóng xạ của mẫu phóng xạ.</p>
+                </div>
+                <div class="pl-4">
+                    <h3 class="font-bold">3. Lưu ý khi giải bài tập có nội dung thực tiễn</h3>
+                    <p>Các bài tập này thường yêu cầu rèn luyện khả năng liên tưởng giữa kiến thức vật lí hạt nhân đã được học và các nội dung thực tiễn; đồng thời cũng yêu cầu trừu tượng hoá, khái quát hoá thực tiễn để thiết lập các mô hình sao cho có thể vận dụng nội dung các kiến thức vật lí hạt nhân để giải quyết vấn đề.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section II -->
+        <section class="bg-white p-6 rounded-12px shadow-md mb-8">
+            <h2 class="section-header text-xl">II. BÀI TẬP VÍ DỤ</h2>
+
+            <!-- Ví dụ 1 -->
+            <div class="mb-8">
+                <div class="question-box p-4 rounded-lg mb-2">
+                    <p class="font-bold">Câu 1:</p>
+                    <p>Giải thích tại sao khi đưa mẫu phóng xạ (1) vào gần đầu thu điện (2) của một tĩnh điện kế đã được tích điện (Hình 25.1) thì độ lệch của kim điện kế (3) giảm rất nhanh?</p>
+                    <div class="my-4 border-2 border-dashed border-gray-300 h-64 flex items-center justify-center bg-gray-50 rounded">
+			<img src="h1.png" class="max-h-full max-w-full object-contain"></img>
+                    </div>
+                </div>
+                <button onclick="toggleAnswer('ans1')" class="btn-primary px-4 py-2 rounded font-semibold">Xem lời giải</button>
+                <div id="ans1" class="answer-box p-4 rounded-lg mt-2 border-l-4 border-green-500">
+                    <p>Độ lệch kim điện kế giảm nhanh cho ta biết tĩnh điện kế nhận thêm điện tích trái dấu hoặc mất bớt điện tích. Như vậy có thể có hai trường hợp:</p>
+                    <ul class="list-disc pl-5 mt-2">
+                        <li>Các tia phóng xạ làm ion hoá không khí xung quanh mẫu phóng xạ do vậy không khí sẽ dẫn điện dễ dàng hơn.</li>
+                        <li>Điện tích của các hạt mang trong tia phóng xạ có thể trái dấu với điện tích đã tích điện trên tĩnh điện kế. Tuy nhiên, nếu vậy kim sẽ giảm rồi tăng lại, không khớp mô tả.</li>
+                    </ul>
+                    <p class="mt-2 font-semibold text-blue-700">Kết luận: Không khí xung quanh tĩnh điện kế trở nên dẫn điện tốt hơn do bị ion hoá, làm điện tích nhanh chóng bị dẫn ra môi trường.</p>
+                </div>
+            </div>
+
+            <!-- Ví dụ 2 -->
+            <div class="mb-8">
+                <div class="question-box p-4 rounded-lg mb-2">
+                    <p class="font-bold">Câu 2:</p>
+                    <p>Viết phương trình phân hạch của \( {}_{}^{235}U \) khi hấp thụ 1 neutron, biết rằng sản phẩm phân hạch gồm có \( {}_{58}^{140}Ce \), \( {}_{40}^{94}Zr \), các neutron và các tia \( \beta^- \).</p>
+                </div>
+                <button onclick="toggleAnswer('ans2')" class="btn-primary px-4 py-2 rounded font-semibold">Xem lời giải</button>
+                <div id="ans2" class="answer-box p-4 rounded-lg mt-2 border-l-4 border-green-500">
+                    <p>Phương trình có dạng: \( {}_{92}^{235}U + {}_{0}^{1}n \rightarrow {}_{58}^{140}Ce + {}_{40}^{94}Zr + x{}_{0}^{1}n + y{}_{-1}^{0}e \)</p>
+                    <p>Áp dụng định luật bảo toàn số khối (A) và điện tích (Z):</p>
+                    <p>\( \begin{cases} 235 + 1 = 140 + 94 + x \cdot 1 + y \cdot 0 \\ 92 + 0 = 58 + 40 + x \cdot 0 + y \cdot (-1) \end{cases} \Rightarrow \begin{cases} x = 2 \\ y = 6 \end{cases} \)</p>
+                    <p class="mt-2 font-semibold">Phương trình hoàn chỉnh: \( {}_{92}^{235}U + {}_{0}^{1}n \rightarrow {}_{58}^{140}Ce + {}_{40}^{94}Zr + 2{}_{0}^{1}n + 6{}_{-1}^{0}e \)</p>
+                </div>
+            </div>
+
+            <!-- Ví dụ 3 -->
+            <div class="mb-8">
+                <div class="question-box p-4 rounded-lg mb-2">
+                    <p class="font-bold">Câu 3:</p>
+                    <p>Máy xạ trị thường sử dụng nguồn \( {}_{27}^{60}Co \) có chu kì bán rã 5,3 năm. Thiết bị phải bảo dưỡng khi độ phóng xạ giảm đi 7% và thay nguồn khi giảm 50%. Hãy lập lịch bảo dưỡng và thay thế.</p>
+                    <div class="my-4 border-2 border-dashed border-gray-300 h-64 flex items-center justify-center bg-gray-50 rounded">
+                        <p class="text-gray-400"><img src="h2.png" class="max-h-full max-w-full object-contain"></img></p>
+                    </div>
+                </div>
+                <button onclick="toggleAnswer('ans3')" class="btn-primary px-4 py-2 rounded font-semibold">Xem lời giải</button>
+                <div id="ans3" class="answer-box p-4 rounded-lg mt-2 border-l-4 border-green-500">
+                    <p>Sử dụng công thức: \( H_t = H_0 \cdot 2^{-\frac{t}{T}} \)</p>
+                    <p>1. Chu kì bảo dưỡng \( t_{bd} \) (giảm 7% nghĩa là còn 93%):</p>
+                    <p>\( \frac{H_0 - H_t}{H_0} = 0,07 \Rightarrow 2^{-\frac{t_{bd}}{T}} = 0,93 \Rightarrow t_{bd} = T \log_2(\frac{1}{0,93}) \approx 0,1047 \times 5,3 \text{ năm} \approx 6,6 \text{ tháng} \).</p>
+                    <p>2. Chu kì thay mới \( t_{tm} \) (giảm 50%):</p>
+                    <p>\( H_t = 0,5 H_0 \Rightarrow t_{tm} = T = 5,3 \text{ năm} \).</p>
+                    <p class="mt-2 font-semibold text-blue-700">Kết luận: Bảo dưỡng sau mỗi 6 tháng và thay thế sau mỗi 5,3 năm.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section III -->
+        <section class="bg-white p-6 rounded-12px shadow-md mb-8">
+            <h2 class="section-header text-xl">III. BÀI TẬP VẬN DỤNG (SGK)</h2>
+
+            <!-- Bài 1 -->
+            <div class="mb-6 border-b pb-4">
+                <p class="font-semibold">1. Lực nào đã làm thay đổi phương của hạt alpha khi được bắn vào lá vàng mỏng?</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                    <p>A. Lực hạt nhân đẩy.</p>
+                    <p>B. Lực hạt nhân hút.</p>
+                    <p>C. Lực đẩy tĩnh điện.</p>
+                    <p>D. Lực hút tĩnh điện.</p>
+                </div>
+                <button onclick="toggleAnswer('vdan1')" class="text-blue-600 underline mt-2 text-sm">Xem đáp án</button>
+                <div id="vdan1" class="hidden text-green-700 font-bold mt-1">Đáp án: C. Lực đẩy tĩnh điện giữa các hạt nhân cùng dấu dương.</div>
+            </div>
+
+            <!-- Bài 2 -->
+            <div class="mb-6 border-b pb-4">
+                <p class="font-semibold">2. Cho bảng độ phóng xạ H theo thời gian t. Ước lượng chu kì bán rã.</p>
+                <div class="overflow-x-auto my-2">
+                    <table>
+                        <tr><th>t (s)</th><td>0</td><td>30</td><td>60</td><td>120</td><td>180</td><td>240</td><td>300</td><td>360</td></tr>
+                        <tr><th>H (Bq)</th><td>151</td><td>85</td><td>55</td><td>31</td><td>22</td><td>15</td><td>11</td><td>9</td></tr>
+                    </table>
+                </div>
+                <button onclick="toggleAnswer('vdan2')" class="text-blue-600 underline mt-2 text-sm">Xem hướng dẫn</button>
+                <div id="vdan2" class="hidden bg-gray-50 p-3 rounded mt-2">
+                    <p>Nhận xét: Sau t = 60s, H giảm từ 151 xuống 55 (gần 1/3). Sau t = 30s, H giảm từ 151 xuống 85 (gần một nửa). <br>Chính xác hơn: Tại t = 38-40s, H sẽ bằng 75,5. <br><b>Ước lượng: T ≈ 40 giây.</b></p>
+                </div>
+            </div>
+
+            <!-- Bài 3 -->
+            <div class="mb-6 border-b pb-4">
+                <p class="font-semibold">3. Xác định tuổi mẫu gỗ cổ vật...</p>
+                <p class="text-sm italic">Dữ kiện: 240 phân rã/phút, 25g gỗ, tỉ lệ \( 10^{12}:1 \), \( T = 5730 \) năm.</p>
+                <button onclick="toggleAnswer('vdan3')" class="text-blue-600 underline mt-2 text-sm">Xem lời giải</button>
+                <div id="vdan3" class="hidden bg-gray-50 p-3 rounded mt-2">
+                    <p>a) Số nguyên tử C14: Tính tổng số nguyên tử C trong 25g (\( N = \frac{m}{M} N_A \)), sau đó chia cho tỉ lệ \( 10^{12} \).</p>
+                    <p>b) Tuổi gỗ: Sử dụng \( H = H_0 2^{-t/T} \). Với \( H_0 \) là độ phóng xạ lúc mới chết (từ tỉ lệ chuẩn).</p>
+                </div>
+            </div>
+
+            <!-- Các bài tập thực tiễn hình ảnh -->
+            <div class="space-y-4">
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <p class="font-bold">Bài 5: Chiếu xạ dược liệu (Hình 25.3)</p>
+                    <p>Vào tháng 6/2024, xe tải chờ bao lâu? (Tháng 1/2022 chờ 150 phút, \( T=5,3 \) năm).</p>
+                    <button onclick="toggleAnswer('vdan5')" class="text-blue-600 underline mt-2 text-sm">Xem đáp án</button>
+                    <div id="vdan5" class="hidden mt-2">
+                        <p>Thời gian chiếu xạ tỉ lệ nghịch với độ phóng xạ: \( \frac{t_2}{t_1} = \frac{H_1}{H_2} \).</p>
+                        <p>Khoảng cách từ 1/2022 đến 6/2024 là 2,42 năm. <br> \( H_2 = H_1 \cdot 2^{-2,42/5,3} \approx 0,729 H_1 \). <br> \( t_2 = 150 / 0,729 \approx 206 \text{ phút} \).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Box: Em đã học / Em có thể -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div class="note-box p-4 rounded-lg shadow-sm">
+                <h3 class="font-bold text-orange-800">EM ĐÃ HỌC</h3>
+                <ul class="list-disc pl-5 text-sm">
+                    <li>Cách giải các bài tập về vật lí hạt nhân.</li>
+                </ul>
+            </div>
+            <div class="can-do-box p-4 rounded-lg shadow-sm">
+                <h3 class="font-bold text-blue-800">EM CÓ THỂ</h3>
+                <ul class="list-disc pl-5 text-sm">
+                    <li>Vận dụng kiến thức cấu trúc, phản ứng, phóng xạ để giải quyết bài tập thực tế.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Trắc nghiệm củng cố -->
+        <section class="bg-white p-6 rounded-12px shadow-md mb-8">
+            <h2 class="section-header text-xl">TRẮC NGHIỆM CỦNG CỐ</h2>
+            <div id="quiz" class="space-y-6">
+                <!-- Câu 1 -->
+                <div>
+                    <p class="font-semibold">Câu 1. Một hạt nhân có 6 proton và 8 neutron. Kí hiệu hạt nhân đó là:</p>
+                    <div class="flex flex-col space-y-1 ml-4">
+                        <label><input type="radio" name="q1" value="a"> A. \( {}_{8}^{6}C \)</label>
+                        <label><input type="radio" name="q1" value="b"> B. \( {}_{6}^{14}C \)</label>
+                        <label><input type="radio" name="q1" value="c"> C. \( {}_{14}^{6}C \)</label>
+                        <label><input type="radio" name="q1" value="d"> D. \( {}_{6}^{8}C \)</label>
+                    </div>
+                </div>
+                <!-- Câu 2 -->
+                <div>
+                    <p class="font-semibold">Câu 2. Tia phóng xạ nào sau đây có khả năng đâm xuyên mạnh nhất?</p>
+                    <div class="flex flex-col space-y-1 ml-4">
+                        <label><input type="radio" name="q2" value="a"> A. Tia \( \alpha \)</label>
+                        <label><input type="radio" name="q2" value="b"> B. Tia \( \beta^+ \)</label>
+                        <label><input type="radio" name="q2" value="c"> C. Tia \( \beta^- \)</label>
+                        <label><input type="radio" name="q2" value="d"> D. Tia \( \gamma \)</label>
+                    </div>
+                </div>
+                <!-- Thêm các câu khác tương tự... -->
+            </div>
+            <button onclick="checkQuiz()" class="mt-6 bg-slate-800 text-white px-8 py-3 rounded-lg font-bold hover:bg-slate-900">NỘP BÀI</button>
+            <div id="quiz-result" class="mt-4 font-bold text-lg"></div>
+        </section>
+
+        <!-- Bài tập tính toán thêm -->
+        <section class="bg-white p-6 rounded-12px shadow-md mb-8">
+            <h2 class="section-header text-xl">BÀI TẬP TÍNH TOÁN BỔ SUNG</h2>
+            <div class="space-y-4">
+                <div class="p-4 border rounded">
+                    <p><b>Bài 1:</b> Một mẫu chất phóng xạ có \( T = 10 \) ngày. Sau bao lâu thì lượng chất phóng xạ còn lại bằng 12,5% lượng ban đầu?</p>
+                    <button onclick="toggleAnswer('bt1')" class="text-blue-600 underline text-sm">Xem giải</button>
+                    <div id="bt1" class="hidden mt-2 p-2 bg-green-50">
+                        \( 12,5\% = 1/8 = 2^{-3} \Rightarrow t = 3T = 30 \text{ ngày.} \)
+                    </div>
+                </div>
+                <div class="p-4 border rounded">
+                    <p><b>Bài 2:</b> Tính năng lượng liên kết của hạt nhân \( {}_{2}^{4}He \). Biết \( m_p = 1,0073u, m_n = 1,0087u, m_{He} = 4,0015u \).</p>
+                    <button onclick="toggleAnswer('bt2')" class="text-blue-600 underline text-sm">Xem giải</button>
+                    <div id="bt2" class="hidden mt-2 p-2 bg-green-50">
+                        \( \Delta E = [2 \cdot 1,0073 + 2 \cdot 1,0087 - 4,0015] \cdot 931,5 \approx 28,4 \text{ MeV.} \)
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === 'block' || el.classList.contains('block')) {
+                el.style.display = 'none';
+                el.classList.add('hidden');
+            } else {
+                el.style.display = 'block';
+                el.classList.remove('hidden');
+            }
+        }
+
+        function checkQuiz() {
+            const answers = {
+                q1: 'b',
+                q2: 'd'
+            };
+            let score = 0;
+            let total = Object.keys(answers).length;
+
+            for (let q in answers) {
+                const selected = document.querySelector(`input[name="${q}"]:checked`);
+                if (selected && selected.value === answers[q]) {
+                    score++;
+                }
+            }
+
+            const resultDiv = document.getElementById('quiz-result');
+            if (score === total) {
+                resultDiv.className = 'mt-4 font-bold text-lg text-green-600';
+                resultDiv.innerHTML = `Tuyệt vời! Bạn đúng ${score}/${total} câu.`;
+            } else {
+                resultDiv.className = 'mt-4 font-bold text-lg text-red-600';
+                resultDiv.innerHTML = `Bạn đúng ${score}/${total} câu. Hãy kiểm tra lại kiến thức nhé!`;
+            }
+        }
+    </script>
+</body>
+</html>
