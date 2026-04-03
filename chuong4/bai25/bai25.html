@@ -196,26 +196,55 @@
 
             <!-- Bài 3 -->
             <div class="mb-6 border-b pb-4">
-                <p class="font-semibold">3. Xác định tuổi mẫu gỗ cổ vật...</p>
-                <p class="text-sm italic">Dữ kiện: 240 phân rã/phút, 25g gỗ, tỉ lệ \( 10^{12}:1 \), \( T = 5730 \) năm.</p>
+                <p class="font-semibold">3. Dùng máy đo phóng xạ của một mẫu gỗ của một cổ vật phát hiện được 240 phóng xạ mỗi phút. 
+		Biết rằng thành phần của mẫu gỗ có chứa 25 g \(^{14} C\) và \(^{12} C\), chu kì bán rã của C là 5730 năm và tỉ lệ nguyên tử \(^{14} C\) và \(^{12} C\) khi một sinh vật còn sống \(10^{12}:1\).
+			<p>a) Xác định số nguyên tử C có trong mẫu gỗ.</p>
+			<p>b) Xác định độ tuổi của mẫu gỗ này.</p>
+		</p>
                 <button onclick="toggleAnswer('vdan3')" class="text-blue-600 underline mt-2 text-sm">Xem lời giải</button>
                 <div id="vdan3" class="hidden bg-gray-50 p-3 rounded mt-2">
                     <p>a) Số nguyên tử C14: Tính tổng số nguyên tử C trong 25g (\( N = \frac{m}{M} N_A \)), sau đó chia cho tỉ lệ \( 10^{12} \).</p>
                     <p>b) Tuổi gỗ: Sử dụng \( H = H_0 2^{-t/T} \). Với \( H_0 \) là độ phóng xạ lúc mới chết (từ tỉ lệ chuẩn).</p>
                 </div>
             </div>
+            <!-- Bài 4 -->
+            <div class="mb-6 border-b pb-4">
+                <p class="font-semibold"> 4. Một nhà máy điện hạt nhân sử dụng nguyên liệu hạt nhân là \(^{235}U\). Biết rằng mỗi phân hạch sẽ toả năng 
+		lượng 200 MeV. Hiệu suất phát điện của nhà máy là 36%. Công suất phát điện của nhà máy là 1400 MW.
+		<p> a) Hãy tính khối lượng của nguyên liệu 235U nhà máy tiêu thụ trong 1 năm.</p>
+		<p> b) Tính lượng than đá tiêu thụ để sản xuất ra năng lượng điện tương đương, biết rằng năng suất toả nhiệt của than đá là 30 MJ/kg.</p>
+		</p>
+                <button onclick="toggleAnswer('vdan4')" class="text-blue-600 underline mt-2 text-sm">Xem lời giải</button>
+                <div id="vdan4" class="hidden bg-gray-50 p-3 rounded mt-2">
+                    <p>a) Năng lượng hạt nhân 1 năm: E=\frac{p.t}{H} ; Khối lượng hạt nhân : \(m = \frac{N.A}{N_A}=\frac{\frac{E}{W}.A}{N_A}=1495,6 kg\).</p>
+                    <p>b) KL than : \(\frac{E}{A} = 4088.10^6 kg\)</p>
+                </div>
+            </div>
 
             <!-- Các bài tập thực tiễn hình ảnh -->
-            <div class="space-y-4">
-                <div class="p-4 bg-gray-50 rounded-lg">
-                    <p class="font-bold">Bài 5: Chiếu xạ dược liệu (Hình 25.3)</p>
-                    <p>Vào tháng 6/2024, xe tải chờ bao lâu? (Tháng 1/2022 chờ 150 phút, \( T=5,3 \) năm).</p>
+            <div class="space-y-4 border-b">
+                    <p class="font-semibold">5. Vào tháng 6 năm 2024, người lái xe tải sẽ phải chờ bao nhiêu lâu để toàn bộ lượng thuốc đông y 
+			chất đầy thùng xe tải được chiếu xạ để bảo quản tại Trung tâm chiếu xạ Hà Nội, biết rằng cũng tại 
+			nơi đó vào tháng 1 năm 2022 người lái xe đã phải chờ 150 phút chiếu xạ cùng lượng thuốc như vậy và trung tâm chiếu xạ vẫn 
+			sử dụng nguồn chiếu xạ là \(^{60} Co\) có chu kì 27 bán rã là 5,3 năm?</p>
                     <button onclick="toggleAnswer('vdan5')" class="text-blue-600 underline mt-2 text-sm">Xem đáp án</button>
                     <div id="vdan5" class="hidden mt-2">
                         <p>Thời gian chiếu xạ tỉ lệ nghịch với độ phóng xạ: \( \frac{t_2}{t_1} = \frac{H_1}{H_2} \).</p>
                         <p>Khoảng cách từ 1/2022 đến 6/2024 là 2,42 năm. <br> \( H_2 = H_1 \cdot 2^{-2,42/5,3} \approx 0,729 H_1 \). <br> \( t_2 = 150 / 0,729 \approx 206 \text{ phút} \).</p>
                     </div>
-                </div>
+
+            </div>
+	    <div class="space-y-4 border-b">
+                    <p class="font-semibold">6. Dược chất phóng xạ FDG có thành phân là  đồng vị \(^{18}F\) với chu kì bán rã là 110 phút, được sử dụng trong chụp ảnh cắt lớp PET. 
+	Dược chất này được sản xuất bằng cách bắn phá vào các hạt đồng vị \(^{18}O\) nhờ một loại hạt được tăng tốc bằng máy gia tốc.
+		 <p> a) Xác định loại hạt được tăng tốc trong máy gia tốc biết rằng ngoài 18F, sån phẩm bắn phá còn có neutron và phát xạ tia gamma.</p>
+		 <p> b) Trước khi chụp ảnh cắp lớp PET, bệnh nhân sẽ được tiêm liều lượng dược chất FDG để  đảm bảo độ phóng xạ trên mỗi kg cân nặng là 0,1 mCi không đổi. Hai bệnh nhân cùng cân nặng, cùng sử dụng FDG trong cùng một đợt sản xuất, nhưng được tiêm ở 2 thời điểm cách nhau 60 phút. Hỏi người nào sẽ được tiêm lượng FDG nhiều hơn? Xác định phần trăm lượng FDG nhiều hơn này cần được tiêm.</p>
+                    <button onclick="toggleAnswer('vdan6')" class="text-blue-600 underline mt-2 text-sm">Xem đáp án</button>
+                    <div id="vdan6" class="hidden mt-2">
+                        <p>\(a) _Z^A X + _8^{18} O = _9^{18} F+_0^1 n + \gamma \to Z=1,A=1\)</p>
+                        <p>\(B) n = \frac{H_0}{H} = 2^{-t/T}\to \Delta =(n-1).100 = 46 \text{phần trăm} \)</p>
+                    </div>
+
             </div>
         </section>
 
