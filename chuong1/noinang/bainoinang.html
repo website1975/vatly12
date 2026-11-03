@@ -3,295 +3,657 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bài 2: Nội năng - Định luật I Nhiệt động lực học</title>
+    <title>Bài 2: Nội năng. Định luật I của nhiệt động lực học</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax CDN với gói đầy đủ Tex-CHTML hỗ trợ công thức toán/hóa -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)'], ['$', '$']],
+                displayMath: [['\\[', '\\]'], ['$$', '$$']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
+	    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background-color: #f4f7f9;
-        }
-        .header-primary { background-color: #1a202c; }
-        .rounded-12 { border-radius: 12px; }
-        /* Màu xanh đen đồng nhất cho các tiêu đề chính */
-        .bg-dark-blue {
-            background-color: #1a202c; 
-        }
-        .chapter-header {
-            color: white;
-            padding: 1rem;
-            text-align: center;
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-        }
-        .lesson-title {
-            color: white;
-            padding: 1.5rem;
-            text-align: center;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            text-transform: uppercase;
-        }
-        .intro-box {
-            border: 2px solid #1a202c;
-            padding: 1.5rem;
-            background-color: #fff;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            font-style: italic;
-            position: relative;
-        }
-        .section-title {
-            color: #1a202c;
-            border-bottom: 2px solid #1a202c;
-            padding-bottom: 0.5rem;
-            margin-top: 2rem;
-            font-weight: bold;
-            font-size: 1.5rem;
-        }
-        .subsection-title {
             color: #2d3748;
-            font-weight: bold;
-            margin-top: 1rem;
-            font-size: 1.2rem;
-        }
-        .question-toggle {
-            background-color: #ebf8ff;
-            border-left: 4px solid #1a202c;
-            padding: 1rem;
-            margin: 1rem 0;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .question-toggle:hover {
-            background-color: #bee3f8;
-        }
-        .answer-content {
-            display: none;
-            background-color: #f7fafc;
-            padding: 1rem;
-            border: 1px dashed #1a202c;
-            margin-top: 0.5rem;
-        }
-        .quiz-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-top: 2rem;
-        }
-        .convention-table th {
-            background-color: #edf2f7;
-            color: #1a202c;
-        }
-        .highlight {
-            color: #e53e3e;
-            font-weight: bold;
         }
     </style>
 </head>
-<body class="p-4 md:p-8 max-w-4xl mx-auto">
+<body class="p-4 md:p-8">
 
-    <!-- Tiêu đề chương -->
-      <header class="max-w-5xl mx-auto mb-8 shadow-lg overflow-hidden rounded-12">
-        <div class="header-primary text-white py-3 px-6 text-center text-sm font-semibold tracking-widest uppercase">
-            Chương 1: Vật Lý Nhiệt
+    <div class="max-w-5xl mx-auto space-y-6">
+
+        <!-- 1. Header: Gồm 2 khối màu bo tròn 4 góc, ngăn bằng đường kẻ mảnh -->
+        <div class="rounded-xl overflow-hidden shadow-md border border-gray-200">
+            <!-- Khối trên: Màu 1 (Cyan) -->
+                        <div class="bg-[#002B49] text-white py-3 px-6 text-center font-semibold text-lg md:text-xl border-b border-slate-600">
+                Chương 1: Vật Lý Nhiệt
+            </div>
+            <!-- Đường kẻ mảnh -->
+            <div class="border-t border-cyan-300"></div>
+            <!-- Khối dưới: Màu 2 (Cyan đậm hơn) -->
+                <div class="bg-[#002B49] text-white py-5 px-6 text-center font-bold text-2xl md:text-3xl tracking-wide uppercase">
+                BÀI 2: NỘI NĂNG. ĐỊNH LUẬT I CỦA NHIỆT ĐỘNG LỰC HỌC
+            </div>
         </div>
-        <div class="header-primary text-white py-6 px-6 text-center border-t border-gray-700">
-            <h1 class="text-3xl font-bold">BÀI 2: NỘI NĂNG. ĐỊNH LUẬT I CỦA NHIỆT ĐỘNG LỰC HỌC</h1>
+
+        <!-- 2. Intro Box: Lời dẫn đóng khung viền đen mỏng, nền trắng, in nghiêng -->
+        <div class="bg-white p-5 rounded-xl border border-black shadow-sm italic text-gray-800 leading-relaxed">
+            Khi nước được đun tới lúc bắt đầu sôi thì dù có tiếp tục đun, nhiệt độ của nước cũng không thay đổi. Vậy nhiệt năng mà nước nhận được lúc này làm tăng dạng năng lượng nào của nước?
         </div>
-    </header>
-    <!-- Lời dẫn -->
-    <div class="intro-box">
-       <p class="mt-2">Khi nước được đun tới lúc bắt đầu sôi thì dù có tiếp tục đun, nhiệt độ của nước cũng không thay đổi. Vậy nhiệt năng mà nước nhận được lúc này làm tăng dạng năng lượng nào của nước?</p>
+
+        <!-- Nội dung chính của bài học -->
+        <div class="bg-white p-6 md:p-8 rounded-xl shadow-md space-y-8">
+
+            <!-- MỤC I -->
+            <section class="space-y-4">
+                <div class="flex items-center space-x-3 border-b-4 border-slate-800 pb-2">
+                    <span class="w-8 h-8 flex items-center justify-center bg-slate-800 text-white font-bold rounded-sm text-lg">I</span>
+                    <h2 class="text-xl md:text-2xl font-bold uppercase text-slate-900">KHÁI NIỆM NỘI NĂNG</h2>
+                </div>
+
+                <!-- 1. Nội năng của một vật -->
+                <div class="space-y-3">
+                    <h3 class="font-bold text-slate-800 text-lg flex items-center space-x-2">
+                        <span class="w-6 h-6 flex items-center justify-center bg-slate-700 text-white rounded-full text-xs">1</span>
+                        <span>Nội năng của một vật</span>
+                    </h3>
+
+                    <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-lg shadow-sm space-y-2">
+                        <p class="text-gray-800">
+                            - <strong>Động năng phân tử:</strong> Các phân tử chuyển động không ngừng nên chúng có động năng. Động năng phân tử phụ thuộc vào tốc độ chuyển động của phân tử (và nhiệt độ của vật).<br>
+                            - <strong>Thế năng phân tử:</strong> Các phân tử tương tác với nhau nên chúng có thế năng tương tác phân tử (gọi tắt là thế năng phân tử). Thế năng phân tử phụ thuộc vào khoảng cách giữa các phân tử (và thể tích của vật).
+                        </p>
+                        <p class="text-emerald-950 font-bold border-t border-emerald-200 pt-2 text-base">
+                            Định nghĩa: Tổng động năng và thế năng của các phân tử cấu tạo nên vật được gọi là nội năng của vật. Nội năng được kí hiệu bằng chữ \(U\) và có đơn vị là jun (\(\text{J}\)).
+                        </p>
+                        <p class="text-emerald-900 font-semibold text-sm">
+                            * Nội năng của một vật phụ thuộc vào nhiệt độ (\(T\)) và thể tích (\(V\)) của vật: \(U = f(T, V)\).
+                        </p>
+                    </div>
+
+                    <!-- Mục ? -->
+                    <div class="border-l-4 border-indigo-500 bg-indigo-50 p-4 rounded-r-lg space-y-2 my-3">
+                        <p class="font-bold text-indigo-900 flex items-center space-x-1">
+                            <span class="text-xl">❓</span>
+                            <span>Tại sao nội năng của vật lại phụ thuộc vào nhiệt độ và thể tích của vật?</span>
+                        </p>
+                        <button onclick="toggleAnswer('ans_q_noinang')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem câu trả lời</button>
+                        <div id="ans_q_noinang" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2">
+                            Vì động năng của phân tử phụ thuộc vào tốc độ chuyển động của phân tử (phụ thuộc nhiệt độ), còn thế năng của phân tử phụ thuộc vào khoảng cách giữa các phân tử (phụ thuộc thể tích). Do đó, tổng động năng và thế năng (nội năng) phụ thuộc vào nhiệt độ và thể tích của vật.
+                        </div>
+                    </div>
+
+                    <!-- Các lưu ý 1, 2 -->
+                    <div class="space-y-3 mt-3">
+                        <div class="border-l-4 border-blue-600 bg-slate-50 p-4 rounded-r-lg space-y-1">
+                            <div class="flex items-start space-x-2">
+                                <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-blue-600 text-white font-bold rounded-full text-sm">1</span>
+                                <p class="text-sm text-gray-800">
+                                    Vì các phân tử cấu tạo nên vật chuyển động không ngừng nên tốc độ và khoảng cách giữa các phân tử luôn thay đổi làm cho động năng và cả thế năng của các phân tử cũng không ngừng thay đổi. Do đó, khi nói động năng và thế năng của phân tử thì phải hiểu đó là <strong>động năng và thế năng trung bình</strong> của các phân tử cấu tạo nên vật.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="border-l-4 border-blue-600 bg-slate-50 p-4 rounded-r-lg space-y-1">
+                            <div class="flex items-start space-x-2">
+                                <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-blue-600 text-white font-bold rounded-full text-sm">2</span>
+                                <p class="text-sm text-gray-800">
+                                    Vì số phân tử trong một vật vô cùng lớn và các phân tử chuyển động hỗn loạn nên không thể xác định được chính xác độ lớn nội năng của một vật. Trong vật lí người ta chủ yếu quan tâm đến <strong>độ biến thiên nội năng (\(\Delta U\))</strong> của vật.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Em có biết Joule -->
+                    <div class="p-4 bg-purple-50 border border-purple-300 rounded-lg text-purple-900 space-y-2 shadow-sm my-4">
+                        <h4 class="font-bold text-lg text-purple-950">EM CÓ BIẾT: James Joule và Nhiệt động lực học</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+                            <div class="border rounded p-2 bg-white text-center">
+                                <img src="h1.png" alt="Hình 2.1. James Joule" class="mx-auto max-h-40 object-contain mb-1">
+                                <p class="text-xs font-semibold text-gray-600">Hình 2.1. James Joule (1818-1889)</p>
+                            </div>
+                            <div class="md:col-span-3 text-sm leading-relaxed space-y-1">
+                                <p><strong>James Joule (1818-1889):</strong> Nhà vật lí người Anh có nhiều đóng góp cho sự hình thành và phát triển nhiệt động lực học.</p>
+                                <p><strong>Nhiệt động lực học:</strong> Là lĩnh vực vật lí nghiên cứu về năng lượng nhiệt và sự truyền nhiệt. Lĩnh vực này ra đời vào giữa thế kỉ XIX trong quá trình con người tìm hiểu về sự chuyển hóa năng lượng dự trữ trong các nhiên liệu thành cơ năng để chế tạo các động cơ nhiệt.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Thí nghiệm về mối liên hệ nội năng... -->
+                <div class="space-y-3 pt-4 border-t border-gray-200">
+                    <h3 class="font-bold text-slate-800 text-lg flex items-center space-x-2">
+                        <span class="w-6 h-6 flex items-center justify-center bg-slate-700 text-white rounded-full text-xs">2</span>
+                        <span>Thí nghiệm về mối liên hệ nội năng của vật với năng lượng của các phân tử cấu tạo nên vật</span>
+                    </h3>
+
+                    <div class="border rounded-lg p-3 text-center bg-gray-50 my-2">
+                        <img src="h2.png" alt="Hình 2.2 Thí nghiệm mối liên hệ nội năng với năng lượng phân tử" class="mx-auto max-h-64 object-contain mb-2">
+                        <p class="text-sm font-semibold text-gray-700">Hình 2.2. Thí nghiệm về mối liên hệ giữa nội năng của vật với năng lượng của các phân tử khí</p>
+                        <p class="text-xs text-gray-500">(1) Ống nghiệm | (2) Nút bấc vừa khít | (3) Đèn cồn | (4) Giá đỡ thí nghiệm</p>
+                    </div>
+
+                    <!-- Các câu hỏi thí nghiệm -->
+                    <div class="space-y-4">
+                        <div class="border-l-4 border-blue-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                            <div class="flex items-start space-x-2">
+                                <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-blue-600 text-white font-bold rounded-full text-sm">1</span>
+                                <p class="font-semibold text-gray-800">Khi đun ống nghiệm tới một lúc nào đó thì thấy nút bấc bật ra. Giải thích vì sao nút bấc bật ra.</p>
+                            </div>
+                            <button onclick="toggleAnswer('ans_tn_1')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải</button>
+                            <div id="ans_tn_1" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2">
+                                Khi đun nóng, không khí trong ống nghiệm nhận nhiệt lượng, nhiệt độ tăng làm các phân tử khí chuyển động nhanh hơn, áp suất khí tăng lên và tác dụng lực đẩy lớn lên nút bấc làm nút bật ra.
+                            </div>
+                        </div>
+
+                        <div class="border-l-4 border-blue-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                            <div class="flex items-start space-x-2">
+                                <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-blue-600 text-white font-bold rounded-full text-sm">2</span>
+                                <p class="font-semibold text-gray-800">Khi nút chưa bị bật ra:</p>
+                            </div>
+                            <p class="text-sm text-gray-700 ml-8">a) Nội năng của không khí trong ống nghiệm tăng hay giảm? Vì sao?</p>
+                            <p class="text-sm text-gray-700 ml-8">b) Nội năng của không khí trong ống nghiệm tăng có phải do thế năng phân tử khí tăng không? Tại sao?</p>
+                            <p class="text-sm text-gray-700 ml-8">c) Tại sao hiện tượng nút ống nghiệm bị bật ra lại chứng tỏ động năng của các phân tử khí trong ống nghiệm tăng?</p>
+                            <button onclick="toggleAnswer('ans_tn_2')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition ml-8">Xem lời giải</button>
+                            <div id="ans_tn_2" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2 ml-8 space-y-2">
+                                <p><strong>a)</strong> Nội năng của không khí tăng vì không khí nhận nhiệt từ đèn cồn làm nhiệt độ không khí tăng.</p>
+                                <p><strong>b)</strong> Không phải. Vì khi nút chưa bật ra, thể tích khí giữ không đổi nên khoảng cách trung bình giữa các phân tử khí không thay đổi, dẫn đến thế năng phân tử không tăng.</p>
+                                <p><strong>c)</strong> Khi nút bị bật ra chứng tỏ khí trong ống đã đẩy nút (thực hiện công). Công này do động năng của các phân tử khí va chạm vào nút tạo ra. Động năng phân tử tăng làm áp suất khí tăng đủ lớn để đẩy bật nút.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MỤC II -->
+            <section class="space-y-4">
+                <div class="flex items-center space-x-3 border-b-4 border-slate-800 pb-2">
+                    <span class="w-8 h-8 flex items-center justify-center bg-slate-800 text-white font-bold rounded-sm text-lg">II</span>
+                    <h2 class="text-xl md:text-2xl font-bold uppercase text-slate-900">ĐỊNH LUẬT I CỦA NHIỆT ĐỘNG LỰC HỌC</h2>
+                </div>
+
+                <!-- 1. Cách làm thay đổi nội năng -->
+                <div class="space-y-3">
+                    <h3 class="font-bold text-slate-800 text-lg flex items-center space-x-2">
+                        <span class="w-6 h-6 flex items-center justify-center bg-slate-700 text-white rounded-full text-xs">1</span>
+                        <span>Cách làm thay đổi nội năng</span>
+                    </h3>
+
+                    <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-lg shadow-sm space-y-2">
+                        <p class="text-emerald-950 font-bold">
+                            Có hai cách làm thay đổi nội năng của vật:
+                        </p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-800">
+                            <li><strong>Thực hiện công:</strong> Có sự chuyển hóa từ dạng năng lượng khác (như cơ năng) thành nội năng hoặc ngược lại. <em>(Ví dụ: Cọ xát miếng kim loại lên sàn nhà).</em></li>
+                            <li><strong>Truyền nhiệt (Truyền năng lượng nhiệt):</strong> Không có sự chuyển hóa năng lượng, chỉ có sự truyền nội năng từ vật này sang vật khác. <em>(Ví dụ: Cho miếng kim loại tiếp xúc với nguồn nhiệt).</em></li>
+                        </ul>
+                    </div>
+
+                    <div class="border rounded-lg p-3 text-center bg-gray-50 my-2">
+                        <img src="h3.png" alt="Hình 2.3 Hai cách làm thay đổi nội năng của vật" class="mx-auto max-h-60 object-contain mb-2">
+                        <p class="text-sm font-semibold text-gray-700">Hình 2.3. Hai cách làm thay đổi nội năng của vật: a) Thực hiện công - b) Truyền nhiệt</p>
+                    </div>
+
+                    <!-- Câu hỏi hoạt động -->
+                    <div class="space-y-3">
+                        <div class="border-l-4 border-blue-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                            <div class="flex items-start space-x-2">
+                                <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-blue-600 text-white font-bold rounded-full text-sm">1</span>
+                                <p class="font-semibold text-gray-800">Mô tả sự thay đổi nội năng của lượng khí trong xi lanh ở Hình 2.3.</p>
+                            </div>
+                            <button onclick="toggleAnswer('ans_c_1')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải</button>
+                            <div id="ans_c_1" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2">
+                                - Hình 2.3a: Ấn pit-tông xuống (thực hiện công lên khối khí), làm khí bị nén, nội năng lượng khí trong xi lanh tăng lên.<br>
+                                - Hình 2.3b: Đun nóng xi lanh (truyền nhiệt), khối khí nhận nhiệt lượng từ ngọn lửa đèn cồn làm nội năng của nó tăng lên.
+                            </div>
+                        </div>
+
+                        <div class="border-l-4 border-blue-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                            <div class="flex items-start space-x-2">
+                                <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-blue-600 text-white font-bold rounded-full text-sm">2</span>
+                                <p class="font-semibold text-gray-800">Tìm thêm ví dụ về thực hiện công và truyền nhiệt làm thay đổi nội năng của vật.</p>
+                            </div>
+                            <button onclick="toggleAnswer('ans_c_2')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải</button>
+                            <div id="ans_c_2" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2 space-y-1">
+                                <p>- <strong>Thực hiện công:</strong> Bơm xe đạp làm thân bơm nóng lên; dùng tay chà xát hai bàn tay vào nhau mùa đông.</p>
+                                <p>- <strong>Truyền nhiệt:</strong> Thả thìa kim loại vào cốc nước nóng; phơi tấm sắt ngoài trời nắng.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Định luật 1 của nhiệt động lực học -->
+                <div class="space-y-3 pt-4 border-t border-gray-200">
+                    <h3 class="font-bold text-slate-800 text-lg flex items-center space-x-2">
+                        <span class="w-6 h-6 flex items-center justify-center bg-slate-700 text-white rounded-full text-xs">2</span>
+                        <span>Định luật I của nhiệt động lực học</span>
+                    </h3>
+
+                    <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-lg shadow-sm space-y-3">
+                        <p class="text-gray-800">
+                            Định luật I của nhiệt động lực học là sự vận dụng định luật bảo toàn năng lượng vào các quá trình thay đổi nội năng.
+                        </p>
+                        <div class="p-3 bg-white border border-emerald-300 rounded-md text-center">
+                            <p class="font-bold text-emerald-950 text-base md:text-lg">
+                                Phát biểu: Nếu vật vừa nhận được công vừa được truyền nhiệt thì độ biến thiên nội năng của vật bằng tổng công và nhiệt lượng mà vật nhận được:
+                            </p>
+                            <p class="text-xl font-extrabold text-blue-700 my-2">
+                                $$\Delta U = A + Q$$
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Quy ước về dấu -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center bg-slate-50 p-4 border rounded-lg">
+                        <div class="space-y-2">
+                            <h4 class="font-bold text-slate-900 border-b pb-1">Quy ước về dấu của \(A\) và \(Q\):</h4>
+                            <ul class="space-y-1 text-sm text-gray-800">
+                                <li>• \(Q > 0\): Vật <strong>nhận</strong> nhiệt lượng từ vật khác.</li>
+                                <li>• \(Q < 0\): Vật <strong>truyền</strong> nhiệt lượng cho vật khác.</li>
+                                <li>• \(A > 0\): Vật <strong>nhận</strong> công từ vật khác.</li>
+                                <li>• \(A < 0\): Vật <strong>thực hiện</strong> công lên vật khác.</li>
+                            </ul>
+                        </div>
+                        <div class="border rounded p-2 bg-white text-center">
+                            <img src="h4.png" alt="Hình 2.4 Quy ước về dấu của Q và A" class="mx-auto max-h-48 object-contain mb-1">
+                            <p class="text-xs font-semibold text-gray-600">Hình 2.4. Quy ước về dấu của \(Q\) và \(A\) trong hệ thức \(\Delta U = A + Q\)</p>
+                        </div>
+                    </div>
+
+                    <!-- Mục ? các hệ thức -->
+                    <div class="border-l-4 border-indigo-500 bg-indigo-50 p-4 rounded-r-lg space-y-2">
+                        <p class="font-bold text-indigo-900 flex items-center space-x-1">
+                            <span class="text-xl">❓</span>
+                            <span>Các hệ thức sau đây mô tả các quá trình thay đổi nội năng nào?</span>
+                        </p>
+                        <ol class="list-decimal list-inside text-sm text-gray-800 space-y-1 pl-2">
+                            <li>\(\Delta U = Q\) khi \(Q > 0\) và khi \(Q < 0\).</li>
+                            <li>\(\Delta U = A\) khi \(A > 0\) và khi \(A < 0\).</li>
+                            <li>\(\Delta U = A + Q\) khi \(Q > 0\) và \(A < 0\).</li>
+                            <li>\(\Delta U = A + Q\) khi \(Q < 0\) và \(A > 0\).</li>
+                        </ol>
+                        <button onclick="toggleAnswer('ans_q_hethuc')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải</button>
+                        <div id="ans_q_hethuc" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2 space-y-1 text-sm">
+                            <p><strong>1.</strong> Đơn thuần truyền nhiệt: \(Q>0\) (vật nhận nhiệt lượng), \(Q<0\) (vật tỏa/truyền nhiệt lượng).</p>
+                            <p><strong>2.</strong> Đơn thuần thực hiện công: \(A>0\) (vật nhận công), \(A<0\) (vật thực hiện công).</p>
+                            <p><strong>3.</strong> Vật nhận nhiệt lượng (\(Q>0\)) và thực hiện công lên vật khác (\(A<0\)).</p>
+                            <p><strong>4.</strong> Vật nhận công từ vật khác (\(A>0\)) và truyền nhiệt lượng cho vật khác (\(Q<0\)).</p>
+                        </div>
+                    </div>
+
+                    <!-- Em có biết Joule Thí nghiệm -->
+                    <div class="p-4 bg-purple-50 border border-purple-300 rounded-lg text-purple-900 space-y-2 shadow-sm my-3">
+                        <h4 class="font-bold text-lg text-purple-950">EM CÓ BIẾT: Thí nghiệm minh họa Định luật I của Joule</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                            <div class="border rounded p-2 bg-white text-center">
+                                <img src="h5.png" alt="Hình 2.5 Sơ đồ thí nghiệm Joule" class="mx-auto max-h-48 object-contain mb-1">
+                                <p class="text-xs font-semibold text-gray-600">Hình 2.5. Sơ đồ mô tả thí nghiệm của Joule</p>
+                            </div>
+                            <div class="md:col-span-2 text-sm leading-relaxed space-y-1">
+                                <p>Định luật I được hình thành từ thí nghiệm Joule tiến hành từ 1844 đến 1854. Công \(A\) mà nước nhận được từ vật nặng chuyển động làm quay các cánh cản khiến nước nóng lên (nội năng tăng). Nếu tính cả phần nhiệt truyền cho môi trường: \(\Delta U = A + Q\) (với \(Q < 0\)).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Động cơ nhiệt & ứng dụng -->
+                    <div class="space-y-3 pt-3">
+                        <h4 class="font-bold text-slate-800 text-lg">Ứng dụng: Động cơ nhiệt</h4>
+                        <p class="text-gray-800">
+                            Động cơ nhiệt là động cơ hoạt động dựa trên nguyên tắc biến nội năng của nhiên liệu thành cơ năng. Mỗi động cơ nhiệt đều có ba bộ phận chính:
+                        </p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-800 pl-4 text-sm">
+                            <li><strong>Nguồn nóng (nhiệt độ \(T_1\)):</strong> Cung cấp nhiệt lượng \(Q_1\) cho động cơ.</li>
+                            <li><strong>Bộ phận phát động:</strong> Tác nhân nhận nhiệt từ nguồn nóng, giãn nở sinh công \(A\).</li>
+                            <li><strong>Nguồn lạnh (nhiệt độ \(T_2 < T_1\)):</strong> Nhận nhiệt lượng \(Q_2\) do động cơ tỏa ra.</li>
+                        </ul>
+
+                        <div class="border rounded-lg p-3 text-center bg-gray-50 my-2">
+                            <img src="h6.png" alt="Hình 2.6 Nguyên tắc hoạt động động cơ nhiệt và sơ đồ máy hơi nước, động cơ đốt trong" class="mx-auto max-h-72 object-contain mb-2">
+                            <p class="text-sm font-semibold text-gray-700">Hình 2.6. (a) Sơ đồ nguyên tắc hoạt động động cơ nhiệt | (b) Máy hơi nước | (c) Động cơ đốt trong</p>
+                        </div>
+
+                        <!-- Câu hỏi ứng dụng động cơ nhiệt -->
+                        <div class="border-l-4 border-blue-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                            <p class="font-semibold text-gray-800">Hãy dựa vào các sơ đồ trong Hình 2.6b, c để trình bày sơ lược về cấu tạo và hoạt động của máy hơi nước và động cơ đốt trong.</p>
+                            <button onclick="toggleAnswer('ans_dongco')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải</button>
+                            <div id="ans_dongco" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2 text-sm space-y-2">
+                                <p><strong>- Máy hơi nước:</strong> Nguồn nóng là nồi súp de tạo hơi nước áp suất cao; hơi nước vào xi lanh đẩy pit-tông sinh công; hơi thải được ngưng tụ tại bình ngưng hơi (nguồn lạnh).</p>
+                                <p><strong>- Động cơ đốt trong:</strong> Nhiên liệu và không khí nạp vào xi lanh, bu-gi đánh lửa đốt cháy nhiên liệu tạo khí nhiệt độ/áp suất cao đẩy pit-tông sinh công; khí thải xả ra môi trường (nguồn lạnh).</p>
+                            </div>
+                        </div>
+
+                        <!-- Mục ? cuối bài PDF -->
+                        <div class="space-y-3 mt-4">
+                            <div class="border-l-4 border-indigo-500 bg-indigo-50 p-4 rounded-r-lg space-y-2">
+                                <p class="font-bold text-indigo-900 flex items-center space-x-1">
+                                    <span class="text-xl">❓</span>
+                                    <span>1. Nội năng của vật biến đổi như thế nào trong các trường hợp sau:</span>
+                                </p>
+                                <p class="text-sm text-gray-700 ml-6">a) Vật rắn đang nóng chảy.</p>
+                                <p class="text-sm text-gray-700 ml-6">b) Nước đá đang tan.</p>
+                                <p class="text-sm text-gray-700 ml-6">c) Hơi nước ngưng tụ ở nhiệt độ không đổi.</p>
+                                <button onclick="toggleAnswer('ans_q_biendoi')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition ml-6">Xem lời giải</button>
+                                <div id="ans_q_biendoi" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2 ml-6 text-sm space-y-1">
+                                    <p><strong>a)</strong> Nội năng tăng (do nhận nhiệt năng để phá vỡ mạng tinh thể, làm thế năng phân tử tăng).</p>
+                                    <p><strong>b)</strong> Nội năng tăng (tương tự sự nóng chảy, thế năng phân tử tăng).</p>
+                                    <p><strong>c)</strong> Nội năng giảm (do tỏa nhiệt ra môi trường làm giảm thế năng tương tác phân tử).</p>
+                                </div>
+                            </div>
+
+                            <div class="border-l-4 border-indigo-500 bg-indigo-50 p-4 rounded-r-lg space-y-2">
+                                <p class="font-bold text-indigo-900 flex items-center space-x-1">
+                                    <span class="text-xl">❓</span>
+                                    <span>2. Một vật khối lượng \(1\text{ kg}\) trượt không vận tốc ban đầu từ đỉnh xuống chân mặt phẳng nghiêng dài \(21\text{ m}\), góc nghiêng \(30^\circ\). Tốc độ ở chân là \(4,1\text{ m/s}\). Tính công của lực ma sát và độ biến thiên nội năng. Lấy \(g = 9,8\text{ m/s}^2\). Bỏ qua trao đổi nhiệt với MPN.</span>
+                                </p>
+                                <button onclick="toggleAnswer('ans_q_bai2')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải</button>
+                                <div id="ans_q_bai2" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2 text-sm space-y-1">
+                                    <p>Chiều cao đỉnh MPN: \(h = s \cdot \sin 30^\circ = 21 \cdot 0,5 = 10,5\text{ m}\).</p>
+                                    <p>Cơ năng tại đỉnh: \(W_1 = mgh = 1 \cdot 9,8 \cdot 10,5 = 102,9\text{ J}\).</p>
+                                    <p>Cơ năng tại chân: \(W_2 = \frac{1}{2} m v^2 = 0,5 \cdot 1 \cdot 4,1^2 = 8,405\text{ J}\).</p>
+                                    <p>Công của lực ma sát: \(A_{\text{ms}} = W_2 - W_1 = 8,405 - 102,9 = -94,495\text{ J}\).</p>
+                                    <p>Độ biến thiên nội năng của vật: \(\Delta U = -A_{\text{ms}} = 94,495\text{ J}\) (do cơ năng hao phí chuyển hóa thành nội năng).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EM ĐÃ HỌC -->
+                <div class="p-4 bg-blue-50 border-2 border-blue-400 rounded-xl space-y-2 mt-4">
+                    <h4 class="font-bold text-blue-900 text-lg uppercase">EM ĐÃ HỌC</h4>
+                    <ul class="list-disc list-inside space-y-1 text-blue-950 font-medium text-sm">
+                        <li>Tổng động năng và thế năng của các phân tử cấu tạo nên vật gọi là nội năng của vật (\(U\), đơn vị Jun \(\text{J}\)).</li>
+                        <li>Có thể làm thay đổi nội năng bằng hai cách: Thực hiện công và Truyền nhiệt.</li>
+                        <li>Định luật I của nhiệt động lực học: \(\Delta U = A + Q\).
+                            <ul class="list-circle list-inside pl-6 font-normal">
+                                <li>\(Q > 0\): Vật nhận nhiệt; \(Q < 0\): Vật truyền nhiệt.</li>
+                                <li>\(A > 0\): Vật nhận công; \(A < 0\): Vật thực hiện công.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- EM CÓ THỂ -->
+                <div class="p-4 bg-teal-50 border-2 border-teal-400 rounded-xl space-y-2">
+                    <h4 class="font-bold text-teal-900 text-lg uppercase">EM CÓ THỂ</h4>
+                    <ul class="list-disc list-inside space-y-1 text-teal-950 text-sm">
+                        <li>Dùng mô hình động học phân tử giải thích được một số hiện tượng liên quan đến sự chuyển thể của các chất.</li>
+                        <li>Dùng khái niệm nội năng và Định luật I của nhiệt động lực học để giải thích sự chuyển hóa năng lượng trong các quá trình chuyển thể và nguyên tắc hoạt động của động cơ nhiệt.</li>
+                    </ul>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- 6. PHẦN CỦNG CỐ CUỐI BÀI -->
+
+        <!-- TRẮC NGHIỆM GAMESHOW AI LÀ TRIỆU PHÚ -->
+        <div class="bg-slate-900 text-white p-6 rounded-xl shadow-xl space-y-6">
+            <div class="text-center space-y-2">
+                <h2 class="text-2xl md:text-3xl font-extrabold text-yellow-400 tracking-wider">🎮 GAMESHOW: AI LÀ TRIỆU PHÚ 🎮</h2>
+                <p class="text-sm text-slate-300">Thử thách 10 câu hỏi trắc nghiệm Bài 2!</p>
+            </div>
+
+            <form id="quizForm" class="space-y-6 text-slate-100">
+                <!-- Câu 1 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 1: Nội năng của một vật là:</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q1" value="A"> <span>A. Tổng thế năng và động năng của vật so với mặt đất</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q1" value="B"> <span>B. Tổng động năng và thế năng của các phân tử cấu tạo nên vật</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q1" value="C"> <span>C. Nhiệt lượng vật tỏa ra môi trường</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q1" value="D"> <span>D. Công mà vật thực hiện được</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 2 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 2: Nội năng của một vật phụ thuộc vào những yếu tố nào?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q2" value="A"> <span>A. Nhiệt độ và thể tích</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q2" value="B"> <span>B. Vận tốc và độ cao</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q2" value="C"> <span>C. Áp suất và màu sắc</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q2" value="D"> <span>D. Khối lượng và vị trí</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 3 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 3: Động năng phân tử phụ thuộc trực tiếp vào yếu tố nào?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q3" value="A"> <span>A. Khoảng cách phân tử</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q3" value="B"> <span>B. Tốc độ chuyển động phân tử (nhiệt độ)</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q3" value="C"> <span>C. Hình dạng bình chứa</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q3" value="D"> <span>D. Lực hấp dẫn</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 4 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 4: Có bao nhiêu cách làm thay đổi nội năng của vật?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q4" value="A"> <span>A. 1 cách</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q4" value="B"> <span>B. 2 cách (Thực hiện công và Truyền nhiệt)</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q4" value="C"> <span>C. 3 cách</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q4" value="D"> <span>D. 4 cách</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 5 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 5: Công thức Định luật I của Nhiệt động lực học là:</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q5" value="A"> <span>A. \(\Delta U = A - Q\)</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q5" value="B"> <span>B. \(\Delta U = A + Q\)</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q5" value="C"> <span>C. \(Q = A + \Delta U\)</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q5" value="D"> <span>D. \(A = Q + \Delta U\)</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 6 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 6: Quy ước dấu nào sau đây là DÚNG khi vật NHẬN công?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q6" value="A"> <span>A. \(A > 0\)</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q6" value="B"> <span>B. \(A < 0\)</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q6" value="C"> <span>C. \(A = 0\)</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q6" value="D"> <span>D. \(Q < 0\)</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 7 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 7: Trong quá trình truyền nhiệt không có sự biến đổi năng lượng từ dạng nào sang dạng nào?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q7" value="A"> <span>A. Chỉ có sự truyền nội năng giữa các vật</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q7" value="B"> <span>B. Cơ năng sang nội năng</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q7" value="C"> <span>C. Điện năng sang nội năng</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q7" value="D"> <span>D. Hóa năng sang cơ năng</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 8 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 8: Thiết bị biến đổi nội năng của nhiên liệu thành cơ năng gọi là gì?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q8" value="A"> <span>A. Động cơ điện</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q8" value="B"> <span>B. Động cơ nhiệt</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q8" value="C"> <span>C. Máy phát điện</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q8" value="D"> <span>D. Đèn cồn</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 9 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 9: Hệ thức \(\Delta U = Q\) với \(Q < 0\) mô tả quá trình nào?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q9" value="A"> <span>A. Vật nhận nhiệt lượng</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q9" value="B"> <span>B. Vật tỏa (truyền) nhiệt lượng cho vật khác</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q9" value="C"> <span>C. Vật thực hiện công</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q9" value="D"> <span>D. Vật nhận công</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 10 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 10: Động cơ nhiệt gồm bao nhiêu bộ phận chính?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q10" value="A"> <span>A. 2 bộ phận</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q10" value="B"> <span>B. 3 bộ phận (Nguồn nóng, bộ phận phát động, nguồn lạnh)</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q10" value="C"> <span>C. 4 bộ phận</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q10" value="D"> <span>D. 5 bộ phận</span></label>
+                    </div>
+                </div>
+
+                <div class="text-center pt-4">
+                    <button type="button" onclick="checkQuiz()" class="px-8 py-3 bg-cyan-950 text-white font-extrabold rounded-lg shadow-lg hover:bg-slate-800 border border-yellow-400 transition">
+                        NỘP BÀI
+                    </button>
+                </div>
+            </form>
+
+            <!-- Kết quả Quiz -->
+            <div id="quizResult" class="hidden p-5 rounded-lg border text-base font-semibold space-y-3"></div>
+        </div>
+
+        <!-- BÀI TẬP TỰ LUẬN TÍNH TOÁN (3 CÂU) -->
+        <div class="bg-white p-6 rounded-xl shadow-md space-y-6">
+            <h3 class="text-xl font-bold text-slate-900 border-b-2 border-slate-800 pb-2">BÀI TẬP TỰ LUẬN TÍNH TOÁN</h3>
+
+            <!-- Bài 1 -->
+            <div class="border-l-4 border-cyan-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                <p class="font-bold text-gray-800">Bài 1:</p>
+                <p class="text-gray-800">Người ta truyền cho khí trong một xi lanh một nhiệt lượng \(100\text{ J}\). Khí nở ra thực hiện một công \(70\text{ J}\) đẩy pit-tông. Tính độ biến thiên nội năng của khí.</p>
+                <button onclick="toggleAnswer('tl1')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải chi tiết</button>
+                <div id="tl1" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2 space-y-1">
+                    <p><strong>Lời giải:</strong></p>
+                    <p>- Khí nhận nhiệt lượng nên \(Q = +100\text{ J}\).</p>
+                    <p>- Khí thực hiện công nên \(A = -70\text{ J}\).</p>
+                    <p>Theo Định luật I của nhiệt động lực học:</p>
+                    <p>$$\Delta U = A + Q = (-70) + 100 = +30\text{ J}$$</p>
+                    <p>Vậy nội năng của khí tăng \(30\text{ J}\).</p>
+                </div>
+            </div>
+
+            <!-- Bài 2 -->
+            <div class="border-l-4 border-cyan-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                <p class="font-bold text-gray-800">Bài 2:</p>
+                <p class="text-gray-800">Nén một khối khí trong xi lanh, ta thực hiện một công là \(150\text{ J}\). Trong quá trình nén, khối khí tỏa ra môi trường xung quanh một nhiệt lượng là \(40\text{ J}\). Tính độ biến thiên nội năng của khối khí.</p>
+                <button onclick="toggleAnswer('tl2')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải chi tiết</button>
+                <div id="tl2" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2 space-y-1">
+                    <p><strong>Lời giải:</strong></p>
+                    <p>- Khối khí nhận công từ bên ngoài nên \(A = +150\text{ J}\).</p>
+                    <p>- Khối khí tỏa nhiệt lượng nên \(Q = -40\text{ J}\).</p>
+                    <p>Độ biến thiên nội năng của khối khí là:</p>
+                    <p>$$\Delta U = A + Q = 150 + (-40) = +110\text{ J}$$</p>
+                    <p>Vậy nội năng của khối khí tăng \(110\text{ J}\).</p>
+                </div>
+            </div>
+
+            <!-- Bài 3 -->
+            <div class="border-l-4 border-cyan-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                <p class="font-bold text-gray-800">Bài 3:</p>
+                <p class="text-gray-800">Một động cơ nhiệt nhận nhiệt lượng \(Q_1 = 1200\text{ J}\) từ nguồn nóng và truyền nhiệt lượng \(Q_2 = 800\text{ J}\) cho nguồn lạnh. Tính công cơ học \(A\) mà động cơ thực hiện được và hiệu suất \(H\) của động cơ nhiệt này.</p>
+                <button onclick="toggleAnswer('tl3')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải chi tiết</button>
+                <div id="tl3" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2 space-y-1">
+                    <p><strong>Lời giải:</strong></p>
+                    <p>Công cơ học do động cơ thực hiện là:</p>
+                    <p>$$A = Q_1 - Q_2 = 1200 - 800 = 400\text{ J}$$</p>
+                    <p>Hiệu suất của động cơ nhiệt là:</p>
+                    <p>$$H = \frac{A}{Q_1} \cdot 100\% = \frac{400}{1200} \cdot 100\% \approx 33,33\%$$</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. FOOTER -->
+        <footer class="text-center text-gray-600 py-6 border-t border-gray-300 font-semibold text-sm">
+            Chương trình GDPT 2018 - Bộ sách thống nhất
+        </footer>
+
     </div>
 
-    <!-- I. Khái niệm nội năng -->
-    <section>
-        <div class="section-title">I. KHÁI NIỆM NỘI NĂNG</div>
-        
-        <div class="subsection-title">1. Nội năng của một vật</div>
-        <p class="mt-2">
-            Tổng động năng và thế năng của các phân tử cấu tạo nên vật được gọi là <strong>nội năng</strong> của vật. <br>
-            Kí hiệu: <span class="highlight">U</span>. Đơn vị: <strong>Jun (J)</strong>.
-        </p>
-
-        <!-- Câu hỏi tương tác -->
-        <div class="question-toggle" onclick="toggleAnswer('ans1')">
-            <strong>? Câu hỏi:</strong> Tại sao nội năng của vật lại phụ thuộc vào nhiệt độ và thể tích của vật? (Click để xem giải thích)
-        </div>
-        <div id="ans1" class="answer-content">
-            <ul class="list-disc ml-6 text-gray-700">
-                <li><strong>Nhiệt độ:</strong> Khi nhiệt độ tăng, các phân tử chuyển động nhanh hơn $\rightarrow$ Động năng phân tử tăng $\rightarrow$ Nội năng tăng.</li>
-                <li><strong>Thể tích:</strong> Khi thể tích thay đổi, khoảng cách giữa các phân tử thay đổi $\rightarrow$ Thế năng phân tử thay đổi $\rightarrow$ Nội năng thay đổi.</li>
-            </ul>
-        </div>
-
-        <div class="subsection-title">2. Thí nghiệm về mối quan hệ giữa nội năng với năng lượng</div>
-        <div class="mt-2 ml-4">
-            <p><strong>a. Giới thiệu thí nghiệm:</strong> Sử dụng nhiệt lượng kế để đo năng lượng cung cấp và sự thay đổi trạng thái của nước.</p>
-            <p><strong>b. Tiến hành:</strong> Cung cấp nhiệt lượng bằng điện trở, đo thông số nhiệt độ và thời gian.</p>
-            <p><strong>c. Thực hiện các yêu cầu:</strong> </p>
-            <div class="bg-gray-50 p-3 border-l-4 border-gray-400 mt-2 italic text-sm">
-                <strong>Giải thích chi tiết:</strong> Khi cung cấp năng lượng, các phân tử nhận được động năng lớn hơn. Nếu vật đang ở điểm chuyển pha (như nước sôi), năng lượng này dùng để phá vỡ liên kết (tăng thế năng phân tử) thay vì tăng nhiệt độ.
-            </div>
-        </div>
-    </section>
-
-    <!-- II. Định luật I -->
-    <section>
-        <div class="section-title">II. ĐỊNH LUẬT I CỦA NHIỆT ĐỘNG LỰC HỌC</div>
-        
-        <div class="subsection-title">1. Cách làm thay đổi nội năng</div>
-        <p>Có hai cách chính để làm thay đổi nội năng của một vật:</p>
-        <ul class="list-decimal ml-8 mt-2">
-            <li><strong>Thực hiện công:</strong> Chuyển hóa cơ năng thành nội năng (vd: cọ xát).</li>
-            <li><strong>Truyền nhiệt:</strong> Trao đổi nhiệt năng trực tiếp (vd: đun nóng).</li>
-        </ul>
-
-        <div class="question-toggle" onclick="toggleAnswer('ans2')">
-            <strong>? Câu hỏi:</strong> Giải thích tại sao khi xoa hai bàn tay vào nhau ta thấy tay nóng lên? (Click để xem chi tiết)
-        </div>
-        <div id="ans2" class="answer-content">
-            Đây là quá trình <strong>thực hiện công</strong>. Cơ năng từ chuyển động của tay thắng lực ma sát, chuyển hóa thành nội năng của các phân tử ở bề mặt da, làm nhiệt độ tăng lên.
-        </div>
-
-        <div class="subsection-title">2. Định luật 1</div>
-        <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 mt-2">
-            <p><strong>Phát biểu:</strong> Độ biến thiên nội năng của vật bằng tổng công và nhiệt lượng vật nhận được.</p>
-            <p class="text-xl font-bold text-center my-4">$$\Delta U = A + Q$$</p>
-            
-            <p><strong>Quy ước dấu:</strong></p>
-            <table class="w-full mt-2 border-collapse border border-gray-300 convention-table">
-                <thead>
-                    <tr>
-                        <th class="border p-2">Đại lượng</th>
-                        <th class="border p-2">Dấu dương (+)</th>
-                        <th class="border p-2">Dấu âm (-)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="border p-2 font-bold text-center">Q</td>
-                        <td class="border p-2">Vật nhận nhiệt lượng</td>
-                        <td class="border p-2">Vật truyền nhiệt lượng</td>
-                    </tr>
-                    <tr>
-                        <td class="border p-2 font-bold text-center">A</td>
-                        <td class="border p-2">Vật nhận công</td>
-                        <td class="border p-2">Vật thực hiện công</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-
-    <!-- III. Củng cố -->
-    <section class="mb-20">
-        <div class="section-title">III. CỦNG CỐ</div>
-        
-        <div class="subsection-title">1. Câu hỏi củng cố</div>
-        <div class="question-toggle" onclick="toggleAnswer('ans-cc')">
-            Hệ thức $\Delta U = Q$ áp dụng cho quá trình nào?
-        </div>
-        <div id="ans-cc" class="answer-content">
-            Áp dụng cho quá trình <strong>truyền nhiệt</strong> mà không có sự thực hiện công ($A=0$).
-        </div>
-
-        <div class="subsection-title">2. Mục em đã học</div>
-        <div class="bg-green-50 p-4 rounded border-l-4 border-green-500 text-gray-800">
-            <ul class="list-disc ml-5 space-y-2">
-                <li><strong>Nội năng (U):</strong> Tổng động năng và thế năng của các phân tử.</li>
-                <li><strong>Cách thay đổi nội năng:</strong> Thực hiện công và truyền nhiệt.</li>
-                <li><strong>Định luật I:</strong> $\Delta U = A + Q$.</li>
-            </ul>
-        </div>
-
-        <div class="subsection-title">3. Bài tập trắc nghiệm tự luyện</div>
-        <div class="quiz-container">
-            <!-- Nhận biết -->
-            <div class="mb-6">
-                <p class="font-bold">Câu 1 (Nhận biết): Nội năng của vật là gì?</p>
-                <div class="ml-4 mt-2">
-                    <label class="block cursor-pointer"><input type="radio" name="q1"> A. Tổng động năng và thế năng của vật.</label>
-                    <label class="block cursor-pointer"><input type="radio" name="q1" id="correct1"> B. Tổng động năng và thế năng của các phân tử cấu tạo nên vật.</label>
-                    <label class="block cursor-pointer"><input type="radio" name="q1"> C. Nhiệt lượng vật nhận được trong quá trình truyền nhiệt.</label>
-                    <label class="block cursor-pointer"><input type="radio" name="q1"> D. Công mà vật thực hiện được.</label>
-                </div>
-            </div>
-
-            <!-- Thông hiểu -->
-            <div class="mb-6">
-                <p class="font-bold">Câu 2 (Thông hiểu): Trong hệ thức $\Delta U = A + Q$, nếu vật nhận công và truyền nhiệt thì:</p>
-                <div class="ml-4 mt-2">
-                    <label class="block cursor-pointer"><input type="radio" name="q2"> A. A > 0 và Q > 0</label>
-                    <label class="block cursor-pointer"><input type="radio" name="q2" id="correct2"> B. A > 0 và Q < 0</label>
-                    <label class="block cursor-pointer"><input type="radio" name="q2"> C. A < 0 và Q > 0</label>
-                    <label class="block cursor-pointer"><input type="radio" name="q2"> D. A < 0 và Q < 0</label>
-                </div>
-            </div>
-
-            <!-- Vận dụng -->
-            <div class="mb-6">
-                <p class="font-bold">Câu 3 (Vận dụng): Người ta cung cấp nhiệt lượng 1,5 J cho một khối khí trong xilanh. Khí nở ra đẩy pít-tông thực hiện công 1,2 J. Độ biến thiên nội năng của khối khí là:</p>
-                <div class="ml-4 mt-2">
-                    <label class="block cursor-pointer"><input type="radio" name="q3" id="correct3"> A. 0,3 J</label>
-                    <label class="block cursor-pointer"><input type="radio" name="q3"> B. 2,7 J</label>
-                    <label class="block cursor-pointer"><input type="radio" name="q3"> C. -0,3 J</label>
-                    <label class="block cursor-pointer"><input type="radio" name="q3"> D. 1,5 J</label>
-                </div>
-            </div>
-
-             <div class="mb-6">
-                <p class="font-bold">Câu 4 (Thông hiểu): Nội năng của khí lí tưởng phụ thuộc vào yếu tố nào?</p>
-                <div class="ml-4 mt-2">
-                    <label class="block cursor-pointer"><input type="radio" name="q4" id="correct4"> A. Chỉ nhiệt độ</label>
-                    <label class="block cursor-pointer"><input type="radio" name="q4"> B. Chỉ thể tích</label>
-                    <label class="block cursor-pointer"><input type="radio" name="q4"> C. Cả nhiệt độ và thể tích</label>
-                    <label class="block cursor-pointer"><input type="radio" name="q4"> D. Áp suất</label>
-                </div>
-            </div>
-
-            <div class="mb-6">
-                <p class="font-bold">Câu 5 (Vận dụng): Một viên đạn chì đang bay với vận tốc v thì va chạm vào bia thép và dừng lại. Nội năng của viên đạn tăng lên chủ yếu do quá trình nào?</p>
-                <div class="ml-4 mt-2">
-                    <label class="block cursor-pointer"><input type="radio" name="q5"> A. Truyền nhiệt</label>
-                    <label class="block cursor-pointer"><input type="radio" name="q5" id="correct5"> B. Thực hiện công</label>
-                    <label class="block cursor-pointer"><input type="radio" name="q5"> C. Vừa thực hiện công vừa truyền nhiệt</label>
-                    <label class="block cursor-pointer"><input type="radio" name="q5"> D. Bức xạ nhiệt</label>
-                </div>
-            </div>
-            
-            <button class="bg-dark-blue text-white px-4 py-2 rounded hover:opacity-90 w-full font-bold" onclick="checkQuiz()">XÁC NHẬN ĐÁP ÁN</button>
-            <div id="quizResult" class="mt-4 font-bold text-center"></div>
-        </div>
-    </section>
-
+    <!-- JAVASCRIPT LOGIC -->
     <script>
+        // Hàm Toggle hiển thị/ẩn câu trả lời
         function toggleAnswer(id) {
-            const element = document.getElementById(id);
-            element.style.display = (element.style.display === "block") ? "none" : "block";
+            const el = document.getElementById(id);
+            if (el) {
+                if (el.classList.contains('hidden')) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            }
         }
 
+        // Đáp án trắc nghiệm Bài 2
+        const correctAnswers = {
+            q1: 'B',
+            q2: 'A',
+            q3: 'B',
+            q4: 'B',
+            q5: 'B',
+            q6: 'A',
+            q7: 'A',
+            q8: 'B',
+            q9: 'B',
+            q10: 'B'
+        };
+
+        const explanations = {
+            q1: 'Câu 1: B - Nội năng là tổng động năng và thế năng của các phân tử cấu tạo nên vật.',
+            q2: 'Câu 2: A - Nội năng phụ thuộc vào nhiệt độ (T) và thể tích (V).',
+            q3: 'Câu 3: B - Động năng phân tử phụ thuộc vào tốc độ chuyển động (nhiệt độ).',
+            q4: 'Câu 4: B - Có 2 cách: Thực hiện công và Truyền nhiệt.',
+            q5: 'Câu 5: B - Công thức Định luật I: ΔU = A + Q.',
+            q6: 'Câu 6: A - Quy ước dấu: Vật nhận công thì A > 0.',
+            q7: 'Câu 7: A - Truyền nhiệt chỉ là sự truyền nội năng, không biến đổi năng lượng.',
+            q8: 'Câu 8: B - Động cơ nhiệt biến đổi nội năng thành cơ năng.',
+            q9: 'Câu 9: B - Q < 0 mô tả vật tỏa/truyền nhiệt cho vật khác.',
+            q10: 'Câu 10: B - Động cơ nhiệt gồm 3 bộ phận: Nguồn nóng, bộ phận phát động, nguồn lạnh.'
+        };
+
+        // Hàm kiểm tra đáp án Quiz
         function checkQuiz() {
-            const results = [
-                document.getElementById('correct1').checked,
-                document.getElementById('correct2').checked,
-                document.getElementById('correct3').checked,
-                document.getElementById('correct4').checked,
-                document.getElementById('correct5').checked
-            ];
-            const score = results.filter(r => r).length;
+            let score = 0;
+            let total = 10;
+            let detailHtml = '<div class="space-y-2"><p class="text-lg font-bold">KẾT QUẢ ĐÁNH GIÁ:</p>';
+
+            for (let i = 1; i <= total; i++) {
+                const qName = 'q' + i;
+                const selected = document.querySelector(`input[name="${qName}"]:checked`);
+                if (selected && selected.value === correctAnswers[qName]) {
+                    score++;
+                }
+            }
+
+            if (score === total) {
+                detailHtml += `<p class="text-green-600 font-bold text-xl">Xuất sắc! Bạn đạt ${score}/${total} điểm! 🏆</p>`;
+            } else {
+                detailHtml += `<p class="text-red-600 font-bold text-xl">Bạn đạt ${score}/${total} điểm. Hãy thử lại để đạt kết quả tối đa!</p>`;
+            }
+
+            detailHtml += '<hr class="my-2 border-slate-600"><p class="font-bold underline text-yellow-300">Hướng dẫn giải chi tiết:</p><ul class="list-disc list-inside space-y-1 text-sm text-slate-200">';
+            for (let i = 1; i <= total; i++) {
+                detailHtml += `<li>${explanations['q' + i]}</li>`;
+            }
+            detailHtml += '</ul></div>';
+
             const resDiv = document.getElementById('quizResult');
-            resDiv.innerHTML = `Kết quả: ${score}/5 câu đúng. <br> <span class="text-sm text-gray-500 font-normal">Đáp án đúng: 1B, 2B, 3A, 4A (với khí lí tưởng), 5B</span>`;
-            resDiv.className = score >= 3 ? "mt-4 font-bold text-center text-green-600" : "mt-4 font-bold text-center text-red-600";
+            resDiv.innerHTML = detailHtml;
+            resDiv.classList.remove('hidden');
+
+            if (score === total) {
+                resDiv.className = 'p-5 rounded-lg border bg-green-950 border-green-500 text-white space-y-3';
+            } else {
+                resDiv.className = 'p-5 rounded-lg border bg-slate-800 border-red-500 text-white space-y-3';
+            }
         }
-        
-        // Load MathJax
-        window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };
-        const script = document.createElement('script');
-        script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
-        document.head.appendChild(script);
     </script>
 </body>
 </html>
