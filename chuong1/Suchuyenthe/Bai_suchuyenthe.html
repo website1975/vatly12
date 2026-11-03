@@ -1,80 +1,666 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bài học Vật lý</title>
-<style>
-  body {
-    margin: 0;
-    font-family: "Segoe UI", Arial, sans-serif;
-    background-color: #f5f5f5;
-  }
-
-  /* Panel trên */
-  .top-panel {
-    width: 100%;
-    background: linear-gradient(135deg, #2196f3, #03a9f4);
-    padding: 10px 0;
-    text-align: center;
-  }
-
-  .top-panel table {
-    margin: 0 auto;
-  }
-
-  .top-panel td {
-    padding: 0px 0px;
-  }
-
-  /* Nút chữ nhật bo góc */
-  .btn {
-    display: inline-block;
-    background: #ffffff;
-    color: #0078d7;
-    font-weight: 600;
-    text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 10px;
-    border: 2px solid #0078d7;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-    transition: all 0.25s ease;
-  }
-
-  .btn:hover {
-    background: #e3f2fd;
-    color: #005fa3;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
-    transform: translateY(-2px);
-  }
-
-  /* Panel dưới */
-iframe {
-  width: 100%;
-  height: calc(100vh - 70px); /* 70px là chiều cao panel top */
-  border: none;
-  background-color: #ffffff;
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 1: Cấu trúc của chất. Sự chuyển thể</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax CDN với gói đầy đủ Tex-CHTML bao gồm hóa học (mhchem) -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)'], ['$', '$']],
+                displayMath: [['\\[', '\\]'], ['$$', '$$']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #f4f7f9;
+            color: #2d3748;
+        }
+    </style>
 </head>
+<body class="p-4 md:p-8">
 
-<body>
+    <div class="max-w-5xl mx-auto space-y-6">
 
-<!-- Panel Top -->
-<div class="top-panel">
-  <table>
-    <tr>
-      <td><a class="btn" href="chuyenthe.html" target="noi_dung">Tóm tắt Lý thuyết</a></td>
-      <td><a class="btn" href="haimophongchuyenthe.html" target="noi_dung">Mô phỏng Vật lý</a></td>
-      <td><a class="btn" href="../trangkhac/Trangtrang.html" target="noi_dung">Phân dạng Bài tập</a></td>
-      <td><a class="btn" href="tracnghiem_chuyenthe.html" target="noi_dung">Trắc nghiệm</a></td>
-    </tr>
-  </table>
-</div>
+        <!-- 1 Header: Gồm 2 khối màu (màu 1 và màu 2) bo tròn 4 góc, ngăn bằng đường kẻ mảnh -->
+        <div class="rounded-xl overflow-hidden shadow-md border border-gray-200">
+            <!-- Khối trên: Màu 1 (Cyan) -->
+            <div class="bg-[#002B49] text-white py-3 px-6 text-center font-semibold text-lg md:text-xl border-b border-slate-600">
+                Chương 1: Vật Lý Nhiệt
+            </div>
+            <!-- Đường kẻ mảnh -->
+            <div class="border-t border-cyan-300"></div>
+            <!-- Khối dưới: Màu 2 (Cyan đậm hơn/tương phản) -->
+          <div class="bg-[#002B49] text-white py-5 px-6 text-center font-bold text-2xl md:text-3xl tracking-wide uppercase">
+                BÀI 1: CẤU TRÚC CỦA CHẤT. SỰ CHUYỂN THỂ
+            </div>
+        </div>
 
-<!-- Panel Dưới -->
-<iframe name = "noi_dung" src="chuyenthe.html"></iframe>
+        <!-- 2 Intro Box: Lời dẫn đóng khung viền đen mỏng, nền trắng, in nghiêng -->
+        <div class="bg-white p-5 rounded-xl border border-black shadow-sm italic text-gray-800 leading-relaxed">
+            Hãy dựa trên những kiến thức đã học về cấu tạo chất để giải thích tại sao cùng một chất lại có thể tồn tại ở các thể khác nhau là rắn, lỏng, khí.
+        </div>
 
+        <!-- Nội dung chính của bài học -->
+        <div class="bg-white p-6 md:p-8 rounded-xl shadow-md space-y-8">
+
+            <!-- MỤC I -->
+            <section class="space-y-4">
+                <div class="flex items-center space-x-3 border-b-4 border-slate-800 pb-2">
+                    <span class="w-8 h-8 flex items-center justify-center bg-slate-800 text-white font-bold rounded-sm text-lg">I</span>
+                    <h2 class="text-xl md:text-2xl font-bold uppercase text-slate-900">MÔ HÌNH ĐỘNG HỌC PHÂN TỬ VỀ CẤU TẠO CHẤT</h2>
+                </div>
+
+                <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-lg shadow-sm space-y-2">
+                    <h3 class="font-bold text-emerald-900 text-lg">Mô hình động học phân tử về cấu tạo chất gồm các nội dung cơ bản:</h3>
+                    <ol class="list-decimal list-inside space-y-1 text-gray-800 font-medium">
+                        <li>Các chất được cấu tạo từ các hạt riêng biệt là phân tử.</li>
+                        <li>Các phân tử chuyển động không ngừng. Nhiệt độ của vật càng cao thì tốc độ chuyển động của các phân tử cấu tạo nên vật càng lớn.</li>
+                        <li>Giữa các phân tử có lực hút và đẩy gọi chung là lực liên kết phân tử.</li>
+                    </ol>
+                    <p class="text-sm text-emerald-800 italic mt-2">
+                        * Thuật ngữ phân tử trong mô hình trên được dùng để chỉ chung các hạt cấu tạo chất: phân tử, nguyên tử, ion.
+                    </p>
+                </div>
+
+                <!-- Các hình ảnh minh họa Mục I -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                    <div class="border rounded-lg p-3 text-center bg-gray-50">
+                        <img src="h1.png" alt="Hình 1.1. Chuyển động của các phân tử nước và các hạt phấn hoa" class="mx-auto max-h-64 object-contain mb-2">
+                        <p class="text-sm font-semibold text-gray-700">Hình 1.1. Chuyển động của các phân tử nước và các hạt phấn hoa</p>
+                        <p class="text-xs text-gray-500">Mũi tên đen: hướng chuyển động của phân tử nước | Mũi tên vàng: hướng chuyển động của hạt phấn hoa</p>
+                    </div>
+                    <div class="border rounded-lg p-3 text-center bg-gray-50">
+                        <img src="h2.png" alt="Hình 1.2. Quỹ đạo chuyển động của hạt phấn hoa trong nước" class="mx-auto max-h-64 object-contain mb-2">
+                        <p class="text-sm font-semibold text-gray-700">Hình 1.2. Quỹ đạo chuyển động của hạt phấn hoa trong nước</p>
+                    </div>
+                </div>
+
+                <!-- Mục Lưu ý / Định nghĩa thêm -->
+                <div class="p-4 bg-amber-50 border border-amber-300 rounded-lg text-amber-900">
+                    <strong>Thông tin thêm:</strong> Người ta thường gọi chuyển động hỗn loạn, không ngừng của các hạt rất nhỏ dưới tác dụng của các phân tử chất lỏng hoặc chất khí là <strong>chuyển động Brown</strong>.
+                </div>
+
+                <!-- Các câu hỏi hoạt động 1, 2, 3 (Con số 1, 2, 3 bao xung quanh hình tròn) -->
+                <div class="space-y-4 mt-4">
+                    <!-- Câu 1 -->
+                    <div class="border-l-4 border-blue-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                        <div class="flex items-start space-x-2">
+                            <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-blue-600 text-white font-bold rounded-full text-sm">1</span>
+                            <p class="font-semibold text-gray-800">Trong lịch sử phát triển của khoa học, có hai quan điểm khác nhau về cấu tạo chất là quan điểm chất có cấu tạo liên tục và chất có cấu tạo gián đoạn. Mô hình động học phân tử được xây dựng trên quan điểm nào?</p>
+                        </div>
+                        <button onclick="toggleAnswer('ans_i_1')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem trả lời</button>
+                        <div id="ans_i_1" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2">
+                            Mô hình động học phân tử được xây dựng trên <strong>quan điểm chất có cấu tạo gián đoạn</strong> (được cấu tạo từ các hạt riêng biệt là phân tử, nguyên tử).
+                        </div>
+                    </div>
+
+                    <!-- Câu 2 -->
+                    <div class="border-l-4 border-blue-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                        <div class="flex items-start space-x-2">
+                            <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-blue-600 text-white font-bold rounded-full text-sm">2</span>
+                            <p class="font-semibold text-gray-800">Năm 1827, khi làm thí nghiệm quan sát các hạt phấn hoa rất nhỏ trong nước bằng kính hiển vi, Brown thấy chúng chuyển động hỗn loạn, không ngừng (Hình 1.1 và 1.2).</p>
+                        </div>
+                        <p class="text-sm text-gray-700 ml-8">a) Tại sao thí nghiệm của Brown được coi là một trong những thí nghiệm chứng tỏ các phân tử chuyển động hỗn loạn, không ngừng?</p>
+                        <p class="text-sm text-gray-700 ml-8">b) Làm thế nào để với thí nghiệm của Brown có thể chứng tỏ được khi nhiệt độ của nước càng cao thì các phân tử nước chuyển động càng nhanh?</p>
+                        <button onclick="toggleAnswer('ans_i_2')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition ml-8">Xem lời giải</button>
+                        <div id="ans_i_2" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2 ml-8 space-y-2">
+                            <p><strong>a)</strong> Do các phân tử nước chuyển động hỗn loạn không ngừng, va chạm vào hạt phấn hoa từ nhiều phía không cân bằng, làm cho hạt phấn hoa chuyển động hỗn loạn. Vì vậy chuyển động của hạt phấn hoa gián tiếp chứng tỏ các phân tử nước chuyển động hỗn loạn không ngừng.</p>
+                            <p><strong>b)</strong> Khi tăng nhiệt độ của nước, ta quan sát thấy các hạt phấn hoa chuyển động hỗn loạn càng nhanh. Điều này chứng tỏ khi nhiệt độ tăng thì các phân tử nước chuyển động càng nhanh, va chạm vào hạt phấn hoa mạnh hơn và nhiều hơn.</p>
+                        </div>
+                    </div>
+
+                    <!-- Câu 3 -->
+                    <div class="border-l-4 border-blue-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                        <div class="flex items-start space-x-2">
+                            <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-blue-600 text-white font-bold rounded-full text-sm">3</span>
+                            <p class="font-semibold text-gray-800">Hãy tìm các hiện tượng thực tế chứng tỏ giữa các phân tử có lực đẩy, lực hút.</p>
+                        </div>
+                        <button onclick="toggleAnswer('ans_i_3')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải</button>
+                        <div id="ans_i_3" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2 space-y-1">
+                            <p>- <strong>Lực hút:</strong> Hai sợi dây chì gấp nếp nén chặt vào nhau có thể dính chặt vào nhau; hoặc dùng lực kéo nén một thanh kim loại rất khó đứt chứng tỏ có lực hút giữ các phân tử.</p>
+                            <p>- <strong>Lực đẩy:</strong> Rất khó nén một thể tích chất lỏng hoặc chất rắn chứng tỏ giữa các phân tử có lực đẩy chống lại sự lại gần nhau.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MỤC II -->
+            <section class="space-y-4">
+                <div class="flex items-center space-x-3 border-b-4 border-slate-800 pb-2">
+                    <span class="w-8 h-8 flex items-center justify-center bg-slate-800 text-white font-bold rounded-sm text-lg">II</span>
+                    <h2 class="text-xl md:text-2xl font-bold uppercase text-slate-900">CẤU TRÚC CỦA CHẤT RẮN, CHẤT LỎNG VÀ CHẤT KHÍ</h2>
+                </div>
+
+                <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-lg shadow-sm space-y-2">
+                    <p class="text-gray-800">Dựa vào các đặc điểm sau đây của phân tử có thể nêu được sơ lược cấu trúc của hầu hết các chất rắn, chất lỏng, chất khí:</p>
+                    <ul class="list-disc list-inside space-y-1 text-gray-800 font-medium">
+                        <li>Khoảng cách giữa các phân tử càng lớn thì lực liên kết giữa chúng càng yếu.</li>
+                        <li>Các phân tử sắp xếp có trật tự thì lực liên kết giữa chúng mạnh.</li>
+                    </ul>
+                </div>
+
+                <div class="border rounded-lg p-3 text-center bg-gray-50 my-4">
+                    <img src="h3.png" alt="Hình 1.3 Khoảng cách, sắp xếp và chuyển động của phân tử ở các thể" class="mx-auto max-h-72 object-contain mb-2">
+                    <p class="text-sm font-semibold text-gray-700">Hình 1.3. (a) Khoảng cách và sự sắp xếp các phân tử ở các thể khác nhau | (b) Chuyển động của phân tử ở các thể khác nhau</p>
+                </div>
+
+                <!-- Bảng so sánh cấu trúc các thể -->
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse border border-slate-300 text-center text-sm md:text-base">
+                        <thead>
+                            <tr class="bg-slate-200 text-slate-900 font-bold">
+                                <th class="border border-slate-300 p-2">Đặc điểm</th>
+                                <th class="border border-slate-300 p-2">Thể khí</th>
+                                <th class="border border-slate-300 p-2">Thể rắn</th>
+                                <th class="border border-slate-300 p-2">Thể lỏng</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="border border-slate-300 p-2 font-semibold">Khoảng cách phân tử</td>
+                                <td class="border border-slate-300 p-2">Rất lớn</td>
+                                <td class="border border-slate-300 p-2">Rất nhỏ</td>
+                                <td class="border border-slate-300 p-2">Trung bình (lớn hơn chất rắn, nhỏ hơn chất khí)</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-slate-300 p-2 font-semibold">Sắp xếp</td>
+                                <td class="border border-slate-300 p-2">Hỗn loạn, không có trật tự</td>
+                                <td class="border border-slate-300 p-2">Trật tự, chặt chẽ</td>
+                                <td class="border border-slate-300 p-2">Kém trật tự hơn chất rắn</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-slate-300 p-2 font-semibold">Chuyển động</td>
+                                <td class="border border-slate-300 p-2">Hỗn loạn về mọi phía</td>
+                                <td class="border border-slate-300 p-2">Dao động quanh vị trí cân bằng cố định</td>
+                                <td class="border border-slate-300 p-2">Dao động quanh vị trí cân bằng luôn di chuyển</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-slate-300 p-2 font-semibold">Lực liên kết</td>
+                                <td class="border border-slate-300 p-2">Rất yếu</td>
+                                <td class="border border-slate-300 p-2">Rất mạnh</td>
+                                <td class="border border-slate-300 p-2">Trung bình</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Các câu hỏi mục II -->
+                <div class="space-y-4 mt-4">
+                    <div class="border-l-4 border-blue-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                        <div class="flex items-start space-x-2">
+                            <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-blue-600 text-white font-bold rounded-full text-sm">1</span>
+                            <p class="font-semibold text-gray-800">Hãy dựa vào Hình 1.3 để mô tả, so sánh khoảng cách và sự sắp xếp (a), chuyển động (b) của phân tử ở các thể khác nhau. Từ đó mô tả một cách sơ lược về cấu trúc của chất rắn, chất lỏng, chất khí.</p>
+                        </div>
+                        <button onclick="toggleAnswer('ans_ii_1')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem hướng dẫn</button>
+                        <div id="ans_ii_1" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2">
+                            - <strong>Thể rắn:</strong> Các phân tử ở rất gần nhau, sắp xếp có trật tự, chỉ dao động quanh vị trí cân bằng cố định.<br>
+                            - <strong>Thể lỏng:</strong> Khoảng cách phân tử lớn hơn chất rắn, sắp xếp kém trật tự hơn, dao động quanh vị trí cân bằng di động.<br>
+                            - <strong>Thể khí:</strong> Khoảng cách phân tử rất lớn, chuyển động hỗn loạn không ngừng về mọi phía.
+                        </div>
+                    </div>
+
+                    <div class="border-l-4 border-blue-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                        <div class="flex items-start space-x-2">
+                            <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-blue-600 text-white font-bold rounded-full text-sm">2</span>
+                            <p class="font-semibold text-gray-800">Hãy giải thích các đặc điểm sau đây của thể khí, thể rắn, thể lỏng:</p>
+                        </div>
+                        <p class="text-sm text-gray-700 ml-8">a) Chất khí không có hình dạng và thể tích riêng, luôn chiếm toàn bộ thể tích bình chứa và có thể nén được dễ dàng.</p>
+                        <p class="text-sm text-gray-700 ml-8">b) Vật ở thể rắn có thể tích và hình dạng riêng, rất khó nén.</p>
+                        <p class="text-sm text-gray-700 ml-8">c) Vật ở thể lỏng có thể tích riêng nhưng không có hình dạng riêng.</p>
+                        <button onclick="toggleAnswer('ans_ii_2')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition ml-8">Xem lời giải</button>
+                        <div id="ans_ii_2" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2 ml-8 space-y-2">
+                            <p><strong>a) Thể khí:</strong> Lực liên kết giữa các phân tử rất yếu nên các phân tử chuyển động tự do về mọi phía làm chất khí chiếm toàn bộ bình chứa. Khoảng cách giữa các phân tử lớn nên dễ bị nén.</p>
+                            <p><strong>b) Thể rắn:</strong> Lực tương tác phân tử rất mạnh giữ các phân tử ở các vị trí cố định tạo ra hình dạng và thể tích riêng xác định, khoảng cách giữa các phân tử nhỏ nên rất khó nén.</p>
+                            <p><strong>c) Thể lỏng:</strong> Lực liên kết phân tử đủ mạnh để giữ chất lỏng có thể tích riêng, nhưng không đủ mạnh để giữ vị trí cố định nên chất lỏng mang hình dạng của phần bình chứa nó.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MỤC III -->
+            <section class="space-y-4">
+                <div class="flex items-center space-x-3 border-b-4 border-slate-800 pb-2">
+                    <span class="w-8 h-8 flex items-center justify-center bg-slate-800 text-white font-bold rounded-sm text-lg">III</span>
+                    <h2 class="text-xl md:text-2xl font-bold uppercase text-slate-900">SỰ CHUYỂN THỂ</h2>
+                </div>
+
+                <!-- 1. Sự chuyển thể -->
+                <div class="space-y-3">
+                    <h3 class="font-bold text-slate-800 text-lg flex items-center space-x-2">
+                        <span class="w-6 h-6 flex items-center justify-center bg-slate-700 text-white rounded-full text-xs">1</span>
+                        <span>Sự chuyển thể</span>
+                    </h3>
+                    <p class="text-gray-800 leading-relaxed">
+                        Các chất có thể chuyển từ thể này sang thể khác. Đa số các chất ở thể rắn khi nóng lên có thể chuyển sang thể lỏng, rồi từ thể lỏng sang thể khí. Ngược lại, đa số chất khí khi lạnh đi có thể chuyển sang thể lỏng, rồi từ thể lỏng sang thể rắn. Một số chất có thể chuyển trực tiếp từ thể rắn sang thể khí và ngược lại.
+                    </p>
+                    <div class="border rounded-lg p-3 text-center bg-gray-50 my-2">
+                        <img src="h4.png" alt="Hình 1.4. Sơ đồ các hình thức chuyển thể" class="mx-auto max-h-60 object-contain mb-2">
+                        <p class="text-sm font-semibold text-gray-700">Hình 1.4. Sơ đồ các hình thức chuyển thể</p>
+                    </div>
+                </div>
+
+                <!-- 2. Dùng mô hình động học phân tử giải thích sự chuyển thể -->
+                <div class="space-y-3 pt-4 border-t border-gray-200">
+                    <h3 class="font-bold text-slate-800 text-lg flex items-center space-x-2">
+                        <span class="w-6 h-6 flex items-center justify-center bg-slate-700 text-white rounded-full text-xs">2</span>
+                        <span>Dùng mô hình động học phân tử giải thích sự chuyển thể</span>
+                    </h3>
+                    
+                    <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-lg shadow-sm">
+                        <p class="text-gray-800">
+                            Trong khi chuyển động hỗn loạn, các phân tử va chạm vào nhau, truyền năng lượng cho nhau. Càng nhận được nhiều năng lượng thì các phân tử chuyển động hỗn loạn càng nhanh, khoảng cách trung bình giữa chúng càng tăng, lực liên kết giữa chúng càng yếu.
+                        </p>
+                    </div>
+
+                    <!-- a) Giải thích sự hóa hơi -->
+                    <div class="space-y-2">
+                        <h4 class="font-bold text-gray-800">a) Giải thích sự hóa hơi</h4>
+                        <p class="text-gray-800">Sự hóa hơi xảy ra dưới hai hình thức là <strong>bay hơi</strong> và <strong>sôi</strong>.</p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-700 pl-4">
+                            <li><strong>Sự bay hơi:</strong> Là sự hoá hơi xảy ra ở mặt thoáng của chất lỏng. Một số phân tử ở gần mặt thoáng có động năng đủ lớn để thắng lực liên kết của các phân tử chất lỏng khác, thoát ra khỏi mặt thoáng thành thể hơi.</li>
+                            <li><strong>Sự sôi:</strong> Là sự hoá hơi xảy ra đồng thời ở bên trong và trên mặt thoáng của chất lỏng khi đun đến nhiệt độ sôi (Ví dụ: nước sôi ở \(100^\circ\text{C}\) dưới áp suất tiêu chuẩn \(1,01.10^5\text{ Pa}\)).</li>
+                        </ul>
+                        
+                        <div class="border rounded-lg p-3 text-center bg-gray-50 my-2">
+                            <img src="h5.png" alt="Hình 1.5 Đồ thị sự thay đổi nhiệt độ của nước khi đun sôi" class="mx-auto max-h-60 object-contain mb-2">
+                            <p class="text-sm font-semibold text-gray-700">Hình 1.5. Đồ thị về sự thay đổi nhiệt độ của nước theo thời gian khi được đun sôi</p>
+                        </div>
+
+                        <!-- Mục có biểu tượng dấu ? -->
+                        <div class="border-l-4 border-indigo-500 bg-indigo-50 p-4 rounded-r-lg space-y-2">
+                            <p class="font-bold text-indigo-900 flex items-center space-x-1">
+                                <span class="text-xl">❓</span>
+                                <span>Tại sao khi bay hơi nhiệt độ của chất lỏng giảm?</span>
+                            </p>
+                            <button onclick="toggleAnswer('ans_q_hơi')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem câu trả lời</button>
+                            <div id="ans_q_hơi" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2">
+                                Khi bay hơi, các phân tử thoát ra khỏi mặt thoáng là những phân tử có động năng lớn nhất. Do đó, động năng trung bình của các phân tử còn lại trong chất lỏng giảm xuống, làm cho nhiệt độ của chất lỏng giảm đi.
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 mt-3">
+                            <div class="border-l-4 border-blue-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                                <div class="flex items-start space-x-2">
+                                    <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-blue-600 text-white font-bold rounded-full text-sm">1</span>
+                                    <p class="font-semibold text-gray-800">Hãy dựa vào đồ thị ở Hình 1.5 để mô tả sự thay đổi nhiệt độ của nước khi được đun từ \(20^\circ\text{C}\) tới khi sôi.</p>
+                                </div>
+                                <button onclick="toggleAnswer('ans_iii_1')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải</button>
+                                <div id="ans_iii_1" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2">
+                                    - Từ điểm A (\(20^\circ\text{C}\)) đến B (\(100^\circ\text{C}\)): Nhiệt độ của nước tăng liên tục theo thời gian đun.<br>
+                                    - Từ điểm B trở đi: Nước bắt đầu sôi, nhiệt độ giữ không đổi ở \(100^\circ\text{C}\) trong suốt quá trình sôi.
+                                </div>
+                            </div>
+
+                            <div class="border-l-4 border-blue-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                                <div class="flex items-start space-x-2">
+                                    <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-blue-600 text-white font-bold rounded-full text-sm">2</span>
+                                    <p class="font-semibold text-gray-800">Khi nước đang sôi thì năng lượng mà nước nhận được từ nguồn nhiệt có được chuyển hoá thành động năng của các phân tử nước không? Tại sao?</p>
+                                </div>
+                                <button onclick="toggleAnswer('ans_iii_2')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải</button>
+                                <div id="ans_iii_2" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2">
+                                    Không. Năng lượng nhận được lúc này không dùng để tăng động năng (vì nhiệt độ giữ nguyên), mà dùng để phá vỡ các liên kết giữa các phân tử nước, làm khoảng cách phân tử tăng lên để chuyển sang thể khí.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- b) Giải thích sự nóng chảy của chất rắn kết tinh -->
+                    <div class="space-y-2 pt-4">
+                        <h4 class="font-bold text-gray-800">b) Giải thích sự nóng chảy của chất rắn kết tinh</h4>
+                        <div class="border rounded-lg p-3 text-center bg-gray-50 my-2">
+                            <img src="h7.png" alt="Hình 1.7 Đồ thị sự thay đổi nhiệt độ chất rắn kết tinh khi làm nóng chảy" class="mx-auto max-h-60 object-contain mb-2">
+                            <p class="text-sm font-semibold text-gray-700">Hình 1.7. Đồ thị sự thay đổi nhiệt độ của chất rắn kết tinh khi được làm nóng chảy</p>
+                            <p class="text-xs text-gray-500">Giai đoạn a: Chưa nóng chảy | Giai đoạn b: Đang nóng chảy | Giai đoạn c: Đã nóng chảy hoàn toàn</p>
+                        </div>
+
+                        <!-- Hoạt động / Câu hỏi -->
+                        <div class="space-y-3">
+                            <div class="border-l-4 border-blue-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                                <div class="flex items-start space-x-2">
+                                    <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-blue-600 text-white font-bold rounded-full text-sm">1</span>
+                                    <p class="font-semibold text-gray-800">Tại sao chất rắn kết tinh khi được đun nóng có thể chuyển thành chất lỏng?</p>
+                                </div>
+                                <button onclick="toggleAnswer('ans_nc_1')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải</button>
+                                <div id="ans_nc_1" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2">
+                                    Khi đun nóng, các phân tử dao động càng mạnh làm biên độ dao động tăng lên, khoảng cách trung bình tăng và làm suy yếu lực liên kết mạng tinh thể đến mức trật tự mạng bị phá hủy, chuyển sang thể lỏng.
+                                </div>
+                            </div>
+
+                            <div class="border-l-4 border-blue-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                                <div class="flex items-start space-x-2">
+                                    <span class="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-blue-600 text-white font-bold rounded-full text-sm">2</span>
+                                    <div>
+                                        <p class="font-semibold text-gray-800">a) Hãy dựa vào Hình 1.7 để mô tả quá trình nóng chảy của chất kết tinh.</p>
+                                        <p class="font-semibold text-gray-800">b) Giải thích tại sao khi đang nóng chảy, nhiệt độ của chất rắn kết tinh không tăng dù vẫn nhận được nhiệt năng. Năng lượng nhận được dùng để làm gì?</p>
+                                    </div>
+                                </div>
+                                <button onclick="toggleAnswer('ans_nc_2')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải</button>
+                                <div id="ans_nc_2" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2 space-y-1">
+                                    <p><strong>a)</strong> Giai đoạn a: Nhiệt độ tăng đến nhiệt độ nóng chảy \(t_c\). Giai đoạn b: Chất rắn bắt đầu nóng chảy, nhiệt độ giữ nguyên ở \(t_c\). Giai đoạn c: Toàn bộ chất rắn đã chuyển sang lỏng, nhiệt độ tiếp tục tăng.</p>
+                                    <p><strong>b)</strong> Nhiệt độ không tăng vì năng lượng nhận được không dùng làm tăng động năng phân tử mà dùng để <strong>phá hủy cấu trúc mạng tinh thể</strong> của chất rắn.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mục Em có biết 1 -->
+                <div class="p-4 bg-purple-50 border border-purple-300 rounded-lg text-purple-900 space-y-2 shadow-sm">
+                    <h4 class="font-bold text-lg text-purple-950">EM CÓ BIẾT: Chất rắn kết tinh và chất rắn vô định hình</h4>
+                    <p class="text-sm leading-relaxed">
+                        Chất rắn kết tinh là chất mà các hạt (phân tử, nguyên tử, ion) liên kết chặt chẽ, sắp xếp theo một trật tự hình học tuần hoàn tạo thành mạng tinh thể (Hình 1.6 - Ví dụ: tinh thể muối ăn \(\text{NaCl}\), hầu hết kim loại). Chất rắn kết tinh có nhiệt độ nóng chảy xác định.
+                        <br>
+                        Chất rắn vô định hình không có cấu trúc mạng tinh thể (Ví dụ: thủy tinh, nhựa đường, chất dẻo) và không có nhiệt độ nóng chảy xác định.
+                    </p>
+                    <div class="border rounded p-2 bg-white text-center w-full max-w-xs mx-auto">
+                        <img src="h6.png" alt="Hình 1.6 Tinh thể muối ăn" class="mx-auto max-h-40 object-contain mb-1">
+                        <p class="text-xs font-semibold text-gray-600">Hình 1.6. Tinh thể muối ăn (\(\text{Na}^+\), \(\text{Cl}^-\))</p>
+                    </div>
+                </div>
+
+                <!-- Mục Em có biết 2 -->
+                <div class="p-4 bg-orange-50 border border-orange-300 rounded-lg text-orange-950 space-y-2 shadow-sm">
+                    <h4 class="font-bold text-lg text-orange-900">EM CÓ BIẾT: Thể Plasma</h4>
+                    <p class="text-sm leading-relaxed">
+                        Ở nhiệt độ hàng triệu độ, chất không tồn tại ở các thể rắn, lỏng, khí mà ở một thể đặc biệt gọi là Plasma. Ở thể này, chất không tồn tại dưới dạng các nguyên tử, phân tử mà dưới dạng các ion. Plasma rất ít gặp trên Trái Đất nhưng trong vũ trụ có tới trên 99% các chất tồn tại ở thể Plasma.
+                    </p>
+                    <div class="border rounded p-2 bg-white text-center w-full max-w-xs mx-auto">
+                        <img src="h8.png" alt="Hình 1.8 Luồng Plasma phóng ra từ Mặt Trời" class="mx-auto max-h-40 object-contain mb-1">
+                        <p class="text-xs font-semibold text-gray-600">Hình 1.8. Luồng Plasma phóng ra từ Mặt Trời</p>
+                    </div>
+                </div>
+
+                <!-- EM ĐÃ HỌC -->
+                <div class="p-4 bg-blue-50 border-2 border-blue-400 rounded-xl space-y-2">
+                    <h4 class="font-bold text-blue-900 text-lg uppercase">EM ĐÃ HỌC</h4>
+                    <ul class="list-disc list-inside space-y-1 text-blue-950 font-medium">
+                        <li>Mô hình động học phân tử về cấu tạo chất:
+                            <ul class="list-circle list-inside pl-6 font-normal">
+                                <li>Các chất được cấu tạo từ các hạt riêng biệt là phân tử.</li>
+                                <li>Các phân tử chuyển động không ngừng. Nhiệt độ của vật càng cao thì tốc độ trung bình của các phân tử càng lớn.</li>
+                                <li>Giữa các phân tử có lực liên kết phân tử.</li>
+                            </ul>
+                        </li>
+                        <li>Các chất có thể chuyển từ thể này sang thể khác.</li>
+                    </ul>
+                </div>
+
+                <!-- EM CÓ THỂ -->
+                <div class="p-4 bg-teal-50 border-2 border-teal-400 rounded-xl space-y-2">
+                    <h4 class="font-bold text-teal-900 text-lg uppercase">EM CÓ THỂ</h4>
+                    <ul class="list-disc list-inside space-y-1 text-teal-950">
+                        <li>Giải thích được sự khác nhau giữa các thể của chất và cơ chế của sự chuyển thể.</li>
+                        <li>Tìm hiểu và trình bày được vai trò của sự chuyển thể đối với cuộc sống con người như vòng tuần hoàn nước, công nghệ đúc,...</li>
+                    </ul>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- 6. PHẦN CỦNG CỐ CUỐI BÀI -->
+
+        <!-- TRẮC NGHIỆM GAMESHOW AI LÀ TRIỆU PHÚ -->
+        <div class="bg-slate-900 text-white p-6 rounded-xl shadow-xl space-y-6">
+            <div class="text-center space-y-2">
+                <h2 class="text-2xl md:text-3xl font-extrabold text-yellow-400 tracking-wider">🎮 GAMESHOW: AI LÀ TRIỆU PHÚ 🎮</h2>
+                <p class="text-sm text-slate-300">Trả lời 10 câu hỏi củng cố kiến thức bài học!</p>
+            </div>
+
+            <form id="quizForm" class="space-y-6 text-slate-100">
+                <!-- Câu 1 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 1: Các chất được cấu tạo từ:</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q1" value="A"> <span>A. Một khối liền không khoảng cách</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q1" value="B"> <span>B. Các hạt riêng biệt gọi là phân tử</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q1" value="C"> <span>C. Các chất rắn thu nhỏ</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q1" value="D"> <span>D. Các sóng năng lượng</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 2 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 2: Khi nhiệt độ của vật tăng lên thì các phân tử cấu tạo nên vật:</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q2" value="A"> <span>A. Chuyển động chậm đi</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q2" value="B"> <span>B. Ngừng chuyển động</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q2" value="C"> <span>C. Chuyển động nhanh hơn</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q2" value="D"> <span>D. Khối lượng tăng lên</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 3 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 3: Chuyển động Brown là chuyển động của:</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q3" value="A"> <span>A. Các phân tử nước quan sát bằng mắt thường</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q3" value="B"> <span>B. Các hạt rất nhỏ trong chất lỏng/khí dưới tác dụng va chạm phân tử</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q3" value="C"> <span>C. Trái Đất quay quanh Mặt Trời</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q3" value="D"> <span>D. Các dòng điện trong kim loại</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 4 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 4: Thể nào sau đây có hình dạng và thể tích riêng xác định?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q4" value="A"> <span>A. Thể khí</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q4" value="B"> <span>B. Thể lỏng</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q4" value="C"> <span>C. Thể rắn</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q4" value="D"> <span>D. Thể Plasma</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 5 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 5: Lực tương tác phân tử ở thể nào là yếu nhất?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q5" value="A"> <span>A. Thể rắn</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q5" value="B"> <span>B. Thể lỏng</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q5" value="C"> <span>C. Thể khí</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q5" value="D"> <span>D. Như nhau ở mọi thể</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 6 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 6: Quá trình chuyển từ thể lỏng sang thể khí được gọi là:</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q6" value="A"> <span>A. Sự nóng chảy</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q6" value="B"> <span>B. Sự hóa hơi</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q6" value="C"> <span>C. Sự đông đặc</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q6" value="D"> <span>D. Sự ngưng kết</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 7 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 7: Sự bay hơi xảy ra ở vị trí nào của chất lỏng?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q7" value="A"> <span>A. Chỉ ở đáy bình</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q7" value="B"> <span>B. Ở trong lòng chất lỏng</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q7" value="C"> <span>C. Chỉ trên mặt thoáng chất lỏng</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q7" value="D"> <span>D. Đồng thời cả trong lòng và mặt thoáng</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 8 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 8: Trong suốt thời gian diễn ra sự nóng chảy của chất rắn kết tinh, nhiệt độ của chất:</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q8" value="A"> <span>A. Tăng liên tục</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q8" value="B"> <span>B. Giảm liên tục</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q8" value="C"> <span>C. Không thay đổi</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q8" value="D"> <span>D. Lúc tăng lúc giảm</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 9 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 9: Chất nào sau đây là chất rắn kết tinh?</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q9" value="A"> <span>A. Thủy tinh</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q9" value="B"> <span>B. Nhựa đường</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q9" value="C"> <span>C. Muối ăn (\(\text{NaCl}\))</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q9" value="D"> <span>D. Chất dẻo</span></label>
+                    </div>
+                </div>
+
+                <!-- Câu 10 -->
+                <div class="p-4 bg-slate-800 rounded-lg border border-slate-700 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 10: Thể đặc biệt tồn tại ở nhiệt độ cực cao (hàng triệu độ) chiếm hơn 99% vũ trụ là:</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q10" value="A"> <span>A. Thể rắn</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q10" value="B"> <span>B. Thể Plasma</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q10" value="C"> <span>C. Thể khí nén</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="radio" name="q10" value="D"> <span>D. Thể siêu lỏng</span></label>
+                    </div>
+                </div>
+
+                <div class="text-center pt-4">
+                    <button type="button" onclick="checkQuiz()" class="px-8 py-3 bg-cyan-950 text-white font-extrabold rounded-lg shadow-lg hover:bg-slate-800 border border-yellow-400 transition">
+                        NỘP BÀI
+                    </button>
+                </div>
+            </form>
+
+            <!-- Kết quả Quiz -->
+            <div id="quizResult" class="hidden p-5 rounded-lg border text-base font-semibold space-y-3"></div>
+        </div>
+
+        <!-- BÀI TẬP TỰ LUẬN TÍNH TOÁN (3 CÂU) -->
+        <div class="bg-white p-6 rounded-xl shadow-md space-y-6">
+            <h3 class="text-xl font-bold text-slate-900 border-b-2 border-slate-800 pb-2">BÀI TẬP TỰ LUẬN TÍNH TOÁN</h3>
+
+            <!-- Bài 1 -->
+            <div class="border-l-4 border-cyan-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                <p class="font-bold text-gray-800">Bài 1:</p>
+                <p class="text-gray-800">Một lượng nước có khối lượng \(m = 2\text{ kg}\) được đun nóng từ \(20^\circ\text{C}\) đến nhiệt độ sôi \(100^\circ\text{C}\). Tính nhiệt lượng cần cung cấp cho nước. Biết nhiệt dung riêng của nước là \(c = 4180\text{ J/kg.K}\).</p>
+                <button onclick="toggleAnswer('tl1')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải chi tiết</button>
+                <div id="tl1" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2 space-y-1">
+                    <p><strong>Lời giải:</strong></p>
+                    <p>Độ tăng nhiệt độ của nước: \(\Delta t = 100 - 20 = 80^\circ\text{C}\)</p>
+                    <p>Nhiệt lượng cần cung cấp cho nước để đun sôi là:</p>
+                    <p>$$Q = m \cdot c \cdot \Delta t = 2 \cdot 4180 \cdot 80 = 668\,800\text{ J} = 668,8\text{ kJ}$$</p>
+                </div>
+            </div>
+
+            <!-- Bài 2 -->
+            <div class="border-l-4 border-cyan-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                <p class="font-bold text-gray-800">Bài 2:</p>
+                <p class="text-gray-800">Tính nhiệt lượng cần thiết để hóa hơi hoàn toàn \(0,5\text{ kg}\) nước ở \(100^\circ\text{C}\). Biết nhiệt hóa hơi riêng của nước là \(L = 2,26.10^6\text{ J/kg}\).</p>
+                <button onclick="toggleAnswer('tl2')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải chi tiết</button>
+                <div id="tl2" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2 space-y-1">
+                    <p><strong>Lời giải:</strong></p>
+                    <p>Nhiệt lượng cần thiết để hóa hơi hoàn toàn khối lượng nước trên là:</p>
+                    <p>$$Q = m \cdot L = 0,5 \cdot 2,26.10^6 = 1,13.10^6\text{ J} = 1130\text{ kJ}$$</p>
+                </div>
+            </div>
+
+            <!-- Bài 3 -->
+            <div class="border-l-4 border-cyan-600 bg-slate-50 p-4 rounded-r-lg space-y-2">
+                <p class="font-bold text-gray-800">Bài 3:</p>
+                <p class="text-gray-800">Tính nhiệt lượng để làm nóng chảy hoàn toàn \(1,5\text{ kg}\) đá vôi/nước đá ở nhiệt độ nóng chảy \(0^\circ\text{C}\). Biết nhiệt nóng chảy riêng của nước đá là \(\lambda = 3,34.10^5\text{ J/kg}\).</p>
+                <button onclick="toggleAnswer('tl3')" class="px-3 py-1 text-sm bg-[#33FF33] hover:bg-green-400 font-bold rounded shadow transition">Xem lời giải chi tiết</button>
+                <div id="tl3" class="hidden p-3 bg-green-100 border border-green-300 rounded text-gray-800 mt-2 space-y-1">
+                    <p><strong>Lời giải:</strong></p>
+                    <p>Nhiệt lượng cần thiết để làm nóng chảy hoàn toàn khối nước đá là:</p>
+                    <p>$$Q = m \cdot \lambda = 1,5 \cdot 3,34.10^5 = 5,01.10^5\text{ J} = 501\text{ kJ}$$</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. FOOTER -->
+        <footer class="text-center text-gray-600 py-6 border-t border-gray-300 font-semibold text-sm">
+            Chương trình GDPT 2018 - Bộ sách thống nhất
+        </footer>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Hàm Toggle hiển thị lời giải
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                if (el.classList.contains('hidden')) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            }
+        }
+
+        // Đáp án trắc nghiệm chuẩn
+        const correctAnswers = {
+            q1: 'B',
+            q2: 'C',
+            q3: 'B',
+            q4: 'C',
+            q5: 'C',
+            q6: 'B',
+            q7: 'C',
+            q8: 'C',
+            q9: 'C',
+            q10: 'B'
+        };
+
+        const explanations = {
+            q1: 'Câu 1: B - Các chất cấu tạo từ các hạt riêng biệt là phân tử.',
+            q2: 'Câu 2: C - Nhiệt độ càng cao thì các phân tử chuyển động càng nhanh.',
+            q3: 'Câu 3: B - Chuyển động Brown là chuyển động hỗn loạn của hạt rất nhỏ trong chất lỏng/khí.',
+            q4: 'Câu 4: C - Thể rắn có thể tích và hình dạng riêng xác định.',
+            q5: 'Câu 5: C - Thể khí có lực tương tác phân tử rất yếu.',
+            q6: 'Câu 6: B - Sự chuyển từ thể lỏng sang thể khí là sự hóa hơi.',
+            q7: 'Câu 7: C - Sự bay hơi chỉ diễn ra ở mặt thoáng của chất lỏng.',
+            q8: 'Câu 8: C - Trong quá trình nóng chảy của chất rắn kết tinh, nhiệt độ không thay đổi.',
+            q9: 'Câu 9: C - Muối ăn là chất rắn kết tinh có cấu trúc mạng tinh thể.',
+            q10: 'Câu 10: B - Plasma là thể đặc biệt ở nhiệt độ rất cao.'
+        };
+
+        // Hàm kiểm tra đáp án Quiz
+        function checkQuiz() {
+            let score = 0;
+            let total = 10;
+            let detailHtml = '<div class="space-y-2"><p class="text-lg font-bold">KẾT QUẢ ĐÁNH GIÁ:</p>';
+
+            for (let i = 1; i <= total; i++) {
+                const qName = 'q' + i;
+                const selected = document.querySelector(`input[name="${qName}"]:checked`);
+                if (selected && selected.value === correctAnswers[qName]) {
+                    score++;
+                }
+            }
+
+            if (score === total) {
+                detailHtml += `<p class="text-green-600 font-bold text-xl">Xuất sắc! Bạn đạt ${score}/${total} điểm! 🏆</p>`;
+            } else {
+                detailHtml += `<p class="text-red-600 font-bold text-xl">Bạn đạt ${score}/${total} điểm. Hãy rèn luyện thêm nhé!</p>`;
+            }
+
+            detailHtml += '<hr class="my-2 border-slate-600"><p class="font-bold underline text-yellow-300">Hướng dẫn giải chi tiết:</p><ul class="list-disc list-inside space-y-1 text-sm text-slate-200">';
+            for (let i = 1; i <= total; i++) {
+                detailHtml += `<li>${explanations['q' + i]}</li>`;
+            }
+            detailHtml += '</ul></div>';
+
+            const resDiv = document.getElementById('quizResult');
+            resDiv.innerHTML = detailHtml;
+            resDiv.classList.remove('hidden');
+
+            if (score === total) {
+                resDiv.className = 'p-5 rounded-lg border bg-green-950 border-green-500 text-white space-y-3';
+            } else {
+                resDiv.className = 'p-5 rounded-lg border bg-slate-800 border-red-500 text-white space-y-3';
+            }
+        }
+    </script>
 </body>
 </html>
