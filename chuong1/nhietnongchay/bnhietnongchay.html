@@ -4,350 +4,668 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bài 5: Nhiệt Nóng Chảy Riêng - Vật Lý 12</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- MathJax với Chemistry support -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                packages: {'[+]': ['mhchem']}
+            },
+            loader: {load: ['[tex]/mhchem']}
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
     <style>
         body {
             background-color: #f4f7f9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #2d3748;
         }
-        .header-primary { background-color: #1a202c; }
-        .rounded-12 { border-radius: 12px; }
-        .section-title {
-            border-bottom: 4px solid #1a202c;
-            display: inline-block;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.25rem;
-        }
-        .answer-box { display: none; }
-        .btn-toggle {
-            background-color: #1a202c;
+        /* Style cho số thứ tự La Mã (I, II...) hình vuông */
+        .roman-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            background-color: darkblue;
             color: white;
-            padding: 6px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 0.5rem;
         }
-        .btn-toggle:hover { background-color: #2d3748; }
-        .quiz-option {
-            display: block;
-            margin-bottom: 8px;
-            padding: 10px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            cursor: pointer;
+        /* Style cho số thứ tự (1, 2...) hình tròn */
+        .arabic-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.8rem;
+            height: 1.8rem;
+            background-color: darkblue;
+            color: white;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        .section-header {
+            border-bottom: 3px solid darkblue;
+        }
+        /* Style game Ai là triệu phú */
+        .millionaire-option {
+            transition: all 0.2s;
+        }
+        .millionaire-option:hover {
+            background-color: #1e3a8a;
+            color: white;
         }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <!-- Header Section -->
-    <header class="max-w-5xl mx-auto mb-8 shadow-lg overflow-hidden rounded-12">
-        <div class="header-primary text-white py-3 px-6 text-center text-sm font-semibold tracking-widest uppercase">
-            Chương 1: Vật Lý Nhiệt
-        </div>
-        <div class="header-primary text-white py-6 px-6 text-center border-t border-gray-700">
-            <h1 class="text-3xl font-bold">BÀI 5: NHIỆT NÓNG CHẢY RIÊNG</h1>
-        </div>
-    </header>
+    <div class="max-w-5xl mx-auto space-y-6">
 
-    <main class="max-w-5xl mx-auto space-y-8">
-        
-        <!-- Intro Box -->
-        <section class="bg-white p-6 rounded-12 shadow-md border border-black/10">
-            <p class="italic text-lg text-gray-700">
-                "Khi vật bắt đầu nóng chảy phải tiếp tục cung cấp nhiệt lượng cho vật để vật nóng chảy hoàn toàn. Nhiệt lượng này phụ thuộc vào những đại lượng nào?"
-            </p>
-        </section>
-
-        <!-- I. Khái niệm -->
-        <section class="bg-white p-8 rounded-12 shadow-md">
-            <h2 class="section-title text-2xl font-bold uppercase">I. KHÁI NIỆM NHIỆT NÓNG CHẢY RIÊNG</h2>
-            
-            <div class="mb-6">
-                <h3 class="font-bold text-lg mb-3">1. Hệ thức tính nhiệt lượng trong quá trình truyền nhiệt để làm vật nóng chảy hoàn toàn</h3>
-                <p class="mb-4">Nhiệt lượng cần truyền cho vật khi vật bắt đầu nóng chảy tới khi vật nóng chảy hoàn toàn phụ thuộc vào khối lượng của vật và tính chất của chất làm vật.</p>
-                
-                <!-- Formula Box -->
-                <div class="bg-gray-50 border-2 border-slate-800 p-6 rounded-lg text-center my-6">
-                    <div class="text-2xl font-bold text-slate-900 mb-2">
-                        \( Q = \lambda m \)
-                    </div>
-                    <div class="text-sm text-gray-600 space-y-1">
-                        <p>Trong đó:</p>
-                        <p><strong>\( Q \):</strong> Nhiệt lượng cần truyền cho vật (J)</p>
-                        <p><strong>\( m \):</strong> Khối lượng của vật (kg)</p>
-                        <p><strong>\( \lambda \):</strong> Nhiệt nóng chảy riêng của chất làm vật (J/kg)</p>
-                    </div>
-                </div>
-
-                <p class="mb-4">Bảng 5.1 dưới đây cung cấp giá trị nhiệt nóng chảy riêng của một số chất phổ biến:</p>
-                <div class="overflow-x-auto">
-                    <table class="w-full border-collapse border border-gray-300 text-center">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <th class="border border-gray-300 p-2">Chất</th>
-                                <th class="border border-gray-300 p-2">Nhiệt độ nóng chảy (°C)</th>
-                                <th class="border border-gray-300 p-2">Nhiệt nóng chảy riêng (J/kg)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="border border-gray-300 p-2">Nước đá</td>
-                                <td class="border border-gray-300 p-2">0</td>
-                                <td class="border border-gray-300 p-2">\( 3,34 \cdot 10^5 \)</td>
-                            </tr>
-                            <tr>
-                                <td class="border border-gray-300 p-2">Sắt</td>
-                                <td class="border border-gray-300 p-2">1535</td>
-                                <td class="border border-gray-300 p-2">\( 2,77 \cdot 10^5 \)</td>
-                            </tr>
-                            <tr>
-                                <td class="border border-gray-300 p-2">Đồng</td>
-                                <td class="border border-gray-300 p-2">1084</td>
-                                <td class="border border-gray-300 p-2">\( 1,80 \cdot 10^5 \)</td>
-                            </tr>
-                            <tr>
-                                <td class="border border-gray-300 p-2">Chì</td>
-                                <td class="border border-gray-300 p-2">327</td>
-                                <td class="border border-gray-300 p-2">\( 0,25 \cdot 10^5 \)</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+        <!-- Header Block -->
+        <div class="rounded-xl overflow-hidden shadow-lg border border-blue-900">
+            <div style="background-color: darkblue;" class="text-white text-center py-3 font-semibold text-lg uppercase tracking-wider">
+                CHƯƠNG I: VẬT LÝ NHIỆT
             </div>
+            <div class="border-t border-blue-400"></div>
+            <div style="background-color: darkblue;" class="text-white text-center py-5 text-2xl md:text-3xl font-extrabold tracking-wide">
+                BÀI 5: NHIỆT NÓNG CHẢY RIÊNG
+            </div>
+        </div>
 
-            <div class="mb-6">
-                <h3 class="font-bold text-lg mb-3">2. Định nghĩa nhiệt nóng chảy riêng</h3>
-                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
-                    <p class="font-semibold text-lg">
-                        Nhiệt nóng chảy riêng của một chất là nhiệt lượng cần để làm cho một kilôgam chất đó nóng chảy hoàn toàn ở nhiệt độ nóng chảy.
+        <!-- Lời dẫn / Intro Box -->
+        <div class="bg-white p-5 rounded-xl border border-gray-400 shadow-sm italic text-gray-700 leading-relaxed">
+            <i class="fa-solid fa-quote-left text-blue-900 text-xl mr-2"></i>
+            Khi vật bắt đầu nóng chảy phải tiếp tục cung cấp nhiệt lượng cho vật để vật nóng chảy hoàn toàn. Nhiệt lượng này phụ thuộc vào những đại lượng nào?
+        </div>
+
+        <!-- PHẦN I -->
+        <div class="bg-white p-6 rounded-xl shadow-md space-y-6">
+            <h2 class="text-xl md:text-2xl font-bold section-header pb-2 text-blue-950 flex items-center">
+                <span class="roman-num">I</span> KHÁI NIỆM NHIỆT NÓNG CHẢY RIÊNG
+            </h2>
+
+            <!-- Mục 1 -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold flex items-center text-gray-800">
+                    <span class="arabic-num">1</span> Hệ thức tính nhiệt lượng trong quá trình truyền nhiệt để làm vật nóng chảy hoàn toàn
+                </h3>
+                
+                <p class="leading-relaxed">
+                    Nhiệt lượng cần truyền cho vật khi vật bắt đầu nóng chảy tới khi vật nóng chảy hoàn toàn phụ thuộc vào <strong>khối lượng của vật</strong> và <strong>tính chất của chất làm vật</strong>.
+                </p>
+                <p class="leading-relaxed">
+                    Thí nghiệm cho thấy nhiệt lượng này tỉ lệ thuận với khối lượng của vật:
+                </p>
+
+                <!-- Công thức 5.1 -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center font-bold text-lg">
+                    \[ \frac{Q}{m} = \text{hằng số} \tag{5.1} \]
+                    <p class="text-sm font-normal text-gray-600 mt-2">
+                        Trong đó: \(Q\) là nhiệt lượng cần truyền cho vật (J); \(m\) là khối lượng của vật (kg).
                     </p>
                 </div>
-                <p class="text-gray-700 leading-relaxed">
-                    <strong>Ý nghĩa:</strong> Giúp xác định năng lượng cần cung cấp cho lò nung, thời gian nung và lựa chọn vật liệu chế tạo hợp kim, tách kim loại nguyên chất ra khỏi quặng...
+
+                <p class="leading-relaxed">
+                    Với mỗi chất, hằng số trong hệ thức (5.1) có độ lớn riêng. Hằng số này được gọi là <strong>nhiệt nóng chảy riêng</strong> của chất làm vật, kí hiệu là \(\lambda\), có giá trị là:
                 </p>
-            </div>
 
-            <!-- Questions -->
-            <div class="space-y-4">
-                <div class="bg-slate-100 border-l-4 border-slate-800 p-4">
-                    <p class="font-semibold mb-2">Câu hỏi 1: Tại sao khi chế tạo các vật bằng chì, đồng thường hay dùng phương pháp đúc?</p>
-                    <button onclick="toggleAnswer('ans1')" class="btn-toggle text-xs">Xem lời giải</button>
-                    <div id="ans1" class="answer-box mt-3 p-3 bg-green-50 rounded border border-green-200">
-                        Vì chì và đồng có nhiệt độ nóng chảy xác định và không quá cao so với công nghệ lò nung. Khi nóng chảy, chúng ở thể lỏng, dễ dàng điền đầy vào các khuôn có hình dạng phức tạp, sau khi nguội sẽ đông đặc tạo thành vật phẩm mong muốn.
-                    </div>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center font-bold text-lg">
+                    \[ \lambda = \frac{Q}{m} \tag{5.2} \]
+                    <span class="text-sm font-normal block text-gray-700 mt-1">Đơn vị của nhiệt nóng chảy riêng là \(\text{J/kg}\).</span>
                 </div>
 
-                <div class="bg-slate-100 border-l-4 border-slate-800 p-4">
-                    <p class="font-semibold mb-2">Câu hỏi 2: Tính thời gian làm nóng chảy 2kg đồng ban đầu ở \( 30^\circ C \), lò có công suất 20.000W, hiệu suất 50%.</p>
-                    <button onclick="toggleAnswer('ans2')" class="btn-toggle text-xs">Xem lời giải</button>
-                    <div id="ans2" class="answer-box mt-3 p-3 bg-green-50 rounded border border-green-200">
-                        <p>Nhiệt lượng cần cung cấp để đồng nóng lên từ \( 30^\circ C \) đến \( 1084^\circ C \): \( Q_1 = mc(t_2 - t_1) \)</p>
-                        <p>Nhiệt lượng để nóng chảy hoàn toàn: \( Q_2 = \lambda m \)</p>
-                        <p>Tổng nhiệt lượng có ích: \( Q_{ci} = Q_1 + Q_2 \)</p>
-                        <p>Công suất thực tế sử dụng: \( P_{ci} = H \cdot P = 0,5 \cdot 20000 = 10000 \, W \)</p>
-                        <p>Thời gian: \( \tau = \frac{Q_{ci}}{P_{ci}} \). (HS thay số cụ thể theo hằng số nhiệt dung riêng đồng \( c \approx 380 J/kg.K \)).</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+                <p class="leading-relaxed">
+                    Do đó, hệ thức tính nhiệt lượng trong quá trình truyền nhiệt để làm vật nóng chảy hoàn toàn là:
+                </p>
 
-        <!-- II. Thực hành -->
-        <section class="bg-white p-8 rounded-12 shadow-md">
-            <h2 class="section-title text-2xl font-bold uppercase">II. THỰC HÀNH ĐO NHIỆT NÓNG CHẢY RIÊNG</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <h3 class="font-bold mb-2">1. Mục đích thí nghiệm</h3>
-                    <p>Xác định nhiệt nóng chảy riêng của nước đá.</p>
-                    
-                    <h3 class="font-bold mt-4 mb-2">2. Dụng cụ</h3>
-                    <ul class="list-disc ml-5 space-y-1">
-                        <li>Bình nhiệt lượng kế.</li>
-                        <li>Các viên nước đá nhỏ và nước lạnh.</li>
-                        <li>Cân, nhiệt kế, oát kế, nguồn điện.</li>
-                    </ul>
+                <div class="bg-blue-100 border border-blue-300 rounded-lg p-4 text-center font-bold text-xl text-blue-900">
+                    \[ Q = \lambda m \tag{5.3} \]
                 </div>
-                <div class="flex items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg">
-                <img src="h2.png"></img>
-                </div>
-            </div>
 
-            <div class="mb-6">
-                <h3 class="font-bold mb-3">3. Thiết kế phương án thí nghiệm</h3>
-                <div class="bg-slate-100 border-l-4 border-slate-800 p-4">
-                    <p class="italic mb-2">- Từ công thức (5.3), cần đo đại lượng nào để xác định nhiệt nóng chảy riêng?</p>
-                    <button onclick="toggleAnswer('ans3')" class="btn-toggle text-xs">Xem lời giải</button>
-                    <div id="ans3" class="answer-box mt-3 p-3 bg-green-50 rounded border border-green-200">
-                        Cần đo công suất \( P \), thời gian \( \tau \) (để tính nhiệt lượng \( Q = P\tau \)) và khối lượng \( m \) của nước đá.
-                    </div>
-                </div>
-            </div>
-
-            <div class="mb-6">
-                <h3 class="font-bold mb-3">4. Tiến hành & Kết quả</h3>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div>
-                        <p class="text-sm font-semibold mb-2">Bảng 5.2. Ví dụ kết quả (\( m = 0,25kg \))</p>
-                        <table class="w-full text-xs border-collapse border border-gray-300">
-                            <tr class="bg-gray-100">
-                                <th class="border p-1">Thời gian (s)</th>
-                                <th class="border p-1">Nhiệt độ (°C)</th>
-                                <th class="border p-1">Công suất (W)</th>
-                            </tr>
-                            <tr><td class="border p-1">0</td><td class="border p-1">0</td><td class="border p-1">14,25</td></tr>
-                            <tr><td class="border p-1">240</td><td class="border p-1">0</td><td class="border p-1">14,19</td></tr>
-                            <tr><td class="border p-1">600</td><td class="border p-1">0</td><td class="border p-1">14,24</td></tr>
-                            <tr><td class="border p-1">840</td><td class="border p-1">0,8</td><td class="border p-1">14,32</td></tr>
+                <!-- Bảng 5.1 -->
+                <div class="mt-4">
+                    <p class="font-semibold text-center mb-2">Bảng 5.1. Giá trị gần đúng của nhiệt nóng chảy riêng ở nhiệt độ nóng chảy dưới áp suất tiêu chuẩn của một số chất</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse border border-gray-300 text-center">
+                            <thead>
+                                <tr class="bg-gray-200">
+                                    <th class="border border-gray-300 p-2">Chất</th>
+                                    <th class="border border-gray-300 p-2">Nhiệt độ nóng chảy (\(^\circ\text{C}\))</th>
+                                    <th class="border border-gray-300 p-2">Nhiệt nóng chảy riêng (\(\text{J/kg}\))</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border border-gray-300 p-2">Nước đá</td>
+                                    <td class="border border-gray-300 p-2">0</td>
+                                    <td class="border border-gray-300 p-2">\(3,34 \cdot 10^5\)</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="border border-gray-300 p-2">Sắt</td>
+                                    <td class="border border-gray-300 p-2">1535</td>
+                                    <td class="border border-gray-300 p-2">\(2,77 \cdot 10^5\)</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-gray-300 p-2">Đồng</td>
+                                    <td class="border border-gray-300 p-2">1084</td>
+                                    <td class="border border-gray-300 p-2">\(1,80 \cdot 10^5\)</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="border border-gray-300 p-2">Chì</td>
+                                    <td class="border border-gray-300 p-2">327</td>
+                                    <td class="border border-gray-300 p-2">\(0,25 \cdot 10^5\)</td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
-                    <div class="bg-gray-50 border border-gray-200 rounded p-2 flex flex-col items-center justify-center">
-                        <span class="text-xs font-bold mb-2">Đồ thị nhiệt độ - thời gian</span>
-                            <img src="h1.png"></img>
-                                               
-                    </div>
                 </div>
             </div>
 
-            <div>
-                <h3 class="font-bold mb-2">5. Kết quả thí nghiệm</h3>
-                <div class="bg-blue-50 p-4 rounded-lg">
-                    <p class="mb-2">Công thức tính từ thực nghiệm:</p>
-                    <div class="text-xl font-bold text-center mb-2">
-                        \( \lambda_{H_2O} = \frac{\overline{P} \cdot \tau_M}{m} \)
+            <!-- Mục 2 -->
+            <div class="space-y-4 pt-4">
+                <h3 class="text-lg font-semibold flex items-center text-gray-800">
+                    <span class="arabic-num">2</span> Định nghĩa nhiệt nóng chảy riêng
+                </h3>
+
+                <!-- Định nghĩa -->
+                <div class="bg-blue-50 border-l-4 border-blue-900 p-4 rounded-r-lg shadow-sm">
+                    <p class="font-medium text-gray-900">
+                        <strong>Nhiệt nóng chảy riêng của một chất</strong> là nhiệt lượng cần để làm cho một kilôgam chất đó nóng chảy hoàn toàn ở nhiệt độ nóng chảy.
+                    </p>
+                </div>
+
+                <p class="leading-relaxed">
+                    Nhiệt nóng chảy riêng và nhiệt độ nóng chảy là những thông tin giúp xác định được năng lượng cần cung cấp cho lò nung, thời gian nung, thời điểm đổ kim loại nóng chảy vào khuôn, thời điểm lấy sản phẩm ra khỏi khuôn. Các đại lượng này cũng cần cho việc lựa chọn vật liệu chế tạo hợp kim phù hợp với từng yêu cầu sử dụng khác nhau, tách các kim loại nguyên chất ra khỏi quặng hỗn hợp,...
+                </p>
+
+                <!-- Mục ? (Hỏi đáp) -->
+                <div class="space-y-3 mt-4">
+                    <div class="bg-slate-100 border-l-4 border-blue-900 p-4 rounded-r-md">
+                        <p class="font-semibold text-gray-800">1. Tại sao khi chế tạo các vật bằng chì, đồng, thường hay dùng phương pháp đúc?</p>
+                        <button onclick="toggleAnswer('q-app-1')" class="mt-2 text-sm text-white px-3 py-1 rounded shadow" style="background-color: darkblue;">
+                            <i class="fa-solid fa-eye mr-1"></i> Xem lời giải
+                        </button>
+                        <div id="q-app-1" class="hidden mt-3 p-3 bg-green-50 text-green-900 rounded border border-green-200">
+                            <strong>Lời giải:</strong> Vì chì và đồng có nhiệt độ nóng chảy thích hợp (chì \(327^\circ\text{C}\), đồng \(1084^\circ\text{C}\)) và khi ở thể lỏng chúng có độ chảy dẻo cao, dễ chảy điền đầy vào các khuôn đúc phức tạp. Phương pháp đúc giúp tạo ra các chi tiết có hình dạng phức tạp một cách dễ dàng và tiết kiệm chi phí so với gia công cơ khí.
+                        </div>
                     </div>
-                    <p class="text-sm">Trong đó \( \tau_M \) là thời gian tại điểm M (giao điểm giữa giai đoạn nóng chảy và giai đoạn tăng nhiệt độ).</p>
+
+                    <div class="bg-slate-100 border-l-4 border-blue-900 p-4 rounded-r-md">
+                        <p class="font-semibold text-gray-800">2. Tính thời gian cần thiết để làm nóng chảy hoàn toàn 2 kg đồng có nhiệt độ ban đầu \(30^\circ\text{C}\), trong một lò nung điện có công suất 20 000 W. Biết chỉ có 50% năng lượng tiêu thụ của lò được dùng vào việc làm đồng nóng lên và nóng chảy hoàn toàn ở nhiệt độ không đổi.</p>
+                        <button onclick="toggleAnswer('q-app-2')" class="mt-2 text-sm text-white px-3 py-1 rounded shadow" style="background-color: darkblue;">
+                            <i class="fa-solid fa-eye mr-1"></i> Xem lời giải
+                        </button>
+                        <div id="q-app-2" class="hidden mt-3 p-3 bg-green-50 text-green-900 rounded border border-green-200 space-y-2">
+                            <p><strong>Lời giải:</strong></p>
+                            <p>Tra Bảng 4.1 và Bảng 5.1 đối với Đồng:</p>
+                            <p>- Nhiệt dung riêng \(c = 380\,\text{J/kg.K}\)</p>
+                            <p>- Nhiệt độ nóng chảy \(t_{\text{nc}} = 1084^\circ\text{C}\)</p>
+                            <p>- Nhiệt nóng chảy riêng \(\lambda = 1,80 \cdot 10^5\,\text{J/kg}\)</p>
+                            <p><strong>Bước 1:</strong> Nhiệt lượng cần thiết để tăng nhiệt độ đồng từ \(30^\circ\text{C}\) lên \(1084^\circ\text{C}\):</p>
+                            <p>\[ Q_1 = m \cdot c \cdot (t_{\text{nc}} - t_0) = 2 \cdot 380 \cdot (1084 - 30) = 801.040\,\text{J} \]</p>
+                            <p><strong>Bước 2:</strong> Nhiệt lượng cần để làm nóng chảy hoàn toàn 2 kg đồng ở \(1084^\circ\text{C}\):</p>
+                            <p>\[ Q_2 = \lambda \cdot m = 1,80 \cdot 10^5 \cdot 2 = 360.000\,\text{J} \]</p>
+                            <p><strong>Bước 3:</strong> Tổng nhiệt lượng có ích cần cung cấp:</p>
+                            <p>\[ Q_{\text{ích}} = Q_1 + Q_2 = 801.040 + 360.000 = 1.161.040\,\text{J} \]</p>
+                            <p><strong>Bước 4:</strong> Năng lượng điện toàn phần lò nung tiêu thụ (\(H = 50\% = 0,5\)):</p>
+                            <p>\[ A = \frac{Q_{\text{ích}}}{H} = \frac{1.161.040}{0,5} = 2.322.080\,\text{J} \]</p>
+                            <p>Thời gian nung cần thiết với công suất \(P = 20.000\,\text{W}\):</p>
+                            <p>\[ t = \frac{A}{P} = \frac{2.322.080}{20.000} = 116,104\,\text{giây} \approx 1,935\,\text{phút} \]</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- III. Củng cố -->
-        <section class="bg-white p-8 rounded-12 shadow-md">
-            <h2 class="section-title text-2xl font-bold uppercase">III. CỦNG CỐ</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-indigo-50 p-5 rounded-lg">
-                    <h3 class="font-bold text-indigo-800 mb-2">Em đã học</h3>
-                    <ul class="list-disc ml-5 text-sm space-y-2">
-                        <li>Định nghĩa và đơn vị \( J/kg \) của nhiệt nóng chảy riêng.</li>
-                        <li>Công thức: \( Q = \lambda m \).</li>
-                        <li>Cách đo thực nghiệm bằng nhiệt lượng kế.</li>
+        <!-- PHẦN II -->
+        <div class="bg-white p-6 rounded-xl shadow-md space-y-6">
+            <h2 class="text-xl md:text-2xl font-bold section-header pb-2 text-blue-950 flex items-center">
+                <span class="roman-num">II</span> THỰC HÀNH ĐO NHIỆT NÓNG CHẢY RIÊNG CỦA NƯỚC ĐÁ
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-3">
+                    <h3 class="text-lg font-semibold flex items-center text-gray-800">
+                        <span class="arabic-num">1</span> Mục đích thí nghiệm
+                    </h3>
+                    <p class="pl-8">Xác định nhiệt nóng chảy riêng của nước đá.</p>
+
+                    <h3 class="text-lg font-semibold flex items-center text-gray-800">
+                        <span class="arabic-num">2</span> Dụng cụ thí nghiệm
+                    </h3>
+                    <ul class="list-disc pl-12 space-y-1 text-gray-700">
+                        <li>Bộ dụng cụ thí nghiệm như bài đo nhiệt dung riêng (Biến thế nguồn, oát kế, nhiệt kế điện tử, nhiệt lượng kế,...).</li>
+                        <li>Các viên nước đá nhỏ và nước lạnh.</li>
                     </ul>
                 </div>
-                <div class="bg-emerald-50 p-5 rounded-lg">
-                    <h3 class="font-bold text-emerald-800 mb-2">Em có thể</h3>
-                    <ul class="list-disc ml-5 text-sm space-y-2">
-                        <li>Giải thích các hiện tượng đúc kim loại, hàn thiếc.</li>
-                        <li>Tính toán năng lượng cần thiết cho các quá trình chuyển thể.</li>
-                    </ul>
+
+                <!-- Khung hiển thị hình ảnh bộ dụng cụ -->
+                <div class="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 p-4 rounded-lg bg-gray-50">
+                    <img src="h2.png" alt="Bộ thí nghiệm đo nhiệt nóng chảy riêng" class="max-h-64 object-contain rounded" onerror="this.src='https://placehold.co/400x250/e2e8f0/1e293b?text=H%C3%ACnh+đo+nhi%E1%BB%87t+n%C3%B3ng+ch%E1%BA%A3y+ri%C3%AAng';">
+                    <span class="text-xs text-gray-500 mt-2">Hình 5.1. Bộ thí nghiệm đo nhiệt nóng chảy riêng của nước đá</span>
                 </div>
             </div>
 
-            <!-- Quiz Section -->
-            <div class="mt-10">
-                <h3 class="text-xl font-bold mb-6 border-b-2 border-gray-100 pb-2">Bài tập củng cố</h3>
-                <div id="quiz-container" class="space-y-6">
-                    <!-- Q1 -->
-                    <div class="quiz-item">
-                        <p class="font-semibold mb-3">Câu 1: Đơn vị của nhiệt nóng chảy riêng là:</p>
-                        <label class="quiz-option"><input type="radio" name="q1" value="a"> A. J</label>
-                        <label class="quiz-option"><input type="radio" name="q1" value="b"> B. J/kg.K</label>
-                        <label class="quiz-option"><input type="radio" name="q1" value="c"> C. J/kg</label>
-                        <label class="quiz-option"><input type="radio" name="q1" value="d"> D. W/kg</label>
-                    </div>
+            <!-- Mục 3: Hoạt động / Nêu vấn đề -->
+            <div class="space-y-4 pt-2">
+                <h3 class="text-lg font-semibold flex items-center text-gray-800">
+                    <span class="arabic-num">3</span> Thiết kế phương án thí nghiệm
+                </h3>
 
-                    <!-- Q2 -->
-                    <div class="quiz-item">
-                        <p class="font-semibold mb-3">Câu 2: Nhiệt nóng chảy riêng của nước đá là \( 3,34 \cdot 10^5 J/kg \). Nhiệt lượng cần để làm nóng chảy hoàn toàn 2kg nước đá ở \( 0^\circ C \) là:</p>
-                        <label class="quiz-option"><input type="radio" name="q2" value="a"> A. \( 6,68 \cdot 10^5 J \)</label>
-                        <label class="quiz-option"><input type="radio" name="q2" value="b"> B. \( 1,67 \cdot 10^5 J \)</label>
-                        <label class="quiz-option"><input type="radio" name="q2" value="c"> C. \( 3,34 \cdot 10^5 J \)</label>
-                        <label class="quiz-option"><input type="radio" name="q2" value="d"> D. \( 6,68 \cdot 10^4 J \)</label>
-                    </div>
-
-                    <!-- Q3 -->
-                    <div class="quiz-item">
-                        <p class="font-semibold mb-3">Câu 3: Trong quá trình nóng chảy, nhiệt độ của vật thay đổi như thế nào?</p>
-                        <label class="quiz-option"><input type="radio" name="q3" value="a"> A. Tăng dần</label>
-                        <label class="quiz-option"><input type="radio" name="q3" value="b"> B. Giảm dần</label>
-                        <label class="quiz-option"><input type="radio" name="q3" value="c"> C. Không thay đổi</label>
-                        <label class="quiz-option"><input type="radio" name="q3" value="d"> D. Tăng rồi giảm</label>
-                    </div>
-
-                    <!-- Q4 -->
-                    <div class="quiz-item">
-                        <p class="font-semibold mb-3">Câu 4: Đại lượng \( \lambda \) trong công thức \( Q = \lambda m \) phụ thuộc vào:</p>
-                        <label class="quiz-option"><input type="radio" name="q4" value="a"> A. Khối lượng của vật</label>
-                        <label class="quiz-option"><input type="radio" name="q4" value="b"> B. Nhiệt lượng cung cấp</label>
-                        <label class="quiz-option"><input type="radio" name="q4" value="c"> C. Bản chất của chất làm vật</label>
-                        <label class="quiz-option"><input type="radio" name="q4" value="d"> D. Hình dạng của vật</label>
-                    </div>
-
-                    <!-- Q5 -->
-                    <div class="quiz-item">
-                        <p class="font-semibold mb-3">Câu 5: Công thức tính nhiệt nóng chảy riêng từ thí nghiệm là:</p>
-                        <label class="quiz-option"><input type="radio" name="q5" value="a"> A. \( \lambda = P \cdot m \cdot \tau \)</label>
-                        <label class="quiz-option"><input type="radio" name="q5" value="b"> B. \( \lambda = \frac{P \cdot \tau}{m} \)</label>
-                        <label class="quiz-option"><input type="radio" name="q5" value="c"> C. \( \lambda = \frac{m}{P \cdot \tau} \)</label>
-                        <label class="quiz-option"><input type="radio" name="q5" value="d"> D. \( \lambda = \frac{P}{m} \)</label>
+                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-md">
+                    <div class="flex items-start">
+                        <i class="fa-regular fa-hand-pointer text-yellow-600 text-xl mr-3 mt-1"></i>
+                        <div class="w-full">
+                            <p class="font-semibold text-gray-800">Thảo luận trả lời các câu hỏi thiết kế phương án:</p>
+                            <ul class="list-disc pl-5 space-y-1 text-gray-700 mt-1">
+                                <li>Từ công thức (5.3), hãy cho biết cần đo đại lượng nào để xác định nhiệt nóng chảy riêng của nước đá?</li>
+                                <li>Nhiệt lượng làm các viên nước đá trong nhiệt lượng kế nóng chảy được lấy từ đâu?</li>
+                                <li>Nhiệt lượng nước đá thu được trong bình nhiệt lượng kế được xác định bằng cách nào?</li>
+                                <li>Mô tả các bước tiến hành thí nghiệm.</li>
+                            </ul>
+                            <button onclick="toggleAnswer('act-design-5')" class="mt-3 text-sm text-white px-3 py-1 rounded shadow" style="background-color: darkblue;">
+                                <i class="fa-solid fa-lightbulb mr-1"></i> Xem hướng giải quyết
+                            </button>
+                            <div id="act-design-5" class="hidden mt-3 p-3 bg-white text-gray-800 rounded border border-gray-300 space-y-2">
+                                <p><strong>Hướng giải quyết:</strong></p>
+                                <p>1. Cần đo: Khối lượng nước đá \(m\) và nhiệt lượng \(Q\) cung cấp để nước đá nóng chảy hoàn toàn ở \(0^\circ\text{C}\).</p>
+                                <p>2. Nhiệt lượng tỏa ra chủ yếu từ dây điện trở của nhiệt lượng kế khi có dòng điện chạy qua.</p>
+                                <p>3. Nhiệt lượng được xác định qua công suất dòng điện và thời gian nóng chảy: \(Q = \overline{P} \cdot \tau_M\).</p>
+                                <p>4. Các bước: Cho nước đá và nước lạnh vào bình \(\rightarrow\) Bật nguồn điện \(\rightarrow\) Đọc thời gian, nhiệt độ và công suất theo chu kỳ \(\rightarrow\) Vẽ đồ thị để xác định thời điểm \(\tau_M\) nước đá tan hết \(\rightarrow\) Tính \(\lambda\).</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="mt-8 text-center">
-                    <button onclick="checkQuiz()" class="header-primary text-white font-bold py-3 px-10 rounded-full hover:bg-slate-700 transition shadow-lg">
-                        NỘP BÀI
+            <!-- Mục 4 -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold flex items-center text-gray-800">
+                    <span class="arabic-num">4</span> Tiến hành thí nghiệm
+                </h3>
+                <ol class="list-decimal pl-8 space-y-2 text-gray-700">
+                    <li>Cho viên nước đá (khối lượng \(m = 0,25\,\text{kg}\)) và một ít nước lạnh vào bình nhiệt lượng kế, sao cho toàn bộ điện trở chìm trong hỗn hợp nước và nước đá.</li>
+                    <li>Cắm đầu đo của nhiệt kế vào bình nhiệt lượng kế.</li>
+                    <li>Nối oát kế với nhiệt lượng kế và nguồn điện.</li>
+                    <li>Bật nguồn điện. Khuấy liên tục nước đá, cứ sau mỗi khoảng thời gian 2 phút lại đọc số đo thời gian trên oát kế và nhiệt độ trên nhiệt kế rồi ghi kết quả vào bảng.</li>
+                    <li>Tắt nguồn điện.</li>
+                </ol>
+
+                <div class="mt-3">
+                    <p class="font-semibold text-center mb-2">Bảng 5.2. Ví dụ về kết quả thí nghiệm đo nhiệt nóng chảy riêng của nước đá (\(m = 0,25\,\text{kg}\))</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse border border-gray-300 text-center text-sm">
+                            <thead>
+                                <tr class="bg-gray-200">
+                                    <th class="border border-gray-300 p-2">Thời gian \(\tau\) (s)</th>
+                                    <th class="border border-gray-300 p-2">0</th>
+                                    <th class="border border-gray-300 p-2">120</th>
+                                    <th class="border border-gray-300 p-2">240</th>
+                                    <th class="border border-gray-300 p-2">360</th>
+                                    <th class="border border-gray-300 p-2">480</th>
+                                    <th class="border border-gray-300 p-2">600</th>
+                                    <th class="border border-gray-300 p-2">720</th>
+                                    <th class="border border-gray-300 p-2">840</th>
+                                    <th class="border border-gray-300 p-2">960</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border border-gray-300 p-2 font-medium">Nhiệt độ \(t\) (\(^\circ\text{C}\))</td>
+                                    <td class="border border-gray-300 p-2">0</td>
+                                    <td class="border border-gray-300 p-2">0</td>
+                                    <td class="border border-gray-300 p-2">0</td>
+                                    <td class="border border-gray-300 p-2">0</td>
+                                    <td class="border border-gray-300 p-2">0</td>
+                                    <td class="border border-gray-300 p-2">0</td>
+                                    <td class="border border-gray-300 p-2">0,3</td>
+                                    <td class="border border-gray-300 p-2">0,8</td>
+                                    <td class="border border-gray-300 p-2">1,5</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-medium">Công suất (W)</td>
+                                    <td class="border border-gray-300 p-2">14,25</td>
+                                    <td class="border border-gray-300 p-2">14,23</td>
+                                    <td class="border border-gray-300 p-2">14,19</td>
+                                    <td class="border border-gray-300 p-2">14,25</td>
+                                    <td class="border border-gray-300 p-2">14,23</td>
+                                    <td class="border border-gray-300 p-2">14,24</td>
+                                    <td class="border border-gray-300 p-2">14,22</td>
+                                    <td class="border border-gray-300 p-2">14,32</td>
+                                    <td class="border border-gray-300 p-2">14,26</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mục 5 -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold flex items-center text-gray-800">
+                    <span class="arabic-num">5</span> Kết quả thí nghiệm
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <div class="space-y-2">
+                        <p class="leading-relaxed">
+                            Vẽ đồ thị sự phụ thuộc nhiệt độ \(t\) theo thời gian \(\tau\). Vẽ hai đường thẳng đi gần nhất các điểm trên đồ thị (Hình 5.1).
+                        </p>
+                        <p class="leading-relaxed">
+                            Chọn điểm \(M\) là giao điểm của hai đường thẳng, đọc giá trị \(\tau_M\) (tương ứng điểm bắt đầu tăng nhiệt độ sau khi tan hết).
+                        </p>
+                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                            <p class="font-semibold text-blue-900">Công thức tính nhiệt nóng chảy riêng:</p>
+                            \[ \lambda_{\text{H}_2\text{O}} = \frac{\overline{P}\tau_M}{m} \]
+                            <p class="text-xs text-gray-600 mt-1">Trong đó \(\overline{P}\tau_M\) là nhiệt lượng do dòng điện qua điện trở tỏa ra trong thời gian \(\tau_M\) và \(m\) là khối lượng nước đá.</p>
+                        </div>
+                    </div>
+                    <!-- Khung hình 5.1 -->
+                    <div class="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 p-4 rounded-lg bg-gray-50">
+                        <img src="h1.png" alt="Đồ thị biểu diễn sự thay đổi nhiệt độ theo thời gian của nước đá" class="max-h-64 object-contain rounded" onerror="this.src='https://placehold.co/400x250/e2e8f0/1e293b?text=H%C3%ACnh+5.1:+%C4%90%E1%BB%93+th%E1%BB%8B+t+theo+tau';">
+                        <span class="text-xs text-gray-500 mt-2">Hình 5.1. Đồ thị biểu diễn sự thay đổi nhiệt độ theo thời gian</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Các khung đặc biệt -->
+        <div class="space-y-4">
+            <!-- EM ĐÃ HỌC -->
+            <div class="bg-blue-900 text-white p-5 rounded-xl shadow-md">
+                <h3 class="text-lg font-bold uppercase mb-2 flex items-center">
+                    <i class="fa-solid fa-graduation-cap mr-2"></i> EM ĐÃ HỌC
+                </h3>
+                <ul class="list-disc pl-6 space-y-2">
+                    <li>Nhiệt nóng chảy riêng của một chất là nhiệt lượng cần để làm cho một kilôgam chất đó nóng chảy hoàn toàn ở nhiệt độ nóng chảy.</li>
+                    <li>Đơn vị của nhiệt nóng chảy riêng là: \(\text{J/kg}\).</li>
+                    <li>Hệ thức tính nhiệt lượng trong quá trình truyền nhiệt để làm vật nóng chảy hoàn toàn ở nhiệt độ nóng chảy: \(Q = \lambda m\).</li>
+                    <li>Cách xác định nhiệt nóng chảy riêng của nước đá bằng thực hành thí nghiệm.</li>
+                </ul>
+            </div>
+
+            <!-- EM CÓ THỂ -->
+            <div class="bg-teal-50 border-2 border-teal-500 p-5 rounded-xl shadow-md">
+                <h3 class="text-lg font-bold text-teal-900 uppercase mb-2 flex items-center">
+                    <i class="fa-solid fa-user-check mr-2"></i> EM CÓ THỂ
+                </h3>
+                <ul class="list-disc pl-6 space-y-1 text-teal-900">
+                    <li>Xác định được nhiệt nóng chảy riêng của một chất.</li>
+                    <li>Dùng khái niệm nhiệt nóng chảy riêng để giải thích các hiện tượng thực tế có liên quan. Ví dụ: công nghệ phân kim (tách kim loại) bằng nóng chảy, dùng thiếc để hàn,...</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- BÀI TẬP CỦNG CỐ & GAMESHOW -->
+        <div class="bg-white p-6 rounded-xl shadow-md space-y-6">
+            <h2 class="text-xl md:text-2xl font-bold section-header pb-2 text-blue-950 flex items-center">
+                <i class="fa-solid fa-gamepad mr-2"></i> CỦNG CỐ LÝ THUYẾT & BÀI TẬP
+            </h2>
+
+            <!-- GAME SHOW AI LÀ TRIỆU PHÚ (10 CÂU TRẮC NGHIỆM) -->
+            <div class="bg-indigo-950 text-white p-6 rounded-xl shadow-xl">
+                <div class="text-center mb-6">
+                    <span class="bg-yellow-500 text-black px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Gameshow</span>
+                    <h3 class="text-2xl font-extrabold text-yellow-400 mt-2">AI LÀ TRIỆU PHÚ VẬT LÝ</h3>
+                    <p class="text-sm text-gray-300">Trả lời 10 câu hỏi để chinh phục đỉnh cao tri thức Bài 5!</p>
+                </div>
+
+                <form id="quizForm" class="space-y-6">
+                    <div id="quizContainer" class="space-y-6 text-gray-800">
+                        <!-- JS Render -->
+                    </div>
+
+                    <div class="text-center pt-4">
+                        <button type="button" onclick="checkQuiz()" class="bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold text-lg px-8 py-3 rounded-full shadow-lg transition">
+                            <i class="fa-solid fa-paper-plane mr-2"></i> NỘP BÀI KẾT QUẢ
+                        </button>
+                    </div>
+                </form>
+
+                <div id="quizResult" class="hidden mt-6 p-4 rounded-lg bg-slate-900 border border-yellow-500 text-white"></div>
+            </div>
+
+            <!-- 3 BÀI TẬP TỰ LUẬN -->
+            <div class="space-y-4 pt-4">
+                <h3 class="text-xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
+                    <i class="fa-solid fa-pen-ruler mr-2 text-blue-900"></i> Bài tập tự luận tính toán
+                </h3>
+
+                <!-- Bài 1 -->
+                <div class="bg-slate-50 p-4 rounded-lg border border-gray-300">
+                    <p class="font-semibold text-gray-900">Bài 1: Tính nhiệt lượng cần cung cấp để làm nóng chảy hoàn toàn 3 kg nước đá ở nhiệt độ \(0^\circ\text{C}\). Cho biết nhiệt nóng chảy riêng của nước đá là \(\lambda = 3,34 \cdot 10^5\,\text{J/kg}\).</p>
+                    <button onclick="toggleAnswer('essay-1')" class="mt-2 text-sm text-white px-3 py-1 rounded shadow" style="background-color: darkblue;">
+                        <i class="fa-solid fa-eye mr-1"></i> Xem lời giải chi tiết
                     </button>
-                    <div id="quiz-result" class="mt-4 font-bold text-xl"></div>
+                    <div id="essay-1" class="hidden mt-3 p-3 bg-green-50 text-green-900 rounded border border-green-200">
+                        <p><strong>Lời giải:</strong></p>
+                        <p>Nhiệt lượng cần thiết để làm nóng chảy hoàn toàn 3 kg nước đá ở \(0^\circ\text{C}\) là:</p>
+                        <p>\[ Q = \lambda \cdot m = (3,34 \cdot 10^5) \cdot 3 = 1.002.000\,\text{J} = 1,002\,\text{MJ} \]</p>
+                    </div>
+                </div>
+
+                <!-- Bài 2 -->
+                <div class="bg-slate-50 p-4 rounded-lg border border-gray-300">
+                    <p class="font-semibold text-gray-900">Bài 2: Cho 1,5 kg chì ở nhiệt độ ban đầu \(27^\circ\text{C}\). Biết chì có nhiệt độ nóng chảy là \(327^\circ\text{C}\), nhiệt dung riêng \(c = 130\,\text{J/kg.K}\) và nhiệt nóng chảy riêng \(\lambda = 0,25 \cdot 10^5\,\text{J/kg}\). Tính tổng nhiệt lượng cần cung cấp để đưa chì lên nhiệt độ nóng chảy và làm nóng chảy hoàn toàn lượng chì đó.</p>
+                    <button onclick="toggleAnswer('essay-2')" class="mt-2 text-sm text-white px-3 py-1 rounded shadow" style="background-color: darkblue;">
+                        <i class="fa-solid fa-eye mr-1"></i> Xem lời giải chi tiết
+                    </button>
+                    <div id="essay-2" class="hidden mt-3 p-3 bg-green-50 text-green-900 rounded border border-green-200 shadow-sm space-y-1">
+                        <p><strong>Lời giải:</strong></p>
+                        <p>1. Nhiệt lượng làm chì tăng nhiệt độ từ \(27^\circ\text{C}\) lên \(327^\circ\text{C}\):</p>
+                        <p>\[ Q_1 = m \cdot c \cdot \Delta t = 1,5 \cdot 130 \cdot (327 - 27) = 1,5 \cdot 130 \cdot 300 = 58.500\,\text{J} \]</p>
+                        <p>2. Nhiệt lượng làm nóng chảy hoàn toàn chì ở \(327^\circ\text{C}\):</p>
+                        <p>\[ Q_2 = \lambda \cdot m = 0,25 \cdot 10^5 \cdot 1,5 = 37.500\,\text{J} \]</p>
+                        <p>3. Tổng nhiệt lượng cần thiết:</p>
+                        <p>\[ Q = Q_1 + Q_2 = 58.500 + 37.500 = 96.000\,\text{J} = 96\,\text{kJ} \]</p>
+                    </div>
+                </div>
+
+                <!-- Bài 3 -->
+                <div class="bg-slate-50 p-4 rounded-lg border border-gray-300">
+                    <p class="font-semibold text-gray-900">Bài 3: Thả 500 g nước đá ở \(0^\circ\text{C}\) vào một bình chứa 2 kg nước ở \(30^\circ\text{C}\). Bỏ qua nhiệt dung của bình và sự trao đổi nhiệt với môi trường. Hỏi nước đá có tan hết không? Nếu tan hết, nhiệt độ cuối cùng của hệ là bao nhiêu? (Cho \(c_{\text{nước}} = 4200\,\text{J/kg.K}\), \(\lambda_{\text{đá}} = 3,34 \cdot 10^5\,\text{J/kg}\)).</p>
+                    <button onclick="toggleAnswer('essay-3')" class="mt-2 text-sm text-white px-3 py-1 rounded shadow" style="background-color: darkblue;">
+                        <i class="fa-solid fa-eye mr-1"></i> Xem lời giải chi tiết
+                    </button>
+                    <div id="essay-3" class="hidden mt-3 p-3 bg-green-50 text-green-900 rounded border border-green-200 space-y-1">
+                        <p><strong>Lời giải:</strong></p>
+                        <p>1. Nhiệt lượng tối đa mà 2 kg nước tỏa ra khi hạ từ \(30^\circ\text{C}\) xuống \(0^\circ\text{C}\):</p>
+                        <p>\[ Q_{\text{tỏa max}} = m_2 \cdot c \cdot (30 - 0) = 2 \cdot 4200 \cdot 30 = 252.000\,\text{J} \]</p>
+                        <p>2. Nhiệt lượng cần thiết để làm nóng chảy hoàn toàn 0,5 kg nước đá ở \(0^\circ\text{C}\):</p>
+                        <p>\[ Q_{\text{nc}} = \lambda \cdot m_1 = (3,34 \cdot 10^5) \cdot 0,5 = 167.000\,\text{J} \]</p>
+                        <p>Vì \(Q_{\text{tỏa max}} (252.000\,\text{J}) > Q_{\text{nc}} (167.000\,\text{J})\) nên <strong>nước đá tan hết hoàn toàn</strong>.</p>
+                        <p>3. Gọi \(t\) là nhiệt độ chung cuối cùng của hệ (\(t > 0^\circ\text{C}\)):</p>
+                        <p>Phương trình cân bằng nhiệt:</p>
+                        <p>\[ Q_{\text{nc}} + m_1 \cdot c \cdot (t - 0) = m_2 \cdot c \cdot (30 - t) \]</p>
+                        <p>\[ 167.000 + 0,5 \cdot 4200 \cdot t = 2 \cdot 4200 \cdot (30 - t) \]</p>
+                        <p>\[ 167.000 + 2100t = 252.000 - 8400t \implies 10500t = 85.000 \implies t \approx 8,1^\circ\text{C} \]</p>
+                    </div>
                 </div>
             </div>
-        </section>
-    </main>
+        </div>
 
-    <footer class="text-center py-10 text-gray-500 text-sm">
-        &copy; 2024 - Tài liệu học tập Vật Lý 12 - Kết nối tri thức
-    </footer>
+        <!-- FOOTER -->
+        <footer class="text-center text-gray-600 text-sm py-4 border-t border-gray-300">
+            Chương trình GDPT 2018 - Bộ sách thống nhất
+        </footer>
 
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
     <script>
         function toggleAnswer(id) {
             const element = document.getElementById(id);
-            if (element.style.display === "block") {
-                element.style.display = "none";
-            } else {
-                element.style.display = "block";
+            if (element) {
+                element.classList.toggle('hidden');
             }
         }
 
-        function checkQuiz() {
-            const answers = {
-                q1: 'c',
-                q2: 'a',
-                q3: 'c',
-                q4: 'c',
-                q5: 'b'
-            };
-            
-            let score = 0;
-            let total = 5;
-            
-            for (let i = 1; i <= total; i++) {
-                const selected = document.querySelector(`input[name="q${i}"]:checked`);
-                if (selected && selected.value === answers[`q${i}`]) {
-                    score++;
-                }
+        const questions = [
+            {
+                q: "Câu 1: Đơn vị của nhiệt nóng chảy riêng trong hệ SI là gì?",
+                options: ["A. J/kg.K", "B. J/kg", "C. J/K", "D. N/kg"],
+                answer: 1,
+                explain: "Nhiệt nóng chảy riêng λ = Q / m nên có đơn vị là J/kg."
+            },
+            {
+                q: "Câu 2: Nhiệt nóng chảy riêng của một chất là nhiệt lượng cần cung cấp để làm gì?",
+                options: [
+                    "A. Làm 1 kg chất đó tăng thêm 1°C.",
+                    "B. Làm 1 kg chất đó nóng chảy hoàn toàn ở nhiệt độ nóng chảy.",
+                    "C. Làm 1 kg chất đó hóa hơi hoàn toàn.",
+                    "D. Nung nóng 1 kg chất đó từ 0°C đến 100°C."
+                ],
+                answer: 1,
+                explain: "Theo định nghĩa: Nhiệt nóng chảy riêng là nhiệt lượng cần để làm cho 1 kg chất đó nóng chảy hoàn toàn ở nhiệt độ nóng chảy."
+            },
+            {
+                q: "Câu 3: Công thức tính nhiệt lượng cần cung cấp cho m kg chất rắn nóng chảy hoàn toàn ở nhiệt độ nóng chảy là:",
+                options: ["A. Q = m.c.ΔT", "B. Q = λ / m", "C. Q = λ.m", "D. Q = m.c / λ"],
+                answer: 2,
+                explain: "Công thức tính nhiệt lượng chuyển thể nóng chảy là Q = λ.m."
+            },
+            {
+                q: "Câu 4: Nhiệt nóng chảy riêng của nước đá là 3,34.10⁵ J/kg có ý nghĩa gì?",
+                options: [
+                    "A. Cần 3,34.10⁵ J để làm 1 kg nước đá tăng thêm 1°C.",
+                    "B. Cần 3,34.10⁵ J để làm 1 kg nước đá nóng chảy hoàn toàn ở 0°C.",
+                    "C. 1 kg nước đá ở 0°C chứa nhiệt lượng 3,34.10⁵ J.",
+                    "D. Nước đá bắt đầu nóng chảy ở 3,34.10⁵ °C."
+                ],
+                answer: 1,
+                explain: "Ý nghĩa nhiệt nóng chảy riêng λ chính là lượng nhiệt cần thiết cho 1 kg chất nóng chảy hoàn toàn ở nhiệt độ nóng chảy."
+            },
+            {
+                q: "Câu 5: Trong quá trình chất rắn kết tinh nóng chảy hoàn toàn ở nhiệt độ nóng chảy, nhiệt độ của nó sẽ:",
+                options: ["A. Tăng liên tục", "B. Giảm liên tục", "C. Không đổi", "D. Biến đổi ngẫu nhiên"],
+                answer: 2,
+                explain: "Trong quá trình nóng chảy, nhiệt lượng cung cấp được dùng để phá vỡ liên kết tinh thể nên nhiệt độ giữ nguyên không đổi."
+            },
+            {
+                q: "Câu 6: Kim loại nào sau đây có nhiệt độ nóng chảy thấp nhất trong các kim loại nêu trong bài?",
+                options: ["A. Đồng", "B. Sắt", "C. Chì", "D. Nước đá"],
+                answer: 2,
+                explain: "Trong các kim loại ghi ở Bảng 5.1 (Sắt: 1535°C, Đồng: 1084°C, Chì: 327°C), Chì có nhiệt độ nóng chảy thấp nhất."
+            },
+            {
+                q: "Câu 7: Nhiệt lượng cần thiết để làm nóng chảy hoàn toàn 2 kg nước đá ở 0°C là:",
+                options: ["A. 6,68.10⁵ J", "B. 3,34.10⁵ J", "C. 1,67.10⁵ J", "D. 6,68.10⁶ J"],
+                answer: 0,
+                explain: "Q = λ.m = (3,34.10⁵) * 2 = 6,68.10⁵ J."
+            },
+            {
+                q: "Câu 8: Ứng dụng nào sau đây KHÔNG dựa trên hiện tượng nóng chảy?",
+                options: [
+                    "A. Đúc chuông đồng, tượng đồng.",
+                    "B. Hàn thiếc linh kiện điện tử.",
+                    "C. Tách kim loại nguyên chất khỏi quặng.",
+                    "D. Đun nước sôi bằng ấm điện."
+                ],
+                answer: 3,
+                explain: "Đun nước sôi là quá trình hóa hơi (sôi) chứ không phải chuyển thể nóng chảy chất rắn."
+            },
+            {
+                q: "Câu 9: Để xác định điểm thời gian τ_M nước đá tan hết trên đồ thị thí nghiệm, người ta tìm điểm nào?",
+                options: [
+                    "A. Điểm cực đại của nhiệt độ.",
+                    "B. Giao điểm của đường thẳng giai đoạn 0°C và đường thẳng giai đoạn nhiệt độ tăng dốc lên.",
+                    "C. Điểm xuất phát ban đầu τ = 0.",
+                    "D. Trung điểm của trục thời gian."
+                ],
+                answer: 1,
+                explain: "Giao điểm M đánh dấu khoảng thời gian vừa đủ làm toàn bộ nước đá nóng chảy hoàn toàn trước khi nhiệt độ bắt đầu tăng."
+            },
+            {
+                q: "Câu 10: Hai khối chì và đồng có cùng khối lượng m đang ở nhiệt độ nóng chảy tương ứng. So sánh nhiệt lượng Q_chì và Q_đồng để nóng chảy hoàn toàn:",
+                options: [
+                    "A. Q_chì > Q_đồng",
+                    "B. Q_chì < Q_đồng",
+                    "C. Q_chì = Q_đồng",
+                    "D. Không so sánh được"
+                ],
+                answer: 1,
+                explain: "Vì λ_chì (0,25.10⁵ J/kg) < λ_đồng (1,80.10⁵ J/kg), với cùng khối lượng m thì Q_chì = λ_chì.m < Q_đồng = λ_đồng.m."
             }
-            
-            const resultDiv = document.getElementById('quiz-result');
-            if (score === total) {
-                resultDiv.style.color = "#059669"; // Green
-                resultDiv.innerHTML = `Tuyệt vời! Bạn đúng ${score}/${total} câu.`;
-            } else {
-                resultDiv.style.color = "#dc2626"; // Red
-                resultDiv.innerHTML = `Bạn đúng ${score}/${total} câu. Hãy xem lại nội dung bài học nhé!`;
-            }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quizContainer');
+            let html = '';
+            questions.forEach((q, index) => {
+                html += `
+                    <div class="bg-white p-4 rounded-lg shadow border border-gray-200 space-y-2">
+                        <p class="font-bold text-blue-900">${q.q}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                            ${q.options.map((opt, optIndex) => `
+                                <label class="millionaire-option flex items-center p-2 rounded border border-gray-200 cursor-pointer text-sm">
+                                    <input type="radio" name="question_${index}" value="${optIndex}" class="mr-2 accent-blue-900">
+                                    <span>${opt}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
         }
+
+        function checkQuiz() {
+            let score = 0;
+            let detailHtml = '<h4 class="text-xl font-bold mb-3 text-yellow-400">KẾT QUẢ VÀ GIẢI CHI TIẾT:</h4>';
+            
+            questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="question_${index}"]:checked`);
+                const userAns = selected ? parseInt(selected.value) : -1;
+                
+                if (userAns === q.answer) {
+                    score++;
+                    detailHtml += `
+                        <div class="mb-3 p-3 bg-green-900/40 border border-green-500 rounded">
+                            <p class="font-semibold text-green-300">✓ ${q.q}</p>
+                            <p class="text-sm text-gray-200">Đáp án chọn: ${q.options[userAns]} (ĐÚNG)</p>
+                            <p class="text-xs text-green-200 italic mt-1">Giải thích: ${q.explain}</p>
+                        </div>
+                    `;
+                } else {
+                    detailHtml += `
+                        <div class="mb-3 p-3 bg-red-900/40 border border-red-500 rounded">
+                            <p class="font-semibold text-red-300">✗ ${q.q}</p>
+                            <p class="text-sm text-gray-200">Bạn chọn: ${userAns !== -1 ? q.options[userAns] : 'Chưa chọn'} | Đáp án đúng: <span class="font-bold text-yellow-300">${q.options[q.answer]}</span></p>
+                            <p class="text-xs text-red-200 italic mt-1">Giải thích: ${q.explain}</p>
+                        </div>
+                    `;
+                }
+            });
+
+            const resultDiv = document.getElementById('quizResult');
+            resultDiv.classList.remove('hidden');
+
+            const scoreColor = score === 10 ? 'text-green-400' : 'text-yellow-400';
+            const titleText = score === 10 ? 'XUẤT SẮC! BẠN ĐÃ TRỞ THÀNH TRIỆU PHÚ VẬT LÝ!' : `BẠN TRẢ LỜI ĐÚNG ${score}/10 CÂU.`;
+
+            resultDiv.innerHTML = `
+                <div class="text-center mb-4">
+                    <h3 class="text-2xl font-extrabold ${scoreColor}">${titleText}</h3>
+                    <p class="text-lg">Điểm số: <span class="font-bold">${score * 10} / 100 điểm</span></p>
+                </div>
+                ${detailHtml}
+            `;
+            
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.onload = function() {
+            renderQuiz();
+        };
     </script>
 </body>
 </html>
