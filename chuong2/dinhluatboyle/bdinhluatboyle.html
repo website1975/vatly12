@@ -3,360 +3,739 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bài 9: Định luật Boyle - Vật Lý 12</title>
+    <title>Bài 9: Định luật Boyle</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mau1: '#1a202c',
+                        mau2: '#1a202c',
+                        chudao: '#33FF33',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- MathJax Library with Chemistry Support -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                packages: {'[+]': ['mhchem']}
+            },
+            loader: {load: ['[tex]/mhchem']}
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
     <style>
         body {
             background-color: #f4f7f9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2d3748;
         }
-		.header-primary { background-color: #000080; }
-        .rounded-12 { border-radius: 12px; }
-
-        .navy-bg { background-color: #000080; }
-        .navy-text { color: #000080; }
-        .rounded-12px { border-radius: 12px; }
-        .section-header {
-            border-bottom: 4px solid #000080;
-            display: inline-block;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.2rem;
+        .roman-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.2rem;
+            height: 2.2rem;
+            border: 2px solid #1a202c;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 0.5rem;
+            background-color: #f7fafc;
         }
-        .answer-box {
-            display: none;
-            background-color: #f0fff4; /* Light green */
-            border-left: 4px solid #48bb78;
+        .arabic-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background-color: #1a202c;
+            color: white;
+            font-weight: bold;
+            margin-right: 0.5rem;
         }
-        .question-box {
-            background-color: #edf2f7;
-            border-left: 4px solid #000080;
+        .section-title {
+            border-bottom: 3px solid #1a202c;
+            padding-bottom: 0.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
         }
-        table { width: 100%; border-collapse: collapse; }
-        th { background-color: #e2e8f0; border: 1px solid #cbd5e0; padding: 10px; }
-        td { border: 1px solid #cbd5e0; padding: 10px; text-align: center; }
+        .mil-option-btn:hover {
+            background-color: #feebc8;
+        }
+        .mil-option-btn.selected {
+            background-color: #fbd38d;
+            border-color: #dd6b20;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <!-- Header Section -->
-		<header class="max-w-5xl mx-auto mb-8 shadow-lg overflow-hidden rounded-12">
-        <div class="header-primary text-white py-3 px-6 text-center text-sm font-semibold tracking-widest uppercase">
-            Chương 2: Khí Lí Tưởng
-        </div>
-        <div class="header-primary text-white py-6 px-6 text-center border-t border-gray-700">
-            <h1 class="text-3xl font-bold">Bài 9: ĐỊNH LUẬT BOYLE</h1>
-        </div>
-	</header>
-    <main class="max-w-4xl mx-auto space-y-8">
-        
-        <!-- Lời dẫn -->
-        <section class="bg-white p-6 border border-gray-300 rounded-12px shadow-md italic text-center text-gray-700">
-            "Khi thay đổi thể tích của một khối lượng khí xác định ở nhiệt độ không đổi thì áp suất khí thay đổi như thế nào?"
-        </section>
+    <div class="max-w-5xl mx-auto space-y-6">
 
-        <!-- I. Các thông số trạng thái -->
-        <section class="bg-white p-6 rounded-12px shadow-md">
-            <h2 class="section-header text-xl font-bold navy-text uppercase">I. CÁC THÔNG SỐ TRẠNG THÁI CỦA MỘT LƯỢNG KHÍ</h2>
-            <div class="space-y-4 text-justify">
-                <p>Một lượng khí đựng trong một bình kín được xác định bởi bốn đại lượng là khối lượng \( (m) \), thể tích \( (V) \), nhiệt độ \( (T) \) và áp suất \( (p) \).</p>
-                <p>Khi thể tích, nhiệt độ và áp suất của một khối lượng khí xác định không thay đổi, ta nói lượng khí ở trạng thái cân bằng. Thể tích, áp suất và nhiệt độ của lượng khí được gọi là các <strong>thông số trạng thái</strong> của nó.</p>
-                
-                <div class="bg-blue-50 p-4 border-l-4 border-blue-500 rounded my-4 italic">
-                    <strong>Ghi chú:</strong> Các thông số trạng thái của một lượng khí đều là đại lượng có thể đo hoặc xác định được bằng các dụng cụ đo lường.
-                </div>
-
-                <!-- Câu hỏi 1 -->
-                <div class="question-box p-4 rounded mb-4">
-                    <p class="font-semibold">Câu hỏi 1: Người ta dùng các dụng cụ nào để đo, xác định các thông số trạng thái của lượng khí trong hộp kín (nhiệt kế, áp kế)?</p>
-                    <button onclick="toggleAnswer('q1')" class="mt-2 navy-bg text-white px-4 py-1 rounded hover:opacity-90 text-sm">Xem chi tiết</button>
-                    <div id="q1" class="answer-box p-4 mt-2 rounded">
-                        <center><img src="h1.png"></img></center>
-			<p> Dùng nhiệt kế để đo nhiệt độ và áp kế để đo áp suất của lượng khí. Thể tích có thể xác định qua kích thước hình học của bình chứa.
-                    </div>
-                </div>
-
-                <!-- Câu hỏi 2 -->
-                <div class="question-box p-4 rounded mb-4">
-                    <p class="font-semibold">Câu hỏi 2: Nêu tên đơn vị của các đại lượng này trong hệ SI.</p>
-                    <button onclick="toggleAnswer('q2')" class="mt-2 navy-bg text-white px-4 py-1 rounded hover:opacity-90 text-sm">Xem chi tiết</button>
-                    <div id="q2" class="answer-box p-4 mt-2 rounded">
-                        - Thể tích: mét khối \( (m^3) \).<br>
-                        - Áp suất: Pascal \( (Pa) \).<br>
-                        - Nhiệt độ: Kelvin \( (K) \).
-                    </div>
-                </div>
-
-                <div class="bg-yellow-50 p-4 border border-yellow-200 rounded text-sm">
-                    <strong>Lưu ý:</strong> Khí chuyển từ trạng thái này sang trạng thái khác bằng các quá trình biến đổi trạng thái, gọi tắt là <strong>quá trình</strong>.
-                </div>
+        <!-- HEADER -->
+        <div class="rounded-xl overflow-hidden shadow-md border border-gray-300">
+            <div class="bg-mau1 text-white text-center py-3 text-lg font-bold uppercase tracking-wide">
+                KHÍ LÍ TƯỞNG
             </div>
-        </section>
-
-        <!-- II. Định luật Boyle -->
-        <section class="bg-white p-6 rounded-12px shadow-md">
-            <h2 class="section-header text-xl font-bold navy-text uppercase">II. ĐỊNH LUẬT BOYLE</h2>
-            
-            <h3 class="font-bold text-lg mb-2 text-blue-800">1. Quá trình đẳng nhiệt</h3>
-            <p class="mb-4">Quá trình biến đổi trạng thái của một khối lượng khí xác định khi nhiệt độ giữ không đổi được gọi là <strong>quá trình đẳng nhiệt</strong>.</p>
-
-            <h3 class="font-bold text-lg mb-2 text-blue-800">2. Thí nghiệm</h3>
-            <div class="grid md:grid-cols-2 gap-6 mb-4">
-                <div class="border p-4 rounded">
-                    <p class="font-bold mb-2">Chuẩn bị:</p>
-                    <ul class="list-disc ml-6 text-sm">
-                        <li>Xi lanh trong suốt có chia độ (1).</li>
-                        <li>Pit-tông có ống nối (2).</li>
-                        <li>Áp kế (3).</li>
-                        <li>Giá đỡ (4) và thước đo (5).</li>
-                    </ul>
-                    <div class="mt-4 bg-gray-100 h-50 flex items-center justify-center rounded border-dashed border-2 border-gray-400">
-                        <center></center><img src="h2.png"></img></center>
-					</div>
-                </div>
-                <div>
-                    <p class="font-bold mb-2">Tiến hành:</p>
-                    <ol class="list-decimal ml-6 text-sm space-y-1">
-                        <li>Bố trí thí nghiệm như hình vẽ.</li>
-                        <li>Dịch chuyển từ từ pit-tông để thay đổi thể tích.</li>
-                        <li>Đọc và ghi kết quả \( p \) và \( V \).</li>
-                    </ol>
-                </div>
+            <div class="border-t border-gray-400"></div>
+            <div class="bg-mau2 text-white text-center py-4 text-2xl md:text-3xl font-extrabold uppercase tracking-wider">
+                BÀI 9: ĐỊNH LUẬT BOYLE
             </div>
+        </div>
 
-            <p class="font-bold mb-2 text-center">Bảng kết quả thí nghiệm mẫu</p>
-            <table class="mb-6">
-                <thead>
-                    <tr>
-                        <th>Lần TN</th>
-                        <th>\( V (cm^3) \)</th>
-                        <th>\( p (10^5 Pa) \)</th>
-                        <th>Tích \( p \cdot V \)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>1</td><td>3,0</td><td>1,0</td><td>3,0</td></tr>
-                    <tr><td>2</td><td>2,5</td><td>1,2</td><td>3,0</td></tr>
-                    <tr><td>3</td><td>2,0</td><td>1,5</td><td>3,0</td></tr>
-                    <tr><td>4</td><td>1,5</td><td>1,9</td><td>~2,85</td></tr>
-                </tbody>
-            </table>
+        <!-- INTRO BOX -->
+        <div class="bg-white border border-black rounded-xl p-5 shadow-sm">
+            <p class="italic text-gray-800 leading-relaxed">
+                Khi thay đổi thể tích của một khối lượng khí xác định ở nhiệt độ không đổi thì áp suất khí thay đổi như thế nào?
+            </p>
+        </div>
+
+        <!-- SECTION I -->
+        <div class="bg-white rounded-xl shadow-md p-6 space-y-6">
+            <h2 class="text-xl md:text-2xl section-title text-gray-900 flex items-center">
+                <span class="roman-num">I</span> CÁC THÔNG SỐ TRẠNG THÁI CỦA MỘT LƯỢNG KHÍ
+            </h2>
 
             <div class="space-y-4">
-                <div class="p-3 border rounded bg-gray-50 flex justify-between items-center">
-                    <span>Thảo luận 1: Xác định giá trị tích \( pV \)</span>
-                    <button onclick="toggleAnswer('tl1')" class="navy-bg text-white px-3 py-1 rounded text-xs">Hiển thị kết quả</button>
-                </div>
-                <div id="tl1" class="answer-box p-4 rounded text-sm mb-2">Giá trị tích \( pV \) trong các lần thí nghiệm gần như không đổi (sai số do đo đạc).</div>
+                <p>Một lượng khí đựng trong một bình kín được xác định bởi bốn đại lượng là khối lượng (\(m\)), thể tích (\(V\)), nhiệt độ (\(T\)) và áp suất (\(p\)).</p>
 
-                <div class="p-3 border rounded bg-gray-50 flex justify-between items-center">
-                    <span>Thảo luận 2: Vẽ đường biểu diễn \( p \) theo \( V \)</span>
-                    <button onclick="toggleAnswer('tl2')" class="navy-bg text-white px-3 py-1 rounded text-xs">Hiển thị kết quả</button>
-                </div>
-                <div id="tl2" class="answer-box p-4 rounded text-sm mb-2">Đường biểu diễn có dạng một nhánh của đường hypebol, cho thấy \( p \) tỉ lệ nghịch với \( V \).</div>
-            </div>
-
-            <h3 class="font-bold text-lg mt-8 mb-2 text-blue-800">3. Định luật Boyle</h3>
-            <div class="navy-bg text-white p-6 rounded-lg mb-6">
-                <p class="text-lg italic mb-4 text-center">"Khi nhiệt độ của một khối lượng khí xác định giữ không đổi thì áp suất gây ra bởi khí tỉ lệ nghịch với thể tích của nó."</p>
-                <p class="text-2xl font-bold text-center">\( pV = \text{const} \) hoặc \( p_1V_1 = p_2V_2 \)</p>
-            </div>
-
-            <!-- Đồ thị -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div class="border p-2 rounded text-center">
-                    <div class="h-32 bg-blue-50 flex items-center justify-center mb-2">
-                        <span class="text-xs">[Đồ thị p-V: Hypebol]</span>
-                    </div>
-                    <p class="text-xs font-bold">Hệ tọa độ (p,V)</p>
-                </div>
-                <div class="border p-2 rounded text-center">
-                    <div class="h-32 bg-blue-50 flex items-center justify-center mb-2">
-                        <span class="text-xs">[Đồ thị V-T: Thẳng đứng]</span>
-                    </div>
-                    <p class="text-xs font-bold">Hệ tọa độ (V,T)</p>
-                </div>
-                <div class="border p-2 rounded text-center">
-                    <div class="h-32 bg-blue-50 flex items-center justify-center mb-2">
-                        <span class="text-xs">[Đồ thị p-T: Thẳng đứng]</span>
-                    </div>
-                    <p class="text-xs font-bold">Hệ tọa độ (p,T)</p>
-                </div>
-            </div>
-
-            <div class="border-t pt-4">
-                <button onclick="toggleAnswer('history')" class="w-full py-2 bg-gray-200 rounded font-bold text-sm">Giới thiệu lịch sử tìm ra định luật (Nhấn xem)</button>
-                <div id="history" class="answer-box p-4 mt-2 rounded italic text-sm">
-                    Định luật được Robert Boyle (1627-1691) - nhà vật lý người Ireland tìm ra bằng thực nghiệm năm 1662. Cùng thời gian đó, Edme Mariotte cũng tìm ra độc lập nên đôi khi còn gọi là định luật Boyle-Mariotte.
-                </div>
-            </div>
-
-            <div class="mt-4 space-y-2">
-                <div class="question-box p-3 rounded text-sm">
-                    <strong>Câu hỏi 1:</strong> Nếu vẽ đồ thị \( p \) theo \( 1/V \) thì dạng đồ thị là gì?
-                    <button onclick="toggleAnswer('q_extra1')" class="ml-2 underline text-blue-700">Xem trả lời</button>
-                    <div id="q_extra1" class="answer-box p-3 mt-2 rounded">Dạng đường thẳng đi qua gốc tọa độ vì \( p \) tỉ lệ thuận với \( 1/V \).</div>
-                </div>
-                <div class="question-box p-3 rounded text-sm">
-                    <strong>Câu hỏi 2:</strong> Tìm ví dụ về quá trình đẳng nhiệt trong đời sống?
-                    <button onclick="toggleAnswer('q_extra2')" class="ml-2 underline text-blue-700">Xem trả lời</button>
-                    <div id="q_extra2" class="answer-box p-3 mt-2 rounded">Bóp chậm một quả bóng bay, bơm xe đạp từ từ để hơi không nóng lên...</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- III. Củng cố -->
-        <section class="bg-white p-6 rounded-12px shadow-md">
-            <h2 class="section-header text-xl font-bold navy-text uppercase">III. CỦNG CỐ</h2>
-            
-            <div class="mb-8">
-                <h3 class="font-bold border-l-4 border-orange-500 pl-2 mb-4">Bài tập ví dụ</h3>
-                <div class="bg-orange-50 p-4 rounded border border-orange-200">
-                    <p class="mb-2">Một lượng khí có thể tích 10 lít ở áp suất \( 10^5 Pa \). Tính thể tích của lượng khí này ở áp suất \( 1,25 \cdot 10^5 Pa \). Biết nhiệt độ không đổi.</p>
-                    <button onclick="toggleAnswer('ex_sol')" class="bg-orange-500 text-white px-4 py-1 rounded text-sm font-bold">Xem các bước giải</button>
-                    <div id="ex_sol" class="answer-box p-4 mt-2 rounded bg-white border border-green-200">
-                        <p><strong>Bước 1:</strong> Xác định đẳng quá trình: Đẳng nhiệt.</p>
-                        <p><strong>Bước 2:</strong> Tóm tắt trạng thái:<br>
-                           TT1: \( p_1 = 10^5 Pa; V_1 = 10 L \)<br>
-                           TT2: \( p_2 = 1,25 \cdot 10^5 Pa; V_2 = ? \)</p>
-                        <p><strong>Bước 3:</strong> Áp dụng ĐL Boyle:<br>
-                           \( p_1V_1 = p_2V_2 \Rightarrow V_2 = \frac{p_1V_1}{p_2} = \frac{10^5 \cdot 10}{1,25 \cdot 10^5} = 8 \text{ lít} \).</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="space-y-6">
-                <h3 class="font-bold border-l-4 border-blue-500 pl-2 mb-2">Bài tập vận dụng</h3>
-                
-                <div class="p-4 border rounded">
-                    <p><strong>Bài 1:</strong> Một quả bóng chứa \( 0,04 m^3 \) không khí ở áp suất 120 kPa. Tính áp suất khi giảm thể tích còn \( 0,025 m^3 \).</p>
-                    <button onclick="toggleAnswer('app1')" class="mt-2 text-blue-600 text-sm font-bold">Xem giải chi tiết</button>
-                    <div id="app1" class="answer-box p-4 mt-2 rounded italic">
-                        Áp dụng \( p_1V_1 = p_2V_2 \Rightarrow p_2 = \frac{120 \cdot 0,04}{0,025} = 192 \text{ kPa} \).
-                    </div>
-                </div>
-
-                <div class="p-4 border rounded">
-                    <p><strong>Bài 2:</strong> Một bọt khí nổi từ đáy giếng sâu 6m lên mặt nước. Thể tích tăng bao nhiêu lần? (Cho \( p_0 = 1,013 \cdot 10^5 Pa, \rho = 1000 kg/m^3 \)).</p>
-                    <button onclick="toggleAnswer('app2')" class="mt-2 text-blue-600 text-sm font-bold">Xem giải chi tiết</button>
-                    <div id="app2" class="answer-box p-4 mt-2 rounded italic">
-                        Áp suất đáy giếng: \( p_1 = p_0 + \rho gh = 1,013 \cdot 10^5 + 1000 \cdot 9,8 \cdot 6 \approx 1,601 \cdot 10^5 Pa \).<br>
-                        Áp suất mặt nước: \( p_2 = p_0 = 1,013 \cdot 10^5 Pa \).<br>
-                        Tỉ số thể tích: \( \frac{V_2}{V_1} = \frac{p_1}{p_2} = \frac{1,601}{1,013} \approx 1,58 \text{ lần} \).
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-8 grid md:grid-cols-2 gap-4">
-                <div class="bg-blue-600 text-white p-4 rounded-lg">
-                    <h4 class="font-bold mb-2">EM ĐÃ HỌC</h4>
-                    <ul class="list-disc ml-5 text-sm">
-                        <li>Thông số trạng thái: p, V, T.</li>
-                        <li>Định luật Boyle: \( pV = \text{const} \).</li>
+                <!-- ĐỊNH NGHĨA KHUNG MÀU NỀN -->
+                <div class="bg-amber-50 border border-amber-300 rounded-xl p-4 shadow-sm space-y-2 text-gray-800">
+                    <p class="font-bold text-amber-900 text-lg">📌 ĐỊNH NGHĨA & TÍNH CHẤT:</p>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>Khi thể tích, nhiệt độ và áp suất của một khối lượng khí xác định không thay đổi, ta nói lượng khí ở <strong>trạng thái cân bằng</strong>.</li>
+                        <li>Thể tích, áp suất và nhiệt độ của lượng khí được gọi là các <strong>thông số trạng thái</strong> của nó.</li>
+                        <li>Các thông số trạng thái của một lượng khí đều là đại lượng có thể đo hoặc xác định được bằng các dụng cụ đo lường.</li>
                     </ul>
                 </div>
-                <div class="bg-green-600 text-white p-4 rounded-lg">
-                    <h4 class="font-bold mb-2">EM CÓ THỂ</h4>
-                    <p class="text-sm">Giải thích các hiện tượng thực tế như hít thở, hoạt động của ống tiêm, bọt khí nổi dưới nước...</p>
+
+                <!-- HÌNH MINH HỌA -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                    <div class="border border-gray-300 rounded-lg p-2 text-center bg-gray-50">
+                        <img src="h1.png" alt="Hình 9.1" class="mx-auto max-h-48 object-contain mb-2 border rounded">
+                        <span class="text-sm font-semibold text-gray-600">Hình 9.1. Xác định các thông số trạng thái của một lượng khí</span>
+                    </div>
+                    <div class="border border-gray-300 rounded-lg p-2 text-center bg-gray-50">
+                        <img src="h2.png" alt="Hình 9.2" class="mx-auto max-h-48 object-contain mb-2 border rounded">
+                        <span class="text-sm font-semibold text-gray-600">Hình 9.2. Trạng thái và quá trình</span>
+                    </div>
+                </div>
+
+                <!-- CÂU HỎI ? SECTION I -->
+                <div class="space-y-3">
+                    <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                        <p class="font-semibold text-blue-900">❓ 1. Người ta dùng các dụng cụ nào để đo, xác định các thông số trạng thái của lượng khí trong hộp kín ở Hình 9.1?</p>
+                        <button onclick="toggleAnswer('ans_i_1')" class="mt-2 px-3 py-1 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                            Xem trả lời
+                        </button>
+                        <div id="ans_i_1" class="hidden mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-gray-800">
+                            <strong>Trả lời:</strong>
+                            <ul class="list-disc list-inside">
+                                <li>Nhiệt độ (\(T\)): Dùng <strong>Nhiệt kế</strong>.</li>
+                                <li>Áp suất (\(p\)): Dùng <strong>Áp kế</strong>.</li>
+                                <li>Thể tích (\(V\)): Dùng <strong>Thước đo</strong> (để đo chiều dài các cạnh của hộp kín rồi tính thể tích).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                        <p class="font-semibold text-blue-900">❓ 2. Nêu tên đơn vị của các đại lượng này trong hệ SI.</p>
+                        <button onclick="toggleAnswer('ans_i_2')" class="mt-2 px-3 py-1 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                            Xem trả lời
+                        </button>
+                        <div id="ans_i_2" class="hidden mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-gray-800">
+                            <strong>Trả lời:</strong>
+                            <ul class="list-disc list-inside">
+                                <li>Thể tích (\(V\)): Mét khối (\(\text{m}^3\)).</li>
+                                <li>Áp suất (\(p\)): Pascal (\(\text{Pa}\)) hoặc Newton trên mét vuông (\(\text{N/m}^2\)).</li>
+                                <li>Nhiệt độ tuyệt đối (\(T\)): Kelvin (\(\text{K}\)).</li>
+                                <li>Khối lượng (\(m\)): Kilôgam (\(\text{kg}\)).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="pt-2">Khí chuyển từ trạng thái này sang trạng thái khác bằng các <strong>quá trình biến đổi trạng thái</strong>, gọi tắt là <strong>quá trình</strong>.</p>
+                <p>Người ta thường biểu diễn trạng thái và quá trình biến đổi trạng thái của một khối lượng khí xác định theo sơ đồ:</p>
+                <div class="bg-gray-100 border border-gray-300 rounded-lg p-3 text-center font-bold text-gray-800 my-2">
+                    Trạng thái 1 (\(p_1, V_1, T_1\)) \(\xrightarrow{\text{Quá trình}}\) Trạng thái 2 (\(p_2, V_2, T_2\))
+                </div>
+
+                <!-- EM CÓ BIẾT -->
+                <div class="bg-indigo-50 border border-indigo-300 rounded-xl p-4 shadow-sm">
+                    <p class="font-bold text-indigo-900 text-base">EM CÓ BIẾT?</p>
+                    <p class="text-sm text-gray-800 mt-1">
+                        Các phân tử khí chuyển động hỗn loạn, không ngừng nên vận tốc và số va chạm của các phân tử khí lên thành bình thay đổi theo thời gian và áp suất chất khí tác dụng lên thành bình tại các thời điểm khác nhau có thể khác nhau. Do đó, áp suất chất khí được hiểu là <strong>áp suất trung bình</strong> của các phân tử khí tác dụng lên thành bình.
+                    </p>
+                </div>
+
+                <!-- CÂU HỎI ? BÓNG BAY -->
+                <div class="space-y-3 pt-2">
+                    <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                        <div class="flex flex-col md:flex-row items-center gap-4">
+                            <div class="flex-1">
+                                <p class="font-semibold text-blue-900">❓ Hãy so sánh các thông số trạng thái của không khí trong một quả bóng bay đã được bơm khi để trong bóng mát và khi để ngoài nắng (Hình 9.3).</p>
+                                <button onclick="toggleAnswer('ans_i_3')" class="mt-2 px-3 py-1 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                                    Xem trả lời
+                                </button>
+                            </div>
+                            <div class="border border-gray-300 rounded p-1 text-center bg-white w-48 shrink-0">
+                                <img src="h3.png" alt="Hình 9.3" class="mx-auto max-h-32 object-contain mb-1">
+                                <span class="text-xs font-semibold text-gray-600">Hình 9.3. Quả bóng để trong bóng mát (a), ngoài nắng (b)</span>
+                            </div>
+                        </div>
+                        <div id="ans_i_3" class="hidden mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-gray-800">
+                            <strong>Trả lời:</strong>
+                            <p>Khi đưa quả bóng từ trong bóng mát (a) ra ngoài nắng (b):</p>
+                            <ul class="list-disc list-inside">
+                                <li>Nhiệt độ không khí trong bóng tăng lên (\(T_b > T_a\)).</li>
+                                <li>Thể tích của không khí trong bóng tăng lên làm quả bóng căng to hơn (\(V_b > V_a\)).</li>
+                                <li>Áp suất không khí bên trong bóng cũng tăng lên (\(p_b > p_a\)).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="pt-2">Trong hầu hết các quá trình biến đổi trạng thái của một khối lượng khí xác định thì cả ba thông số trạng thái (\(p, V, T\)) đều có thể biến đổi. Tuy nhiên, để thuận lợi cho việc tìm hiểu mối quan hệ giữa các thông số trạng thái, người ta thực hiện những quá trình đơn giản trong đó chỉ có hai thông số biến đổi còn một thông số không đổi, gọi là các <strong>đẳng quá trình</strong>.</p>
+            </div>
+        </div>
+
+        <!-- SECTION II -->
+        <div class="bg-white rounded-xl shadow-md p-6 space-y-6">
+            <h2 class="text-xl md:text-2xl section-title text-gray-900 flex items-center">
+                <span class="roman-num">II</span> ĐỊNH LUẬT BOYLE
+            </h2>
+
+            <!-- 1. Quá trình đẳng nhiệt -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-bold flex items-center text-gray-800">
+                    <span class="arabic-num">1</span> Quá trình đẳng nhiệt
+                </h3>
+
+                <div class="bg-amber-50 border border-amber-300 rounded-xl p-4 text-gray-800">
+                    <p><strong>Quá trình đẳng nhiệt:</strong> Quá trình biến đổi trạng thái của một khối lượng khí xác định khi nhiệt độ giữ không đổi được gọi là quá trình đẳng nhiệt.</p>
                 </div>
             </div>
-        </section>
 
-        <!-- Trắc nghiệm -->
-        <section class="bg-white p-6 rounded-12px shadow-md">
-            <h2 class="section-header text-xl font-bold navy-text uppercase">BÀI TẬP TRẮC NGHIỆM</h2>
-            <form id="quizForm" class="space-y-6">
-                <div>
-                    <p class="font-semibold">Câu 1: Quá trình đẳng nhiệt là quá trình biến đổi trạng thái trong đó đại lượng nào không đổi?</p>
-                    <div class="ml-4 space-y-1 mt-2">
-                        <label class="block"><input type="radio" name="q1" value="a"> A. Áp suất</label>
-                        <label class="block"><input type="radio" name="q1" value="b"> B. Thể tích</label>
-                        <label class="block"><input type="radio" name="q1" value="c"> C. Nhiệt độ</label>
-                        <label class="block"><input type="radio" name="q1" value="d"> D. Khối lượng</label>
-                    </div>
-                </div>
-                <div>
-                    <p class="font-semibold">Câu 2: Hệ thức nào sau đây phù hợp với định luật Boyle?</p>
-                    <div class="ml-4 space-y-1 mt-2">
-                        <label class="block"><input type="radio" name="q2" value="a"> A. \( p/V = \text{const} \)</label>
-                        <label class="block"><input type="radio" name="q2" value="b"> B. \( p \cdot V = \text{const} \)</label>
-                        <label class="block"><input type="radio" name="q2" value="c"> C. \( V/p = \text{const} \)</label>
-                        <label class="block"><input type="radio" name="q2" value="d"> D. \( p_1V_2 = p_2V_1 \)</label>
-                    </div>
-                </div>
-                <div>
-                    <p class="font-semibold">Câu 3: Đồ thị đẳng nhiệt trong hệ tọa độ (p,V) là đường:</p>
-                    <div class="ml-4 space-y-1 mt-2">
-                        <label class="block"><input type="radio" name="q3" value="a"> A. Thẳng</label>
-                        <label class="block"><input type="radio" name="q3" value="b"> B. Tròn</label>
-                        <label class="block"><input type="radio" name="q3" value="c"> C. Hypebol</label>
-                        <label class="block"><input type="radio" name="q3" value="d"> D. Parabol</label>
-                    </div>
-                </div>
-                <div>
-                    <p class="font-semibold">Câu 4: Khi nén khí đẳng nhiệt, thể tích giảm 2 lần thì áp suất:</p>
-                    <div class="ml-4 space-y-1 mt-2">
-                        <label class="block"><input type="radio" name="q4" value="a"> A. Tăng 2 lần</label>
-                        <label class="block"><input type="radio" name="q4" value="b"> B. Giảm 2 lần</label>
-                        <label class="block"><input type="radio" name="q4" value="c"> C. Không đổi</label>
-                        <label class="block"><input type="radio" name="q4" value="d"> D. Tăng 4 lần</label>
-                    </div>
-                </div>
-                <div>
-                    <p class="font-semibold">Câu 5: Thông số trạng thái của một lượng khí gồm:</p>
-                    <div class="ml-4 space-y-1 mt-2">
-                        <label class="block"><input type="radio" name="q5" value="a"> A. m, V, T</label>
-                        <label class="block"><input type="radio" name="q5" value="b"> B. p, V, m</label>
-                        <label class="block"><input type="radio" name="q5" value="c"> C. p, V, T</label>
-                        <label class="block"><input type="radio" name="q5" value="d"> D. p, T, m</label>
-                    </div>
-                </div>
-                
-                <button type="button" onclick="checkQuiz()" class="navy-bg text-white px-8 py-3 rounded-lg font-bold hover:opacity-90 shadow-lg">NỘP BÀI</button>
-            </form>
-            <div id="quizResult" class="mt-6 font-bold text-lg hidden"></div>
-        </section>
-    </main>
+            <!-- 2. Thí nghiệm -->
+            <div class="space-y-4 pt-2">
+                <h3 class="text-lg font-bold flex items-center text-gray-800">
+                    <span class="arabic-num">2</span> Thí nghiệm
+                </h3>
 
-    <footer class="mt-12 text-center text-gray-500 text-sm pb-8">
-        &copy; 2024 Học liệu Vật Lý 12 - Kết nối tri thức
-    </footer>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                    <div class="md:col-span-2 space-y-3">
+                        <p><strong>Chuẩn bị:</strong> Bộ thí nghiệm về chất khí gồm:</p>
+                        <ul class="list-disc list-inside space-y-1 text-sm bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <li>Xi lanh trong suốt có độ chia nhỏ nhất \(0,5\text{ cm}^3\) (1).</li>
+                            <li>Pit-tông có ống nối khí trong xi lanh với áp kế (2).</li>
+                            <li>Áp kế có độ chia nhỏ nhất \(0,05 \times 10^5\text{ Pa}\) (3).</li>
+                            <li>Giá đỡ thí nghiệm (4).</li>
+                            <li>Thước đo (5).</li>
+                        </ul>
+                        <p><strong>Tiến hành:</strong> Bố trí thí nghiệm như Hình 9.4. Dịch chuyển từ từ pit-tông để làm thay đổi thể tích khí. Đọc và ghi kết quả thí nghiệm vào Bảng 9.1.</p>
+                    </div>
+                    <div class="border border-gray-300 rounded-lg p-2 text-center bg-gray-50">
+                        <img src="h4.png" alt="Hình 9.4" class="mx-auto max-h-56 object-contain mb-2 border rounded">
+                        <span class="text-sm font-semibold text-gray-600">Hình 9.4. Thí nghiệm về quá trình đẳng nhiệt</span>
+                    </div>
+                </div>
 
+                <div class="space-y-3 pt-2">
+                    <p class="font-bold text-gray-800 text-center">Bảng 9.1. Ví dụ về kết quả thí nghiệm khảo sát mối quan hệ của thể tích và áp suất trong quá trình đẳng nhiệt của một lượng khí xác định</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse border border-gray-300 text-center">
+                            <thead>
+                                <tr class="bg-gray-200">
+                                    <th class="border border-gray-300 p-2">Lần thí nghiệm</th>
+                                    <th class="border border-gray-300 p-2">\(V (\text{cm}^3)\)</th>
+                                    <th class="border border-gray-300 p-2">\(p (10^5 \text{ Pa})\)</th>
+                                    <th class="border border-gray-300 p-2 bg-yellow-100">Tích \(p \cdot V (10^5 \text{ Pa}\cdot\text{cm}^3)\)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border border-gray-300 p-2 font-bold">1</td>
+                                    <td class="border border-gray-300 p-2">3,0</td>
+                                    <td class="border border-gray-300 p-2">1,0</td>
+                                    <td class="border border-gray-300 p-2 bg-yellow-50 font-semibold text-blue-700">3,0</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold">2</td>
+                                    <td class="border border-gray-300 p-2">2,5</td>
+                                    <td class="border border-gray-300 p-2">1,2</td>
+                                    <td class="border border-gray-300 p-2 bg-yellow-50 font-semibold text-blue-700">3,0</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-gray-300 p-2 font-bold">3</td>
+                                    <td class="border border-gray-300 p-2">2,0</td>
+                                    <td class="border border-gray-300 p-2">1,5</td>
+                                    <td class="border border-gray-300 p-2 bg-yellow-50 font-semibold text-blue-700">3,0</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="border border-gray-300 p-2 font-bold">4</td>
+                                    <td class="border border-gray-300 p-2">1,5</td>
+                                    <td class="border border-gray-300 p-2">1,9</td>
+                                    <td class="border border-gray-300 p-2 bg-yellow-50 font-semibold text-blue-700">2,85 (\(\approx 3,0\))</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- CÂU HỎI ? BẢNG THÍ NGHIỆM -->
+                <div class="space-y-3 pt-2">
+                    <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                        <p class="font-semibold text-blue-900">❓ Từ kết quả thí nghiệm ở Bảng 9.1, hãy:</p>
+                        <ol class="list-decimal list-inside text-sm space-y-1 mt-1 text-gray-800">
+                            <li>Xác định giá trị của tích \(p \cdot V\) trong mỗi lần thí nghiệm.</li>
+                            <li>Vẽ đường biểu diễn sự phụ thuộc của áp suất \(p\) vào thể tích \(V\) trong hệ tọa độ \((p, V)\).</li>
+                            <li>Phát biểu mối quan hệ giữa \(p\) và \(V\) trong quá trình đẳng nhiệt.</li>
+                        </ol>
+                        <button onclick="toggleAnswer('ans_ii_exp')" class="mt-2 px-3 py-1 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                            Xem lời giải
+                        </button>
+                        <div id="ans_ii_exp" class="hidden mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-gray-800 space-y-2">
+                            <p><strong>Trả lời:</strong></p>
+                            <p>1. Tích \(p \cdot V\) ở các lần thí nghiệm xấp xỉ không đổi: \(p \cdot V \approx 3,0 \times 10^5\text{ Pa}\cdot\text{cm}^3\).</p>
+                            <p>2. Trong hệ tọa độ \((p, V)\), đồ thị có dạng một nhánh đường Hypebol cong xuống.</p>
+                            <p>3. Phát biểu: Trong quá trình đẳng nhiệt của một khối lượng khí xác định, áp suất tỉ lệ nghịch với thể tích.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Định luật Boyle -->
+            <div class="space-y-4 pt-4 border-t border-gray-200">
+                <h3 class="text-lg font-bold flex items-center text-gray-800">
+                    <span class="arabic-num">3</span> Định luật Boyle
+                </h3>
+
+                <!-- ĐỊNH LUẬT BOYLE KHUNG NỀN -->
+                <div class="bg-amber-50 border-2 border-amber-400 rounded-xl p-5 shadow-sm space-y-3 text-gray-800">
+                    <p class="font-bold text-amber-900 text-lg uppercase">📜 ĐỊNH LUẬT BOYLE:</p>
+                    <p class="text-base font-semibold">
+                        Khi nhiệt độ của một khối lượng khí xác định giữ không đổi thì áp suất gây ra bởi khí tỉ lệ nghịch với thể tích của nó:
+                    </p>
+                    <div class="bg-white border border-amber-300 rounded-lg p-3 text-center text-xl font-bold text-red-700">
+                        \( p \cdot V = \text{hằng số} \) &nbsp;&nbsp;\(\Leftrightarrow\)&nbsp;&nbsp; \( p_1 \cdot V_1 = p_2 \cdot V_2 \)
+                    </div>
+                    <p class="text-xs text-gray-600 italic">Định luật được nhà vật lí và hóa học người Ireland là Robert Boyle (1627-1691) tìm ra bằng thực nghiệm năm 1662.</p>
+                </div>
+
+                <!-- HÌNH ĐỒ THỊ 9.5 VÀ 9.6 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                    <div class="border border-gray-300 rounded-lg p-2 text-center bg-gray-50">
+                        <img src="h5.png" alt="Hình 9.5" class="mx-auto max-h-48 object-contain mb-2 border rounded">
+                        <span class="text-sm font-semibold text-gray-600">Hình 9.5. Đường đẳng nhiệt (nhánh Hypebol)</span>
+                    </div>
+                    <div class="border border-gray-300 rounded-lg p-2 text-center bg-gray-50">
+                        <img src="h6.png" alt="Hình 9.6" class="mx-auto max-h-48 object-contain mb-2 border rounded">
+                        <span class="text-sm font-semibold text-gray-600">Hình 9.6. Các đường đẳng nhiệt ở nhiệt độ khác nhau (\(T_1 < T_2\))</span>
+                    </div>
+                </div>
+
+                <p>Đồ thị biểu diễn định luật Boyle trong hệ tọa độ \((p, V)\) là một nhánh của đường hypebol (Hình 9.5). Đường đẳng nhiệt của cùng một lượng khí ứng với các nhiệt độ khác nhau thì khác nhau. Đường ở trên ứng với nhiệt độ cao hơn (\(T_2 > T_1\)) (Hình 9.6).</p>
+
+                <!-- CÂU HỎI ? SECTION III -->
+                <div class="space-y-3">
+                    <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                        <p class="font-semibold text-blue-900">❓ 1. Nếu vẽ đường biểu diễn sự phụ thuộc của \(p\) vào \(\frac{1}{V}\) thì đường biểu diễn sẽ có dạng như thế nào? Tại sao?</p>
+                        <button onclick="toggleAnswer('ans_iii_1')" class="mt-2 px-3 py-1 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                            Xem trả lời
+                        </button>
+                        <div id="ans_iii_1" class="hidden mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-gray-800">
+                            <strong>Trả lời:</strong>
+                            <p>Đường biểu diễn sự phụ thuộc của \(p\) vào \(\frac{1}{V}\) có dạng là một <strong>đường thẳng kéo dài đi qua gốc tọa độ \(O\)</strong>.</p>
+                            <p><strong>Giải thích:</strong> Vì \(p \cdot V = k \Rightarrow p = k \cdot \left(\frac{1}{V}\right)\) (với \(k\) là hằng số). Công thức này có dạng hàm số bậc nhất \(y = k \cdot x\) với \(x = \frac{1}{V}\), nên đồ thị là đường thẳng qua gốc tọa độ.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                        <p class="font-semibold text-blue-900">❓ 2. Tìm ví dụ về quá trình đẳng nhiệt trong đời sống.</p>
+                        <button onclick="toggleAnswer('ans_iii_2')" class="mt-2 px-3 py-1 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                            Xem trả lời
+                        </button>
+                        <div id="ans_iii_2" class="hidden mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-gray-800">
+                            <strong>Trả lời:</strong>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Ấn từ từ pít-tông của bống bơm xe đạp khi bít đầu ra (thao tác chậm để nhiệt độ không thay đổi).</li>
+                                <li>Bọt khí nổi từ từ từ đáy hồ lên mặt nước khi nhiệt độ nước coi như không đổi theo độ sâu.</li>
+                                <li>Dùng xilanh y tế rút hoặc đẩy không khí một cách từ từ.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BÀI TẬP VÍ DỤ SÁCH GIÁO KHOA -->
+                <div class="bg-gray-100 border border-gray-300 rounded-xl p-5 space-y-3 mt-4">
+                    <p class="font-bold text-gray-900 text-lg">📝 BÀI TẬP VÍ DỤ (SGK):</p>
+                    <p class="text-gray-800">Một lượng khí có thể tích là \(10\text{ lít}\) ở áp suất \(10^5\text{ Pa}\). Tính thể tích của lượng khí này ở áp suất \(1,25 \times 10^5\text{ Pa}\). Biết nhiệt độ của khí không đổi.</p>
+                    <div class="bg-white p-4 rounded-lg border border-gray-200 text-gray-800 space-y-2">
+                        <p class="font-bold text-blue-900">Các bước giải:</p>
+                        <p><strong>1. Xác định quá trình:</strong> Đây là bài toán về quá trình đẳng nhiệt.</p>
+                        <p><strong>2. Các trạng thái:</strong></p>
+                        <ul class="list-disc list-inside text-sm pl-2">
+                            <li>Trạng thái 1: \(p_1 = 10^5\text{ Pa}\); \(V_1 = 10\text{ L}\).</li>
+                            <li>Trạng thái 2: \(p_2 = 1,25 \times 10^5\text{ Pa}\); \(V_2 = ?\)</li>
+                        </ul>
+                        <p><strong>3. Áp dụng định luật Boyle:</strong></p>
+                        <p>\[ p_1 \cdot V_1 = p_2 \cdot V_2 \implies V_2 = \frac{p_1 \cdot V_1}{p_2} = \frac{10^5 \times 10}{1,25 \times 10^5} = 8\text{ (L)} \]</p>
+                    </div>
+                </div>
+
+                <!-- BÀI TẬP VẬN DỤNG SGK -->
+                <div class="space-y-4 pt-4">
+                    <p class="font-bold text-gray-900 text-lg">💪 BÀI TẬP VẬN DỤNG SGK:</p>
+
+                    <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg space-y-2">
+                        <p class="font-semibold text-blue-900">1. Một quả bóng chứa \(0,04\text{ m}^3\) không khí ở áp suất \(120\text{ kPa}\). Tính áp suất của không khí trong bóng khi làm giảm thể tích bóng còn \(0,025\text{ m}^3\) ở nhiệt độ không đổi.</p>
+                        <button onclick="toggleAnswer('ans_vd_1')" class="px-3 py-1 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                            Xem lời giải
+                        </button>
+                        <div id="ans_vd_1" class="hidden mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-gray-800">
+                            <p><strong>Lời giải:</strong></p>
+                            <p>Trạng thái 1: \(V_1 = 0,04\text{ m}^3\), \(p_1 = 120\text{ kPa}\).</p>
+                            <p>Trạng thái 2: \(V_2 = 0,025\text{ m}^3\), \(p_2 = ?\)</p>
+                            <p>Áp dụng định luật Boyle cho quá trình đẳng nhiệt:</p>
+                            <p>\[ p_1 \cdot V_1 = p_2 \cdot V_2 \implies p_2 = \frac{p_1 \cdot V_1}{V_2} = \frac{120 \times 0,04}{0,025} = 192\text{ (kPa)} \]</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg space-y-2">
+                        <p class="font-semibold text-blue-900">2. Một bọt khí nổi từ đáy giếng sâu \(6\text{ m}\) lên mặt nước. Khi lên tới mặt nước, thể tích của bọt khí tăng lên bao nhiêu lần? Coi áp suất khí quyển là \(p_0 = 1,013 \times 10^5\text{ Pa}\); khối lượng riêng của nước giếng là \(\rho = 1000\text{ kg/m}^3\), gia tốc trọng trường \(g = 9,8\text{ m/s}^2\) và nhiệt độ của nước giếng không thay đổi theo độ sâu.</p>
+                        <button onclick="toggleAnswer('ans_vd_2')" class="px-3 py-1 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                            Xem lời giải
+                        </button>
+                        <div id="ans_vd_2" class="hidden mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-gray-800">
+                            <p><strong>Lời giải:</strong></p>
+                            <p>Áp suất ở đáy giếng (ở độ sâu \(h = 6\text{ m}\)):</p>
+                            <p>\[ p_1 = p_0 + \rho \cdot g \cdot h = 1,013 \times 10^5 + 1000 \times 9,8 \times 6 = 101300 + 58800 = 160100\text{ (Pa)} \]</p>
+                            <p>Áp suất tại mặt nước: \(p_2 = p_0 = 101300\text{ Pa}\).</p>
+                            <p>Vì nhiệt độ không đổi, theo định luật Boyle:</p>
+                            <p>\[ p_1 \cdot V_1 = p_2 \cdot V_2 \implies \frac{V_2}{V_1} = \frac{p_1}{p_2} = \frac{160100}{101300} \approx 1,58\text{ (lần)} \]</p>
+                            <p><strong>Kết luận:</strong> Thể tích bọt khí tăng khoảng 1,58 lần khi lên tới mặt nước.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EM ĐÃ HỌC -->
+        <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-5 shadow-sm space-y-2">
+            <h3 class="text-lg font-bold text-indigo-900 uppercase">EM ĐÃ HỌC</h3>
+            <p class="font-semibold text-gray-800">■ Trạng thái và quá trình biến đổi trạng thái:</p>
+            <p class="text-center bg-white py-2 rounded border border-indigo-100 font-bold">
+                Trạng thái 1 (\(p_1, V_1, T_1\)) \(\xrightarrow{\text{Quá trình}}\) Trạng thái 2 (\(p_2, V_2, T_2\))
+            </p>
+            <p class="font-semibold text-gray-800 pt-2">■ Định luật Boyle:</p>
+            <p class="text-gray-800">Khi nhiệt độ của một khối lượng khí xác định giữ không đổi thì áp suất gây ra bởi khí tỉ lệ nghịch với thể tích của nó:</p>
+            <div class="text-center font-bold text-indigo-900 my-1">
+                \( p \cdot V = \text{hằng số} \) &nbsp;&nbsp;hay&nbsp;&nbsp; \( p_1 \cdot V_1 = p_2 \cdot V_2 \)
+            </div>
+        </div>
+
+        <!-- EM CÓ THỂ -->
+        <div class="bg-teal-50 border border-teal-200 rounded-xl p-5 shadow-sm space-y-2">
+            <h3 class="text-lg font-bold text-teal-900 uppercase">EM CÓ THỂ</h3>
+            <p class="text-gray-800">
+                Dùng định luật Boyle giải thích được các hiện tượng thực tế đơn giản có liên quan.
+            </p>
+        </div>
+
+        <!-- TRẮC NGHIỆM GAMESHOW "AI LÀ TRIỆU PHÚ" -->
+        <div class="bg-slate-900 text-white rounded-xl shadow-xl p-6 space-y-6">
+            <div class="text-center space-y-2">
+                <span class="bg-yellow-500 text-black px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest">GAMESHOW</span>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-yellow-400">AI LÀ TRIỆU PHÚ VẬT LÝ</h2>
+                <p class="text-gray-300 text-sm">Chinh phục 10 câu hỏi củng cố về Định luật Boyle & Đẳng nhiệt!</p>
+            </div>
+
+            <!-- Khung câu hỏi gameshow -->
+            <div id="quiz-container" class="space-y-6">
+                <!-- Câu 1 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 1: Quá trình đẳng nhiệt là quá trình biến đổi trạng thái trong đó:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(1, 'A')" id="q1-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Áp suất không đổi</button>
+                        <button onclick="selectOption(1, 'B')" id="q1-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. Thể tích không đổi</button>
+                        <button onclick="selectOption(1, 'C')" id="q1-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Nhiệt độ giữ không đổi</button>
+                        <button onclick="selectOption(1, 'D')" id="q1-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Cả áp suất và thể tích không đổi</button>
+                    </div>
+                </div>
+
+                <!-- Câu 2 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 2: Hệ thức nào sau đây thể hiện đúng định luật Boyle?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(2, 'A')" id="q2-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. p/V = hằng số</button>
+                        <button onclick="selectOption(2, 'B')" id="q2-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. p · V = hằng số</button>
+                        <button onclick="selectOption(2, 'C')" id="q2-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. V/p = hằng số</button>
+                        <button onclick="selectOption(2, 'D')" id="q2-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. p1 · p2 = V1 · V2</button>
+                    </div>
+                </div>
+
+                <!-- Câu 3 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 3: Đồ thị biểu diễn đường đẳng nhiệt trong hệ tọa độ (p, V) có dạng là:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(3, 'A')" id="q3-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Đường thẳng đi qua gốc tọa độ</button>
+                        <button onclick="selectOption(3, 'B')" id="q3-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Nhánh đường Hypebol</button>
+                        <button onclick="selectOption(3, 'C')" id="q3-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Đường tròn</button>
+                        <button onclick="selectOption(3, 'D')" id="q3-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Đường Parabol</button>
+                    </div>
+                </div>
+
+                <!-- Câu 4 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 4: Ba thông số trạng thái của một lượng khí bao gồm:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(4, 'A')" id="q4-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Khối lượng, Thể tích, Áp suất</button>
+                        <button onclick="selectOption(4, 'B')" id="q4-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. Áp suất, Thể tích, Nhiệt độ</button>
+                        <button onclick="selectOption(4, 'C')" id="q4-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Mật độ, Khối lượng, Áp suất</button>
+                        <button onclick="selectOption(4, 'D')" id="q4-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Khối lượng riêng, Áp suất, Nhiệt độ</button>
+                    </div>
+                </div>
+
+                <!-- Câu 5 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 5: Khi nén đẳng nhiệt một khối lượng khí xác định làm thể tích giảm 2 lần thì áp suất của khí sẽ:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(5, 'A')" id="q5-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Giảm 2 lần</button>
+                        <button onclick="selectOption(5, 'B')" id="q5-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. Tăng 2 lần</button>
+                        <button onclick="selectOption(5, 'C')" id="q5-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Tăng 4 lần</button>
+                        <button onclick="selectOption(5, 'D')" id="q5-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Không đổi</button>
+                    </div>
+                </div>
+
+                <!-- Câu 6 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 6: Đồ thị biểu diễn sự phụ thuộc của p vào 1/V trong quá trình đẳng nhiệt có dạng là:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(6, 'A')" id="q6-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Đường thẳng có đường kéo dài đi qua gốc tọa độ</button>
+                        <button onclick="selectOption(6, 'B')" id="q6-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. Nhánh Hypebol</button>
+                        <button onclick="selectOption(6, 'C')" id="q6-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Đường song song với trục tung</button>
+                        <button onclick="selectOption(6, 'D')" id="q6-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Đường song song với trục hoành</button>
+                    </div>
+                </div>
+
+                <!-- Câu 7 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 7: Đối với cùng một khối lượng khí xác định, đường đẳng nhiệt nằm phía trên trong hệ (p, V) ứng với nhiệt độ:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(7, 'A')" id="q7-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Thấp hơn</button>
+                        <button onclick="selectOption(7, 'B')" id="q7-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. Cao hơn</button>
+                        <button onclick="selectOption(7, 'C')" id="q7-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Bằng 0 K</button>
+                        <button onclick="selectOption(7, 'D')" id="q7-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Không so sánh được</button>
+                    </div>
+                </div>
+
+                <!-- Câu 8 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 8: Một lượng khí ở thể tích 4 L, áp suất 1 atm. Nếu nén đẳng nhiệt thể tích giảm còn 2 L thì áp suất mới là:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(8, 'A')" id="q8-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. 0,5 atm</button>
+                        <button onclick="selectOption(8, 'B')" id="q8-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. 2 atm</button>
+                        <button onclick="selectOption(8, 'C')" id="q8-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. 4 atm</button>
+                        <button onclick="selectOption(8, 'D')" id="q8-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. 1 atm</button>
+                    </div>
+                </div>
+
+                <!-- Câu 9 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 9: Trong thí nghiệm khảo sát định luật Boyle, điều kiện để giữ cho nhiệt độ của khí không đổi là:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(9, 'A')" id="q9-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Dịch chuyển pit-tông thật nhanh</button>
+                        <button onclick="selectOption(9, 'B')" id="q9-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. Dịch chuyển pit-tông từ từ và dừng lại chờ cân bằng nhiệt trước khi đọc kết quả</button>
+                        <button onclick="selectOption(9, 'C')" id="q9-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Đốt nóng xilanh bằng ngọn lửa</button>
+                        <button onclick="selectOption(9, 'D')" id="q9-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Ngâm xilanh vào nước đá liên tục</button>
+                    </div>
+                </div>
+
+                <!-- Câu 10 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 10: Đơn vị nào sau đây KHÔNG PHẢI là đơn vị của áp suất?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(10, 'A')" id="q10-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Pascal (Pa)</button>
+                        <button onclick="selectOption(10, 'B')" id="q10-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. Atmosphere (atm)</button>
+                        <button onclick="selectOption(10, 'C')" id="q10-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Newton trên mét vuông (N/m²)</button>
+                        <button onclick="selectOption(10, 'D')" id="q10-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Joule (J)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nút nộp bài -->
+            <div class="text-center pt-4">
+                <button onclick="checkQuiz()" class="px-8 py-3 bg-chudao text-black font-extrabold text-lg rounded-full shadow-lg hover:bg-green-400 transform hover:scale-105 transition">
+                    NỘP BÀI TRẮC NGHIỆM
+                </button>
+            </div>
+
+            <!-- Kết quả Gameshow -->
+            <div id="quiz-result" class="hidden mt-6 p-4 rounded-xl text-center font-bold text-lg"></div>
+            <div id="quiz-explanation" class="hidden space-y-3 mt-4 text-sm text-gray-200 bg-slate-800 p-4 rounded-lg"></div>
+        </div>
+
+        <!-- TỰ LUẬN TÍNH TOÁN -->
+        <div class="bg-white rounded-xl shadow-md p-6 space-y-6">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-900 border-b-2 border-gray-800 pb-2">
+                🧮 BÀI TẬP TỰ LUẬN TÍNH TOÁN CỦNG CỐ
+            </h2>
+
+            <!-- Bài 1 -->
+            <div class="border border-gray-300 rounded-lg p-4 space-y-2 bg-gray-50">
+                <p class="font-bold text-gray-800">Bài 1:</p>
+                <p>Một lượng khí lý tưởng ở áp suất \(1,5 \times 10^5\text{ Pa}\) chiếm thể tích \(12\text{ lít}\). Dùng xilanh nén lượng khí này ở nhiệt độ không đổi cho đến khi áp suất đạt \(4,5 \times 10^5\text{ Pa}\). Tính thể tích lúc sau của lượng khí.</p>
+                <button onclick="toggleAnswer('essay_1')" class="px-4 py-1.5 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                    Xem lời giải chi tiết
+                </button>
+                <div id="essay_1" class="hidden mt-3 p-3 bg-green-50 border border-green-300 rounded-lg text-gray-800">
+                    <p><strong>Lời giải:</strong></p>
+                    <p>Trạng thái 1: \(p_1 = 1,5 \times 10^5\text{ Pa}\), \(V_1 = 12\text{ L}\).</p>
+                    <p>Trạng thái 2: \(p_2 = 4,5 \times 10^5\text{ Pa}\), \(V_2 = ?\)</p>
+                    <p>Do quá trình là đẳng nhiệt, áp dụng định luật Boyle:</p>
+                    <p>\[ p_1 \cdot V_1 = p_2 \cdot V_2 \implies V_2 = \frac{p_1 \cdot V_1}{p_2} = \frac{1,5 \times 10^5 \times 12}{4,5 \times 10^5} = 4\text{ (lít)} \]</p>
+                    <p><strong>Đáp số:</strong> \(4\text{ lít}\).</p>
+                </div>
+            </div>
+
+            <!-- Bài 2 -->
+            <div class="border border-gray-300 rounded-lg p-4 space-y-2 bg-gray-50">
+                <p class="font-bold text-gray-800">Bài 2:</p>
+                <p>Một xilanh chứa \(150\text{ cm}^3\) không khí ở áp suất \(10^5\text{ Pa}\). Nén pit-tông làm cho thể tích khí giảm bớt \(50\text{ cm}^3\) ở nhiệt độ không đổi. Tính áp suất của khối khí sau khi nén.</p>
+                <button onclick="toggleAnswer('essay_2')" class="px-4 py-1.5 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                    Xem lời giải chi tiết
+                </button>
+                <div id="essay_2" class="hidden mt-3 p-3 bg-green-50 border border-green-300 rounded-lg text-gray-800">
+                    <p><strong>Lời giải:</strong></p>
+                    <p>Trạng thái 1: \(V_1 = 150\text{ cm}^3\), \(p_1 = 10^5\text{ Pa}\).</p>
+                    <p>Trạng thái 2: Do giảm bớt \(50\text{ cm}^3\) nên thể tích còn lại là:</p>
+                    <p>\[ V_2 = V_1 - \Delta V = 150 - 50 = 100\text{ (cm}^3\text{)} \]</p>
+                    <p>Áp dụng định luật Boyle:</p>
+                    <p>\[ p_1 \cdot V_1 = p_2 \cdot V_2 \implies p_2 = \frac{p_1 \cdot V_1}{V_2} = \frac{10^5 \times 150}{100} = 1,5 \times 10^5\text{ (Pa)} \]</p>
+                    <p><strong>Đáp số:</strong> \(1,5 \times 10^5\text{ Pa}\).</p>
+                </div>
+            </div>
+
+            <!-- Bài 3 -->
+            <div class="border border-gray-300 rounded-lg p-4 space-y-2 bg-gray-50">
+                <p class="font-bold text-gray-800">Bài 3:</p>
+                <p>Mỗi lần bơm, bóng nhận được \(100\text{ cm}^3\) không khí ở áp suất khí quyển \(1\text{ atm}\). Người ta dùng bơm này để bơm một quả bóng có thể tích không đổi là \(2\text{ lít}\). Ban đầu bóng không chứa không khí. Tính áp suất bên trong bóng sau 50 lần bơm, coi nhiệt độ không đổi trong suốt quá trình bơm.</p>
+                <button onclick="toggleAnswer('essay_3')" class="px-4 py-1.5 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                    Xem lời giải chi tiết
+                </button>
+                <div id="essay_3" class="hidden mt-3 p-3 bg-green-50 border border-green-300 rounded-lg text-gray-800">
+                    <p><strong>Lời giải:</strong></p>
+                    <p>Đổi đơn vị: \(2\text{ lít} = 2000\text{ cm}^3\).</p>
+                    <p>Sau 50 lần bơm, tổng thể tích không khí ở áp suất khí quyển \(p_1 = 1\text{ atm}\) đã đưa vào bóng là:</p>
+                    <p>\[ V_1 = 50 \times 100\text{ cm}^3 = 5000\text{ cm}^3 \]</p>
+                    <p>Toàn bộ lượng khí này khi nén vào trong bóng sẽ chiếm thể tích \(V_2 = 2000\text{ cm}^3\).</p>
+                    <p>Coi nhiệt độ không đổi, áp dụng định luật Boyle:</p>
+                    <p>\[ p_1 \cdot V_1 = p_2 \cdot V_2 \implies p_2 = \frac{p_1 \cdot V_1}{V_2} = \frac{1 \times 5000}{2000} = 2,5\text{ (atm)} \]</p>
+                    <p><strong>Đáp số:</strong> \(2,5\text{ atm}\).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="text-center py-6 text-gray-600 text-sm font-semibold border-t border-gray-300">
+            Chương trình GDPT 2018 - Bộ sách thống nhất
+        </footer>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
     <script>
+        // Hàm ẩn/hiện lời giải
         function toggleAnswer(id) {
             const el = document.getElementById(id);
-            if (el.style.display === "block") {
-                el.style.display = "none";
-            } else {
-                el.style.display = "block";
+            if (el) {
+                if (el.classList.contains('hidden')) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            }
+        }
+
+        // Dữ liệu đáp án trắc nghiệm Gameshow
+        const userAnswers = {};
+        const correctAnswers = {
+            1: 'C',
+            2: 'B',
+            3: 'B',
+            4: 'B',
+            5: 'B',
+            6: 'A',
+            7: 'B',
+            8: 'B',
+            9: 'B',
+            10: 'D'
+        };
+
+        const explanations = {
+            1: "Câu 1: Quá trình đẳng nhiệt là quá trình biến đổi trạng thái khi nhiệt độ được giữ không đổi.",
+            2: "Câu 2: Định luật Boyle có dạng p · V = hằng số hay p1 · V1 = p2 · V2.",
+            3: "Câu 3: Đồ thị đường đẳng nhiệt trong hệ (p, V) có dạng là một nhánh đường Hypebol.",
+            4: "Câu 4: Ba thông số trạng thái chính của một lượng khí là Áp suất (p), Thể tích (V) và Nhiệt độ tuyệt đối (T).",
+            5: "Câu 5: Trong quá trình đẳng nhiệt, áp suất tỉ lệ nghịch với thể tích. V giảm 2 lần thì p tăng 2 lần.",
+            6: "Câu 6: Do p = k · (1/V) nên đồ thị p theo 1/V có dạng đường thẳng kéo dài qua gốc tọa độ O.",
+            7: "Câu 7: Trên đồ thị (p, V), đường đẳng nhiệt ở phía trên ứng với nhiệt độ cao hơn (T2 > T1).",
+            8: "Câu 8: Áp dụng p1 · V1 = p2 · V2 => 1 · 4 = p2 · 2 => p2 = 2 atm.",
+            9: "Câu 9: Dịch chuyển pit-tông từ từ giúp nhiệt độ khí kịp cân bằng với môi trường xung quanh.",
+            10: "Câu 10: Joule (J) là đơn vị của công và năng lượng, không phải đơn vị của áp suất."
+        };
+
+        function selectOption(qNum, option) {
+            userAnswers[qNum] = option;
+            const options = ['A', 'B', 'C', 'D'];
+            options.forEach(opt => {
+                const btn = document.getElementById(`q${qNum}-${opt}`);
+                if (btn) {
+                    btn.classList.remove('selected');
+                }
+            });
+            const selectedBtn = document.getElementById(`q${qNum}-${option}`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('selected');
             }
         }
 
         function checkQuiz() {
-            const answers = { q1: 'c', q2: 'b', q3: 'c', q4: 'a', q5: 'c' };
-            const form = document.getElementById('quizForm');
             let score = 0;
-            let total = 5;
+            let total = 10;
+            let explanationText = "<h4 class='font-bold text-yellow-400 mb-2'>HƯỚNG DẪN GIẢI CHI TIẾT CÁC CÂU:</h4>";
 
             for (let i = 1; i <= total; i++) {
-                const selected = form.querySelector(`input[name="q${i}"]:checked`);
-                if (selected && selected.value === answers[`q${i}`]) {
+                if (userAnswers[i] === correctAnswers[i]) {
                     score++;
                 }
+                explanationText += `<p>${explanations[i]} - <span class="text-green-400 font-bold">Đáp án đúng: ${correctAnswers[i]}</span></p>`;
             }
 
-            const resultDiv = document.getElementById('quizResult');
-            resultDiv.classList.remove('hidden');
-            
+            const resultDiv = document.getElementById('quiz-result');
+            const expDiv = document.getElementById('quiz-explanation');
+
+            resultDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+
             if (score === total) {
-                resultDiv.style.color = "#059669"; // Green
-                resultDiv.innerHTML = `Chúc mừng! Bạn đúng tuyệt đối: ${score}/${total} điểm.`;
+                resultDiv.classList.add('bg-green-100', 'text-green-800');
+                resultDiv.innerHTML = `🎉 XUẤT SẮC! BẠN ĐÃ TRỞ THÀNH TRIỆU PHÚ KNOWLEDGE CỦA BÀI HỌC! ĐIỂM SỐ: ${score}/${total}`;
             } else {
-                resultDiv.style.color = "#dc2626"; // Red
-                resultDiv.innerHTML = `Kết quả của bạn: ${score}/${total} điểm. Hãy kiểm tra lại kiến thức nhé!`;
+                resultDiv.classList.add('bg-red-100', 'text-red-800');
+                resultDiv.innerHTML = `BẠN ĐẠT CẤP ĐỘ: ${score}/${total} CÂU ĐÚNG. Hãy xem lại giải chi tiết bên dưới để hoàn thiện nhé!`;
             }
-            
-            resultDiv.scrollIntoView({ behavior: 'smooth' });
+
+            expDiv.innerHTML = explanationText;
+            expDiv.classList.remove('hidden');
         }
     </script>
 </body>
