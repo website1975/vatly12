@@ -4,370 +4,629 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bài 8: Mô hình động học phân tử chất khí</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mau1: '#1a202c',
+                        mau2: '#1a202c',
+                        chudao: '#33FF33',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- MathJax Library with Chemistry Support -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                packages: {'[+]': ['mhchem']}
+            },
+            loader: {load: ['[tex]/mhchem']}
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
     <style>
         body {
             background-color: #f4f7f9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #2d3748;
         }
-        .header-primary { background-color: #000080; }
-        .rounded-12 { border-radius: 12px; }
-
-        .header-navy {
-            background-color: #000080;
-        }
-        .rounded-12px {
-            border-radius: 12px;
-        }
-        .section-header {
-            color: #000080;
-            border-bottom: 4px solid #000080;
-            display: inline-block;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
+        .roman-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.2rem;
+            height: 2.2rem;
+            border: 2px solid #1a202c;
+            border-radius: 4px;
             font-weight: bold;
+            margin-right: 0.5rem;
+            background-color: #f7fafc;
         }
-        .question-box {
-            background-color: #edf2f7;
-            border-left: 4px solid #000080;
-        }
-        .answer-box {
-            background-color: #f0fff4;
-            display: none;
-        }
-        .btn-navy {
-            background-color: #000080;
+        .arabic-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background-color: #1a202c;
             color: white;
-            transition: all 0.3s;
+            font-weight: bold;
+            margin-right: 0.5rem;
         }
-        .btn-navy:hover {
-            background-color: #000066;
-            transform: translateY(-1px);
+        .section-title {
+            border-bottom: 3px solid #1a202c;
+            padding-bottom: 0.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
         }
-        table, th, td {
-            border: 1px solid #cbd5e0;
+        .mil-option-btn:hover {
+            background-color: #feebc8;
         }
-        th {
-            background-color: #e2e8f0;
+        .mil-option-btn.selected {
+            background-color: #fbd38d;
+            border-color: #dd6b20;
         }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <header class="max-w-5xl mx-auto mb-8 shadow-lg overflow-hidden rounded-12">
-        <div class="header-primary text-white py-3 px-6 text-center text-sm font-semibold tracking-widest uppercase">
-            Chương 2: Khí Lí Tưởng
+    <div class="max-w-5xl mx-auto space-y-6">
+
+        <!-- HEADER -->
+        <div class="rounded-xl overflow-hidden shadow-md border border-gray-300">
+            <div class="bg-mau1 text-white text-center py-3 text-lg font-bold uppercase tracking-wide">
+                CHƯƠNG II - KHÍ LÍ TƯỞNG
+            </div>
+            <div class="border-t border-gray-400"></div>
+            <div class="bg-mau2 text-white text-center py-4 text-2xl md:text-3xl font-extrabold uppercase tracking-wider">
+                BÀI 8: MÔ HÌNH ĐỘNG HỌC PHÂN TỬ CHẤT KHÍ
+            </div>
         </div>
-        <div class="header-primary text-white py-6 px-6 text-center border-t border-gray-700">
-            <h1 class="text-3xl font-bold">Bài 8: MÔ HÌNH ĐỘNG HỌC PHÂN TỬ CHẤT KHÍ</h1>
-        </div>
-	</header>
-    <main class="max-w-5xl mx-auto space-y-8">
-        
-        <!-- Intro Box -->
-        <section class="bg-white p-6 rounded-12px shadow-md border border-gray-200">
-            <p class="italic text-gray-700">
+
+        <!-- INTRO BOX -->
+        <div class="bg-white border border-black rounded-xl p-5 shadow-sm">
+            <p class="italic text-gray-800 leading-relaxed">
                 Khi học môn Khoa học tự nhiên ở lớp 6, các em đã biết một số tính chất đặc biệt của chất ở thể khí so với chất ở thể lỏng và thể rắn. Tại sao chất ở thể khí lại có một số tính chất vật lí khác chính chất đó ở các thể khác?
             </p>
-        </section>
+        </div>
 
-        <!-- I. Chuyển động và tương tác -->
-        <section class="bg-white p-6 rounded-12px shadow-md">
-            <h2 class="section-header text-xl">I. CHUYỂN ĐỘNG VÀ TƯƠNG TÁC CỦA CÁC PHÂN TỬ KHÍ</h2>
-            
-            <div class="mb-6">
-                <h3 class="font-bold text-lg mb-4">1. Chuyển động Brown trong chất khí</h3>
-                <p class="mb-4">Chuyển động Brown không chỉ xảy ra trong chất lỏng mà xảy ra cả trong chất khí. Dưới đây là sơ đồ thí nghiệm quan sát chuyển động của các hạt khói trong không khí.</p>
-                
-                <!-- Hình ảnh thí nghiệm -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div class="border-2 border-dashed border-gray-300 p-4 flex flex-col items-center justify-center bg-gray-50 rounded-lg">
-                        <div class="w-full h-40 bg-blue-100 flex items-center justify-center rounded mb-2">
-                            <img src="h2.png" class="max-h-full max-w-full object-contain">
-                        </div>
-                        <p class="text-sm italic text-center text-gray-600 font-semibold">Hình 8.1. Sơ đồ thí nghiệm quan sát chuyển động Brown</p>
-                    </div>
-                    <div class="border-2 border-dashed border-gray-300 p-4 flex flex-col items-center justify-center bg-gray-50 rounded-lg">
-                        <div class="w-full h-40 bg-blue-100 flex items-center justify-center rounded mb-2 overflow-hidden">
-                            <img src="h1.png" class="max-h-full max-w-full object-contain">
-                        </div>
-                        <p class="text-sm italic text-center text-gray-600 font-semibold">Hình 8.2. Quỹ đạo chuyển động của hạt khói</p>
-                    </div>
-                </div>
+        <!-- SECTION I -->
+        <div class="bg-white rounded-xl shadow-md p-6 space-y-6">
+            <h2 class="text-xl md:text-2xl section-title text-gray-900 flex items-center">
+                <span class="roman-num">I</span> CHUYỂN ĐỘNG VÀ TƯƠNG TÁC CỦA CÁC PHÂN TỬ KHÍ
+            </h2>
 
-                <!-- Thảo luận 1 -->
-                <div class="space-y-4">
-                    <div class="question-box p-4 rounded">
-                        <p class="font-semibold">Câu hỏi 1: Dựa vào Hình 8.1, hãy mô tả thí nghiệm dùng để quan sát chuyển động Brown trong không khí.</p>
-                        <button onclick="toggleAnswer('ans1')" class="mt-2 text-sm text-blue-800 underline font-medium">Xem phương án trả lời</button>
-                        <div id="ans1" class="answer-box p-3 mt-2 rounded border border-green-200 text-gray-800">
-                            Thí nghiệm sử dụng một ống thủy tinh chứa đầy khói, đậy nắp kính. Chiếu ánh sáng vào ống khói và quan sát qua kính hiển vi. Dưới kính hiển vi, ta thấy các hạt khói nhỏ li ti hiện ra như những điểm sáng chuyển động hỗn độn.
-                        </div>
-                    </div>
+            <!-- 1. Chuyển động Brown -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-bold flex items-center text-gray-800">
+                    <span class="arabic-num">1</span> Chuyển động Brown trong chất khí
+                </h3>
 
-                    <div class="question-box p-4 rounded">
-                        <p class="font-semibold">Câu hỏi 2: Hãy dựa vào quỹ đạo chuyển động của hạt khói (Hình 8.2) để chứng tỏ rằng các phân tử không khí chuyển động hỗn loạn, không ngừng.</p>
-                        <button onclick="toggleAnswer('ans2')" class="mt-2 text-sm text-blue-800 underline font-medium">Xem phương án trả lời</button>
-                        <div id="ans2" class="answer-box p-3 mt-2 rounded border border-green-200 text-gray-800">
-                            Hạt khói có quỹ đạo là những đường gấp khúc ziczac bất kỳ. Điều này chứng tỏ nó bị các phân tử không khí (vốn quá nhỏ để nhìn thấy) va chạm vào từ mọi phía một cách không cân bằng. Sự va chạm hỗn loạn này đẩy hạt khói đi theo các hướng ngẫu nhiên, chứng tỏ các phân tử khí chuyển động hỗn loạn, không ngừng.
-                        </div>
-                    </div>
+                <p>Chuyển động Brown không chỉ xảy ra trong chất lỏng mà xảy ra cả trong chất khí. Hình 8.1 vẽ sơ đồ thí nghiệm dùng để quan sát chuyển động Brown trong chất khí.</p>
 
-                    <div class="question-box p-4 rounded">
-                        <p class="font-semibold">Câu hỏi 3: Khi quan sát tia nắng mặt trời qua cửa sổ, ta thấy các hạt bụi chuyển động. Chuyển động này có phải là chuyển động Brown không? Tại sao?</p>
-                        <button onclick="toggleAnswer('ans3')" class="mt-2 text-sm text-blue-800 underline font-medium">Xem phương án trả lời</button>
-                        <div id="ans3" class="answer-box p-3 mt-2 rounded border border-green-200 text-gray-800">
-                            Không hẳn. Các hạt bụi nhìn thấy được bằng mắt thường thường có kích thước khá lớn, chuyển động của chúng chủ yếu do các dòng đối lưu của không khí thổi đi. Chuyển động Brown chỉ quan sát được rõ rệt với các hạt có kích thước cực nhỏ (như hạt khói) dưới kính hiển vi.
-                        </div>
+                <!-- KHUNG HÌNH MINH HỌA -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
+                    <div class="border border-gray-300 rounded-lg p-2 text-center bg-gray-50">
+                        <img src="h1.png" alt="Hình 8.1" class="mx-auto max-h-48 object-contain mb-2 border rounded">
+                        <span class="text-sm font-semibold text-gray-600">Hình 8.1. Sơ đồ thí nghiệm quan sát chuyển động Brown trong không khí</span>
+                    </div>
+                    <div class="border border-gray-300 rounded-lg p-2 text-center bg-gray-50">
+                        <img src="h2.png" alt="Hình 8.2" class="mx-auto max-h-48 object-contain mb-2 border rounded">
+                        <span class="text-sm font-semibold text-gray-600">Hình 8.2. Quỹ đạo chuyển động của hạt khói trong không khí</span>
+                    </div>
+                    <div class="border border-gray-300 rounded-lg p-2 text-center bg-gray-50">
+                        <img src="h3.png" alt="Hình 8.3" class="mx-auto max-h-48 object-contain mb-2 border rounded">
+                        <span class="text-sm font-semibold text-gray-600">Hình 8.3. Chuyển động và va chạm của các phân tử khí</span>
                     </div>
                 </div>
 
-                <div class="mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-400">
-                    <h4 class="font-bold mb-2">Kết luận từ thí nghiệm:</h4>
-                    <ul class="list-disc ml-5 space-y-2">
-                        <li>Chất khí được cấu tạo từ các phân tử chuyển động hỗn loạn, không ngừng.</li>
-                        <li>Nhiệt độ của khí càng cao thì tốc độ chuyển động hỗn loạn của các phân tử khí càng lớn.</li>
-                        <li>Các phân tử không ngừng va chạm với nhau và với thành bình làm tốc độ của chúng thay đổi liên tục.</li>
+                <!-- CÂU HỎI ? -->
+                <div class="space-y-3">
+                    <!-- Câu 1 -->
+                    <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                        <p class="font-semibold text-blue-900">❓ 1. Dựa vào Hình 8.1, hãy mô tả thí nghiệm dùng để quan sát chuyển động Brown trong không khí.</p>
+                        <button onclick="toggleAnswer('ans_i_1')" class="mt-2 px-3 py-1 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                            Xem trả lời
+                        </button>
+                        <div id="ans_i_1" class="hidden mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-gray-800">
+                            <strong>Trả lời:</strong> Thí nghiệm gồm một ống thủy tinh đựng khói, được đậy nắp thủy tinh. Chiếu ánh sáng vào ống khói từ một bên và dùng ống kính của kính hiển vi quan sát từ trên xuống để theo dõi chuyển động của các hạt khói trong không khí.
+                        </div>
+                    </div>
+
+                    <!-- Câu 2 -->
+                    <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                        <p class="font-semibold text-blue-900">❓ 2. Hãy dựa vào quỹ đạo chuyển động của hạt khói trong không khí (Hình 8.2) để chứng tỏ rằng các phân tử không khí chuyển động hỗn loạn, không ngừng.</p>
+                        <button onclick="toggleAnswer('ans_i_2')" class="mt-2 px-3 py-1 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                            Xem trả lời
+                        </button>
+                        <div id="ans_i_2" class="hidden mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-gray-800">
+                            <strong>Trả lời:</strong> Quỹ đạo chuyển động của hạt khói là những đường gấp khúc gấp ngoặc ngẫu nhiên, không theo quy luật cố định. Điều này chứng tỏ các hạt khói liên tục bị các phân tử không khí va chạm từ nhiều phía khác nhau. Do các va chạm này ngẫu nhiên và không ngừng nên các phân tử không khí chuyển động hỗn loạn, không ngừng.
+                        </div>
+                    </div>
+
+                    <!-- Câu 3 -->
+                    <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                        <p class="font-semibold text-blue-900">❓ 3. Khi quan sát tia nắng mặt trời chiếu qua cửa sổ vào trong phòng, ta có thể thấy các hạt bụi trong ánh nắng chuyển động không ngừng. Chuyển động này có phải là chuyển động Brown không? Tại sao?</p>
+                        <button onclick="toggleAnswer('ans_i_3')" class="mt-2 px-3 py-1 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                            Xem trả lời
+                        </button>
+                        <div id="ans_i_3" class="hidden mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-gray-800">
+                            <strong>Trả lời:</strong>
+                            <p>Không hoàn toàn hoàn toàn là chuyển động Brown thuần túy đối với các hạt bụi kích thước lớn (chúng chịu ảnh hưởng của các dòng đối lưu không khí và trọng lực).</p>
+                            <p>Đối với các hạt bụi cực kỳ nhỏ (kích thước micromet), chuyển động quan sát được chính là chuyển động Brown do va chạm với các phân tử không khí.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="mt-2">Thí nghiệm mô tả ở Hình 8.1 còn cho thấy, khi tăng nhiệt độ của không khí trong ống thủy tinh chứa khói thì các hạt khói chuyển động nhanh hơn.</p>
+
+                <!-- KHUNG NỘI DUNG TÓM TẮT ĐỊNH NGHĨA / TÍNH CHẤT -->
+                <div class="bg-amber-50 border border-amber-300 rounded-xl p-4 shadow-sm space-y-2 text-gray-800">
+                    <p class="font-bold text-amber-900 text-lg">📌 KẾT LUẬN QUAN TRỌNG:</p>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li><strong>Chất khí được cấu tạo từ các phân tử chuyển động hỗn loạn, không ngừng.</strong></li>
+                        <li><strong>Nhiệt độ của khí càng cao thì tốc độ chuyển động hỗn loạn của các phân tử khí càng lớn.</strong></li>
                     </ul>
                 </div>
 
-                <div class="mt-4 p-4 bg-blue-50 rounded">
-                    <h4 class="font-bold">Giải thích khái niệm tốc độ trung bình:</h4>
-                    <p>Vì các phân tử có tốc độ khác nhau và thay đổi liên tục do va chạm, ta sử dụng tốc độ trung bình \(\overline{v}\) để mô tả trạng thái của khối khí:</p>
-                    <p class="text-center font-bold my-2">\[ \overline{v} = \frac{v_1 + v_2 + ... + v_n}{n} \]</p>
-                    <p class="text-sm italic">Ví dụ: Ở điều kiện tiêu chuẩn, phân tử oxygen có tốc độ trung bình khoảng \(400 \, m/s\).</p>
+                <p>Trong khi chuyển động hỗn loạn, các phân tử khí không ngừng va chạm với nhau và với thành bình (Hình 8.3) nên tốc độ chuyển động của chúng không ngừng thay đổi. Do đó, tốc độ phân tử mà ta nói tới ở trên là tốc độ trung bình của các phân tử. Trong một khối khí có thể có các phân tử chuyển động nhanh hơn, bằng hoặc nhỏ hơn tốc độ trung bình. Người ta nói tốc độ chuyển động của phân tử có tính thống kê và chỉ có ý nghĩa khi có rất nhiều phân tử. Tốc độ này có độ lớn:</p>
+
+                <div class="bg-gray-100 border border-gray-300 rounded-lg p-3 text-center my-3">
+                    \( \overline{v} = \frac{v_1 + v_2 + ... + v_n}{n} \)
                 </div>
+
+                <p class="italic text-gray-600">Ở điều kiện chuẩn (\(T = 273\text{ K } (0^\circ\text{C})\) và \(p = 1\text{ atm } (10^5\text{ Pa})\)), các phân tử khí oxygen chuyển động với tốc độ trung bình vào khoảng \(400\text{ m/s}\).</p>
             </div>
 
-            <!-- 2. Tương tác -->
-            <div class="mt-10">
-                <h3 class="font-bold text-lg mb-4">2. Tương tác giữa các phân tử khí</h3>
-                <p class="mb-4">Giữa các phân tử khí cũng có lực đẩy và lực hút (gọi chung là lực liên kết). Tuy nhiên, khoảng cách giữa các phân tử khí rất lớn so với kích thước của chúng, nên lực liên kết này <strong>rất yếu</strong> so với ở thể lỏng và rắn.</p>
-                
-                <div class="space-y-4">
-                    <div class="question-box p-4 rounded">
-                        <p class="font-semibold">Câu 1: Nêu các hiện tượng thực tế chứng tỏ lực liên kết phân tử khí rất yếu.</p>
-                        <button onclick="toggleAnswer('ans4')" class="mt-2 text-sm text-blue-800 underline font-medium">Xem trả lời</button>
-                        <div id="ans4" class="answer-box p-3 mt-2 rounded border border-green-200 text-gray-800">
-                            Các hiện tượng: Chất khí luôn tự động lan tỏa chiếm đầy toàn bộ thể tích bình chứa; ta có thể dễ dàng đi xuyên qua không khí; chất khí cực kỳ dễ nén so với chất lỏng và rắn.
+            <!-- 2. Tương tác giữa các phân tử khí -->
+            <div class="space-y-4 pt-4 border-t border-gray-200">
+                <h3 class="text-lg font-bold flex items-center text-gray-800">
+                    <span class="arabic-num">2</span> Tương tác giữa các phân tử khí
+                </h3>
+
+                <div class="bg-amber-50 border border-amber-300 rounded-xl p-4 text-gray-800">
+                    <p>Giữa các phân tử khí cũng có lực đẩy và lực hút, gọi chung là <strong>lực liên kết</strong>. Khoảng cách giữa các phân tử ở thể khí rất lớn so với ở thể lỏng và thể rắn nên <strong>lực liên kết giữa các phân tử ở thể khí rất yếu</strong> so với ở thể lỏng và thể rắn.</p>
+                </div>
+
+                <!-- CÂU HỎI ? -->
+                <div class="space-y-3">
+                    <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                        <p class="font-semibold text-blue-900">❓ 1. Hãy nêu các hiện tượng thực tế chứng tỏ lực liên kết giữa các phân tử ở thể khí rất yếu so với ở thể lỏng và thể rắn.</p>
+                        <button onclick="toggleAnswer('ans_i_2_1')" class="mt-2 px-3 py-1 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                            Xem trả lời
+                        </button>
+                        <div id="ans_i_2_1" class="hidden mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-gray-800">
+                            <strong>Trả lời:</strong>
+                            <ul class="list-disc list-inside">
+                                <li>Chất khí dễ dàng bứt ra và lan tỏa khắp không gian bình chứa (sự khuếch tán mùi nước hoa rất nhanh).</li>
+                                <li>Chất khí không có hình dạng và thể tích riêng xác định, dễ nén hơn chất lỏng và chất rắn rất nhiều.</li>
+                            </ul>
                         </div>
                     </div>
-                    <div class="question-box p-4 rounded">
-                        <p class="font-semibold">Câu 2: Dựa vào khối lượng riêng để chứng tỏ khoảng cách giữa các phân tử khí rất lớn.</p>
-                        <button onclick="toggleAnswer('ans5')" class="mt-2 text-sm text-blue-800 underline font-medium">Xem trả lời</button>
-                        <div id="ans5" class="answer-box p-3 mt-2 rounded border border-green-200 text-gray-800">
-                            Ở cùng nhiệt độ và áp suất, khối lượng riêng của nước đá là \(917 \, kg/m^3\), nước lỏng là \(1000 \, kg/m^3\), trong khi hơi nước chỉ khoảng \(0,6 \, kg/m^3\). Khối lượng riêng của khí nhỏ hơn hàng nghìn lần chứng tỏ các phân tử khí ở rất xa nhau.
+
+                    <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                        <p class="font-semibold text-blue-900">❓ 2. Hãy dựa vào khối lượng riêng ở cùng điều kiện nhiệt độ và áp suất của cùng một chất ở các thể khác nhau để chứng tỏ khoảng cách giữa các phân tử ở thể khí rất lớn so với ở thể lỏng và thể rắn.</p>
+                        <button onclick="toggleAnswer('ans_i_2_2')" class="mt-2 px-3 py-1 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                            Xem trả lời
+                        </button>
+                        <div id="ans_i_2_2" class="hidden mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-gray-800">
+                            <strong>Trả lời:</strong>
+                            <p>Ví dụ đối với nước ở \(0^\circ\text{C}, 1\text{ atm}\): Khối lượng riêng của nước đá là \(\approx 917\text{ kg/m}^3\), nước lỏng là \(\approx 1000\text{ kg/m}^3\), trong khi hơi nước chỉ khoảng \(0,598\text{ kg/m}^3\).</p>
+                            <p>Vì khối lượng riêng của thể khí nhỏ hơn rất nhiều lần (khoảng vài nghìn lần) so với thể rắn và lỏng, cùng một số lượng phân tử nhưng thể tích thể khí chiếm chỗ lớn hơn rất nhiều \(\Rightarrow\) Khoảng cách trung bình giữa các phân tử thể khí lớn hơn rất nhiều so với thể lỏng và rắn.</p>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- II. Mô hình động học phân tử -->
-        <section class="bg-white p-6 rounded-12px shadow-md">
-            <h2 class="section-header text-xl">II. MÔ HÌNH ĐỘNG HỌC PHÂN TỬ CHẤT KHÍ</h2>
-            <div class="bg-blue-50 p-6 rounded-lg border border-blue-200 mb-6">
-                <ol class="list-decimal ml-5 space-y-3 font-medium">
-                    <li>Chất khí được cấu tạo từ các phân tử có kích thước rất nhỏ so với khoảng cách giữa chúng.</li>
+        <!-- SECTION II -->
+        <div class="bg-white rounded-xl shadow-md p-6 space-y-6">
+            <h2 class="text-xl md:text-2xl section-title text-gray-900 flex items-center">
+                <span class="roman-num">II</span> MÔ HÌNH ĐỘNG HỌC PHÂN TỬ CHẤT KHÍ
+            </h2>
+
+            <p>Từ các thí nghiệm và thực tế, người ta đưa ra mô hình động học phân tử chất khí:</p>
+
+            <div class="bg-blue-50 border border-blue-300 rounded-xl p-5 space-y-3 text-gray-800">
+                <p class="font-bold text-blue-900 text-lg">⚙️ CÁC NỘI DUNG CHÍNH CỦA MÔ HÌNH:</p>
+                <ol class="list-decimal list-inside space-y-2 font-medium">
+                    <li>Chất khí được cấu tạo từ các phân tử có kích thước rất nhỏ so với khoảng cách giữa chúng. Lực liên kết giữa các phân tử ở thể khí rất yếu so với ở thể lỏng và thể rắn.</li>
                     <li>Các phân tử khí chuyển động hỗn loạn, không ngừng. Chuyển động này càng nhanh thì nhiệt độ của khí càng cao.</li>
-                    <li>Khi chuyển động hỗn loạn, các phân tử khí va chạm với nhau và với thành bình. Khi va chạm với thành bình, các phân tử khí tác dụng lực, gây <strong>áp suất</strong> lên thành bình.</li>
+                    <li>Khi chuyển động hỗn loạn, các phân tử khí va chạm với nhau và với thành bình. Khi va chạm với thành bình các phân tử khí tác dụng lực, gây áp suất lên thành bình.</li>
                 </ol>
             </div>
 
-            <div class="mt-6">
-                <p class="font-bold mb-4">Thảo luận: Hãy hoàn thành bảng cơ sở thực tế của mô hình:</p>
+            <div class="space-y-3">
+                <p class="font-semibold text-gray-800">Hãy điền vào các ô còn trống trong Bảng 8.1:</p>
+                <p class="font-bold text-center text-gray-700">Bảng 8.1. Bảng các thí nghiệm và hiện tượng thực tế làm cơ sở cho việc đưa ra mô hình động học phân tử chất khí</p>
+                
                 <div class="overflow-x-auto">
-                    <table class="w-full text-center">
+                    <table class="w-full border-collapse border border-gray-300 text-center">
                         <thead>
-                            <tr>
-                                <th class="p-2">STT</th>
-                                <th class="p-2">Mô hình động học phân tử chất khí</th>
-                                <th class="p-2">Các thí nghiệm và hiện tượng thực tế</th>
+                            <tr class="bg-gray-200">
+                                <th class="border border-gray-300 p-3 w-16">STT</th>
+                                <th class="border border-gray-300 p-3">Mô hình động học phân tử chất khí</th>
+                                <th class="border border-gray-300 p-3">Các thí nghiệm và hiện tượng thực tế</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="p-2">1</td>
-                                <td class="p-2">Phân tử khí chuyển động hỗn loạn, không ngừng.</td>
-                                <td class="p-2">Chuyển động Brown trong không khí.</td>
+                                <td class="border border-gray-300 p-3 font-bold">1</td>
+                                <td class="border border-gray-300 p-3 text-left">Phân tử khí chuyển động hỗn loạn, không ngừng.</td>
+                                <td class="border border-gray-300 p-3 text-left">Chuyển động Brown trong không khí.</td>
                             </tr>
-                            <tr>
-                                <td class="p-2">2</td>
-                                <td class="p-2">Kích thước phân tử khí rất nhỏ so với khoảng cách giữa chúng.</td>
-                                <td class="p-2">
-                                    <button onclick="toggleAnswer('tbl1')" class="text-blue-600 font-bold">[Nhấn để mở]</button>
-                                    <div id="tbl1" class="hidden text-sm italic py-2">Khối lượng riêng của chất khí rất nhỏ so với chất lỏng/rắn; tính dễ nén của chất khí.</div>
+                            <tr class="bg-gray-50">
+                                <td class="border border-gray-300 p-3 font-bold">2</td>
+                                <td class="border border-gray-300 p-3 text-left">Kích thước của các phân tử khí rất nhỏ so với khoảng cách giữa chúng.</td>
+                                <td class="border border-gray-300 p-3 text-left text-blue-700 font-semibold bg-yellow-50">
+                                    [Khối lượng riêng thể khí rất nhỏ so với thể lỏng; Khí dễ nén, dễ lan tỏa chiếm toàn bộ thể tích bình chứa]
                                 </td>
                             </tr>
                             <tr>
-                                <td class="p-2">3</td>
-                                <td class="p-2">Khi chuyển động các phân tử va chạm với nhau và với thành bình.</td>
-                                <td class="p-2">
-                                    <button onclick="toggleAnswer('tbl2')" class="text-blue-600 font-bold">[Nhấn để mở]</button>
-                                    <div id="tbl2" class="hidden text-sm italic py-2">Chất khí gây áp suất lên thành bình (bơm căng lốp xe, bóng bay).</div>
+                                <td class="border border-gray-300 p-3 font-bold">3</td>
+                                <td class="border border-gray-300 p-3 text-left">Khi chuyển động các phân tử khí va chạm với nhau và với thành bình.</td>
+                                <td class="border border-gray-300 p-3 text-left text-blue-700 font-semibold bg-yellow-50">
+                                    [Hiện tượng bóng bay/lốp xe bơm căng tác dụng áp suất lên vỏ; Sự khuyếch tán khí trong không gian]
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- III. Khí lý tưởng -->
-        <section class="bg-white p-6 rounded-12px shadow-md">
-            <h2 class="section-header text-xl">III. KHÍ LÝ TƯỞNG</h2>
-            <p class="mb-4 text-justify">Khí lí tưởng là một mô hình đơn giản hóa để nghiên cứu chất khí, dựa trên các đặc điểm:</p>
-            <ul class="list-disc ml-8 mb-6 space-y-2">
-                <li>Các phân tử khí được coi là các <strong>chất điểm</strong> (có khối lượng nhưng thể tích không đáng kể).</li>
-                <li><strong>Không tương tác</strong> với nhau khi chưa va chạm (lực liên kết coi bằng 0).</li>
-                <li>Các va chạm giữa các phân tử và với thành bình là <strong>va chạm hoàn toàn đàn hồi</strong>.</li>
-            </ul>
+        <!-- SECTION III -->
+        <div class="bg-white rounded-xl shadow-md p-6 space-y-6">
+            <h2 class="text-xl md:text-2xl section-title text-gray-900 flex items-center">
+                <span class="roman-num">III</span> KHÍ LÍ TƯỞNG
+            </h2>
 
-            <div class="question-box p-4 rounded">
-                <p class="font-semibold italic">Thảo luận: Hãy dùng mô hình động học phân tử chất khí để chứng tỏ với một khối lượng khí xác định, nếu giảm thể tích bình và giữ nguyên nhiệt độ thì áp suất tăng.</p>
-                <button onclick="toggleAnswer('ans6')" class="mt-2 text-sm text-blue-800 underline font-medium">Xem lời giải</button>
-                <div id="ans6" class="answer-box p-3 mt-2 rounded border border-green-200 text-gray-800">
-                    Khi giảm thể tích bình (giữ nguyên số phân tử và nhiệt độ), mật độ phân tử (số phân tử trên một đơn vị thể tích) sẽ tăng lên. Do nhiệt độ không đổi, tốc độ trung bình của các phân tử không đổi. Tuy nhiên, vì mật độ dày hơn, số lần va chạm của các phân tử vào một đơn vị diện tích thành bình trong một đơn vị thời gian sẽ tăng lên \(\rightarrow\) Tổng lực tác dụng tăng \(\rightarrow\) Áp suất tăng. 
-                    <br><strong>Ví dụ:</strong> Dùng tay nén pittông của ống tiêm (bịt đầu), ta thấy càng nén thể tích càng nhỏ thì tay càng cảm nhận lực đẩy ngược lại mạnh hơn.
-                </div>
+            <p>Để tìm hiểu các tính chất của chất khí, người ta dùng một mô hình khí đơn giản hơn khí thực (khí tồn tại trong thực tế) nhưng vẫn phản ánh được các đặc điểm cơ bản của khí này:</p>
+
+            <div class="bg-emerald-50 border border-emerald-300 rounded-xl p-5 space-y-3 text-gray-800">
+                <p class="font-bold text-emerald-900 text-lg">💡 ĐẶC ĐIỂM CỦA KHÍ LÍ TƯỞNG:</p>
+                <ol class="list-decimal list-inside space-y-2 font-medium">
+                    <li>Các phân tử khí được coi là các <strong>chất điểm</strong>, không tương tác với nhau khi chưa va chạm.</li>
+                    <li>Các phân tử khí tương tác khi va chạm với nhau và va chạm với thành bình. Các va chạm này là <strong>va chạm hoàn toàn đàn hồi</strong>.</li>
+                </ol>
             </div>
-        </section>
 
-        <!-- IV. Củng cố -->
-        <section class="bg-white p-6 rounded-12px shadow-md">
-            <h2 class="section-header text-xl">IV. CỦNG CỐ</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <h3 class="font-bold text-navy-800 border-b mb-2">EM ĐÃ HỌC</h3>
-                    <ul class="list-disc ml-5 text-sm space-y-1">
-                        <li>Cấu tạo chất khí từ các phân tử nhỏ, cách xa nhau.</li>
-                        <li>Chuyển động hỗn loạn tỷ lệ thuận với nhiệt độ.</li>
-                        <li>Va chạm gây ra áp suất.</li>
+            <p>Mô hình trên bỏ qua thể tích của phân tử khí, bỏ qua tương tác của các phân tử khi chưa va chạm và coi va chạm là hoàn toàn đàn hồi làm cho việc mô tả các hiện tượng về chất khí trở nên đơn giản, dễ dàng. Chất khí trong mô hình trên được gọi là <strong>khí lí tưởng</strong>.</p>
+
+            <!-- HOẠT ĐỘNG (BÀN TAY) -->
+            <div class="bg-purple-50 border-l-4 border-purple-600 p-4 rounded-r-lg space-y-2">
+                <p class="font-bold text-purple-900 flex items-center">
+                    🖐️ HOẠT ĐỘNG / NÊU VẤN ĐỀ:
+                </p>
+                <p class="text-gray-800">
+                    Hãy dùng mô hình động học phân tử chất khí để chứng tỏ với một khối lượng khí xác định thì nếu giảm thể tích của bình chứa và giữ nguyên nhiệt độ khí thì áp suất của khí tác dụng lên thành bình tăng. Hãy tìm ví dụ trong thực tế để minh họa cho tính chất trên của chất khí.
+                </p>
+                <button onclick="toggleAnswer('ans_hoatdong')" class="px-3 py-1 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                    Xem hướng giải quyết
+                </button>
+                <div id="ans_hoatdong" class="hidden mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-gray-800 space-y-2">
+                    <p><strong>Giải thích:</strong></p>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>Khi giữ nguyên nhiệt độ, tốc độ chuyển động trung bình của các phân tử khí không đổi.</li>
+                        <li>Nếu giảm thể tích bình chứa, mật độ phân tử khí (số phân tử trên một đơn vị thể tích) sẽ tăng lên.</li>
+                        <li>Do mật độ tăng nên số lần va chạm của các phân tử khí vào một đơn vị diện tích thành bình trong một đơn vị thời gian tăng lên \(\Rightarrow\) Áp suất tác dụng lên thành bình tăng.</li>
                     </ul>
+                    <p><strong>Ví dụ thực tế:</strong> Dùng tay nén pittông của bơm xe đạp khi bít kín đầu ra; khi ấn sâu pít-tông xuống, cảm giác tay bị đẩy lại càng mạnh do áp suất khí trong xi-lanh tăng lên.</p>
                 </div>
-                <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <h3 class="font-bold text-navy-800 border-b mb-2">EM CÓ THỂ</h3>
-                    <p class="text-sm">Giải thích các hiện tượng thực tế: tại sao khí chiếm hết bình, tại sao lốp xe căng, sự thay đổi áp suất theo nhiệt độ và thể tích...</p>
+            </div>
+        </div>
+
+        <!-- EM ĐÃ HỌC -->
+        <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-5 shadow-sm space-y-2">
+            <h3 class="text-lg font-bold text-indigo-900 uppercase">EM ĐÃ HỌC</h3>
+            <ul class="list-disc list-inside space-y-1 text-gray-800">
+                <li>Chất khí được cấu tạo từ các phân tử có kích thước rất nhỏ so với khoảng cách giữa chúng.</li>
+                <li>Các phân tử khí chuyển động hỗn loạn, không ngừng. Chuyển động này càng nhanh thì nhiệt độ của khí càng cao.</li>
+                <li>Khi chuyển động hỗn loạn, các phân tử khí va chạm với nhau và với thành bình. Khi va chạm với thành bình chất khí gây áp suất lên thành bình.</li>
+            </ul>
+        </div>
+
+        <!-- EM CÓ THỂ -->
+        <div class="bg-teal-50 border border-teal-200 rounded-xl p-5 shadow-sm space-y-2">
+            <h3 class="text-lg font-bold text-teal-900 uppercase">EM CÓ THỂ</h3>
+            <p class="text-gray-800">
+                Dùng thuyết động học phân tử chất khí để giải thích được các hiện tượng có liên quan. Ví dụ: chất khí luôn chiếm toàn bộ dung tích của bình chứa; chất khí gây áp suất lên thành bình theo mọi hướng; sự phụ thuộc áp suất của một lượng khí xác định tác dụng lên thành bình vào thể tích và nhiệt độ,...
+            </p>
+        </div>
+
+        <!-- TRẮC NGHIỆM GAMESHOW "AI LÀ TRIỆU PHÚ" -->
+        <div class="bg-slate-900 text-white rounded-xl shadow-xl p-6 space-y-6">
+            <div class="text-center space-y-2">
+                <span class="bg-yellow-500 text-black px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest">GAMESHOW</span>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-yellow-400">AI LÀ TRIỆU PHÚ VẬT LÝ</h2>
+                <p class="text-gray-300 text-sm">Chinh phục 10 câu hỏi củng cố kiến thức về Mô hình động học phân tử chất khí!</p>
+            </div>
+
+            <!-- Khung câu hỏi gameshow -->
+            <div id="quiz-container" class="space-y-6">
+                <!-- Javascript sẽ load hoặc tự định nghĩa 10 câu ở bên dưới -->
+                <!-- Câu 1 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 1: Chuyển động Brown trong chất khí chứng tỏ điều gì?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(1, 'A')" id="q1-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Phân tử khí đứng yên</button>
+                        <button onclick="selectOption(1, 'B')" id="q1-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. Phân tử khí chuyển động hỗn loạn không ngừng</button>
+                        <button onclick="selectOption(1, 'C')" id="q1-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Các hạt khói chuyển động tự phát</button>
+                        <button onclick="selectOption(1, 'D')" id="q1-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Khí không có cấu tạo phân tử</button>
+                    </div>
+                </div>
+
+                <!-- Câu 2 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 2: Khi nhiệt độ của khối khí tăng thì:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(2, 'A')" id="q2-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Tốc độ chuyển động hỗn loạn của các phân tử khí tăng</button>
+                        <button onclick="selectOption(2, 'B')" id="q2-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. Tốc độ chuyển động hỗn loạn giảm</button>
+                        <button onclick="selectOption(2, 'C')" id="q2-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Kích thước phân tử khí tăng</button>
+                        <button onclick="selectOption(2, 'D')" id="q2-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Lực liên kết giữa các phân tử tăng lên rất nhiều</button>
+                    </div>
+                </div>
+
+                <!-- Câu 3 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 3: Nguyên nhân gây ra áp suất của chất khí lên thành bình là do:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(3, 'A')" id="q3-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Khối lượng của các phân tử khí quá lớn</button>
+                        <button onclick="selectOption(3, 'B')" id="q3-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. Hút Trái Đất tác dụng lên khí</button>
+                        <button onclick="selectOption(3, 'C')" id="q3-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Sự va chạm của các phân tử khí vào thành bình</button>
+                        <button onclick="selectOption(3, 'D')" id="q3-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Lực liên kết phân tử lớn</button>
+                    </div>
+                </div>
+
+                <!-- Câu 4 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 4: So với thể lỏng và thể rắn, lực liên kết giữa các phân tử ở thể khí:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(4, 'A')" id="q4-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Rất mạnh</button>
+                        <button onclick="selectOption(4, 'B')" id="q4-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. Rất yếu</button>
+                        <button onclick="selectOption(4, 'C')" id="q4-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Bằng lực liên kết ở thể rắn</button>
+                        <button onclick="selectOption(4, 'D')" id="q4-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Không thể so sánh được</button>
+                    </div>
+                </div>
+
+                <!-- Câu 5 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 5: Trong mô hình khí lí tưởng, các phân tử khí được coi là:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(5, 'A')" id="q5-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Các hình cầu có kích thước lớn</button>
+                        <button onclick="selectOption(5, 'B')" id="q5-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. Các chất điểm, không tương tác khi chưa va chạm</button>
+                        <button onclick="selectOption(5, 'C')" id="q5-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Các hạt luôn tương tác mạnh với nhau</button>
+                        <button onclick="selectOption(5, 'D')" id="q5-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Các hạt đứng yên</button>
+                    </div>
+                </div>
+
+                <!-- Câu 6 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 6: Va chạm giữa các phân tử khí trong mô hình khí lý tưởng là:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(6, 'A')" id="q6-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Va chạm mềm</button>
+                        <button onclick="selectOption(6, 'B')" id="q6-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. Va chạm hoàn toàn đàn hồi</button>
+                        <button onclick="selectOption(6, 'C')" id="q6-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Va chạm dính liền</button>
+                        <button onclick="selectOption(6, 'D')" id="q6-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Không có va chạm diễn ra</button>
+                    </div>
+                </div>
+
+                <!-- Câu 7 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 7: Tốc độ trung bình của phân tử khí oxygen ở điều kiện chuẩn khoảng:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(7, 'A')" id="q7-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. 40 m/s</button>
+                        <button onclick="selectOption(7, 'B')" id="q7-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. 400 m/s</button>
+                        <button onclick="selectOption(7, 'C')" id="q7-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. 1500 m/s</button>
+                        <button onclick="selectOption(7, 'D')" id="q7-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. 3000 m/s</button>
+                    </div>
+                </div>
+
+                <!-- Câu 8 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 8: Lí do chính khiến khí thực khác khí lí tưởng là gì?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(8, 'A')" id="q8-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Phân tử khí thực có thể tích và có tương tác khi ở gần nhau</button>
+                        <button onclick="selectOption(8, 'B')" id="q8-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. Khí thực không gây ra áp suất</button>
+                        <button onclick="selectOption(8, 'C')" id="q8-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Khí lí tưởng có khối lượng rất lớn</button>
+                        <button onclick="selectOption(8, 'D')" id="q8-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Phân tử khí thực không bao giờ va chạm</button>
+                    </div>
+                </div>
+
+                <!-- Câu 9 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 9: Khi giảm thể tích của bình chứa khí và giữ nguyên nhiệt độ, áp suất khí tăng là do:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(9, 'A')" id="q9-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Tốc độ các phân tử khí tăng lên</button>
+                        <button onclick="selectOption(9, 'B')" id="q9-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. Mật độ phân tử khí tăng làm tăng số va chạm vào thành bình trong 1s</button>
+                        <button onclick="selectOption(9, 'C')" id="q9-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Phân tử khí nở ra</button>
+                        <button onclick="selectOption(9, 'D')" id="q9-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Lực hút Trái Đất tăng lên</button>
+                    </div>
+                </div>
+
+                <!-- Câu 10 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-3">
+                    <p class="font-bold text-yellow-300">Câu 10: Tốc độ chuyển động của các phân tử khí mang tính chất gì?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-black">
+                        <button onclick="selectOption(10, 'A')" id="q10-A" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">A. Tuyệt đối chính xác từng phân tử</button>
+                        <button onclick="selectOption(10, 'B')" id="q10-B" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">B. Thống kê và chỉ có ý nghĩa khi xét số lượng rất lớn phân tử</button>
+                        <button onclick="selectOption(10, 'C')" id="q10-C" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">C. Luôn bằng nhau cho mọi phân tử</button>
+                        <button onclick="selectOption(10, 'D')" id="q10-D" class="mil-option-btn text-left p-2.5 rounded bg-white font-medium border-2 border-transparent">D. Không thay đổi theo thời gian</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Quiz Section -->
-            <div class="mt-10">
-                <h3 class="text-xl font-bold mb-6 text-center text-blue-900">BÀI TẬP TRẮC NGHIỆM CỦNG CỐ</h3>
-                <div id="quiz-container" class="space-y-6">
-                    <!-- Câu 1 -->
-                    <div class="quiz-item">
-                        <p class="font-semibold">Câu 1: Chuyển động Brown của các hạt khói trong không khí chứng tỏ điều gì?</p>
-                        <div class="ml-4 mt-2 space-y-1">
-                            <label class="block"><input type="radio" name="q1" value="a"> A. Các hạt khói tự chuyển động.</label>
-                            <label class="block"><input type="radio" name="q1" value="b"> B. Các phân tử không khí chuyển động hỗn loạn, không ngừng.</label>
-                            <label class="block"><input type="radio" name="q1" value="c"> C. Không khí có tính đàn hồi mạnh.</label>
-                            <label class="block"><input type="radio" name="q1" value="d"> D. Nhiệt độ của hạt khói rất cao.</label>
-                        </div>
-                    </div>
+            <!-- Nút nộp bài -->
+            <div class="text-center pt-4">
+                <button onclick="checkQuiz()" class="px-8 py-3 bg-chudao text-black font-extrabold text-lg rounded-full shadow-lg hover:bg-green-400 transform hover:scale-105 transition">
+                    NỘP BÀI TRẮC NGHIỆM
+                </button>
+            </div>
 
-                    <!-- Câu 2 -->
-                    <div class="quiz-item">
-                        <p class="font-semibold">Câu 2: Khi nhiệt độ của khối khí tăng lên thì:</p>
-                        <div class="ml-4 mt-2 space-y-1">
-                            <label class="block"><input type="radio" name="q2" value="a"> A. Tốc độ trung bình phân tử tăng.</label>
-                            <label class="block"><input type="radio" name="q2" value="b"> B. Kích thước phân tử tăng.</label>
-                            <label class="block"><input type="radio" name="q2" value="c"> C. Số lượng phân tử tăng.</label>
-                            <label class="block"><input type="radio" name="q2" value="d"> D. Khoảng cách phân tử giảm.</label>
-                        </div>
-                    </div>
+            <!-- Kết quả Gameshow -->
+            <div id="quiz-result" class="hidden mt-6 p-4 rounded-xl text-center font-bold text-lg"></div>
+            <div id="quiz-explanation" class="hidden space-y-3 mt-4 text-sm text-gray-200 bg-slate-800 p-4 rounded-lg"></div>
+        </div>
 
-                    <!-- Câu 3 -->
-                    <div class="quiz-item">
-                        <p class="font-semibold">Câu 3: Áp suất của chất khí lên thành bình được gây ra bởi:</p>
-                        <div class="ml-4 mt-2 space-y-1">
-                            <label class="block"><input type="radio" name="q3" value="a"> A. Lực hút của thành bình lên phân tử.</label>
-                            <label class="block"><input type="radio" name="q3" value="b"> B. Trọng lượng của các phân tử khí.</label>
-                            <label class="block"><input type="radio" name="q3" value="c"> C. Va chạm của các phân tử khí lên thành bình.</label>
-                            <label class="block"><input type="radio" name="q3" value="d"> D. Kích thước phân tử quá lớn.</label>
-                        </div>
-                    </div>
+        <!-- TỰ LUẬN TÍNH TOÁN -->
+        <div class="bg-white rounded-xl shadow-md p-6 space-y-6">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-900 border-b-2 border-gray-800 pb-2">
+                🧮 BÀI TẬP TỰ LUẬN TÍNH TOÁN CỦNG CỐ
+            </h2>
 
-                    <!-- Câu 4 -->
-                    <div class="quiz-item">
-                        <p class="font-semibold">Câu 4: Đặc điểm nào sau đây KHÔNG phải của khí lí tưởng?</p>
-                        <div class="ml-4 mt-2 space-y-1">
-                            <label class="block"><input type="radio" name="q4" value="a"> A. Phân tử coi là chất điểm.</label>
-                            <label class="block"><input type="radio" name="q4" value="b"> B. Lực tương tác coi như bằng 0 khi chưa va chạm.</label>
-                            <label class="block"><input type="radio" name="q4" value="c"> C. Các va chạm là hoàn toàn đàn hồi.</label>
-                            <label class="block"><input type="radio" name="q4" value="d"> D. Các phân tử luôn đứng yên khi nhiệt độ thấp.</label>
-                        </div>
-                    </div>
-
-                    <!-- Câu 5 -->
-                    <div class="quiz-item">
-                        <p class="font-semibold">Câu 5: Công thức tính tốc độ trung bình của n phân tử khí là:</p>
-                        <div class="ml-4 mt-2 space-y-1">
-                            <label class="block"><input type="radio" name="q5" value="a"> A. \(\overline{v} = v_1 + v_2 + ... + v_n\)</label>
-                            <label class="block"><input type="radio" name="q5" value="b"> B. \(\overline{v} = (v_1 + v_2 + ... + v_n) / n\)</label>
-                            <label class="block"><input type="radio" name="q5" value="c"> C. \(\overline{v} = \sqrt{v_1^2 + ... + v_n^2}\)</label>
-                            <label class="block"><input type="radio" name="q5" value="d"> D. \(\overline{v} = n / (v_1 + ... + v_n)\)</label>
-                        </div>
-                    </div>
-
-                    <div class="text-center mt-8">
-                        <button onclick="checkQuiz()" class="btn-navy px-8 py-3 rounded-lg font-bold shadow-md uppercase">NỘP BÀI</button>
-                    </div>
-                    
-                    <div id="quiz-result" class="mt-4 text-center font-bold text-lg hidden"></div>
+            <!-- Bài 1 -->
+            <div class="border border-gray-300 rounded-lg p-4 space-y-2 bg-gray-50">
+                <p class="font-bold text-gray-800">Bài 1:</p>
+                <p>Một khối khí chứa 5 phân tử có tốc độ lần lượt là \(v_1 = 300\text{ m/s}\), \(v_2 = 350\text{ m/s}\), \(v_3 = 400\text{ m/s}\), \(v_4 = 450\text{ m/s}\), \(v_5 = 500\text{ m/s}\). Hãy tính tốc độ trung bình \(\overline{v}\) của các phân tử khí này.</p>
+                <button onclick="toggleAnswer('essay_1')" class="px-4 py-1.5 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                    Xem lời giải chi tiết
+                </button>
+                <div id="essay_1" class="hidden mt-3 p-3 bg-green-50 border border-green-300 rounded-lg text-gray-800">
+                    <p><strong>Lời giải:</strong></p>
+                    <p>Áp dụng công thức tính tốc độ trung bình của phân tử khí:</p>
+                    <p>\[ \overline{v} = \frac{v_1 + v_2 + v_3 + v_4 + v_5}{n} \]</p>
+                    <p>Thay số:</p>
+                    <p>\[ \overline{v} = \frac{300 + 350 + 400 + 450 + 500}{5} = \frac{2000}{5} = 400\text{ (m/s)} \]</p>
+                    <p><strong>Đáp số:</strong> \(400\text{ m/s}\).</p>
                 </div>
             </div>
-        </section>
-    </main>
 
-    <footer class="max-w-5xl mx-auto mt-12 mb-8 text-center text-gray-500 text-sm">
-        &copy; 2024 Học liệu Vật lí 12 - Kết nối tri thức với cuộc sống
-    </footer>
+            <!-- Bài 2 -->
+            <div class="border border-gray-300 rounded-lg p-4 space-y-2 bg-gray-50">
+                <p class="font-bold text-gray-800">Bài 2:</p>
+                <p>Ở nhiệt độ phòng \(27^\circ\text{C}\) (\(300\text{ K}\)), bình chứa khí Helium có dung tích \(10\text{ lít}\) dưới áp suất \(2\text{ atm}\). Tính số phân tử khí Helium chứa trong bình. Cho biết số Avogadro \(N_A = 6,022 \times 10^{23}\text{ mol}^{-1}\) và hằng số khí \(R = 0,0821\text{ L}\cdot\text{atm/(mol}\cdot\text{K)}\).</p>
+                <button onclick="toggleAnswer('essay_2')" class="px-4 py-1.5 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                    Xem lời giải chi tiết
+                </button>
+                <div id="essay_2" class="hidden mt-3 p-3 bg-green-50 border border-green-300 rounded-lg text-gray-800">
+                    <p><strong>Lời giải:</strong></p>
+                    <p>Áp dụng phương trình trạng thái khí lí tưởng: \(p \cdot V = n \cdot R \cdot T\)</p>
+                    <p>Số mol khí Helium trong bình là:</p>
+                    <p>\[ n = \frac{p \cdot V}{R \cdot T} = \frac{2 \times 10}{0,0821 \times 300} \approx 0,812\text{ (mol)} \]</p>
+                    <p>Số phân tử khí Helium trong bình là:</p>
+                    <p>\[ N = n \times N_A = 0,812 \times 6,022 \times 10^{23} \approx 4,89 \times 10^{23}\text{ (phân tử)} \]</p>
+                    <p><strong>Đáp số:</strong> \(\approx 4,89 \times 10^{23}\) phân tử.</p>
+                </div>
+            </div>
 
+            <!-- Bài 3 -->
+            <div class="border border-gray-300 rounded-lg p-4 space-y-2 bg-gray-50">
+                <p class="font-bold text-gray-800">Bài 3:</p>
+                <p>Một khối khí lí tưởng xác định có thể tích \(6\text{ lít}\) ở áp suất \(1\text{ atm}\). Giữ cho nhiệt độ không đổi, nén khối khí này làm thể tích giảm xuống còn \(2\text{ lít}\). Tính áp suất của khối khí sau khi nén và giải thích sự thay đổi áp suất bằng mô hình động học phân tử.</p>
+                <button onclick="toggleAnswer('essay_3')" class="px-4 py-1.5 bg-mau1 text-white text-sm font-bold rounded hover:bg-gray-800 transition">
+                    Xem lời giải chi tiết
+                </button>
+                <div id="essay_3" class="hidden mt-3 p-3 bg-green-50 border border-green-300 rounded-lg text-gray-800">
+                    <p><strong>Lời giải:</strong></p>
+                    <p>1. <u>Tính toán áp suất:</u></p>
+                    <p>Do nhiệt độ không đổi, áp dụng định luật Boyle-Mariotte: \(p_1 \cdot V_1 = p_2 \cdot V_2\)</p>
+                    <p>Suy ra áp suất lúc sau:</p>
+                    <p>\[ p_2 = \frac{p_1 \cdot V_1}{V_2} = \frac{1 \times 6}{2} = 3\text{ (atm)} \]</p>
+                    <p>2. <u>Giải thích theo mô hình động học phân tử:</u></p>
+                    <p>Khi thể tích giảm 3 lần (\(6\text{ lít} \rightarrow 2\text{ lít}\)) trong khi nhiệt độ không đổi (tốc độ chuyển động trung bình không đổi), mật độ phân tử khí tăng lên 3 lần. Do đó, số va chạm của các phân tử khí vào thành bình trong một đơn vị thời gian tăng gấp 3 lần, làm áp suất khí tác dụng lên thành bình tăng lên 3 lần (\(3\text{ atm}\)).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="text-center py-6 text-gray-600 text-sm font-semibold border-t border-gray-300">
+            Chương trình GDPT 2018 - Bộ sách thống nhất
+        </footer>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
     <script>
+        // Hàm ẩn/hiện lời giải
         function toggleAnswer(id) {
-            const element = document.getElementById(id);
-            if (element.style.display === "block") {
-                element.style.display = "none";
-            } else {
-                element.style.display = "block";
+            const el = document.getElementById(id);
+            if (el) {
+                if (el.classList.contains('hidden')) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            }
+        }
+
+        // Dữ liệu đáp án trắc nghiệm Gameshow
+        const userAnswers = {};
+        const correctAnswers = {
+            1: 'B',
+            2: 'A',
+            3: 'C',
+            4: 'B',
+            5: 'B',
+            6: 'B',
+            7: 'B',
+            8: 'A',
+            9: 'B',
+            10: 'B'
+        };
+
+        const explanations = {
+            1: "Câu 1: Chuyển động Brown chứng tỏ phân tử khí chuyển động hỗn loạn không ngừng.",
+            2: "Câu 2: Nhiệt độ khí càng cao thì tốc độ chuyển động hỗn loạn càng lớn.",
+            3: "Câu 3: Áp suất khí lên thành bình gây ra do các va chạm liên tục của phân tử khí.",
+            4: "Câu 4: Khoảng cách phân tử khí rất lớn nên lực liên kết giữa chúng rất yếu.",
+            5: "Câu 5: Trong khí lí tưởng, các phân tử được coi là chất điểm và không tương tác khi chưa va chạm.",
+            6: "Câu 6: Mô hình khí lý tưởng coi các va chạm là hoàn toàn đàn hồi.",
+            7: "Câu 7: Ở điều kiện chuẩn, tốc độ trung bình của phân tử O2 là khoảng 400 m/s.",
+            8: "Câu 8: Khí thực có kích thước phân tử và có lực tương tác khi ở gần nhau.",
+            9: "Câu 9: Giảm V làm mật độ phân tử tăng, dẫn đến tăng số lần va chạm lên thành bình.",
+            10: "Câu 10: Tốc độ phân tử có tính thống kê và chỉ có ý nghĩa khi xét số lượng phân tử rất lớn."
+        };
+
+        function selectOption(qNum, option) {
+            userAnswers[qNum] = option;
+            const options = ['A', 'B', 'C', 'D'];
+            options.forEach(opt => {
+                const btn = document.getElementById(`q${qNum}-${opt}`);
+                if (btn) {
+                    btn.classList.remove('selected');
+                }
+            });
+            const selectedBtn = document.getElementById(`q${qNum}-${option}`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('selected');
             }
         }
 
         function checkQuiz() {
-            const answers = {
-                q1: "b",
-                q2: "a",
-                q3: "c",
-                q4: "d",
-                q5: "b"
-            };
-
             let score = 0;
-            let total = 5;
-            let resultContainer = document.getElementById('quiz-result');
+            let total = 10;
+            let explanationText = "<h4 class='font-bold text-yellow-400 mb-2'>HƯỚNG DẪN GIẢI CHI TIẾT CÁC CÂU:</h4>";
 
             for (let i = 1; i <= total; i++) {
-                const selected = document.querySelector(`input[name="q${i}"]:checked`);
-                if (selected && selected.value === answers[`q${i}`]) {
+                if (userAnswers[i] === correctAnswers[i]) {
                     score++;
                 }
+                explanationText += `<p>${explanations[i]} - <span class="text-green-400 font-bold">Đáp án đúng: ${correctAnswers[i]}</span></p>`;
             }
 
-            resultContainer.classList.remove('hidden');
+            const resultDiv = document.getElementById('quiz-result');
+            const expDiv = document.getElementById('quiz-explanation');
+
+            resultDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+
             if (score === total) {
-                resultContainer.innerHTML = `<span class="text-green-600">Tuyệt vời! Bạn đúng ${score}/${total} câu.</span>`;
-            } else if (score >= 3) {
-                resultContainer.innerHTML = `<span class="text-blue-600">Khá tốt! Bạn đúng ${score}/${total} câu. Hãy ôn tập lại các câu sai.</span>`;
+                resultDiv.classList.add('bg-green-100', 'text-green-800');
+                resultDiv.innerHTML = `🎉 XUẤT SẮC! BẠN ĐÃ TRỞ THÀNH TRIỆU PHÚ KNOWLEDGE CỦA BÀI HỌC! ĐIỂM SỐ: ${score}/${total}`;
             } else {
-                resultContainer.innerHTML = `<span class="text-red-600">Bạn đúng ${score}/${total} câu. Cần đọc kỹ lại bài học nhé!</span>`;
+                resultDiv.classList.add('bg-red-100', 'text-red-800');
+                resultDiv.innerHTML = `BẠN ĐẠT CẤP ĐỘ: ${score}/${total} CÂU ĐÚNG. Hãy xem lại giải chi tiết bên dưới để hoàn thiện nhé!`;
             }
-            
-            // Cuộn đến kết quả
-            resultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            expDiv.innerHTML = explanationText;
+            expDiv.classList.remove('hidden');
         }
     </script>
 </body>
