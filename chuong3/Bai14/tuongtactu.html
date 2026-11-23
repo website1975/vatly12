@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô phỏng Tương tác từ - Vật lý 11</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- MathJax 3 (không dùng polyfill.io) -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        /* Tùy chỉnh thanh cuộn cho bảng điều khiển nếu màn hình nhỏ */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        input[type=range] {
+            accent-color: #2563eb;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 h-screen overflow-hidden flex flex-col">
+
+    <!-- Header / Top Bar -->
+    <header class="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between shadow-sm z-10 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-red-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M4 13V7a8 8 0 0 1 16 0v6" />
+                    <path d="M4 13h4v6H4z" fill="#ef4444" stroke="none"/>
+                    <path d="M16 13h4v6h-4z" fill="#3b82f6" stroke="none"/>
+                    <path d="M4 13h4v6H4zM16 13h4v6h-4z" />
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-base md:text-lg font-bold text-slate-900 leading-tight">Thí Nghiệm Mô Phỏng: Tương Tác Từ</h1>
+                <p class="text-xs text-slate-500 hidden sm:block">Vật lý 11 - Kết nối tri thức với cuộc sống (Bài 14)</p>
+            </div>
+        </div>
+
+        <!-- Chú thích màu sắc nhanh -->
+        <div class="hidden md:flex items-center gap-4 text-xs font-medium bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
+            <span class="flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-sm bg-red-500 inline-block"></span> Cực Bắc (N)
+            </span>
+            <span class="flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-sm bg-blue-500 inline-block"></span> Cực Nam (S)
+            </span>
+            <span class="flex items-center gap-1.5">
+                <span class="w-3 h-1 bg-red-600 inline-block"></span> Dòng điện ($I$)
+            </span>
+            <span class="flex items-center gap-1.5">
+                <span class="w-3 h-1 bg-sky-600 inline-block"></span> Lực từ ($\vec{F}$)
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Layout: 2 Columns -->
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        
+        <!-- LEFT COLUMN (70-72%): Simulation Canvas & Tabs -->
+        <section class="w-full lg:w-[71%] h-[58vh] lg:h-full flex flex-col bg-slate-50 border-b lg:border-b-0 lg:border-r border-slate-200 relative">
+            
+            <!-- Navigation Tabs -->
+            <div class="bg-white border-b border-slate-200 px-3 pt-2 flex gap-1.5 overflow-x-auto shrink-0">
+                <button onclick="switchTab(1)" id="tab-btn-1" class="tab-btn active px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-t-lg border-t border-x transition-all flex items-center gap-2 whitespace-nowrap bg-blue-50/70 text-blue-700 border-slate-200 border-b-white -mb-px">
+                    <span class="w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">1</span>
+                    Hình 14.1: Hai nam châm
+                </button>
+                <button onclick="switchTab(2)" id="tab-btn-2" class="tab-btn px-4 py-2.5 text-xs sm:text-sm font-medium rounded-t-lg border-t border-x border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all flex items-center gap-2 whitespace-nowrap">
+                    <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-xs flex items-center justify-center">2</span>
+                    Hình 14.2: Thí nghiệm Oersted
+                </button>
+                <button onclick="switchTab(3)" id="tab-btn-3" class="tab-btn px-4 py-2.5 text-xs sm:text-sm font-medium rounded-t-lg border-t border-x border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all flex items-center gap-2 whitespace-nowrap">
+                    <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-xs flex items-center justify-center">3</span>
+                    Hình 14.3: Hai dòng điện
+                </button>
+            </div>
+
+            <!-- Canvas Container -->
+            <div id="canvas-wrapper" class="flex-1 relative w-full h-full overflow-hidden bg-gradient-to-b from-white to-slate-50">
+                <canvas id="simCanvas" class="block w-full h-full cursor-default"></canvas>
+                
+                <!-- Floating Hint Badge on Canvas -->
+                <div id="canvas-hint" class="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm border border-slate-200 px-3 py-1.5 rounded-lg text-xs text-slate-600 shadow-sm pointer-events-none flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="hint-text">Kéo thả thanh nam châm lại gần kim nam châm để quan sát tương tác</span>
+                </div>
+
+                <!-- Angle / Force Readout Badge -->
+                <div id="canvas-telemetry" class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm border border-slate-200 px-3 py-2 rounded-lg text-xs shadow-sm pointer-events-none">
+                    <div class="font-semibold text-slate-700 mb-0.5" id="telemetry-title">Trạng thái kim nam châm</div>
+                    <div class="text-slate-600 font-mono" id="telemetry-value">Góc lệch α = 0.0°</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT COLUMN (28-30%): Controls & Theory Summary -->
+        <aside class="w-full lg:w-[29%] flex-1 lg:h-full bg-white flex flex-col overflow-y-auto">
+            <div class="p-4 border-b border-slate-100 bg-slate-50/50">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                    </svg>
+                    Bảng Điều Khiển
+                </h2>
+            </div>
+
+            <!-- Dynamic Controls Area -->
+            <div class="p-4 space-y-5 flex-1">
+                
+                <!-- ================= CONTROLS TAB 1 ================= -->
+                <div id="controls-tab-1" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-2">Chọn nhanh kịch bản (Hình 14.1):</label>
+                        <div class="grid grid-cols-1 gap-2">
+                            <button onclick="setTab1Preset('free')" id="btn-t1-free" class="t1-preset-btn w-full text-left px-3 py-2.5 rounded-lg border border-blue-500 bg-blue-50 text-blue-800 text-xs font-medium transition flex items-center justify-between">
+                                <span><b>a)</b> Kim nam châm tự do</span>
+                                <span class="text-[10px] bg-blue-200/70 px-1.5 py-0.5 rounded">Cân bằng B-N</span>
+                            </button>
+                            <button onclick="setTab1Preset('repel')" id="btn-t1-repel" class="t1-preset-btn w-full text-left px-3 py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium transition flex items-center justify-between">
+                                <span><b>b)</b> Hai cực cùng tên gần nhau (N - N)</span>
+                                <span class="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded">Đẩy nhau</span>
+                            </button>
+                            <button onclick="setTab1Preset('attract')" id="btn-t1-attract" class="t1-preset-btn w-full text-left px-3 py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium transition flex items-center justify-between">
+                                <span><b>c)</b> Hai cực khác tên gần nhau (S - N)</span>
+                                <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">Hút nhau</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-100 space-y-2.5">
+                        <button onclick="flipBarMagnet()" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-900 active:scale-[0.99] text-white rounded-lg text-xs font-semibold shadow-sm transition flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                            </svg>
+                            Đảo cực thanh nam châm (N ↔ S)
+                        </button>
+
+                        <label class="flex items-center gap-2.5 p-2.5 rounded-lg border border-slate-200 bg-slate-50/50 cursor-pointer hover:bg-slate-50">
+                            <input type="checkbox" id="t1-show-field" checked onchange="state.t1.showField = this.checked" class="w-4 h-4 rounded text-blue-600">
+                            <span class="text-xs font-medium text-slate-700">Hiển thị đường sức từ &amp; vectơ lực $\vec{F}$</span>
+                        </label>
+                    </div>
+
+                    <!-- Theory Box Tab 1 -->
+                    <div class="bg-amber-50/80 border border-amber-200/80 rounded-xl p-3.5 text-xs space-y-2">
+                        <h3 class="font-bold text-amber-900 flex items-center gap-1.5">
+                            <span>💡</span> Hiện tượng &amp; Kết luận
+                        </h3>
+                        <p id="t1-observation" class="text-amber-950 leading-relaxed">
+                            Khi không có nam châm khác ở gần, kim nam châm luôn định hướng theo phương <b>Bắc - Nam</b> địa lý.
+                        </p>
+                        <div class="pt-1.5 border-t border-amber-200/60 text-amber-900 font-medium">
+                            • Hai cực cùng tên thì <b>đẩy nhau</b>.<br>
+                            • Hai cực khác tên thì <b>hút nhau</b>.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= CONTROLS TAB 2 ================= -->
+                <div id="controls-tab-2" class="hidden space-y-4">
+                    <!-- Power Switch -->
+                    <div class="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50">
+                        <div>
+                            <div class="text-xs font-bold text-slate-800">Công tắc mạch điện (Khóa K)</div>
+                            <div class="text-[11px] text-slate-500" id="t2-switch-status">Đang đóng mạch (Có dòng điện)</div>
+                        </div>
+                        <button onclick="toggleOerstedPower()" id="t2-power-btn" class="px-3.5 py-2 rounded-lg font-semibold text-xs text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition">
+                            Đang BẬT (Đóng K)
+                        </button>
+                    </div>
+
+                    <!-- Current Slider -->
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-xs">
+                            <label class="font-semibold text-slate-700">Cường độ dòng điện $I$:</label>
+                            <span class="font-mono font-bold text-red-600" id="t2-current-val">5.0 A</span>
+                        </div>
+                        <input type="range" id="t2-current-slider" min="0" max="10" step="0.5" value="5" oninput="updateOerstedCurrent(this.value)" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer">
+                        <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                            <span>0 A</span>
+                            <span>5 A</span>
+                            <span>10 A</span>
+                        </div>
+                    </div>
+
+                    <!-- Reverse Current Button -->
+                    <button onclick="reverseOerstedCurrent()" class="w-full py-2.5 px-3 bg-red-600 hover:bg-red-700 active:scale-[0.99] text-white rounded-lg text-xs font-semibold shadow-sm transition flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                        </svg>
+                        Đảo chiều dòng điện ($I$)
+                    </button>
+
+                    <!-- Wire Position -->
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-700">Vị trí dây dẫn so với kim:</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="setOerstedWirePos('above')" id="btn-wire-above" class="py-2 px-2.5 rounded-lg border border-blue-500 bg-blue-50 text-blue-800 text-xs font-semibold transition">
+                                Dây ở TRÊN kim
+                            </button>
+                            <button onclick="setOerstedWirePos('below')" id="btn-wire-below" class="py-2 px-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium transition">
+                                Dây ở DƯỚI kim
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Checkboxes -->
+                    <label class="flex items-center gap-2.5 p-2.5 rounded-lg border border-slate-200 bg-slate-50/50 cursor-pointer hover:bg-slate-50">
+                        <input type="checkbox" id="t2-show-vectors" checked onchange="state.t2.showVectors = this.checked" class="w-4 h-4 rounded text-blue-600">
+                        <span class="text-xs font-medium text-slate-700">Hiển thị cảm ứng từ $\vec{B}_{dòng}$ &amp; lực từ $\vec{F}$</span>
+                    </label>
+
+                    <!-- Theory Box Tab 2 -->
+                    <div class="bg-blue-50/80 border border-blue-200/80 rounded-xl p-3.5 text-xs space-y-2">
+                        <h3 class="font-bold text-blue-900 flex items-center gap-1.5">
+                            <span>⚡</span> Thí nghiệm Oersted (1820)
+                        </h3>
+                        <p id="t2-observation" class="text-blue-950 leading-relaxed">
+                            Khi có dòng điện chạy qua dây dẫn đặt song song với kim nam châm, kim bị lệch khỏi phương Bắc - Nam.
+                        </p>
+                        <div class="pt-1.5 border-t border-blue-200/60 text-blue-900">
+                            <b>Kết luận:</b> Dòng điện tác dụng lực từ lên kim nam châm đặt gần nó. Đổi chiều dòng điện thì chiều lệch của kim cũng đổi ngược lại.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= CONTROLS TAB 3 ================= -->
+                <div id="controls-tab-3" class="hidden space-y-4">
+                    <!-- Power Switch -->
+                    <div class="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50">
+                        <div>
+                            <div class="text-xs font-bold text-slate-800">Nguồn điện một chiều</div>
+                            <div class="text-[11px] text-slate-500" id="t3-switch-status">Khóa K đóng - Có dòng điện</div>
+                        </div>
+                        <button onclick="toggleTwoWiresPower()" id="t3-power-btn" class="px-3.5 py-2 rounded-lg font-semibold text-xs text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition">
+                            Đang BẬT
+                        </button>
+                    </div>
+
+                    <!-- Current Direction Mode -->
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-700">Chiều của hai dòng điện:</label>
+                        <div class="grid grid-cols-1 gap-2">
+                            <button onclick="setTwoWiresMode('opposite')" id="btn-w-opposite" class="w-full text-left px-3 py-2.5 rounded-lg border border-blue-500 bg-blue-50 text-blue-800 text-xs font-semibold transition flex items-center justify-between">
+                                <span>Hai dòng điện NGƯỢC chiều (↑ ↓)</span>
+                                <span class="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded">Đẩy nhau</span>
+                            </button>
+                            <button onclick="setTwoWiresMode('same')" id="btn-w-same" class="w-full text-left px-3 py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium transition flex items-center justify-between">
+                                <span>Hai dòng điện CÙNG chiều (↑ ↑)</span>
+                                <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">Hút nhau</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sliders I1 and I2 -->
+                    <div class="space-y-3 pt-1">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <label class="font-semibold text-slate-700">Dòng điện lá trái ($I_1$):</label>
+                                <span class="font-mono font-bold text-red-600" id="t3-i1-val">6.0 A</span>
+                            </div>
+                            <input type="range" id="t3-i1-slider" min="1" max="10" step="0.5" value="6" oninput="updateTwoWiresCurrent(1, this.value)" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <label class="font-semibold text-slate-700">Dòng điện lá phải ($I_2$):</label>
+                                <span class="font-mono font-bold text-red-600" id="t3-i2-val">6.0 A</span>
+                            </div>
+                            <input type="range" id="t3-i2-slider" min="1" max="10" step="0.5" value="6" oninput="updateTwoWiresCurrent(2, this.value)" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer">
+                        </div>
+                    </div>
+
+                    <!-- Show Magnetic Field Circles -->
+                    <label class="flex items-center gap-2.5 p-2.5 rounded-lg border border-slate-200 bg-slate-50/50 cursor-pointer hover:bg-slate-50">
+                        <input type="checkbox" id="t3-show-field" checked onchange="state.t3.showField = this.checked" class="w-4 h-4 rounded text-blue-600">
+                        <span class="text-xs font-medium text-slate-700">Hiển thị đường sức từ tròn quanh dây</span>
+                    </label>
+
+                    <!-- Theory Box Tab 3 -->
+                    <div class="bg-emerald-50/80 border border-emerald-200/80 rounded-xl p-3.5 text-xs space-y-2">
+                        <h3 class="font-bold text-emerald-900 flex items-center gap-1.5">
+                            <span>🧲</span> Tương tác giữa hai dòng điện
+                        </h3>
+                        <p id="t3-observation" class="text-emerald-950 leading-relaxed">
+                            Hai dòng điện thẳng song song <b>ngược chiều</b> thì <b>đẩy nhau</b> (hai dải lá nhôm uốn cong tách xa nhau).
+                        </p>
+                        <div class="pt-1.5 border-t border-emerald-200/60 text-emerald-900">
+                            Độ lớn lực từ trên một đơn vị chiều dài:
+                            <div class="text-center font-semibold my-1">$$F = 2\cdot 10^{-7}\frac{I_1 I_2}{r}$$</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer Note -->
+            <div class="p-3 border-t border-slate-100 text-[11px] text-slate-400 text-center bg-slate-50/50">
+                Mô phỏng tương tác Vật lý • Sử dụng chuột hoặc chạm để thao tác
+            </div>
+        </aside>
+    </main>
+
+    <script>
+        /**
+         * ============================================================================
+         * HỆ THỐNG MÔ PHỎNG VẬT LÝ TƯƠNG TÁC TỪ (BÀI 14 - VẬT LÝ 11)
+         * ============================================================================
+         */
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const wrapper = document.getElementById('canvas-wrapper');
+
+        let width = 800;
+        let height = 600;
+        let dpr = window.devicePixelRatio || 1;
+
+        // Trạng thái chung của ứng dụng
+        const state = {
+            activeTab: 1,
+            time: 0,
+
+            // Tab 1: Tương tác 2 nam châm (Hình 14.1)
+            t1: {
+                preset: 'free',
+                // Vị trí tương đối của trục kim nam châm (so với tâm canvas)
+                needleX: 0,
+                needleY: 0,
+                // Góc phương Bắc-Nam địa lý (giống hình 14.1: nghiêng khoảng -28 độ)
+                baseAngle: -28 * Math.PI / 180,
+                needleAngle: -28 * Math.PI / 180,
+                needleVel: 0,
+                // Thanh nam châm (tọa độ tương đối so với tâm canvas)
+                barVisible: false,
+                barX: -240,
+                barY: 40,
+                barAngle: -25 * Math.PI / 180,
+                barPolarity: 1, // 1: N ở đầu phải (gần kim), -1: S ở đầu phải (gần kim)
+                isDragging: false,
+                dragOffsetX: 0,
+                dragOffsetY: 0,
+                showField: true,
+                lastForceN: { fx: 0, fy: 0 },
+                lastForceS: { fx: 0, fy: 0 }
+            },
+
+            // Tab 2: Thí nghiệm Oersted (Hình 14.2)
+            t2: {
+                powerOn: true,
+                current: 5.0,       // Cường độ dòng điện (A)
+                direction: 1,       // 1: Nam -> Bắc (sang trái trên như Hình 14.2), -1: Bắc -> Nam
+                wirePos: 'above',   // 'above' | 'below'
+                baseAngle: -28 * Math.PI / 180,
+                needleAngle: -28 * Math.PI / 180,
+                needleVel: 0,
+                showVectors: true,
+                chargeOffset: 0
+            },
+
+            // Tab 3: Tương tác 2 dòng điện (Hình 14.3)
+            t3: {
+                powerOn: true,
+                mode: 'opposite',   // 'opposite' (ngược chiều) | 'same' (cùng chiều)
+                i1: 6.0,
+                i2: 6.0,
+                deflection: 0,      // Độ võng hiện tại (px)
+                deflectionVel: 0,
+                showField: true,
+                chargeOffset: 0
+            }
+        };
+
+        // Khởi tạo kích thước Canvas chuẩn Retina/HiDPI
+        function resizeCanvas() {
+            const rect = wrapper.getBoundingClientRect();
+            width = rect.width;
+            height = rect.height;
+            dpr = window.devicePixelRatio || 1;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // ============================================================================
+        // CHUYỂN ĐỔI TAB & ĐIỀU KHIỂN UI
+        // ============================================================================
+        function switchTab(tabIndex) {
+            state.activeTab = tabIndex;
+
+            // Cập nhật giao diện nút Tab
+            document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+                const numSpan = btn.querySelector('span');
+                if (idx + 1 === tabIndex) {
+                    btn.className = 'tab-btn active px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-t-lg border-t border-x transition-all flex items-center gap-2 whitespace-nowrap bg-blue-50/70 text-blue-700 border-slate-200 border-b-white -mb-px';
+                    numSpan.className = 'w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center';
+                } else {
+                    btn.className = 'tab-btn px-4 py-2.5 text-xs sm:text-sm font-medium rounded-t-lg border-t border-x border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all flex items-center gap-2 whitespace-nowrap';
+                    numSpan.className = 'w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-xs flex items-center justify-center';
+                }
+            });
+
+            // Hiển thị bảng điều khiển tương ứng
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById(`controls-tab-${i}`).classList.toggle('hidden', i !== tabIndex);
+            }
+
+            // Cập nhật gợi ý trên Canvas
+            const hintText = document.getElementById('hint-text');
+            if (tabIndex === 1) {
+                hintText.textContent = state.t1.barVisible
+                    ? 'Kéo thả thanh nam châm lại gần hoặc ra xa kim nam châm'
+                    : 'Chọn kịch bản (b) hoặc (c) để đưa thanh nam châm vào thí nghiệm';
+            } else if (tabIndex === 2) {
+                hintText.textContent = 'Điều chỉnh cường độ I, đảo chiều dòng điện hoặc đổi vị trí dây dẫn';
+            } else {
+                hintText.textContent = 'Quan sát độ uốn cong của hai dải lá nhôm khi đổi chiều & cường độ dòng điện';
+            }
+
+            if (window.MathJax && MathJax.typesetPromise) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // --- Điều khiển Tab 1 ---
+        function setTab1Preset(preset) {
+            state.t1.preset = preset;
+            const obs = document.getElementById('t1-observation');
+            const hintText = document.getElementById('hint-text');
+
+            // Reset style các nút preset
+            ['free', 'repel', 'attract'].forEach(p => {
+                const btn = document.getElementById(`btn-t1-${p}`);
+                if (p === preset) {
+                    btn.className = 't1-preset-btn w-full text-left px-3 py-2.5 rounded-lg border border-blue-500 bg-blue-50 text-blue-800 text-xs font-medium transition flex items-center justify-between';
+                } else {
+                    btn.className = 't1-preset-btn w-full text-left px-3 py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium transition flex items-center justify-between';
+                }
+            });
+
+            if (preset === 'free') {
+                state.t1.barVisible = false;
+                state.t1.needleVel += 0.08; // Tạo dao động nhẹ tự nhiên
+                obs.innerHTML = '<b>Trường hợp a:</b> Khi không có nam châm khác ở gần, kim nam châm tự do luôn nằm dọc theo phương <b>Bắc - Nam</b> địa lý (cực N chỉ hướng Bắc).';
+                hintText.textContent = 'Kim nam châm đang dao động tắt dần về vị trí cân bằng Bắc - Nam';
+            } else if (preset === 'repel') {
+                state.t1.barVisible = true;
+                state.t1.barPolarity = 1; // N hướng về kim
+                state.t1.barX = -175;
+                state.t1.barY = -30;
+                state.t1.barAngle = -22 * Math.PI / 180;
+                obs.innerHTML = '<b>Trường hợp b:</b> Đưa cực Bắc (N) của thanh nam châm lại gần cực Bắc (N) của kim. <b>Hai cực cùng tên đẩy nhau</b> làm kim bị đẩy lệch mạnh khỏi phương Bắc - Nam.';
+                hintText.textContent = 'Kéo thả thanh nam châm tự do bằng chuột/cảm ứng để thay đổi khoảng cách';
+            } else if (preset === 'attract') {
+                state.t1.barVisible = true;
+                state.t1.barPolarity = -1; // S hướng về kim
+                state.t1.barX = -175;
+                state.t1.barY = -25;
+                state.t1.barAngle = -22 * Math.PI / 180;
+                obs.innerHTML = '<b>Trường hợp c:</b> Đưa cực Nam (S) của thanh nam châm lại gần cực Bắc (N) của kim. <b>Hai cực khác tên hút nhau</b> làm cực N của kim bị kéo hướng về cực S của thanh nam châm.';
+                hintText.textContent = 'Kéo thả thanh nam châm tự do bằng chuột/cảm ứng để thay đổi khoảng cách';
+            }
+        }
+
+        function flipBarMagnet() {
+            if (!state.t1.barVisible) {
+                setTab1Preset('repel');
+                return;
+            }
+            state.t1.barPolarity *= -1;
+            const obs = document.getElementById('t1-observation');
+            if (state.t1.barPolarity === 1) {
+                obs.innerHTML = 'Đã đảo cực: Đầu gần kim là cực <b>Bắc (N - màu đỏ)</b>. Cực N của kim bị đẩy ra xa!';
+            } else {
+                obs.innerHTML = 'Đã đảo cực: Đầu gần kim là cực <b>Nam (S - màu xanh)</b>. Cực N của kim bị hút lại gần!';
+            }
+        }
+
+        // --- Điều khiển Tab 2 ---
+        function toggleOerstedPower() {
+            state.t2.powerOn = !state.t2.powerOn;
+            const btn = document.getElementById('t2-power-btn');
+            const status = document.getElementById('t2-switch-status');
+            const obs = document.getElementById('t2-observation');
+
+            if (state.t2.powerOn) {
+                btn.textContent = 'Đang BẬT (Đóng K)';
+                btn.className = 'px-3.5 py-2 rounded-lg font-semibold text-xs text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition';
+                status.textContent = 'Đang đóng mạch (Có dòng điện)';
+                obs.innerHTML = 'Mạch điện kín ($I \\neq 0$): Dòng điện sinh ra từ trường làm <b>kim nam châm quay lệch</b> khỏi phương Bắc - Nam.';
+            } else {
+                btn.textContent = 'Đang TẮT (Ngắt K)';
+                btn.className = 'px-3.5 py-2 rounded-lg font-semibold text-xs text-white bg-slate-500 hover:bg-slate-600 shadow-sm transition';
+                status.textContent = 'Đang ngắt mạch (I = 0 A)';
+                obs.innerHTML = 'Ngắt dòng điện ($I = 0$): Không còn lực từ của dòng điện, kim nam châm dao động tắt dần và <b>quay trở lại phương Bắc - Nam</b>.';
+            }
+            if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+        }
+
+        function updateOerstedCurrent(val) {
+            state.t2.current = parseFloat(val);
+            document.getElementById('t2-current-val').textContent = state.t2.current.toFixed(1) + ' A';
+        }
+
+        function reverseOerstedCurrent() {
+            state.t2.direction *= -1;
+            const obs = document.getElementById('t2-observation');
+            obs.innerHTML = 'Đã <b>đảo chiều dòng điện</b>: Chiều cảm ứng từ $\\vec{B}_{dòng}$ đảo ngược $\\rightarrow$ Kim nam châm quay lệch sang phía ngược lại!';
+            if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+        }
+
+        function setOerstedWirePos(pos) {
+            state.t2.wirePos = pos;
+            const btnAbove = document.getElementById('btn-wire-above');
+            const btnBelow = document.getElementById('btn-wire-below');
+            if (pos === 'above') {
+                btnAbove.className = 'py-2 px-2.5 rounded-lg border border-blue-500 bg-blue-50 text-blue-800 text-xs font-semibold transition';
+                btnBelow.className = 'py-2 px-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium transition';
+            } else {
+                btnBelow.className = 'py-2 px-2.5 rounded-lg border border-blue-500 bg-blue-50 text-blue-800 text-xs font-semibold transition';
+                btnAbove.className = 'py-2 px-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium transition';
+            }
+        }
+
+        // --- Điều khiển Tab 3 ---
+        function toggleTwoWiresPower() {
+            state.t3.powerOn = !state.t3.powerOn;
+            const btn = document.getElementById('t3-power-btn');
+            const status = document.getElementById('t3-switch-status');
+            if (state.t3.powerOn) {
+                btn.textContent = 'Đang BẬT';
+                btn.className = 'px-3.5 py-2 rounded-lg font-semibold text-xs text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition';
+                status.textContent = 'Khóa K đóng - Có dòng điện';
+            } else {
+                btn.textContent = 'Đang TẮT';
+                btn.className = 'px-3.5 py-2 rounded-lg font-semibold text-xs text-white bg-slate-500 hover:bg-slate-600 shadow-sm transition';
+                status.textContent = 'Khóa K ngắt - Không có dòng điện';
+            }
+            updateTab3Observation();
+        }
+
+        function setTwoWiresMode(mode) {
+            state.t3.mode = mode;
+            const btnOpp = document.getElementById('btn-w-opposite');
+            const btnSame = document.getElementById('btn-w-same');
+            if (mode === 'opposite') {
+                btnOpp.className = 'w-full text-left px-3 py-2.5 rounded-lg border border-blue-500 bg-blue-50 text-blue-800 text-xs font-semibold transition flex items-center justify-between';
+                btnSame.className = 'w-full text-left px-3 py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium transition flex items-center justify-between';
+            } else {
+                btnSame.className = 'w-full text-left px-3 py-2.5 rounded-lg border border-blue-500 bg-blue-50 text-blue-800 text-xs font-semibold transition flex items-center justify-between';
+                btnOpp.className = 'w-full text-left px-3 py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium transition flex items-center justify-between';
+            }
+            updateTab3Observation();
+        }
+
+        function updateTwoWiresCurrent(wireNum, val) {
+            const v = parseFloat(val);
+            if (wireNum === 1) {
+                state.t3.i1 = v;
+                document.getElementById('t3-i1-val').textContent = v.toFixed(1) + ' A';
+            } else {
+                state.t3.i2 = v;
+                document.getElementById('t3-i2-val').textContent = v.toFixed(1) + ' A';
+            }
+        }
+
+        function updateTab3Observation() {
+            const obs = document.getElementById('t3-observation');
+            if (!state.t3.powerOn) {
+                obs.innerHTML = 'Khi ngắt nguồn điện ($I_1 = I_2 = 0$), không có lực từ tương tác, hai dải lá nhôm treo <b>thẳng đứng song song</b> tự nhiên.';
+            } else if (state.t3.mode === 'opposite') {
+                obs.innerHTML = 'Hai dòng điện thẳng song song <b>ngược chiều</b> thì <b>đẩy nhau</b>: Hai vectơ lực từ $\\vec{F}$ hướng ra ngoài làm hai dải lá nhôm uốn cong tách xa nhau.';
+            } else {
+                obs.innerHTML = 'Hai dòng điện thẳng song song <b>cùng chiều</b> thì <b>hút nhau</b>: Hai vectơ lực từ $\\vec{F}$ hướng vào trong làm hai dải lá nhôm uốn cong xích lại gần nhau.';
+            }
+            if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+        }
+
+        // ============================================================================
+        // XỬ LÝ KÉO THẢ THANH NAM CHÂM TRONG TAB 1 (MOUSE & TOUCH)
+        // ============================================================================
+        function getPointerPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function isPointInBarMagnet(px, py) {
+            if (!state.t1.barVisible) return false;
+            const cx = width * 0.56 + state.t1.barX;
+            const cy = height * 0.52 + state.t1.barY;
+            // Biến đổi ngược góc xoay của thanh nam châm
+            const dx = px - cx;
+            const dy = py - cy;
+            const cos = Math.cos(-state.t1.barAngle);
+            const sin = Math.sin(-state.t1.barAngle);
+            const lx = dx * cos - dy * sin;
+            const ly = dx * sin + dy * cos;
+            return Math.abs(lx) <= 85 && Math.abs(ly) <= 28;
+        }
+
+        function handlePointerDown(e) {
+            if (state.activeTab !== 1 || !state.t1.barVisible) return;
+            const pos = getPointerPos(e);
+            if (isPointInBarMagnet(pos.x, pos.y)) {
+                state.t1.isDragging = true;
+                const cx = width * 0.56 + state.t1.barX;
+                const cy = height * 0.52 + state.t1.barY;
+                state.t1.dragOffsetX = pos.x - cx;
+                state.t1.dragOffsetY = pos.y - cy;
+                canvas.style.cursor = 'grabbing';
+                if (e.cancelable) e.preventDefault();
+            }
+        }
+
+        function handlePointerMove(e) {
+            if (state.activeTab !== 1) return;
+            const pos = getPointerPos(e);
+
+            if (state.t1.isDragging) {
+                const pivotX = width * 0.56;
+                const pivotY = height * 0.52;
+                let newBarX = (pos.x - state.t1.dragOffsetX) - pivotX;
+                let newBarY = (pos.y - state.t1.dragOffsetY) - pivotY;
+
+                // Giới hạn không cho thanh nam châm đè trực tiếp lên tâm trục kim (bán kính an toàn 95px)
+                const dist = Math.hypot(newBarX, newBarY);
+                if (dist < 115) {
+                    const angle = Math.atan2(newBarY, newBarX);
+                    newBarX = Math.cos(angle) * 115;
+                    newBarY = Math.sin(angle) * 115;
+                }
+
+                // Giới hạn trong khung canvas
+                newBarX = Math.max(-pivotX + 80, Math.min(width - pivotX - 80, newBarX));
+                newBarY = Math.max(-pivotY + 50, Math.min(height - pivotY - 50, newBarY));
+
+                state.t1.barX = newBarX;
+                state.t1.barY = newBarY;
+                // Tự động hướng trục thanh nam châm nhẹ về phía tâm kim cho tự nhiên
+                state.t1.barAngle = Math.atan2(-newBarY, -newBarX);
+
+                if (e.cancelable) e.preventDefault();
+            } else {
+                canvas.style.cursor = isPointInBarMagnet(pos.x, pos.y) ? 'grab' : 'default';
+            }
+        }
+
+        function handlePointerUp() {
+            if (state.t1.isDragging) {
+                state.t1.isDragging = false;
+                canvas.style.cursor = 'grab';
+            }
+        }
+
+        canvas.addEventListener('mousedown', handlePointerDown);
+        window.addEventListener('mousemove', handlePointerMove);
+        window.addEventListener('mouseup', handlePointerUp);
+        canvas.addEventListener('touchstart', handlePointerDown, { passive: false });
+        window.addEventListener('touchmove', handlePointerMove, { passive: false });
+        window.addEventListener('touchend', handlePointerUp);
+
+        // ============================================================================
+        // CẬP NHẬT VẬT LÝ (PHYSICS STEP)
+        // ============================================================================
+        function updatePhysics(dt) {
+            state.time += dt;
+
+            // --- 1. Vật lý Tab 1: Mô-men từ trường Trái Đất + Mô-men từ thanh nam châm ---
+            if (state.activeTab === 1) {
+                const t1 = state.t1;
+                // Mô-men hồi phục của từ trường Trái Đất kéo kim về baseAngle
+                const kEarth = 14.0;
+                let torque = -kEarth * Math.sin(t1.needleAngle - t1.baseAngle);
+
+                t1.lastForceN = { fx: 0, fy: 0 };
+                t1.lastForceS = { fx: 0, fy: 0 };
+
+                if (t1.barVisible) {
+                    const needleHalfLen = 68;
+                    const barHalfLen = 65;
+
+                    // Tọa độ 2 cực của kim nam châm (tương đối so với trục quay)
+                    const nPos = {
+                        x: Math.cos(t1.needleAngle) * needleHalfLen,
+                        y: Math.sin(t1.needleAngle) * needleHalfLen
+                    };
+                    const sPos = {
+                        x: -Math.cos(t1.needleAngle) * needleHalfLen,
+                        y: -Math.sin(t1.needleAngle) * needleHalfLen
+                    };
+
+                    // Tọa độ 2 cực của thanh nam châm
+                    const barN = {
+                        x: t1.barX + Math.cos(t1.barAngle) * barHalfLen * t1.barPolarity,
+                        y: t1.barY + Math.sin(t1.barAngle) * barHalfLen * t1.barPolarity
+                    };
+                    const barS = {
+                        x: t1.barX - Math.cos(t1.barAngle) * barHalfLen * t1.barPolarity,
+                        y: t1.barY - Math.sin(t1.barAngle) * barHalfLen * t1.barPolarity
+                    };
+
+                    // Hàm tính lực Coulomb từ giữa hai cực từ (q1, q2 in {+1, -1})
+                    const calcPoleForce = (targetPos, qTarget, sourcePos, qSource) => {
+                        const dx = targetPos.x - sourcePos.x;
+                        const dy = targetPos.y - sourcePos.y;
+                        const r = Math.max(38, Math.hypot(dx, dy));
+                        // Cùng dấu -> đẩy (+), trái dấu -> hút (-)
+                        const mag = (qTarget * qSource * 160000) / Math.pow(r, 2.2);
+                        return {
+                            fx: (dx / r) * mag,
+                            fy: (dy / r) * mag
+                        };
+                    };
+
+                    // Tổng lực tác dụng lên cực N của kim (q = +1)
+                    const fNN = calcPoleForce(nPos, 1, barN, 1);
+                    const fNS = calcPoleForce(nPos, 1, barS, -1);
+                    const totalFN = { fx: fNN.fx + fNS.fx, fy: fNN.fy + fNS.fy };
+
+                    // Tổng lực tác dụng lên cực S của kim (q = -1)
+                    const fSN = calcPoleForce(sPos, -1, barN, 1);
+                    const fSS = calcPoleForce(sPos, -1, barS, -1);
+                    const totalFS = { fx: fSN.fx + fSS.fx, fy: fSN.fy + fSS.fy };
+
+                    t1.lastForceN = totalFN;
+                    t1.lastForceS = totalFS;
+
+                    // Mô-men lực tau = r x F
+                    const torqueN = (nPos.x * totalFN.fy - nPos.y * totalFN.fx) * 0.045;
+                    const torqueS = (sPos.x * totalFS.fy - sPos.y * totalFS.fx) * 0.045;
+                    torque += torqueN + torqueS;
+                }
+
+                // Tích phân Euler bán ẩn với lực cản tắt dần
+                const damping = 4.2;
+                t1.needleVel += (torque - damping * t1.needleVel) * dt;
+                t1.needleAngle += t1.needleVel * dt;
+
+                // Cập nhật Telemetry
+                const deg = ((t1.needleAngle - t1.baseAngle) * 180 / Math.PI);
+                document.getElementById('telemetry-title').textContent = 'Góc lệch kim nam châm';
+                document.getElementById('telemetry-value').textContent = `Δα = ${deg >= 0 ? '+' : ''}${deg.toFixed(1)}° so với B-N`;
+            }
+
+            // --- 2. Vật lý Tab 2: Thí nghiệm Oersted ---
+            if (state.activeTab === 2) {
+                const t2 = state.t2;
+                const effectiveI = t2.powerOn ? t2.current * t2.direction : 0;
+                const posSign = t2.wirePos === 'above' ? 1 : -1;
+
+                // Dòng điện chạy dọc hướng Bắc-Nam tạo từ trường vuông góc (B_wire)
+                // Góc lệch cân bằng: tan(alpha) = B_wire / B_earth
+                const bRatio = (effectiveI * posSign) / 4.2;
+                const targetAngle = t2.baseAngle + Math.atan(bRatio) * 0.88;
+
+                const kSpring = 22.0;
+                const damping = 5.0;
+                const accel = -kSpring * (t2.needleAngle - targetAngle) - damping * t2.needleVel;
+                t2.needleVel += accel * dt;
+                t2.needleAngle += t2.needleVel * dt;
+
+                // Cập nhật hiệu ứng chuyển động điện tích
+                if (t2.powerOn && t2.current > 0) {
+                    t2.chargeOffset = (t2.chargeOffset + t2.direction * t2.current * 24 * dt) % 40;
+                }
+
+                const deg = ((t2.needleAngle - t2.baseAngle) * 180 / Math.PI);
+                document.getElementById('telemetry-title').textContent = 'Thí nghiệm Oersted';
+                document.getElementById('telemetry-value').textContent = `I = ${t2.powerOn ? t2.current.toFixed(1) : '0.0'} A | Góc lệch: ${deg >= 0 ? '+' : ''}${deg.toFixed(1)}°`;
+            }
+
+            // --- 3. Vật lý Tab 3: Tương tác 2 dòng điện ---
+            if (state.activeTab === 3) {
+                const t3 = state.t3;
+                let targetDeflection = 0;
+
+                if (t3.powerOn) {
+                    // F tỉ lệ với I1 * I2. Ngược chiều -> đẩy (+), Cùng chiều -> hút (-)
+                    const sign = t3.mode === 'opposite' ? 1 : -1;
+                    const forceFactor = (t3.i1 * t3.i2) / 100; // 0 -> 1
+                    targetDeflection = sign * (8 + forceFactor * 26);
+                }
+
+                const kSpring = 26.0;
+                const damping = 5.5;
+                const accel = -kSpring * (t3.deflection - targetDeflection) - damping * t3.deflectionVel;
+                t3.deflectionVel += accel * dt;
+                t3.deflection += t3.deflectionVel * dt;
+
+                if (t3.powerOn) {
+                    const avgI = (t3.i1 + t3.i2) * 0.5;
+                    t3.chargeOffset = (t3.chargeOffset + avgI * 22 * dt) % 36;
+                }
+
+                const forceMicroN = t3.powerOn ? (2 * 0.1 * t3.i1 * t3.i2 / 0.02).toFixed(1) : '0.0';
+                document.getElementById('telemetry-title').textContent = 'Lực từ tương tác (l = 1m, r = 2cm)';
+                document.getElementById('telemetry-value').textContent = `F = ${forceMicroN} × 10⁻⁵ N (${!t3.powerOn ? 'Ngắt' : (t3.mode === 'opposite' ? 'Đẩy' : 'Hút')})`;
+            }
+        }
+
+        // ============================================================================
+        // CÁC HÀM VẼ ĐỒ HỌA CHUNG (CÔNG CỤ VẼ KIM NAM CHÂM, ĐẾ ĐỠ, MŨI TÊN)
+        // ============================================================================
+
+        // Vẽ một mũi tên vectơ rõ nét
+        function drawVectorArrow(x1, y1, x2, y2, color, lineWidth = 2.5, label = '', labelOffset = { x: 0, y: -10 }) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const len = Math.hypot(dx, dy);
+            if (len < 6) return;
+
+            const angle = Math.atan2(dy, dx);
+            const headLen = Math.min(12, len * 0.4);
+
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = lineWidth;
+            ctx.lineCap = 'round';
+
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+
+            // Đầu mũi tên
+            ctx.beginPath();
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(x2 - headLen * Math.cos(angle - Math.PI / 6), y2 - headLen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(x2 - headLen * Math.cos(angle + Math.PI / 6), y2 - headLen * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+
+            if (label) {
+                ctx.font = 'bold 14px Inter, sans-serif';
+                ctx.fillText(label, x2 + labelOffset.x, y2 + labelOffset.y);
+            }
+            ctx.restore();
+        }
+
+        // Vẽ đế đỡ kim nam châm chuẩn SGK (khối hộp chữ nhật 3D + trụ đứng + mũi nhọn)
+        function drawCompassStand(cx, cy) {
+            ctx.save();
+            const baseW = 66;
+            const baseH = 22;
+            const depthY = 10;
+            const by = cy + 44;
+
+            // Bóng đổ dưới mặt bàn
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.08)';
+            ctx.beginPath();
+            ctx.ellipse(cx + 4, by + baseH + 4, baseW * 0.65, 10, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Mặt trên đế (hình bình hành phối cảnh)
+            ctx.fillStyle = '#cbd5e1';
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(cx - baseW / 2 - 6, by);
+            ctx.lineTo(cx + baseW / 2 - 6, by);
+            ctx.lineTo(cx + baseW / 2 + 6, by + depthY);
+            ctx.lineTo(cx - baseW / 2 + 6, by + depthY);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Mặt trước đế
+            ctx.fillStyle = '#94a3b8';
+            ctx.beginPath();
+            ctx.rect(cx - baseW / 2 + 6, by + depthY, baseW, baseH);
+            ctx.fill();
+            ctx.stroke();
+
+            // Mặt bên trái đế
+            ctx.fillStyle = '#64748b';
+            ctx.beginPath();
+            ctx.moveTo(cx - baseW / 2 - 6, by);
+            ctx.lineTo(cx - baseW / 2 + 6, by + depthY);
+            ctx.lineTo(cx - baseW / 2 + 6, by + depthY + baseH);
+            ctx.lineTo(cx - baseW / 2 - 6, by + baseH);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Trụ đứng
+            const postW = 12;
+            const postTop = cy + 16;
+            const postBot = by + depthY * 0.5;
+            const grad = ctx.createLinearGradient(cx - postW / 2, 0, cx + postW / 2, 0);
+            grad.addColorStop(0, '#64748b');
+            grad.addColorStop(0.5, '#cbd5e1');
+            grad.addColorStop(1, '#475569');
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.rect(cx - postW / 2, postTop, postW, postBot - postTop);
+            ctx.fill();
+            ctx.stroke();
+
+            // Đỉnh elip trụ
+            ctx.fillStyle = '#e2e8f0';
+            ctx.beginPath();
+            ctx.ellipse(cx, postTop, postW / 2, 3, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Kim nhọn đỡ tâm nam châm
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(cx, postTop);
+            ctx.lineTo(cx, cy);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // Vẽ trục Bắc - Nam nét đứt & Bóng mờ vị trí cân bằng ban đầu
+        function drawNorthSouthAxisAndGhost(cx, cy, baseAngle, halfLen = 74) {
+            ctx.save();
+            // Đường nét đứt trục Bắc - Nam
+            const axisLen = 165;
+            const x1 = cx + Math.cos(baseAngle) * axisLen;
+            const y1 = cy + Math.sin(baseAngle) * axisLen;
+            const x2 = cx - Math.cos(baseAngle) * axisLen;
+            const y2 = cy - Math.sin(baseAngle) * axisLen;
+
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 1.6;
+            ctx.setLineDash([7, 5]);
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Chữ "Bắc" và "Nam"
+            ctx.fillStyle = '#1e293b';
+            ctx.font = '600 15px Inter, sans-serif';
+            ctx.fillText('Bắc', x1 - 32, y1 - 8);
+            ctx.fillText('Nam', x2 + 8, y2 + 16);
+
+            // Vẽ bóng mờ (ghost) của kim nam châm ở vị trí cân bằng ban đầu
+            ctx.translate(cx, cy);
+            ctx.rotate(baseAngle);
+            const halfW = 12;
+
+            // Nửa Bắc mờ (đỏ nhạt)
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.22)';
+            ctx.strokeStyle = 'rgba(239, 68, 68, 0.45)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(halfLen, 0);
+            ctx.lineTo(0, -halfW);
+            ctx.lineTo(0, halfW);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Nửa Nam mờ (xanh nhạt)
+            ctx.fillStyle = 'rgba(59, 130, 246, 0.22)';
+            ctx.strokeStyle = 'rgba(59, 130, 246, 0.45)';
+            ctx.beginPath();
+            ctx.moveTo(-halfLen, 0);
+            ctx.lineTo(0, -halfW);
+            ctx.lineTo(0, halfW);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // Vẽ kim nam châm hình thoi chuẩn (Cực N màu đỏ chỉ theo hướng `angle`, cực S màu xanh)
+        function drawCompassNeedle(cx, cy, angle, halfLen = 74) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+
+            const halfW = 13;
+
+            // Bóng đổ nhẹ của kim
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.12)';
+            ctx.beginPath();
+            ctx.moveTo(halfLen, 4);
+            ctx.lineTo(0, -halfW + 4);
+            ctx.lineTo(-halfLen, 4);
+            ctx.lineTo(0, halfW + 4);
+            ctx.closePath();
+            ctx.fill();
+
+            // Nửa cực Bắc (N - Màu đỏ #ef4444)
+            ctx.fillStyle = '#ef4444';
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(halfLen, 0);
+            ctx.lineTo(0, -halfW);
+            ctx.lineTo(0, halfW);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Nửa cực Nam (S - Màu xanh dương #3b82f6)
+            ctx.fillStyle = '#3b82f6';
+            ctx.beginPath();
+            ctx.moveTo(-halfLen, 0);
+            ctx.lineTo(0, -halfW);
+            ctx.lineTo(0, halfW);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Chốt trục xoay ở tâm
+            ctx.fillStyle = '#f8fafc';
+            ctx.beginPath();
+            ctx.arc(0, 0, 3.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.restore();
+
+            // Nhãn chữ N và S bên cạnh 2 đầu kim (luôn thẳng đứng dễ đọc)
+            const nLabelX = cx + Math.cos(angle) * (halfLen + 14) - 6;
+            const nLabelY = cy + Math.sin(angle) * (halfLen + 14) - 6;
+            const sLabelX = cx - Math.cos(angle) * (halfLen + 16) - 4;
+            const sLabelY = cy - Math.sin(angle) * (halfLen + 16) + 14;
+
+            ctx.save();
+            ctx.font = 'bold 15px Inter, sans-serif';
+            ctx.fillStyle = '#dc2626';
+            ctx.fillText('N', nLabelX, nLabelY);
+            ctx.fillStyle = '#2563eb';
+            ctx.fillText('S', sLabelX, sLabelY);
+            ctx.restore();
+        }
+
+        // ============================================================================
+        // RENDER TAB 1: TƯƠNG TÁC GIỮA HAI NAM CHÂM (HÌNH 14.1)
+        // ============================================================================
+        function renderTab1() {
+            const t1 = state.t1;
+            const pivotX = width * 0.56;
+            const pivotY = height * 0.52;
+
+            // Tiêu đề góc trên trái
+            ctx.save();
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'bold 16px Inter, sans-serif';
+            const subTitle = t1.preset === 'free'
+                ? 'Hình 14.1a: Kim nam châm tự do'
+                : (t1.barPolarity === 1 ? 'Hình 14.1b: Hai cực cùng tên lại gần nhau' : 'Hình 14.1c: Hai cực khác tên lại gần nhau');
+            ctx.fillText(subTitle, 20, 32);
+            ctx.restore();
+
+            // 1. Vẽ trục Bắc - Nam & bóng mờ kim
+            drawNorthSouthAxisAndGhost(pivotX, pivotY, t1.baseAngle);
+
+            // 2. Vẽ thanh nam châm (nếu đang hiện)
+            if (t1.barVisible) {
+                const bx = pivotX + t1.barX;
+                const by = pivotY + t1.barY;
+
+                // Vẽ các đường sức từ mờ xung quanh thanh nam châm
+                if (t1.showField) {
+                    drawBarMagnetFieldLines(bx, by, t1.barAngle, t1.barPolarity);
+                }
+
+                drawBarMagnet3D(bx, by, t1.barAngle, t1.barPolarity);
+            }
+
+            // 3. Vẽ đế đỡ và kim nam châm
+            drawCompassStand(pivotX, pivotY);
+            drawCompassNeedle(pivotX, pivotY, t1.needleAngle);
+
+            // 4. Vẽ vectơ lực từ tác dụng lên hai cực của kim nam châm
+            if (t1.barVisible && t1.showField) {
+                const needleHalfLen = 70;
+                const nx = pivotX + Math.cos(t1.needleAngle) * needleHalfLen;
+                const ny = pivotY + Math.sin(t1.needleAngle) * needleHalfLen;
+                const sx = pivotX - Math.cos(t1.needleAngle) * needleHalfLen;
+                const sy = pivotY - Math.sin(t1.needleAngle) * needleHalfLen;
+
+                const scaleF = 1.6;
+                const fnLen = Math.min(65, Math.hypot(t1.lastForceN.fx, t1.lastForceN.fy) * scaleF);
+                if (fnLen > 8) {
+                    const angN = Math.atan2(t1.lastForceN.fy, t1.lastForceN.fx);
+                    drawVectorArrow(nx, ny, nx + Math.cos(angN) * fnLen, ny + Math.sin(angN) * fnLen, '#0284c7', 2.5, 'F', { x: 4, y: -6 });
+                }
+
+                const fsLen = Math.min(65, Math.hypot(t1.lastForceS.fx, t1.lastForceS.fy) * scaleF);
+                if (fsLen > 8) {
+                    const angS = Math.atan2(t1.lastForceS.fy, t1.lastForceS.fx);
+                    drawVectorArrow(sx, sy, sx + Math.cos(angS) * fsLen, sy + Math.sin(angS) * fsLen, '#0284c7', 2.5, 'F', { x: 4, y: 14 });
+                }
+            }
+        }
+
+        function drawBarMagnet3D(bx, by, angle, polarity) {
+            ctx.save();
+            ctx.translate(bx, by);
+            ctx.rotate(angle);
+
+            const len = 148;
+            const h = 34;
+            const depth = 8;
+
+            // Bóng đổ
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.14)';
+            ctx.fillRect(-len / 2 + 4, -h / 2 + 8, len, h);
+
+            // Polarity = 1: Phải là N (Đỏ), Trái là S (Xanh)
+            // Polarity = -1: Phải là S (Xanh), Trái là N (Đỏ)
+            const leftColor = polarity === 1 ? '#3b82f6' : '#ef4444';
+            const leftTopColor = polarity === 1 ? '#60a5fa' : '#f87171';
+            const leftLabel = polarity === 1 ? 'S' : 'N';
+
+            const rightColor = polarity === 1 ? '#ef4444' : '#3b82f6';
+            const rightTopColor = polarity === 1 ? '#f87171' : '#60a5fa';
+            const rightLabel = polarity === 1 ? 'N' : 'S';
+
+            ctx.lineWidth = 1.6;
+            ctx.strokeStyle = '#0f172a';
+
+            // Mặt trên 3D (nửa trái)
+            ctx.fillStyle = leftTopColor;
+            ctx.beginPath();
+            ctx.moveTo(-len / 2, -h / 2);
+            ctx.lineTo(0, -h / 2);
+            ctx.lineTo(depth, -h / 2 - depth);
+            ctx.lineTo(-len / 2 + depth, -h / 2 - depth);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Mặt trên 3D (nửa phải)
+            ctx.fillStyle = rightTopColor;
+            ctx.beginPath();
+            ctx.moveTo(0, -h / 2);
+            ctx.lineTo(len / 2, -h / 2);
+            ctx.lineTo(len / 2 + depth, -h / 2 - depth);
+            ctx.lineTo(depth, -h / 2 - depth);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Mặt cạnh phải 3D
+            ctx.fillStyle = rightColor;
+            ctx.beginPath();
+            ctx.moveTo(len / 2, -h / 2);
+            ctx.lineTo(len / 2 + depth, -h / 2 - depth);
+            ctx.lineTo(len / 2 + depth, h / 2 - depth);
+            ctx.lineTo(len / 2, h / 2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Mặt chính diện (Nửa trái)
+            ctx.fillStyle = leftColor;
+            ctx.fillRect(-len / 2, -h / 2, len / 2, h);
+            ctx.strokeRect(-len / 2, -h / 2, len / 2, h);
+
+            // Mặt chính diện (Nửa phải)
+            ctx.fillStyle = rightColor;
+            ctx.fillRect(0, -h / 2, len / 2, h);
+            ctx.strokeRect(0, -h / 2, len / 2, h);
+
+            // Chữ S và N trên thanh nam châm
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 17px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(leftLabel, -len / 4, 1);
+            ctx.fillText(rightLabel, len / 4, 1);
+
+            ctx.restore();
+        }
+
+        function drawBarMagnetFieldLines(bx, by, angle, polarity) {
+            ctx.save();
+            ctx.translate(bx, by);
+            ctx.rotate(angle);
+
+            ctx.strokeStyle = 'rgba(100, 116, 139, 0.25)';
+            ctx.lineWidth = 1.3;
+            ctx.setLineDash([4, 4]);
+
+            // Vẽ 3 vòng đường sức từ đối xứng trên và dưới
+            const loops = [42, 75, 112];
+            loops.forEach(ry => {
+                [-1, 1].forEach(side => {
+                    ctx.beginPath();
+                    ctx.moveTo(65, 0);
+                    ctx.bezierCurveTo(105, side * ry, -105, side * ry, -65, 0);
+                    ctx.stroke();
+
+                    // Mũi tên chỉ chiều đường sức từ (Ra Bắc N, vào Nam S)
+                    const midX = 0;
+                    const midY = side * ry * 0.75;
+                    const dir = polarity === 1 ? -1 : 1; // N ở phải thì trên đỉnh đường sức hướng sang trái (-1)
+                    ctx.save();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = 'rgba(100, 116, 139, 0.45)';
+                    ctx.beginPath();
+                    ctx.moveTo(midX + dir * 5, midY);
+                    ctx.lineTo(midX - dir * 4, midY - 4);
+                    ctx.lineTo(midX - dir * 4, midY + 4);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore();
+                });
+            });
+
+            ctx.restore();
+        }
+
+        // ============================================================================
+        // RENDER TAB 2: THÍ NGHIỆM OERSTED (HÌNH 14.2)
+        // ============================================================================
+        function renderTab2() {
+            const t2 = state.t2;
+            const cx = width * 0.5;
+            const cy = height * 0.54;
+
+            // Tiêu đề
+            ctx.save();
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'bold 16px Inter, sans-serif';
+            ctx.fillText('Hình 14.2: Thí nghiệm của Oersted (Ơ-xtét)', 20, 32);
+            ctx.restore();
+
+            // 1. Vẽ trục Bắc - Nam địa lý & Bóng mờ kim
+            drawNorthSouthAxisAndGhost(cx, cy, t2.baseAngle);
+
+            // Hàm vẽ dây dẫn thẳng mang dòng điện
+            const drawOerstedWire = () => {
+                const offsetY = t2.wirePos === 'above' ? -58 : 78;
+                const wireLen = 190;
+                const wx1 = cx + Math.cos(t2.baseAngle) * wireLen;
+                const wy1 = cy + offsetY + Math.sin(t2.baseAngle) * wireLen;
+                const wx2 = cx - Math.cos(t2.baseAngle) * wireLen;
+                const wy2 = cy + offsetY - Math.sin(t2.baseAngle) * wireLen;
+
+                ctx.save();
+                // Dây dẫn màu đỏ nổi bật (hoặc xám nếu ngắt điện)
+                ctx.strokeStyle = t2.powerOn ? '#dc2626' : '#64748b';
+                ctx.lineWidth = t2.powerOn ? 3.5 : 2.5;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(wx1, wy1);
+                ctx.lineTo(wx2, wy2);
+                ctx.stroke();
+
+                // Các hạt điện tích chuyển động dọc theo dây dẫn khi có dòng điện
+                if (t2.powerOn && t2.current > 0) {
+                    const totalDist = wireLen * 2;
+                    const ux = Math.cos(t2.baseAngle);
+                    const uy = Math.sin(t2.baseAngle);
+                    ctx.fillStyle = '#fef08a';
+                    ctx.strokeStyle = '#b91c1c';
+                    ctx.lineWidth = 1;
+
+                    for (let d = -wireLen + 20; d < wireLen - 20; d += 40) {
+                        let posD = d + t2.chargeOffset;
+                        if (posD > wireLen - 15) posD -= (totalDist - 30);
+                        if (posD < -wireLen + 15) posD += (totalDist - 30);
+
+                        const px = cx + ux * posD;
+                        const py = cy + offsetY + uy * posD;
+                        ctx.beginPath();
+                        ctx.arc(px, py, 3.2, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                    }
+                }
+
+                // Mũi tên chỉ chiều dòng điện I ở giữa dây (giống hệt Hình 14.2)
+                const midX = cx;
+                const midY = cy + offsetY;
+                const dirAngle = t2.direction === 1 ? t2.baseAngle + Math.PI : t2.baseAngle;
+
+                if (t2.powerOn && t2.current > 0) {
+                    ctx.fillStyle = '#dc2626';
+                    ctx.beginPath();
+                    ctx.moveTo(midX + Math.cos(dirAngle) * 10, midY + Math.sin(dirAngle) * 10);
+                    ctx.lineTo(midX + Math.cos(dirAngle + 2.5) * 11, midY + Math.sin(dirAngle + 2.5) * 11);
+                    ctx.lineTo(midX + Math.cos(dirAngle - 2.5) * 11, midY + Math.sin(dirAngle - 2.5) * 11);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+
+                // Nhãn chữ I
+                ctx.fillStyle = t2.powerOn ? '#dc2626' : '#64748b';
+                ctx.font = 'bold 16px Inter, sans-serif';
+                ctx.fillText(t2.powerOn ? `I = ${t2.current.toFixed(1)}A` : 'I = 0', midX - 8, midY - 14);
+
+                ctx.restore();
+            };
+
+            // Nếu dây đặt dưới kim thì vẽ dây trước, kim sau
+            if (t2.wirePos === 'below') {
+                drawOerstedWire();
+            }
+
+            // 2. Vẽ đế đỡ và kim nam châm
+            drawCompassStand(cx, cy);
+            drawCompassNeedle(cx, cy, t2.needleAngle);
+
+            // Nếu dây đặt trên kim thì vẽ dây sau cùng (đè lên trên giống Hình 14.2)
+            if (t2.wirePos === 'above') {
+                drawOerstedWire();
+            }
+
+            // 3. Hiển thị vectơ cảm ứng từ B_dòng và lực từ F tác dụng lên cực N
+            if (t2.showVectors && t2.powerOn && t2.current > 0) {
+                const posSign = t2.wirePos === 'above' ? 1 : -1;
+                const perpAngle = t2.baseAngle + (Math.PI / 2) * t2.direction * posSign;
+                const bLen = 25 + t2.current * 4.5;
+
+                // Vectơ cảm ứng từ B của dòng điện tại tâm kim
+                drawVectorArrow(
+                    cx, cy,
+                    cx + Math.cos(perpAngle) * bLen,
+                    cy + Math.sin(perpAngle) * bLen,
+                    '#7c3aed', 2.5, 'B_dòng', { x: 6, y: -4 }
+                );
+
+                // Vectơ lực từ F tác dụng lên cực N của kim
+                const nx = cx + Math.cos(t2.needleAngle) * 72;
+                const ny = cy + Math.sin(t2.needleAngle) * 72;
+                const fLen = 20 + t2.current * 3.5;
+                drawVectorArrow(
+                    nx, ny,
+                    nx + Math.cos(perpAngle) * fLen,
+                    ny + Math.sin(perpAngle) * fLen,
+                    '#0284c7', 2.5, 'F', { x: 6, y: -4 }
+                );
+            }
+        }
+
+        // ============================================================================
+        // RENDER TAB 3: TƯƠNG TÁC GIỮA HAI DÒNG ĐIỆN (HÌNH 14.3)
+        // ============================================================================
+        function renderTab3() {
+            const t3 = state.t3;
+
+            // 1. Vẽ nền phối cảnh 3D bàn thí nghiệm (giống Hình 14.3)
+            ctx.save();
+            // Tường xanh nhạt phía trên
+            ctx.fillStyle = '#e0f2fe';
+            ctx.fillRect(0, 0, width, height * 0.45);
+
+            // Mặt bàn gỗ màu vàng nâu nhạt phối cảnh
+            const tableYLeft = height * 0.34;
+            const tableYTop = height * 0.12;
+            const tableXPeak = width * 0.54;
+
+            ctx.fillStyle = '#e7cba9';
+            ctx.beginPath();
+            ctx.moveTo(0, tableYLeft);
+            ctx.lineTo(tableXPeak, tableYTop);
+            ctx.lineTo(width, tableYTop + (width - tableXPeak) * 0.32);
+            ctx.lineTo(width, height * 0.88);
+            ctx.lineTo(0, height * 0.88);
+            ctx.closePath();
+            ctx.fill();
+
+            // Viền cạnh bàn
+            ctx.strokeStyle = '#b47b44';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(0, tableYLeft);
+            ctx.lineTo(tableXPeak, tableYTop);
+            ctx.lineTo(width, tableYTop + (width - tableXPeak) * 0.32);
+            ctx.stroke();
+
+            // Tiêu đề góc trên trái
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'bold 16px Inter, sans-serif';
+            ctx.fillText('Hình 14.3: Thí nghiệm tương tác giữa hai dòng điện', 20, 32);
+            ctx.restore();
+
+            // 2. Vẽ giá đỡ thí nghiệm bằng kim loại ở phía sau bên phải (giống Hình 14.3)
+            const standX = width * 0.68;
+            const standBaseY = height * 0.42;
+            drawLabStand3D(standX, standBaseY);
+
+            // 3. Tọa độ hai dải lá nhôm treo song song thẳng đứng
+            const w1X = width * 0.46;
+            const w2X = width * 0.54;
+            const topY = height * 0.06;
+            const botY1 = height * 0.53;
+            const botY2 = height * 0.55;
+
+            const defl = t3.deflection; // > 0: đẩy nhau (uốn ra ngoài), < 0: hút nhau (uốn vào trong)
+
+            // Vẽ đường sức từ tròn đồng tâm quanh mỗi dây dẫn (nếu bật)
+            if (t3.showField && t3.powerOn) {
+                const midY = (topY + botY1) * 0.52;
+                drawConcentricFieldCircles(w1X - defl * 0.65, midY, 1, t3.i1);
+                drawConcentricFieldCircles(w2X + defl * 0.65, midY, t3.mode === 'opposite' ? -1 : 1, t3.i2);
+            }
+
+            // Vẽ 2 dải lá nhôm/dây dẫn mảnh mềm
+            drawAluminumStrip(w1X, topY, botY1, -defl, 1, t3.powerOn, t3.i1, t3.chargeOffset);
+            const dir2 = t3.mode === 'opposite' ? -1 : 1;
+            drawAluminumStrip(w2X, topY, botY2, defl, dir2, t3.powerOn, t3.i2, t3.chargeOffset);
+
+            // 4. Vẽ 2 kẹp cá sấu màu bạc ở đầu dưới 2 dải lá nhôm + 2 dây dẫn nguồn màu đen
+            drawAlligatorClipAndCable(w1X, botY1, true, t3.powerOn, 1, t3.chargeOffset);
+            drawAlligatorClipAndCable(w2X, botY2, false, t3.powerOn, dir2, t3.chargeOffset);
+
+            // 5. Vẽ hai vectơ lực từ F màu xanh đậm (giống Hình 14.3)
+            if (t3.powerOn) {
+                const fMidY1 = height * 0.25;
+                const fMidY2 = height * 0.29;
+                const x1Curve = w1X - defl * 0.72;
+                const x2Curve = w2X + defl * 0.72;
+
+                const fLen = 35 + ((t3.i1 + t3.i2) / 20) * 45;
+                const sign = t3.mode === 'opposite' ? 1 : -1;
+
+                // Vectơ F tác dụng lên lá trái
+                drawVectorArrow(
+                    x1Curve - 10, fMidY1,
+                    x1Curve - 10 - sign * fLen, fMidY1 - sign * fLen * 0.35,
+                    '#1d4ed8', 3.5, 'F⃗', { x: -18, y: 18 }
+                );
+
+                // Vectơ F tác dụng lên lá phải
+                drawVectorArrow(
+                    x2Curve + 10, fMidY2,
+                    x2Curve + 10 + sign * fLen, fMidY2 + sign * fLen * 0.35,
+                    '#1d4ed8', 3.5, 'F⃗', { x: 6, y: 20 }
+                );
+            }
+        }
+
+        function drawLabStand3D(sx, sy) {
+            ctx.save();
+            // Đế gang chữ nhật xám
+            ctx.fillStyle = '#94a3b8';
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(sx - 55, sy);
+            ctx.lineTo(sx + 35, sy - 22);
+            ctx.lineTo(sx + 95, sy + 5);
+            ctx.lineTo(sx + 5, sy + 32);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Cạnh dày của đế
+            ctx.fillStyle = '#64748b';
+            ctx.beginPath();
+            ctx.moveTo(sx - 55, sy);
+            ctx.lineTo(sx + 5, sy + 32);
+            ctx.lineTo(sx + 5, sy + 44);
+            ctx.lineTo(sx - 55, sy + 12);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#475569';
+            ctx.beginPath();
+            ctx.moveTo(sx + 5, sy + 32);
+            ctx.lineTo(sx + 95, sy + 5);
+            ctx.lineTo(sx + 95, sy + 17);
+            ctx.lineTo(sx + 5, sy + 44);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Trụ thép thẳng đứng
+            const rodX = sx - 12;
+            const grad = ctx.createLinearGradient(rodX - 6, 0, rodX + 6, 0);
+            grad.addColorStop(0, '#64748b');
+            grad.addColorStop(0.5, '#e2e8f0');
+            grad.addColorStop(1, '#475569');
+            ctx.fillStyle = grad;
+            ctx.fillRect(rodX - 6, height * 0.04, 12, sy - height * 0.04 + 6);
+            ctx.strokeRect(rodX - 6, height * 0.04, 12, sy - height * 0.04 + 6);
+
+            // Thanh ngang treo phía trên cùng
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fillRect(width * 0.35, height * 0.045, width * 0.42, 10);
+            ctx.strokeRect(width * 0.35, height * 0.045, width * 0.42, 10);
+
+            ctx.restore();
+        }
+
+        function drawAluminumStrip(x, topY, botY, bendX, currentDir, powerOn, currentVal, chargeOffset) {
+            ctx.save();
+            const stripW = 28;
+            const midY = (topY + botY) * 0.5;
+            const ctrlX = x + bendX * 1.15;
+
+            // Vẽ dải lá nhôm uốn cong mềm mại (Bézier bậc 2)
+            const grad = ctx.createLinearGradient(x - stripW, 0, x + stripW, 0);
+            grad.addColorStop(0, '#bae6fd');
+            grad.addColorStop(0.5, '#e0f2fe');
+            grad.addColorStop(1, '#7dd3fc');
+
+            ctx.fillStyle = grad;
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 1.6;
+
+            ctx.beginPath();
+            ctx.moveTo(x - stripW / 2, topY);
+            ctx.quadraticCurveTo(ctrlX - stripW / 2, midY, x - stripW / 2, botY);
+            ctx.lineTo(x + stripW / 2, botY + 6);
+            ctx.quadraticCurveTo(ctrlX + stripW / 2, midY + 3, x + stripW / 2, topY + 6);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Vẽ mũi tên chỉ chiều dòng điện trên dải lá nhôm (màu đỏ cam giống Hình 14.3)
+            if (powerOn) {
+                const arrowCenterX = x + bendX * 0.72;
+                const arrowCenterY = midY + 4;
+                const arrowH = 26;
+
+                drawVectorArrow(
+                    arrowCenterX, arrowCenterY + currentDir * arrowH,
+                    arrowCenterX, arrowCenterY - currentDir * arrowH,
+                    '#dc2626', 3
+                );
+
+                // Các hạt điện tích chạy dọc dải lá nhôm
+                ctx.fillStyle = '#ef4444';
+                for (let t = 0.15; t <= 0.85; t += 0.18) {
+                    let shiftT = t - currentDir * (chargeOffset / 220);
+                    if (shiftT < 0.1) shiftT += 0.8;
+                    if (shiftT > 0.9) shiftT -= 0.8;
+                    const px = (1 - shiftT) * (1 - shiftT) * x + 2 * (1 - shiftT) * shiftT * ctrlX + shiftT * shiftT * x;
+                    const py = topY + shiftT * (botY - topY);
+                    ctx.beginPath();
+                    ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            ctx.restore();
+        }
+
+        function drawAlligatorClipAndCable(x, y, isLeft, powerOn, currentDir, chargeOffset) {
+            ctx.save();
+
+            // Dây dẫn nguồn màu đen uốn cong sang bên trái (giống Hình 14.3)
+            const startX = x - 12;
+            const startY = y + 38;
+            const endX = 0;
+            const endY = isLeft ? height * 0.64 : height * 0.73;
+
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 6;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.bezierCurveTo(startX - 55, startY + 55, width * 0.22, endY - 12, endX, endY);
+            ctx.stroke();
+
+            // Vạch sáng phản chiếu trên vỏ dây cách điện
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(startX - 25, startY + 28);
+            ctx.quadraticCurveTo(width * 0.22, endY - 15, width * 0.1, endY - 6);
+            ctx.stroke();
+
+            // Kẹp cá sấu màu bạc gắn vào mép dưới lá nhôm
+            ctx.fillStyle = '#e2e8f0';
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1.5;
+
+            ctx.beginPath();
+            ctx.moveTo(x - 2, y - 6);
+            ctx.lineTo(x + 8, y + 6);
+            ctx.lineTo(x - 6, y + 36);
+            ctx.lineTo(x - 16, y + 32);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Đuôi ống bọc kẹp
+            ctx.fillStyle = '#cbd5e1';
+            ctx.beginPath();
+            ctx.roundRect(x - 18, y + 30, 12, 14, 3);
+            ctx.fill();
+            ctx.stroke();
+
+            // Mũi tên đỏ chỉ chiều dòng điện trên dây dẫn nguồn
+            if (powerOn) {
+                const arrY = endY - 18;
+                const arrX1 = width * 0.12;
+                const arrX2 = width * 0.25;
+                if (currentDir === 1) {
+                    // Dòng đi vào lá trái (từ trái sang phải)
+                    drawVectorArrow(arrX1, arrY - 6, arrX2, arrY + 12, '#dc2626', 3);
+                } else {
+                    // Dòng đi ra (từ phải sang trái) hoặc đi vào nếu cùng chiều
+                    drawVectorArrow(arrX2, arrY + 6, arrX1, arrY - 6, '#dc2626', 3);
+                }
+
+                if (isLeft) {
+                    ctx.fillStyle = '#1e293b';
+                    ctx.font = '600 15px Inter, sans-serif';
+                    ctx.fillText('Dòng điện', width * 0.11, arrY - 22);
+                }
+            }
+
+            ctx.restore();
+        }
+
+        function drawConcentricFieldCircles(cx, cy, currentDir, currentVal) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(2, 132, 199, 0.32)';
+            ctx.lineWidth = 1.4;
+            ctx.setLineDash([4, 3]);
+
+            const radii = [32, 54];
+            radii.forEach(rx => {
+                const ry = rx * 0.32;
+                ctx.beginPath();
+                ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Mũi tên quy tắc nắm tay phải
+                ctx.save();
+                ctx.setLineDash([]);
+                ctx.fillStyle = 'rgba(2, 132, 199, 0.75)';
+                // Dòng đi lên (currentDir = 1): mặt trước hướng sang phải (+)
+                const mx = cx;
+                const my = cy + ry;
+                ctx.beginPath();
+                ctx.moveTo(mx + currentDir * 6, my);
+                ctx.lineTo(mx - currentDir * 4, my - 4);
+                ctx.lineTo(mx - currentDir * 4, my + 4);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            });
+
+            ctx.restore();
+        }
+
+        // ============================================================================
+        // VÒNG LẶP ANIMATION CHÍNH
+        // ============================================================================
+        let lastTimestamp = 0;
+
+        function animate(timestamp) {
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            const dt = Math.min(0.05, (timestamp - lastTimestamp) / 1000);
+            lastTimestamp = timestamp;
+
+            updatePhysics(dt);
+
+            // Xóa nền Canvas
+            ctx.clearRect(0, 0, width, height);
+
+            // Vẽ lưới tọa độ phòng thí nghiệm rất mờ cho chuyên nghiệp
+            drawSubtleGrid();
+
+            // Render Tab đang chọn
+            if (state.activeTab === 1) {
+                renderTab1();
+            } else if (state.activeTab === 2) {
+                renderTab2();
+            } else if (state.activeTab === 3) {
+                renderTab3();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        function drawSubtleGrid() {
+            if (state.activeTab === 3) return; // Tab 3 có phối cảnh bàn 3D riêng
+            ctx.save();
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.14)';
+            ctx.lineWidth = 1;
+            const step = 36;
+            for (let x = 0; x < width; x += step) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < height; y += step) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        // Khởi chạy ứng dụng khi tải xong trang
+        window.onload = function () {
+            resizeCanvas();
+            setTab1Preset('free');
+            requestAnimationFrame(animate);
+        };
+    </script>
+</body>
+</html>
