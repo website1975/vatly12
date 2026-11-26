@@ -1,0 +1,2387 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mô phỏng Thí nghiệm Cân Lực Từ - Vật lí 12 (KNTT)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+  <!-- MathJax 3 -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      user-select: none;
+    }
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 999px;
+      background: #cbd5e1;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      margin-top: -5px;
+      background-color: #2563eb;
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      transition: transform 0.1s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+  </style>
+</head>
+<body class="h-screen overflow-hidden bg-slate-100 text-slate-800 flex flex-col">
+
+  <!-- Top Navigation Header -->
+  <header class="h-12 bg-slate-900 text-white px-4 flex items-center justify-between shrink-0 border-b border-slate-700 shadow-sm z-20">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-sm shadow-inner">
+        F<sub>từ</sub>
+      </div>
+      <div>
+        <h1 class="text-sm sm:text-base font-bold tracking-tight leading-tight">
+          THÍ NGHIỆM CÂN LỰC TỪ &amp; KIỂM CHỨNG CÔNG THỨC AMPE
+        </h1>
+        <p class="text-[11px] text-slate-400 hidden sm:block">
+          Vật lí 12 — Hình 15.1: Bộ thí nghiệm lực từ và cảm ứng từ (Kết nối tri thức với cuộc sống)
+        </p>
+      </div>
+    </div>
+
+    <!-- Quick Toolbar Buttons -->
+    <div class="flex items-center gap-2">
+      <button id="btnToggleLabels" type="button" onclick="toggleOption('showLabels')"
+        class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition flex items-center gap-1.5"
+        title="Bật/tắt đánh số thiết bị (1)-(13) giống Hình 15.1">
+        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+        <span>Chú thích (1)-(13)</span>
+      </button>
+
+      <button id="btnToggleVectors" type="button" onclick="toggleOption('showVectors')"
+        class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-500/40 hover:bg-blue-500/30 transition flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+        <span>Vectơ $\vec{B}, \vec{I}, \vec{F}$</span>
+      </button>
+
+      <button type="button" onclick="resetExperiment()"
+        class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">
+        Đặt lại
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace: Left/Center Simulation Canvas (~70%) + Right Control & Data Panel (~30%) -->
+  <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+
+    <!-- LEFT / CENTER AREA: Simulation Canvas + Zoom Insets -->
+    <section class="relative flex-1 lg:w-[70%] h-[55%] lg:h-full bg-gradient-to-b from-slate-200 via-slate-100 to-slate-200 overflow-hidden flex flex-col">
+      <div id="canvasContainer" class="relative flex-1 w-full h-full">
+        <canvas id="simCanvas" class="w-full h-full block cursor-default"></canvas>
+
+        <!-- Top-Left Live Status HUD Overlay -->
+        <div class="absolute top-3 left-3 flex flex-wrap items-center gap-2 pointer-events-none z-10">
+          <div id="balanceBadge" class="px-3 py-1.5 rounded-full bg-white/90 backdrop-blur border border-slate-300 shadow-sm flex items-center gap-2 text-xs font-semibold text-slate-700">
+            <span id="balanceDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            <span id="balanceText">Đòn cân: Thăng bằng (Δy = 0.0 mm)</span>
+          </div>
+
+          <div class="px-3 py-1.5 rounded-full bg-white/90 backdrop-blur border border-slate-300 shadow-sm flex items-center gap-3 text-xs font-mono-num">
+            <span>$I_{nc} =$ <strong id="hudIn" class="text-blue-700">0.00 A</strong></span>
+            <span class="text-slate-300">|</span>
+            <span>$B =$ <strong id="hudB" class="text-indigo-700">0.0 mT</strong></span>
+            <span class="text-slate-300">|</span>
+            <span>$I_{kd} =$ <strong id="hudIk" class="text-rose-600">0.00 A</strong></span>
+          </div>
+        </div>
+
+        <!-- Floating Zoom Lenses / Magnifiers Overlay (Draggable & Collapsible) -->
+        <div id="magnifierBox" style="top: 12px; right: 12px;" class="absolute z-20 bg-white/95 backdrop-blur rounded-xl border border-slate-300 shadow-lg w-64 sm:w-72 transition-shadow hover:shadow-xl">
+          <div id="magnifierHeader" class="flex items-center justify-between px-3 py-2 bg-slate-100/90 border-b border-slate-200 rounded-t-xl cursor-grab active:cursor-grabbing select-none touch-none" title="Gắp kéo để di chuyển khung kính lúp">
+            <div class="flex items-center gap-1.5 min-w-0">
+              <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 16 16">
+                <circle cx="5" cy="4" r="1.2"/><circle cx="11" cy="4" r="1.2"/>
+                <circle cx="5" cy="8" r="1.2"/><circle cx="11" cy="8" r="1.2"/>
+                <circle cx="5" cy="12" r="1.2"/><circle cx="11" cy="12" r="1.2"/>
+              </svg>
+              <svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 whitespace-nowrap">
+                Kính lúp đọc số liệu
+              </span>
+            </div>
+            <button id="btnCollapseMagnifier" type="button" onclick="toggleMagnifierCollapse(event)"
+              class="w-6 h-6 rounded-md bg-white hover:bg-slate-200 border border-slate-300 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0 transition"
+              title="Thu gọn / Mở rộng kính lúp">
+              —
+            </button>
+          </div>
+
+          <div id="magnifierBody" class="p-2.5 space-y-2">
+            <select id="zoomTargetSelect" onchange="state.zoomTarget = this.value" class="w-full text-[11px] bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 font-medium text-slate-700 focus:outline-none focus:border-blue-500">
+              <option value="all">Tất cả (Lực kế + 2 Đồng hồ)</option>
+              <option value="dynamometer">Chỉ Lực kế (11)</option>
+              <option value="ammeters">Chỉ 2 Ampe kế (5) &amp; (6)</option>
+            </select>
+
+            <canvas id="zoomCanvas" width="260" height="115" class="w-full h-[115px] rounded-lg border border-slate-200 bg-slate-50 block"></canvas>
+
+            <div class="flex items-center justify-between text-[11px] text-slate-600 pt-0.5">
+              <span class="whitespace-nowrap">Số chỉ lực kế: <strong id="zoomForceReadout" class="font-mono-num text-rose-600 text-xs">0.200 N</strong></span>
+              <button type="button" onclick="autoBalanceBeam()" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] shadow-sm transition whitespace-nowrap">
+                Cân bằng đòn
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Hint Bar on Canvas -->
+        <div class="absolute bottom-2.5 left-3 right-3 flex flex-wrap items-center justify-between gap-2 pointer-events-none text-[11px] text-slate-600">
+          <div class="bg-white/85 backdrop-blur px-2.5 py-1 rounded-lg border border-slate-300/80 shadow-xs">
+            💡 <strong>Mẹo tương tác:</strong> Bấm trực tiếp vào công tắc nguồn (13), công tắc đảo chiều (8), (9) hoặc kéo các núm xoay (7) và núm Vôn trên hình vẽ!
+          </div>
+          <div id="hoverPartTooltip" class="hidden bg-slate-900/90 text-white px-3 py-1 rounded-lg shadow font-medium">
+            Thiết bị
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT AREA: Controls, Data Processing & Theory (~30%) -->
+    <aside class="w-full lg:w-[30%] lg:min-w-[370px] lg:max-w-[460px] h-[45%] lg:h-full bg-white border-t lg:border-t-0 lg:border-l border-slate-300 flex flex-col shadow-lg z-10">
+      <div class="grid grid-cols-3 border-b border-slate-200 bg-slate-50 shrink-0">
+        <button type="button" onclick="switchTab('control')" id="tabBtn-control"
+          class="tab-btn py-2.5 px-2 text-xs sm:text-sm font-semibold border-b-2 border-blue-600 text-blue-600 bg-white transition">
+          1. Điều khiển
+        </button>
+        <button type="button" onclick="switchTab('data')" id="tabBtn-data"
+          class="tab-btn py-2.5 px-2 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition">
+          2. Số liệu &amp; Đồ thị
+        </button>
+        <button type="button" onclick="switchTab('theory')" id="tabBtn-theory"
+          class="tab-btn py-2.5 px-2 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition">
+          3. Lý thuyết
+        </button>
+      </div>
+
+      <!-- TAB 1: EXPERIMENT CONTROLS -->
+      <div id="tab-control" class="tab-content flex-1 overflow-y-auto p-3.5 space-y-3.5">
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-600">Nguồn điện &amp; Đảo chiều</span>
+            <button id="btnPowerToggle" type="button" onclick="togglePower()"
+              class="px-3 py-1 rounded-lg text-xs font-bold bg-rose-600 text-white shadow-sm hover:bg-rose-700 transition flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+              <span id="powerBtnLabel">NGUỒN: TẮT</span>
+            </button>
+          </div>
+
+          <!-- Voltage Selector (13) -->
+          <div class="flex items-center justify-between text-xs pt-1">
+            <span class="text-slate-600 font-medium">Điện áp bộ nguồn (13):</span>
+            <div class="flex gap-1">
+              <button type="button" onclick="setVoltage(3)" data-v="3" class="v-btn px-2 py-0.5 rounded border border-slate-300 bg-white font-mono-num text-xs hover:bg-slate-100">3V</button>
+              <button type="button" onclick="setVoltage(6)" data-v="6" class="v-btn px-2 py-0.5 rounded border border-slate-300 bg-white font-mono-num text-xs hover:bg-slate-100">6V</button>
+              <button type="button" onclick="setVoltage(9)" data-v="9" class="v-btn px-2 py-0.5 rounded border border-slate-300 bg-white font-mono-num text-xs hover:bg-slate-100">9V</button>
+              <button type="button" onclick="setVoltage(12)" data-v="12" class="v-btn px-2 py-0.5 rounded border border-blue-600 bg-blue-600 text-white font-mono-num text-xs">12V</button>
+            </div>
+          </div>
+
+          <!-- Reversing Switches (8) & (9) -->
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <div class="p-2 rounded-lg bg-white border border-slate-200">
+              <div class="text-[11px] font-semibold text-slate-700 mb-1">Công tắc (8) Nam châm</div>
+              <div class="grid grid-cols-3 gap-1 text-[11px]">
+                <button type="button" onclick="setSwitch('mag', 1)" id="swMag-1" class="py-1 rounded font-semibold bg-blue-600 text-white">Thuận</button>
+                <button type="button" onclick="setSwitch('mag', 0)" id="swMag-0" class="py-1 rounded font-semibold bg-slate-100 text-slate-600">Ngắt</button>
+                <button type="button" onclick="setSwitch('mag', -1)" id="swMag--1" class="py-1 rounded font-semibold bg-slate-100 text-slate-600">Nghịch</button>
+              </div>
+              <div class="text-[10px] text-slate-500 mt-1 text-center" id="magPoleText">Cực từ: Trái N → Phải S</div>
+            </div>
+
+            <div class="p-2 rounded-lg bg-white border border-slate-200">
+              <div class="text-[11px] font-semibold text-slate-700 mb-1">Công tắc (9) Khung dây</div>
+              <div class="grid grid-cols-3 gap-1 text-[11px]">
+                <button type="button" onclick="setSwitch('coil', 1)" id="swCoil-1" class="py-1 rounded font-semibold bg-blue-600 text-white">Thuận</button>
+                <button type="button" onclick="setSwitch('coil', 0)" id="swCoil-0" class="py-1 rounded font-semibold bg-slate-100 text-slate-600">Ngắt</button>
+                <button type="button" onclick="setSwitch('coil', -1)" id="swCoil--1" class="py-1 rounded font-semibold bg-slate-100 text-slate-600">Nghịch</button>
+              </div>
+              <div class="text-[10px] text-slate-500 mt-1 text-center" id="coilDirText">Dòng đáy khung: Vào trong $\otimes$</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rheostats & Angle Controls Card -->
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-600">Thông số dòng điện &amp; Góc đặt dây</div>
+
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <label for="sliderIk" class="font-medium text-slate-700">Dòng khung dây $I$ (Ampe kế 6):</label>
+              <span id="valIk" class="font-mono-num font-bold text-rose-600">0.80 A</span>
+            </div>
+            <input id="sliderIk" type="range" min="0" max="2.0" step="0.05" value="0.80" class="w-full" oninput="updateParam('I_coil', parseFloat(this.value))" />
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <label for="sliderIn" class="font-medium text-slate-700">Dòng nam châm $I_{nc}$ (Ampe kế 5):</label>
+              <span class="font-mono-num font-bold text-blue-600"><span id="valIn">1.00</span> A ($B = <span id="valB">40.0</span>$ mT)</span>
+            </div>
+            <input id="sliderIn" type="range" min="0" max="2.0" step="0.05" value="1.00" class="w-full" oninput="updateParam('I_mag', parseFloat(this.value))" />
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <label for="sliderTheta" class="font-medium text-slate-700">Góc $\theta = (\vec{B}, \vec{I})$ (Khớp xoay 4):</label>
+              <span class="font-mono-num font-bold text-indigo-600"><span id="valTheta">90</span>° ($\sin\theta = <span id="valSinTheta">1.000</span>$)</span>
+            </div>
+            <input id="sliderTheta" type="range" min="0" max="90" step="5" value="90" class="w-full" oninput="updateParam('theta', parseFloat(this.value))" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <div>
+              <label for="selectN" class="block text-[11px] font-medium text-slate-600 mb-1">Số vòng dây $N$ (10):</label>
+              <select id="selectN" onchange="updateParam('N', parseInt(this.value))" class="w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs font-mono-num font-semibold text-slate-800">
+                <option value="50">50 vòng</option>
+                <option value="100" selected>100 vòng</option>
+                <option value="150">150 vòng</option>
+                <option value="200">200 vòng</option>
+              </select>
+            </div>
+            <div>
+              <label for="selectL" class="block text-[11px] font-medium text-slate-600 mb-1">Chiều dài cạnh $L$:</label>
+              <select id="selectL" onchange="updateParam('L_cm', parseFloat(this.value))" class="w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs font-mono-num font-semibold text-slate-800">
+                <option value="4">4.0 cm (0.04 m)</option>
+                <option value="6" selected>6.0 cm (0.06 m)</option>
+                <option value="8">8.0 cm (0.08 m)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Balance & Tare Calibration Card -->
+        <div class="p-3 rounded-xl bg-amber-50/70 border border-amber-200 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-amber-900">Hiệu chỉnh cân bằng &amp; Đo lực</span>
+            <span class="text-[11px] font-mono-num font-semibold text-amber-800 bg-amber-200/70 px-2 py-0.5 rounded">
+              $F_0 = <span id="valF0">0.200</span>$ N
+            </span>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <label for="sliderTare" class="font-medium text-slate-700">Chỉnh đối trọng (3) / Vị trí 0 lực kế:</label>
+              <span id="valTare" class="font-mono-num font-semibold text-slate-800">0.200 N</span>
+            </div>
+            <input id="sliderTare" type="range" min="0.00" max="0.60" step="0.005" value="0.200" class="w-full" oninput="updateParam('F_tare', parseFloat(this.value))" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="setZeroForce()" class="py-1.5 px-2 rounded-lg bg-white border border-amber-300 hover:bg-amber-100 text-amber-900 text-xs font-semibold transition shadow-2xs">
+              1. Chỉnh 0 (Khi $I=0$)
+            </button>
+            <button type="button" onclick="autoBalanceBeam()" class="py-1.5 px-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition shadow-2xs">
+              2. Cân bằng đòn (Đọc $F$)
+            </button>
+          </div>
+
+          <div class="p-2.5 rounded-lg bg-white border border-amber-200 flex items-center justify-between">
+            <div>
+              <div class="text-[11px] text-slate-500">Độ lớn lực từ đo được $F = |F_{đo} - F_0|$:</div>
+              <div class="text-base font-mono-num font-bold text-rose-600">
+                <span id="readoutFmag">0.000</span> N
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-[11px] text-slate-500">Chiều lực từ $\vec{F}$:</div>
+              <div id="readoutFdir" class="text-xs font-bold text-slate-700">Bằng 0</div>
+            </div>
+          </div>
+
+          <button type="button" onclick="recordDataPoint()"
+            class="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-semibold text-xs shadow-sm transition flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <span>Ghi số liệu vào bảng kiểm chứng</span>
+          </button>
+        </div>
+
+        <!-- Visual Options -->
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-600">Tùy chọn hiển thị &amp; Mô phỏng</div>
+          <label class="flex items-center justify-between text-xs text-slate-700 cursor-pointer">
+            <span>Hiển thị đường sức từ $\vec{B}$ trong khe nam châm</span>
+            <input type="checkbox" id="chkFieldLines" checked onchange="state.showFieldLines = this.checked" class="rounded text-blue-600 w-4 h-4" />
+          </label>
+          <label class="flex items-center justify-between text-xs text-slate-700 cursor-pointer">
+            <span>Hiển thị quy tắc bàn tay trái (3D góc khung dây)</span>
+            <input type="checkbox" id="chkLeftHand" checked onchange="state.showLeftHand = this.checked" class="rounded text-blue-600 w-4 h-4" />
+          </label>
+          <label class="flex items-center justify-between text-xs text-slate-700 cursor-pointer">
+            <span>Mô phỏng sai số thực nghiệm ngẫu nhiên ($\pm 1.5\%$)</span>
+            <input type="checkbox" id="chkNoise" checked onchange="state.experimentalNoise = this.checked; recalcPhysics()" class="rounded text-blue-600 w-4 h-4" />
+          </label>
+        </div>
+      </div>
+
+      <!-- TAB 2: DATA TABLE & GRAPH VERIFICATION -->
+      <div id="tab-data" class="tab-content hidden flex-1 overflow-y-auto p-3.5 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-1.5">
+          <button type="button" onclick="recordDataPoint()" class="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-2xs">
+            + Ghi điểm đo
+          </button>
+          <div class="flex items-center gap-1">
+            <select id="samplePresetSelect" class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs text-slate-700">
+              <option value="I">Mẫu 1: Khảo sát F theo I</option>
+              <option value="B">Mẫu 2: Khảo sát F theo B</option>
+              <option value="theta">Mẫu 3: Khảo sát F theo sin(θ)</option>
+            </select>
+            <button type="button" onclick="loadSampleData()" class="px-2 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-medium">
+              Nạp mẫu
+            </button>
+          </div>
+        </div>
+
+        <div class="border border-slate-200 rounded-xl overflow-hidden bg-white">
+          <div class="max-h-44 overflow-y-auto">
+            <table class="w-full text-left border-collapse text-[11px]">
+              <thead class="bg-slate-100 text-slate-600 sticky top-0 border-b border-slate-200">
+                <tr>
+                  <th class="py-1.5 px-2">#</th>
+                  <th class="py-1.5 px-1.5">$I$ (A)</th>
+                  <th class="py-1.5 px-1.5">$B$ (mT)</th>
+                  <th class="py-1.5 px-1.5">$\theta$</th>
+                  <th class="py-1.5 px-1.5">$F_{đo}$ (N)</th>
+                  <th class="py-1.5 px-1.5">$\frac{F}{NBIL\sin\theta}$</th>
+                  <th class="py-1.5 px-1 text-center">Xóa</th>
+                </tr>
+              </thead>
+              <tbody id="dataTableBody" class="divide-y divide-slate-100 font-mono-num">
+                <tr>
+                  <td colspan="7" class="py-4 text-center text-slate-400 font-sans">
+                    Chưa có số liệu. Hãy điều chỉnh thí nghiệm và bấm "Ghi điểm đo" hoặc "Nạp mẫu".
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="bg-slate-50 px-2.5 py-1.5 border-t border-slate-200 flex items-center justify-between text-[11px]">
+            <button type="button" onclick="clearData()" class="text-rose-600 hover:underline font-medium">Xóa tất cả</button>
+            <button type="button" onclick="exportCSV()" class="text-blue-600 hover:underline font-medium">Xuất file CSV</button>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-600">Đồ thị kiểm chứng</span>
+            <select id="graphModeSelect" onchange="drawVerificationChart()" class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-blue-700">
+              <option value="I">Đồ thị F theo I (F ~ I)</option>
+              <option value="B">Đồ thị F theo B (F ~ B)</option>
+              <option value="sinTheta">Đồ thị F theo sin(θ)</option>
+            </select>
+          </div>
+
+          <canvas id="chartCanvas" width="360" height="200" class="w-full h-[200px] bg-white rounded-lg border border-slate-200"></canvas>
+
+          <div id="verificationSummary" class="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-1">
+            <div class="font-bold flex items-center gap-1.5">
+              <span>📊 Kết quả xử lý số liệu:</span>
+            </div>
+            <div id="summaryDetails" class="text-[11px] leading-relaxed text-emerald-800">
+              Cần ít nhất 2 điểm đo để vẽ đường hồi quy tuyến tính và tính sai số kiểm chứng công thức $F = N B I L \sin\theta$.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: THEORY & INSTRUCTIONS -->
+      <div id="tab-theory" class="tab-content hidden flex-1 overflow-y-auto p-4 space-y-3 text-xs leading-relaxed text-slate-700">
+        <div class="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-950">
+          <h3 class="font-bold text-sm text-blue-800 mb-1">1. Công thức lực từ tổng quát (Định luật Ampe)</h3>
+          <p>
+            Khi đặt đoạn dây dẫn thẳng có chiều dài $L$, mang dòng điện cường độ $I$ trong từ trường đều có vectơ cảm ứng từ $\vec{B}$ hợp với chiều dòng điện một góc $\theta$:
+          </p>
+          <div class="my-2 py-2 px-3 bg-white rounded-lg border border-blue-200 text-center font-semibold text-sm">
+            $$\vec{F} = I\vec{L} \times \vec{B} \implies F = N \cdot B \cdot I \cdot L \cdot \sin\theta$$
+          </div>
+          <p class="text-[11px] text-blue-800">
+            Trong đó $N$ là số vòng dây của khung dây dẫn (10) nằm trong vùng từ trường đều giữa hai cực của nam châm điện (1).
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+          <h3 class="font-bold text-sm text-slate-800">2. Quy tắc bàn tay trái xác định chiều $\vec{F}$</h3>
+          <p>
+            Đặt bàn tay trái sao cho các đường sức từ $\vec{B}$ hướng vào lòng bàn tay, chiều từ cổ tay đến ngón tay giữa hướng theo chiều dòng điện $I$, khi đó ngón cái choãi ra $90^\circ$ chỉ chiều của lực từ $\vec{F}$ tác dụng lên đoạn dây.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+          <h3 class="font-bold text-sm text-slate-800">3. Các bước tiến hành thí nghiệm</h3>
+          <ol class="list-decimal list-inside space-y-1 text-slate-700">
+            <li><strong>Hiệu chỉnh 0 ban đầu:</strong> Khi chưa bật nguồn ($I=0$), chỉnh đối trọng (3) hoặc lực kế (11) để đòn cân (2) nằm ngang. Đọc giá trị ban đầu $F_0$.</li>
+            <li><strong>Cấp điện &amp; tạo từ trường:</strong> Bật bộ nguồn (13), đóng công tắc (8) và điều chỉnh biến trở (7) để có dòng $I_{nc}$ qua nam châm điện (1) tạo cảm ứng từ $B$.</li>
+            <li><strong>Cho dòng điện qua khung dây:</strong> Đóng công tắc (9), điều chỉnh biến trở để có dòng $I$ qua khung dây (10). Lực từ $\vec{F}$ làm đòn cân bị lệch.</li>
+            <li><strong>Đo lực từ $F$:</strong> Điều chỉnh lực kế (hoặc bấm <em>Cân bằng đòn</em>) đưa đòn cân về lại vị trí thăng bằng ngang. Độ lớn lực từ $F = |F_{đo} - F_0|$.</li>
+            <li><strong>Khảo sát các yếu tố:</strong> Lần lượt thay đổi $I$, $B$ (qua $I_{nc}$), và góc $\theta$, ghi số liệu vào bảng và kiểm chứng đồ thị tuyến tính.</li>
+          </ol>
+        </div>
+
+        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 space-y-1">
+          <h3 class="font-bold text-xs text-amber-900">Chú thích thiết bị (Hình 15.1):</h3>
+          <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[11px] text-amber-950">
+            <div><strong>(1)</strong> Nam châm điện chữ U</div>
+            <div><strong>(8)</strong> Công tắc đảo chiều NC</div>
+            <div><strong>(2)</strong> Đòn cân ngang</div>
+            <div><strong>(9)</strong> Công tắc đảo chiều khung</div>
+            <div><strong>(3)</strong> Đối trọng cân bằng</div>
+            <div><strong>(10)</strong> Khung dây dẫn $N$ vòng</div>
+            <div><strong>(4)</strong> Khớp xoay chia độ $\theta$</div>
+            <div><strong>(11)</strong> Lực kế lò xo</div>
+            <div><strong>(5)</strong> Ampe kế đo $I_{nc}$</div>
+            <div><strong>(12)</strong> Hộp đấu dây</div>
+            <div><strong>(6)</strong> Ampe kế đo $I_{kd}$</div>
+            <div><strong>(13)</strong> Bộ nguồn AC-DC</div>
+            <div><strong>(7)</strong> Hai núm biến trở</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Toast Notification Box -->
+  <div id="toastBox" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs font-medium px-4 py-2.5 rounded-xl shadow-xl border border-slate-700 opacity-0 pointer-events-none transition-opacity duration-200 z-50">
+    Thông báo
+  </div>
+
+  <script>
+    /**
+     * =========================================================================
+     * 1. STATE MANAGEMENT & PHYSICS ENGINE
+     * =========================================================================
+     */
+    const state = {
+      powerOn: false,
+      voltage: 12,
+      swMag: 1,
+      swCoil: 1,
+      I_mag_set: 1.00,
+      I_coil_set: 0.80,
+      I_mag_actual: 0.0,
+      I_coil_actual: 0.0,
+      B_mT: 0.0,
+      k_B: 40.0,
+      theta: 90,
+      N: 100,
+      L_cm: 6.0,
+      F_tare: 0.200,
+      F_zero_ref: 0.200,
+      F_mag_true: 0.0,
+      F_mag_signed: 0.0,
+      noiseFactor: 0.0,
+
+      beamAngle: 0.0,
+      beamVel: 0.0,
+      needleMagAnim: 0.0,
+      needleCoilAnim: 0.0,
+
+      showLabels: true,
+      showVectors: true,
+      showFieldLines: true,
+      showLeftHand: true,
+      experimentalNoise: true,
+      zoomTarget: 'all',
+
+      hitboxes: [],
+      draggingControl: null,
+      dragStartX: 0,
+      dragStartY: 0,
+      dragStartVal: 0
+    };
+
+    let measurements = [];
+
+    const EQUIPMENT_INFO = {
+      1: "Nam châm điện chữ U (1)",
+      2: "Đòn cân ngang (2)",
+      3: "Đối trọng hiệu chỉnh cân bằng (3)",
+      4: "Khớp xoay chia độ góc θ (4)",
+      5: "Ampe kế đo dòng nam châm I_nc (5)",
+      6: "Ampe kế đo dòng khung dây I_kd (6)",
+      7: "Núm xoay biến trở điều chỉnh dòng (7)",
+      8: "Công tắc đảo chiều dòng nam châm (8)",
+      9: "Công tắc đảo chiều dòng khung dây (9)",
+      10: "Khung dây dẫn N vòng (10)",
+      11: "Lực kế lò xo đo lực (11)",
+      12: "Hộp đấu dây (12)",
+      13: "Bộ nguồn điện một chiều AC-DC (13)"
+    };
+
+    function showToast(msg) {
+      const box = document.getElementById('toastBox');
+      if (!box) return;
+      box.textContent = msg;
+      box.classList.remove('opacity-0');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        box.classList.add('opacity-0');
+      }, 2400);
+    }
+
+    function recalcPhysics() {
+      const maxIByVoltage = (state.voltage / 12) * 2.2;
+
+      if (!state.powerOn) {
+        state.I_mag_actual = 0;
+        state.I_coil_actual = 0;
+      } else {
+        state.I_mag_actual = state.swMag === 0 ? 0 : Math.min(state.I_mag_set, maxIByVoltage);
+        state.I_coil_actual = state.swCoil === 0 ? 0 : Math.min(state.I_coil_set, maxIByVoltage);
+      }
+
+      state.B_mT = state.k_B * state.I_mag_actual;
+      const B_tesla = state.B_mT * 1e-3;
+      const L_m = state.L_cm * 1e-2;
+      const sinTheta = Math.sin((state.theta * Math.PI) / 180);
+
+      const F_ideal = state.N * B_tesla * state.I_coil_actual * L_m * sinTheta;
+
+      if (state.experimentalNoise && F_ideal > 0.0005) {
+        const seed = Math.sin(state.I_coil_actual * 37.3 + state.I_mag_actual * 19.7 + state.theta * 0.53);
+        state.noiseFactor = seed * 0.015;
+      } else {
+        state.noiseFactor = 0;
+      }
+
+      state.F_mag_true = Math.max(0, F_ideal * (1 + state.noiseFactor));
+      const dirSign = state.swMag * state.swCoil;
+      state.F_mag_signed = dirSign * state.F_mag_true;
+
+      updateUIReadouts();
+    }
+
+    function updateUIReadouts() {
+      const setTxt = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      };
+
+      setTxt('hudIn', state.I_mag_actual.toFixed(2) + ' A');
+      setTxt('hudB', state.B_mT.toFixed(1) + ' mT');
+      setTxt('hudIk', state.I_coil_actual.toFixed(2) + ' A');
+
+      setTxt('valIk', state.I_coil_actual.toFixed(2) + ' A');
+      setTxt('valIn', state.I_mag_actual.toFixed(2));
+      setTxt('valB', state.B_mT.toFixed(1));
+      setTxt('valTheta', state.theta);
+      setTxt('valSinTheta', Math.sin((state.theta * Math.PI) / 180).toFixed(3));
+      setTxt('valTare', state.F_tare.toFixed(3) + ' N');
+      setTxt('valF0', state.F_zero_ref.toFixed(3));
+
+      const magPoleEl = document.getElementById('magPoleText');
+      if (magPoleEl) {
+        if (!state.powerOn || state.swMag === 0) magPoleEl.textContent = 'Cực từ: Ngắt từ trường';
+        else if (state.swMag === 1) magPoleEl.textContent = 'Cực từ: Trái N → Phải S';
+        else magPoleEl.textContent = 'Cực từ: Trái S ← Phải N';
+      }
+
+      const coilDirEl = document.getElementById('coilDirText');
+      if (coilDirEl) {
+        if (!state.powerOn || state.swCoil === 0) coilDirEl.textContent = 'Dòng khung dây: Ngắt (I = 0)';
+        else if (state.swCoil === 1) coilDirEl.textContent = 'Dòng đáy khung: Vào trong ⊗';
+        else coilDirEl.textContent = 'Dòng đáy khung: Ra ngoài ⊙';
+      }
+
+      const F_diff = Math.abs(state.F_tare - state.F_zero_ref);
+      const displayedForce = Math.abs(state.beamAngle) < 0.008 ? F_diff : state.F_mag_true;
+      setTxt('readoutFmag', displayedForce.toFixed(3));
+      setTxt('zoomForceReadout', state.F_tare.toFixed(3) + ' N');
+
+      const fDirEl = document.getElementById('readoutFdir');
+      if (fDirEl) {
+        if (state.F_mag_true < 0.0005) {
+          fDirEl.textContent = 'Bằng 0';
+          fDirEl.className = 'text-xs font-bold text-slate-500';
+        } else if (state.F_mag_signed > 0) {
+          fDirEl.textContent = 'Hướng xuống ↓ (Hút)';
+          fDirEl.className = 'text-xs font-bold text-rose-600';
+        } else {
+          fDirEl.textContent = 'Hướng lên ↑ (Đẩy)';
+          fDirEl.className = 'text-xs font-bold text-blue-600';
+        }
+      }
+    }
+
+    function togglePower() {
+      state.powerOn = !state.powerOn;
+      const btn = document.getElementById('btnPowerToggle');
+      const lbl = document.getElementById('powerBtnLabel');
+      if (state.powerOn) {
+        btn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 transition flex items-center gap-1.5';
+        lbl.textContent = 'NGUỒN: BẬT';
+        showToast('Đã bật nguồn bộ thí nghiệm (' + state.voltage + 'V)');
+      } else {
+        btn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-rose-600 text-white shadow-sm hover:bg-rose-700 transition flex items-center gap-1.5';
+        lbl.textContent = 'NGUỒN: TẮT';
+        showToast('Đã tắt nguồn điện');
+      }
+      recalcPhysics();
+    }
+
+    function setVoltage(v) {
+      state.voltage = v;
+      document.querySelectorAll('.v-btn').forEach(b => {
+        if (parseInt(b.dataset.v, 10) === v) {
+          b.className = 'v-btn px-2 py-0.5 rounded border border-blue-600 bg-blue-600 text-white font-mono-num text-xs';
+        } else {
+          b.className = 'v-btn px-2 py-0.5 rounded border border-slate-300 bg-white font-mono-num text-xs hover:bg-slate-100';
+        }
+      });
+      recalcPhysics();
+    }
+
+    function setSwitch(target, val) {
+      if (target === 'mag') {
+        state.swMag = val;
+        [-1, 0, 1].forEach(v => {
+          const el = document.getElementById('swMag-' + v);
+          if (el) {
+            el.className = v === val
+              ? 'py-1 rounded font-semibold bg-blue-600 text-white'
+              : 'py-1 rounded font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200';
+          }
+        });
+      } else {
+        state.swCoil = val;
+        [-1, 0, 1].forEach(v => {
+          const el = document.getElementById('swCoil-' + v);
+          if (el) {
+            el.className = v === val
+              ? 'py-1 rounded font-semibold bg-blue-600 text-white'
+              : 'py-1 rounded font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200';
+          }
+        });
+      }
+      recalcPhysics();
+    }
+
+    function updateParam(key, val) {
+      if (key === 'I_coil') state.I_coil_set = val;
+      else if (key === 'I_mag') state.I_mag_set = val;
+      else if (key === 'theta') state.theta = val;
+      else if (key === 'N') state.N = val;
+      else if (key === 'L_cm') state.L_cm = val;
+      else if (key === 'F_tare') state.F_tare = val;
+      recalcPhysics();
+    }
+
+    function setZeroForce() {
+      state.F_tare = 0.200;
+      state.F_zero_ref = 0.200;
+      document.getElementById('sliderTare').value = 0.200;
+      recalcPhysics();
+      showToast('Đã hiệu chỉnh điểm 0 ban đầu: F₀ = 0.200 N');
+    }
+
+    function autoBalanceBeam() {
+      const targetTare = Math.max(0.0, Math.min(0.80, state.F_zero_ref + state.F_mag_signed));
+      state.F_tare = parseFloat(targetTare.toFixed(4));
+      document.getElementById('sliderTare').value = Math.min(0.60, state.F_tare);
+      recalcPhysics();
+      showToast('Đòn cân đã thăng bằng! Số chỉ lực kế: ' + state.F_tare.toFixed(3) + ' N');
+    }
+
+    function toggleOption(opt) {
+      state[opt] = !state[opt];
+      const btnId = opt === 'showLabels' ? 'btnToggleLabels' : 'btnToggleVectors';
+      const btn = document.getElementById(btnId);
+      if (btn) {
+        if (state[opt]) btn.classList.remove('opacity-50');
+        else btn.classList.add('opacity-50');
+      }
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      const activeTab = document.getElementById('tab-' + tabName);
+      if (activeTab) activeTab.classList.remove('hidden');
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.className = 'tab-btn py-2.5 px-2 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition';
+      });
+      const activeBtn = document.getElementById('tabBtn-' + tabName);
+      if (activeBtn) {
+        activeBtn.className = 'tab-btn py-2.5 px-2 text-xs sm:text-sm font-semibold border-b-2 border-blue-600 text-blue-600 bg-white transition';
+      }
+
+      if (tabName === 'data') {
+        setTimeout(drawVerificationChart, 30);
+      }
+    }
+
+    function resetExperiment() {
+      state.powerOn = false;
+      state.voltage = 12;
+      state.swMag = 1;
+      state.swCoil = 1;
+      state.I_mag_set = 1.00;
+      state.I_coil_set = 0.80;
+      state.theta = 90;
+      state.N = 100;
+      state.L_cm = 6.0;
+      state.F_tare = 0.200;
+      state.F_zero_ref = 0.200;
+      state.beamAngle = 0;
+      state.beamVel = 0;
+
+      document.getElementById('sliderIk').value = 0.80;
+      document.getElementById('sliderIn').value = 1.00;
+      document.getElementById('sliderTheta').value = 90;
+      document.getElementById('selectN').value = 100;
+      document.getElementById('selectL').value = 6;
+      document.getElementById('sliderTare').value = 0.200;
+
+      setVoltage(12);
+      setSwitch('mag', 1);
+      setSwitch('coil', 1);
+      const btn = document.getElementById('btnPowerToggle');
+      btn.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-rose-600 text-white shadow-sm hover:bg-rose-700 transition flex items-center gap-1.5';
+      document.getElementById('powerBtnLabel').textContent = 'NGUỒN: TẮT';
+
+      recalcPhysics();
+      showToast('Đã đặt lại toàn bộ thông số thí nghiệm');
+    }
+
+    /**
+     * =========================================================================
+     * 2. DATA RECORDING, LINEAR REGRESSION & CHARTING
+     * =========================================================================
+     */
+    function recordDataPoint() {
+      if (!state.powerOn || state.I_coil_actual === 0 || state.I_mag_actual === 0) {
+        showToast('Hãy bật nguồn và điều chỉnh I > 0, B > 0 trước khi ghi số liệu!');
+        return;
+      }
+      autoBalanceBeam();
+
+      const F_measured_mag = Math.abs(state.F_tare - state.F_zero_ref);
+      const B_T = state.B_mT * 1e-3;
+      const L_m = state.L_cm * 1e-2;
+      const sinT = Math.sin((state.theta * Math.PI) / 180);
+      const denom = state.N * B_T * state.I_coil_actual * L_m * sinT;
+      const ratio = denom > 1e-9 ? F_measured_mag / denom : 0;
+
+      measurements.push({
+        id: Date.now(),
+        I: state.I_coil_actual,
+        B_mT: state.B_mT,
+        theta: state.theta,
+        sinTheta: sinT,
+        N: state.N,
+        L_cm: state.L_cm,
+        F: F_measured_mag,
+        ratio: ratio
+      });
+
+      renderDataTable();
+      drawVerificationChart();
+      showToast(`Đã ghi điểm đo #${measurements.length}: F = ${F_measured_mag.toFixed(3)} N`);
+    }
+
+    function loadSampleData() {
+      const mode = document.getElementById('samplePresetSelect').value;
+      measurements = [];
+      const N = 100, L_cm = 6.0, L_m = 0.06;
+
+      if (mode === 'I') {
+        const B_mT = 40.0, B_T = 0.04, theta = 90, sinT = 1;
+        [0.20, 0.40, 0.60, 0.80, 1.00, 1.20, 1.40].forEach((I, idx) => {
+          const jitter = 1 + (Math.sin(idx * 2.1) * 0.012);
+          const F = N * B_T * I * L_m * sinT * jitter;
+          measurements.push({
+            id: idx + 1, I, B_mT, theta, sinTheta: sinT, N, L_cm,
+            F: parseFloat(F.toFixed(4)),
+            ratio: F / (N * B_T * I * L_m * sinT)
+          });
+        });
+        document.getElementById('graphModeSelect').value = 'I';
+      } else if (mode === 'B') {
+        const I = 1.00, theta = 90, sinT = 1;
+        [16.0, 24.0, 32.0, 40.0, 48.0, 56.0, 64.0].forEach((B_mT, idx) => {
+          const B_T = B_mT * 1e-3;
+          const jitter = 1 + (Math.cos(idx * 1.9) * 0.013);
+          const F = N * B_T * I * L_m * sinT * jitter;
+          measurements.push({
+            id: idx + 1, I, B_mT, theta, sinTheta: sinT, N, L_cm,
+            F: parseFloat(F.toFixed(4)),
+            ratio: F / (N * B_T * I * L_m * sinT)
+          });
+        });
+        document.getElementById('graphModeSelect').value = 'B';
+      } else {
+        const I = 1.00, B_mT = 50.0, B_T = 0.05;
+        [15, 30, 45, 60, 75, 90].forEach((theta, idx) => {
+          const sinT = Math.sin((theta * Math.PI) / 180);
+          const jitter = 1 + (Math.sin(idx * 3.1) * 0.011);
+          const F = N * B_T * I * L_m * sinT * jitter;
+          measurements.push({
+            id: idx + 1, I, B_mT, theta, sinTheta: sinT, N, L_cm,
+            F: parseFloat(F.toFixed(4)),
+            ratio: F / (N * B_T * I * L_m * sinT)
+          });
+        });
+        document.getElementById('graphModeSelect').value = 'sinTheta';
+      }
+
+      renderDataTable();
+      drawVerificationChart();
+      showToast('Đã nạp bộ dữ liệu thí nghiệm mẫu!');
+    }
+
+    function deleteRow(index) {
+      measurements.splice(index, 1);
+      renderDataTable();
+      drawVerificationChart();
+    }
+
+    function clearData() {
+      measurements = [];
+      renderDataTable();
+      drawVerificationChart();
+    }
+
+    function renderDataTable() {
+      const tbody = document.getElementById('dataTableBody');
+      if (!tbody) return;
+      if (measurements.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-slate-400 font-sans">Chưa có số liệu. Hãy điều chỉnh thí nghiệm và bấm "Ghi điểm đo" hoặc "Nạp mẫu".</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = measurements.map((m, idx) => `
+        <tr class="hover:bg-blue-50/50">
+          <td class="py-1.5 px-2 text-slate-500">${idx + 1}</td>
+          <td class="py-1.5 px-1.5 font-semibold text-rose-600">${m.I.toFixed(2)}</td>
+          <td class="py-1.5 px-1.5 text-blue-700">${m.B_mT.toFixed(1)}</td>
+          <td class="py-1.5 px-1.5 text-indigo-700">${m.theta}°</td>
+          <td class="py-1.5 px-1.5 font-bold text-slate-900">${m.F.toFixed(3)}</td>
+          <td class="py-1.5 px-1.5 text-emerald-700">${m.ratio.toFixed(3)}</td>
+          <td class="py-1.5 px-1 text-center">
+            <button type="button" onclick="deleteRow(${idx})" class="text-slate-400 hover:text-rose-600 font-bold px-1">×</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function exportCSV() {
+      if (measurements.length === 0) {
+        showToast('Bảng số liệu trống!');
+        return;
+      }
+      let csv = "Lan_do,I_A,B_mT,Goc_theta_deg,sin_theta,So_vong_N,Chieu_dai_L_cm,Luc_tu_F_N,Ti_so_kiem_chung\n";
+      measurements.forEach((m, i) => {
+        csv += `${i + 1},${m.I.toFixed(2)},${m.B_mT.toFixed(1)},${m.theta},${m.sinTheta.toFixed(4)},${m.N},${m.L_cm},${m.F.toFixed(4)},${m.ratio.toFixed(4)}\n`;
+      });
+      const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'so_lieu_can_luc_tu_vat_li_12.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function drawVerificationChart() {
+      const canvas = document.getElementById('chartCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      const W = rect.width || 360;
+      const H = rect.height || 200;
+
+      ctx.clearRect(0, 0, W, H);
+
+      const mode = document.getElementById('graphModeSelect').value;
+      const padL = 46, padR = 16, padT = 18, padB = 32;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+
+      let xLabel = 'I (A)';
+      const points = measurements.map(m => {
+        let x = m.I;
+        if (mode === 'B') x = m.B_mT;
+        else if (mode === 'sinTheta') x = m.sinTheta;
+        return { x, y: m.F, ratio: m.ratio };
+      });
+      if (mode === 'B') xLabel = 'B (mT)';
+      else if (mode === 'sinTheta') xLabel = 'sin(θ)';
+
+      const maxX = points.length > 0 ? Math.max(...points.map(p => p.x)) * 1.15 : (mode === 'B' ? 80 : (mode === 'sinTheta' ? 1.1 : 2.0));
+      const maxY = points.length > 0 ? Math.max(...points.map(p => p.y)) * 1.2 : 0.5;
+
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = padT + (plotH * i) / 4;
+        ctx.beginPath();
+        ctx.moveTo(padL, y);
+        ctx.lineTo(padL + plotW, y);
+        ctx.stroke();
+
+        const valY = maxY * (1 - i / 4);
+        ctx.fillStyle = '#64748b';
+        ctx.font = '10px JetBrains Mono, monospace';
+        ctx.textAlign = 'right';
+        ctx.fillText(valY.toFixed(2), padL - 5, y + 3);
+      }
+
+      for (let i = 0; i <= 4; i++) {
+        const x = padL + (plotW * i) / 4;
+        ctx.beginPath();
+        ctx.moveTo(x, padT);
+        ctx.lineTo(x, padT + plotH);
+        ctx.stroke();
+
+        const valX = (maxX * i) / 4;
+        ctx.fillStyle = '#64748b';
+        ctx.font = '10px JetBrains Mono, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(mode === 'B' ? valX.toFixed(0) : valX.toFixed(2), x, padT + plotH + 13);
+      }
+
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(padL, padT);
+      ctx.lineTo(padL, padT + plotH);
+      ctx.lineTo(padL + plotW, padT + plotH);
+      ctx.stroke();
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 10px Inter, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(xLabel, padL + plotW, H - 4);
+      ctx.textAlign = 'left';
+      ctx.fillText('F (N)', 6, padT - 5);
+
+      const summaryEl = document.getElementById('summaryDetails');
+      if (points.length === 0) {
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '11px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Ghi ít nhất 2 điểm đo để hiển thị đường tuyến tính', padL + plotW / 2, padT + plotH / 2);
+        summaryEl.innerHTML = 'Chưa có đủ dữ liệu. Hãy ghi các điểm đo vào bảng để hệ thống phân tích hồi quy.';
+        return;
+      }
+
+      let sumXY = 0, sumXX = 0, sumRatio = 0;
+      points.forEach(p => {
+        sumXY += p.x * p.y;
+        sumXX += p.x * p.x;
+        sumRatio += p.ratio;
+      });
+      const slope = sumXX > 0 ? sumXY / sumXX : 0;
+
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 3]);
+      ctx.beginPath();
+      ctx.moveTo(padL, padT + plotH);
+      const xEnd = maxX * 0.95;
+      const yEnd = slope * xEnd;
+      const pxEnd = padL + (xEnd / maxX) * plotW;
+      const pyEnd = padT + plotH - (yEnd / maxY) * plotH;
+      ctx.lineTo(pxEnd, Math.max(padT, pyEnd));
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      points.forEach(p => {
+        const px = padL + (p.x / maxX) * plotW;
+        const py = padT + plotH - (p.y / maxY) * plotH;
+
+        ctx.fillStyle = '#e11d48';
+        ctx.beginPath();
+        ctx.arc(px, py, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      });
+
+      const avgRatio = sumRatio / points.length;
+      const relError = Math.abs(avgRatio - 1) * 100;
+      summaryEl.innerHTML = `
+        <div>• Hệ số góc đường thẳng qua gốc O: <strong>k = ${slope.toFixed(4)}</strong></div>
+        <div>• Giá trị trung bình $\\overline{F / (NBIL\\sin\\theta)} = \\mathbf{${avgRatio.toFixed(3)}}$ (Lý thuyết = 1.000)</div>
+        <div>• Sai số tương đối trung bình: <strong>${relError.toFixed(2)}%</strong> → <span class="text-emerald-700 font-bold">Phù hợp công thức Ampe!</span></div>
+      `;
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise([summaryEl]).catch(() => {});
+      }
+    }
+
+    /**
+     * =========================================================================
+     * 3. REALISTIC 2.5D / 3D-STYLED CANVAS RENDERING (MATCHING FIGURE 15.1)
+     * =========================================================================
+     */
+    const simCanvas = document.getElementById('simCanvas');
+    const simCtx = simCanvas.getContext('2d');
+    const zoomCanvas = document.getElementById('zoomCanvas');
+    const zoomCtx = zoomCanvas.getContext('2d');
+
+    function resizeSimCanvas() {
+      const container = document.getElementById('canvasContainer');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = container.getBoundingClientRect();
+      simCanvas.width = rect.width * dpr;
+      simCanvas.height = rect.height * dpr;
+      simCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    window.addEventListener('resize', () => {
+      resizeSimCanvas();
+      drawVerificationChart();
+    });
+
+    function roundRect(ctx, x, y, w, h, r, fill, stroke) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    function drawAnalogAmmeter(ctx, cx, cy, w, h, currentVal, maxVal, subText) {
+      ctx.save();
+      ctx.fillStyle = '#e2e8f0';
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 2;
+      roundRect(ctx, cx - w / 2, cy - h / 2, w, h, 6, true, true);
+
+      const pad = 7;
+      ctx.fillStyle = '#f8fafc';
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1;
+      roundRect(ctx, cx - w / 2 + pad, cy - h / 2 + pad, w - pad * 2, h - pad * 2, 3, true, true);
+
+      const pivotX = cx;
+      const pivotY = cy + h * 0.34;
+      const radius = h * 0.62;
+      const startAngle = -Math.PI * 0.78;
+      const endAngle = -Math.PI * 0.22;
+
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(pivotX, pivotY, radius, startAngle, endAngle);
+      ctx.stroke();
+
+      const totalTicks = 20;
+      for (let i = 0; i <= totalTicks; i++) {
+        const frac = i / totalTicks;
+        const ang = startAngle + frac * (endAngle - startAngle);
+        const isMajor = i % 5 === 0;
+        const tickLen = isMajor ? 9 : 5;
+
+        const x1 = pivotX + Math.cos(ang) * (radius - tickLen);
+        const y1 = pivotY + Math.sin(ang) * (radius - tickLen);
+        const x2 = pivotX + Math.cos(ang) * radius;
+        const y2 = pivotY + Math.sin(ang) * radius;
+
+        ctx.strokeStyle = isMajor ? '#0f172a' : '#64748b';
+        ctx.lineWidth = isMajor ? 1.5 : 1;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        if (isMajor) {
+          const valLabel = (frac * maxVal).toFixed(1);
+          const lx = pivotX + Math.cos(ang) * (radius - 18);
+          const ly = pivotY + Math.sin(ang) * (radius - 18);
+          ctx.fillStyle = '#1e293b';
+          ctx.font = 'bold 9px JetBrains Mono, monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(valLabel, lx, ly);
+        }
+      }
+
+      ctx.fillStyle = '#b91c1c';
+      ctx.font = 'bold 14px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('A', cx, cy + 4);
+
+      ctx.fillStyle = '#475569';
+      ctx.font = '8px Inter, sans-serif';
+      ctx.fillText(subText, cx, cy + 16);
+
+      const clamped = Math.max(0, Math.min(maxVal, currentVal));
+      const needleAng = startAngle + (clamped / maxVal) * (endAngle - startAngle);
+      ctx.strokeStyle = '#dc2626';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(pivotX, pivotY);
+      ctx.lineTo(pivotX + Math.cos(needleAng) * (radius - 2), pivotY + Math.sin(needleAng) * (radius - 2));
+      ctx.stroke();
+
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.arc(pivotX, pivotY, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.beginPath();
+      ctx.moveTo(cx - w / 2 + pad, cy - h / 2 + pad);
+      ctx.lineTo(cx + w * 0.1, cy - h / 2 + pad);
+      ctx.lineTo(cx - w * 0.2, cy + h / 2 - pad);
+      ctx.lineTo(cx - w / 2 + pad, cy + h / 2 - pad);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawToggleSwitch(ctx, cx, cy, val, labelTop, labelBot) {
+      ctx.save();
+      ctx.fillStyle = '#cbd5e1';
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, cx - 14, cy - 26, 28, 52, 4, true, true);
+
+      ctx.fillStyle = val === 1 ? '#dc2626' : '#fca5a5';
+      ctx.fillRect(cx - 10, cy - 22, 20, 10);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 6px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(labelTop, cx, cy - 15);
+
+      ctx.fillStyle = val === -1 ? '#dc2626' : '#fca5a5';
+      ctx.fillRect(cx - 10, cy + 12, 20, 10);
+      ctx.fillStyle = '#fff';
+      ctx.fillText(labelBot, cx, cy + 19);
+
+      ctx.fillStyle = '#64748b';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+      ctx.fill();
+
+      const leverY = val === 1 ? cy - 11 : (val === -1 ? cy + 11 : cy);
+      ctx.strokeStyle = '#f8fafc';
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx, leverY);
+      ctx.stroke();
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.beginPath();
+      ctx.arc(cx, leverY, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawRheostatKnob(ctx, cx, cy, radius, fracVal) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.beginPath();
+      ctx.arc(cx + 2, cy + 3, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      const grad = ctx.createRadialGradient(cx - radius * 0.3, cy - radius * 0.3, 2, cx, cy, radius);
+      grad.addColorStop(0, '#475569');
+      grad.addColorStop(0.7, '#1e293b');
+      grad.addColorStop(1, '#0f172a');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius * 0.72, 0, Math.PI * 2);
+      ctx.stroke();
+
+      const ang = -Math.PI * 1.25 + fracVal * (Math.PI * 1.5);
+      ctx.strokeStyle = '#f8fafc';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(ang) * (radius * 0.25), cy + Math.sin(ang) * (radius * 0.25));
+      ctx.lineTo(cx + Math.cos(ang) * (radius * 0.85), cy + Math.sin(ang) * (radius * 0.85));
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function drawCallout(ctx, num, targetX, targetY, badgeX, badgeY) {
+      if (!state.showLabels) return;
+      ctx.save();
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(badgeX, badgeY);
+      ctx.lineTo(targetX, targetY);
+      ctx.stroke();
+
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath();
+      ctx.arc(targetX, targetY, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      const text = `(${num})`;
+      ctx.font = 'bold 12px Inter, sans-serif';
+      const tw = ctx.measureText(text).width + 10;
+      const th = 20;
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, badgeX - tw / 2, badgeY - th / 2, tw, th, 6, true, true);
+
+      ctx.fillStyle = '#0f172a';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, badgeX, badgeY + 0.5);
+      ctx.restore();
+    }
+
+    /**
+     * Draw 2.5D / 3D-styled U-Electromagnet (1), Terminal Block (12), and Rotating Coil (10)
+     */
+    function draw3DMagnetAndCoil(ctx, magCenterX, magBaseY, coilRightX, coilTopY) {
+      const depthX = 22;
+      const depthY = -14;
+      const limbW = 34;
+      const limbH = 104;
+      const gapW = 54;
+      const totalFrontW = limbW * 2 + gapW;
+      const leftX = magCenterX - totalFrontW / 2;
+      const rightX = leftX + limbW + gapW;
+      const topY = magBaseY - limbH;
+
+      // 1. Back yoke & back 3D faces of the U-core
+      ctx.save();
+      ctx.fillStyle = '#64748b';
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(leftX + depthX, magBaseY + depthY);
+      ctx.lineTo(leftX + totalFrontW + depthX, magBaseY + depthY);
+      ctx.lineTo(leftX + totalFrontW + depthX, magBaseY - 22 + depthY);
+      ctx.lineTo(leftX + depthX, magBaseY - 22 + depthY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Left pole top & right 3D face
+      ctx.fillStyle = '#cbd5e1';
+      ctx.beginPath();
+      ctx.moveTo(leftX, topY);
+      ctx.lineTo(leftX + depthX, topY + depthY);
+      ctx.lineTo(leftX + limbW + depthX, topY + depthY);
+      ctx.lineTo(leftX + limbW, topY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#64748b';
+      ctx.beginPath();
+      ctx.moveTo(leftX + limbW, topY);
+      ctx.lineTo(leftX + limbW + depthX, topY + depthY);
+      ctx.lineTo(leftX + limbW + depthX, magBaseY + depthY);
+      ctx.lineTo(leftX + limbW, magBaseY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Front face of Left Pole
+      const leftGrad = ctx.createLinearGradient(leftX, topY, leftX + limbW, magBaseY);
+      leftGrad.addColorStop(0, '#94a3b8');
+      leftGrad.addColorStop(1, '#64748b');
+      ctx.fillStyle = leftGrad;
+      ctx.fillRect(leftX, topY, limbW, limbH);
+      ctx.strokeRect(leftX, topY, limbW, limbH);
+
+      // Pole marker N / S on Left Pole
+      if (state.powerOn && state.swMag !== 0) {
+        ctx.fillStyle = state.swMag === 1 ? '#dc2626' : '#2563eb';
+        ctx.font = 'bold 12px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(state.swMag === 1 ? 'N' : 'S', leftX + limbW / 2, topY + 22);
+      }
+
+      // 2. Cylindrical Copper Coil Winding at the base (3D shaded copper turns)
+      const coilW = totalFrontW - 10;
+      const coilH = 44;
+      const coilX = leftX + 5;
+      const coilY = magBaseY - coilH - 4;
+      const copperGrad = ctx.createLinearGradient(coilX, coilY, coilX, coilY + coilH);
+      copperGrad.addColorStop(0, '#ea580c');
+      copperGrad.addColorStop(0.5, '#c2410c');
+      copperGrad.addColorStop(1, '#7c2d12');
+      ctx.fillStyle = copperGrad;
+      roundRect(simCtx, coilX, coilY, coilW, coilH, 8, true, true);
+
+      // Copper winding ribs
+      ctx.strokeStyle = 'rgba(255, 220, 180, 0.35)';
+      ctx.lineWidth = 1.2;
+      for (let wx = coilX + 6; wx < coilX + coilW - 4; wx += 5) {
+        ctx.beginPath();
+        ctx.moveTo(wx, coilY + 3);
+        ctx.lineTo(wx, coilY + coilH - 3);
+        ctx.stroke();
+      }
+
+      // 3. Magnetic Field Lines (B) inside the air gap
+      if (state.showFieldLines && state.powerOn && state.swMag !== 0 && state.I_mag_actual > 0.01) {
+        const dir = state.swMag; // +1: Left -> Right, -1: Right -> Left
+        ctx.save();
+        ctx.strokeStyle = 'rgba(37, 99, 235, 0.65)';
+        ctx.fillStyle = 'rgba(37, 99, 235, 0.8)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 3]);
+        for (let row = 0; row < 3; row++) {
+          const fy = topY + 26 + row * 20;
+          const xStart = leftX + limbW + 4;
+          const xEnd = rightX - 4;
+          ctx.beginPath();
+          ctx.moveTo(xStart, fy);
+          ctx.lineTo(xEnd, fy);
+          ctx.stroke();
+
+          const midX = (xStart + xEnd) / 2;
+          ctx.setLineDash([]);
+          ctx.beginPath();
+          if (dir === 1) {
+            ctx.moveTo(midX + 5, fy);
+            ctx.lineTo(midX - 3, fy - 3.5);
+            ctx.lineTo(midX - 3, fy + 3.5);
+          } else {
+            ctx.moveTo(midX - 5, fy);
+            ctx.lineTo(midX + 3, fy - 3.5);
+            ctx.lineTo(midX + 3, fy + 3.5);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.setLineDash([4, 3]);
+        }
+        ctx.restore();
+      }
+
+      // 4. Coil (10) suspended from right balance arm into the magnet gap with 3D rotation by theta
+      const rad = (state.theta * Math.PI) / 180;
+      const cosT = Math.cos(rad);
+      const sinT = Math.sin(rad);
+      const loopW = 36;
+      const loopH = 74;
+      const hangTopY = coilTopY + 12;
+
+      // Perspective 3D horizontal spread & depth shift without crossing edges (prevents figure-8 twist)
+      const halfW = loopW / 2;
+      const frontHalfW = halfW * Math.max(0.22, cosT);
+      const depthDx = halfW * sinT * 0.42;
+      const depthDy = -halfW * sinT * 0.24;
+
+      // Front face (top & bottom edges)
+      const fLeftX = coilRightX - frontHalfW;
+      const fRightX = coilRightX + frontHalfW;
+
+      // Back face shifted uniformly in 3D depth so left stays left and right stays right
+      const bLeftX = fLeftX + depthDx;
+      const bRightX = fRightX + depthDx;
+      const bTopY = hangTopY + depthDy;
+      const cBotY = hangTopY + loopH;
+      const bBotY = cBotY + depthDy;
+
+      // Suspension stem from balance arm (4) to coil frame
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(coilRightX, coilTopY);
+      ctx.lineTo(coilRightX, hangTopY);
+      ctx.stroke();
+
+      // Back face of the coil loop (drawn first for proper depth)
+      ctx.fillStyle = 'rgba(254, 243, 199, 0.28)';
+      ctx.strokeStyle = '#b45309';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(bLeftX, bTopY);
+      ctx.lineTo(bRightX, bTopY);
+      ctx.lineTo(bRightX, bBotY);
+      ctx.lineTo(bLeftX, bBotY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Side connecting ribs (left & right depth bars)
+      ctx.strokeStyle = '#d97706';
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.moveTo(fLeftX, hangTopY);
+      ctx.lineTo(bLeftX, bTopY);
+      ctx.moveTo(fRightX, hangTopY);
+      ctx.lineTo(bRightX, bTopY);
+      ctx.moveTo(fLeftX, cBotY);
+      ctx.lineTo(bLeftX, bBotY);
+      ctx.moveTo(fRightX, cBotY);
+      ctx.lineTo(bRightX, bBotY);
+      ctx.stroke();
+
+      // Front face of the coil loop
+      ctx.fillStyle = 'rgba(254, 243, 199, 0.45)';
+      ctx.strokeStyle = '#d97706';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(fLeftX, hangTopY);
+      ctx.lineTo(fRightX, hangTopY);
+      ctx.lineTo(fRightX, cBotY);
+      ctx.lineTo(fLeftX, cBotY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Copper wire turns along the front coil sides and bottom active bar
+      const activeCurrent = state.powerOn ? state.I_coil_actual : 0;
+      const wireColor = activeCurrent > 0.01 ? '#ea580c' : '#b45309';
+      ctx.strokeStyle = wireColor;
+      ctx.lineWidth = activeCurrent > 0.01 ? 3.5 : 2.5;
+      ctx.beginPath();
+      ctx.moveTo(fLeftX + 2.5, hangTopY + 3);
+      ctx.lineTo(fLeftX + 2.5, cBotY - 2);
+      ctx.lineTo(fRightX - 2.5, cBotY - 2);
+      ctx.lineTo(fRightX - 2.5, hangTopY + 3);
+      ctx.stroke();
+
+      // Current symbol (⊗ or ⊙) and Force vector F on bottom active bar
+      const botMidX = (fLeftX + fRightX) / 2;
+      if (state.showVectors && state.powerOn && activeCurrent > 0.01 && state.swCoil !== 0) {
+        ctx.save();
+        ctx.fillStyle = '#fff7ed';
+        ctx.strokeStyle = '#dc2626';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(botMidX, cBotY - 2, 7.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#dc2626';
+        ctx.font = 'bold 10px JetBrains Mono, monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(state.swCoil === 1 ? '×' : '•', botMidX, cBotY - 1.5);
+
+        // Ampere Force vector arrow F
+        if (Math.abs(state.F_mag_signed) > 0.0005 && state.theta > 0) {
+          const fLen = Math.min(34, 12 + state.F_mag_true * 70);
+          const fDir = state.F_mag_signed > 0 ? 1 : -1;
+          const fyStart = cBotY + fDir * 8;
+          const fyEnd = fyStart + fDir * fLen;
+
+          ctx.strokeStyle = '#e11d48';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(botMidX, fyStart);
+          ctx.lineTo(botMidX, fyEnd);
+          ctx.stroke();
+
+          ctx.fillStyle = '#e11d48';
+          ctx.beginPath();
+          ctx.moveTo(botMidX, fyEnd + fDir * 5);
+          ctx.lineTo(botMidX - 4.5, fyEnd - fDir * 2);
+          ctx.lineTo(botMidX + 4.5, fyEnd - fDir * 2);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.font = 'bold 11px Inter, sans-serif';
+          ctx.fillText('F', botMidX + 14, (fyStart + fyEnd) / 2);
+        }
+        ctx.restore();
+      }
+
+      // 5. Front Right Pole (drawn in front of the coil for 3D depth)
+      ctx.fillStyle = '#cbd5e1';
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(rightX, topY);
+      ctx.lineTo(rightX + depthX, topY + depthY);
+      ctx.lineTo(rightX + limbW + depthX, topY + depthY);
+      ctx.lineTo(rightX + limbW, topY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#64748b';
+      ctx.beginPath();
+      ctx.moveTo(rightX + limbW, topY);
+      ctx.lineTo(rightX + limbW + depthX, topY + depthY);
+      ctx.lineTo(rightX + limbW + depthX, magBaseY + depthY);
+      ctx.lineTo(rightX + limbW, magBaseY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      const rightGrad = ctx.createLinearGradient(rightX, topY, rightX + limbW, magBaseY);
+      rightGrad.addColorStop(0, '#94a3b8');
+      rightGrad.addColorStop(1, '#64748b');
+      ctx.fillStyle = rightGrad;
+      ctx.fillRect(rightX, topY, limbW, limbH);
+      ctx.strokeRect(rightX, topY, limbW, limbH);
+
+      if (state.powerOn && state.swMag !== 0) {
+        ctx.fillStyle = state.swMag === 1 ? '#2563eb' : '#dc2626';
+        ctx.font = 'bold 12px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(state.swMag === 1 ? 'S' : 'N', rightX + limbW / 2, topY + 22);
+      }
+
+      // Bolts on front pole faces
+      ctx.fillStyle = '#334155';
+      [topY + 14, magBaseY - 34].forEach(by => {
+        ctx.beginPath();
+        ctx.arc(leftX + 8, by, 2.5, 0, Math.PI * 2);
+        ctx.arc(rightX + limbW - 8, by, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 6. Terminal Block (12) on the front-right of the wooden box
+      const tbX = rightX + limbW + 10;
+      const tbY = magBaseY - 18;
+      ctx.fillStyle = '#b45309';
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, tbX, tbY, 34, 18, 3, true, true);
+
+      ctx.restore();
+    }
+
+    /**
+     * Main Render Frame
+     */
+    function renderScene() {
+      const container = document.getElementById('canvasContainer');
+      const W = container.clientWidth;
+      const H = container.clientHeight;
+      if (W === 0 || H === 0) return;
+
+      simCtx.clearRect(0, 0, W, H);
+      state.hitboxes = [];
+
+      const tableY = H * 0.88;
+      const tableGrad = simCtx.createLinearGradient(0, tableY, 0, H);
+      tableGrad.addColorStop(0, '#cbd5e1');
+      tableGrad.addColorStop(1, '#94a3b8');
+      simCtx.fillStyle = tableGrad;
+      simCtx.fillRect(0, tableY, W, H - tableY);
+      simCtx.strokeStyle = '#64748b';
+      simCtx.lineWidth = 1.5;
+      simCtx.beginPath();
+      simCtx.moveTo(0, tableY);
+      simCtx.lineTo(W, tableY);
+      simCtx.stroke();
+
+      const baseW = 920;
+      const baseH = 540;
+      const scale = Math.min((W - 30) / baseW, (H - 35) / baseH, 1.25);
+
+      simCtx.save();
+      const offsetX = (W - baseW * scale) / 2;
+      const offsetY = tableY - baseH * scale + 18 * scale;
+      simCtx.translate(offsetX, offsetY);
+      simCtx.scale(scale, scale);
+
+      const addHitbox = (id, label, bx, by, bw, bh, action) => {
+        state.hitboxes.push({
+          id, label, action,
+          x: offsetX + bx * scale,
+          y: offsetY + by * scale,
+          w: bw * scale,
+          h: bh * scale
+        });
+      };
+
+      const psX = 28, psY = 306, psW = 248, psH = 196;
+      const boxX = 304, boxY = 258, boxW = 582, boxH = 244;
+      const pillarX = 562, pillarBottomY = boxY;
+      const knob1X = boxX + 266, knob2X = boxX + 332, knobY = boxY + 146;
+
+      // =====================================================================
+      // A. AC-DC POWER SUPPLY UNIT (13) ON THE LEFT
+      // =====================================================================
+      simCtx.save();
+      simCtx.strokeStyle = '#64748b';
+      simCtx.lineWidth = 5;
+      simCtx.beginPath();
+      simCtx.moveTo(psX + 64, psY);
+      simCtx.lineTo(psX + 64, psY - 16);
+      simCtx.lineTo(psX + 184, psY - 16);
+      simCtx.lineTo(psX + 184, psY);
+      simCtx.stroke();
+
+      simCtx.fillStyle = '#e2e8f0';
+      simCtx.strokeStyle = '#475569';
+      simCtx.lineWidth = 2;
+      roundRect(simCtx, psX, psY, psW, psH, 8, true, true);
+
+      simCtx.fillStyle = '#1e293b';
+      simCtx.font = 'bold 9px Inter, sans-serif';
+      simCtx.textAlign = 'left';
+      simCtx.fillText('BỘ NGUỒN ĐIỆN', psX + 14, psY + 42);
+      simCtx.fillStyle = '#1d4ed8';
+      simCtx.font = 'bold 10px Inter, sans-serif';
+      simCtx.fillText('AC-DC POWER SUPPLY', psX + 112, psY + 24);
+
+      simCtx.fillStyle = state.powerOn ? '#ef4444' : '#7f1d1d';
+      simCtx.beginPath();
+      simCtx.arc(psX + 104, psY + 56, 5.5, 0, Math.PI * 2);
+      simCtx.fill();
+      if (state.powerOn) {
+        simCtx.fillStyle = 'rgba(239, 68, 68, 0.35)';
+        simCtx.beginPath();
+        simCtx.arc(psX + 104, psY + 56, 11, 0, Math.PI * 2);
+        simCtx.fill();
+      }
+      simCtx.fillStyle = '#334155';
+      simCtx.font = 'bold 8px Inter, sans-serif';
+      simCtx.fillText(state.powerOn ? 'ON' : 'OFF', psX + 78, psY + 59);
+
+      const swX = psX + 86, swY = psY + 72;
+      simCtx.fillStyle = '#cbd5e1';
+      simCtx.strokeStyle = '#475569';
+      simCtx.lineWidth = 1.5;
+      roundRect(simCtx, swX, swY, 26, 48, 4, true, true);
+      simCtx.fillStyle = state.powerOn ? '#16a34a' : '#dc2626';
+      roundRect(simCtx, swX + 4, state.powerOn ? swY + 4 : swY + 24, 18, 20, 3, true, false);
+      simCtx.fillStyle = '#ffffff';
+      simCtx.font = 'bold 7px Inter, sans-serif';
+      simCtx.textAlign = 'center';
+      simCtx.fillText(state.powerOn ? 'BẬT' : 'TẮT', swX + 13, state.powerOn ? swY + 17 : swY + 37);
+
+      const vKnobX = psX + 168, vKnobY = psY + 96;
+      const vFrac = ({ 3: 0.1, 6: 0.38, 9: 0.68, 12: 0.95 })[state.voltage] || 0.95;
+      drawRheostatKnob(simCtx, vKnobX, vKnobY, 26, vFrac);
+      simCtx.fillStyle = '#1e293b';
+      simCtx.font = 'bold 8px JetBrains Mono, monospace';
+      simCtx.fillText('3V', vKnobX - 34, vKnobY + 14);
+      simCtx.fillText('6V', vKnobX - 32, vKnobY - 18);
+      simCtx.fillText('9V', vKnobX + 32, vKnobY - 18);
+      simCtx.fillStyle = '#dc2626';
+      simCtx.fillText('12V', vKnobX + 35, vKnobY + 14);
+
+      const termRedX = psX + 34, termBlkX = psX + 64, termY = psY + 158;
+      simCtx.fillStyle = '#dc2626';
+      simCtx.beginPath();
+      simCtx.arc(termRedX, termY, 7, 0, Math.PI * 2);
+      simCtx.fill();
+      simCtx.fillStyle = '#1e293b';
+      simCtx.beginPath();
+      simCtx.arc(termBlkX, termY, 7, 0, Math.PI * 2);
+      simCtx.fill();
+
+      simCtx.save();
+      simCtx.lineCap = 'round';
+      simCtx.strokeStyle = '#dc2626';
+      simCtx.lineWidth = 3.5;
+      simCtx.beginPath();
+      simCtx.moveTo(termRedX, termY + 7);
+      simCtx.bezierCurveTo(termRedX, boxY + boxH + 14, boxX - 24, boxY + boxH + 14, boxX + 18, boxY + boxH - 18);
+      simCtx.stroke();
+
+      simCtx.strokeStyle = '#1e293b';
+      simCtx.lineWidth = 3.5;
+      simCtx.beginPath();
+      simCtx.moveTo(termBlkX, termY + 7);
+      simCtx.bezierCurveTo(termBlkX + 8, boxY + boxH + 22, boxX - 14, boxY + boxH + 22, boxX + 32, boxY + boxH - 18);
+      simCtx.stroke();
+      simCtx.restore();
+
+      addHitbox('power13', EQUIPMENT_INFO[13], psX, psY - 16, psW, psH + 16, () => togglePower());
+      addHitbox('knobVolt13', EQUIPMENT_INFO[13] + ' — Kéo hoặc bấm để chọn điện áp (3V–12V)', vKnobX - 28, vKnobY - 28, 56, 56, {
+        type: 'volt',
+        stepAction: (dir = 1) => {
+          const volts = [3, 6, 9, 12];
+          const idx = volts.indexOf(state.voltage);
+          const nextIdx = Math.max(0, Math.min(volts.length - 1, (idx === -1 ? 3 : idx) + dir));
+          setVoltage(volts[nextIdx]);
+          showToast('Điện áp bộ nguồn: ' + volts[nextIdx] + 'V');
+        }
+      });
+      simCtx.restore();
+
+      // =====================================================================
+      // B. WOODEN INSTRUMENT BOX, AMMETERS (5)(6), KNOBS (7), SWITCHES (8)(9)
+      // =====================================================================
+      simCtx.save();
+      const woodGrad = simCtx.createLinearGradient(boxX, boxY, boxX, boxY + boxH);
+      woodGrad.addColorStop(0, '#9a5b28');
+      woodGrad.addColorStop(1, '#6d3b14');
+      simCtx.fillStyle = woodGrad;
+      simCtx.strokeStyle = '#452208';
+      simCtx.lineWidth = 2;
+      roundRect(simCtx, boxX, boxY, boxW, boxH, 6, true, true);
+
+      simCtx.fillStyle = '#b46e34';
+      roundRect(simCtx, boxX - 6, boxY - 8, boxW + 12, 14, 4, true, true);
+
+      const sw8X = boxX + 42, sw9X = boxX + boxW - 42;
+      const revSwY = boxY + 146;
+      drawToggleSwitch(simCtx, sw8X, revSwY, state.swMag, 'THUẬN', 'NGHỊCH');
+      drawToggleSwitch(simCtx, sw9X, revSwY, state.swCoil, 'THUẬN', 'NGHỊCH');
+
+      addHitbox('sw8', EQUIPMENT_INFO[8] + ' (Bấm để đảo chiều)', sw8X - 18, revSwY - 28, 36, 56, () => {
+        const next = state.swMag === 1 ? -1 : (state.swMag === -1 ? 0 : 1);
+        setSwitch('mag', next);
+      });
+      addHitbox('sw9', EQUIPMENT_INFO[9] + ' (Bấm để đảo chiều)', sw9X - 18, revSwY - 28, 36, 56, () => {
+        const next = state.swCoil === 1 ? -1 : (state.swCoil === -1 ? 0 : 1);
+        setSwitch('coil', next);
+      });
+
+      const m5X = boxX + 152, m6X = boxX + boxW - 152, mY = boxY + 136;
+      drawAnalogAmmeter(simCtx, m5X, mY, 134, 88, state.needleMagAnim, 2.0, 5, 'I_nc (Nam châm)');
+      drawAnalogAmmeter(simCtx, m6X, mY, 134, 88, state.needleCoilAnim, 2.0, 6, 'I_kd (Khung dây)');
+
+      addHitbox('meter5', EQUIPMENT_INFO[5], m5X - 67, mY - 44, 134, 88, null);
+      addHitbox('meter6', EQUIPMENT_INFO[6], m6X - 67, mY - 44, 134, 88, null);
+
+      drawRheostatKnob(simCtx, knob1X, knobY, 24, state.I_mag_set / 2.0);
+      simCtx.fillStyle = '#f8fafc';
+      simCtx.font = 'bold 9px Inter, sans-serif';
+      simCtx.textAlign = 'center';
+      simCtx.fillText('Chỉnh I_nc', knob1X, knobY + 36);
+
+      drawRheostatKnob(simCtx, knob2X, knobY, 24, state.I_coil_set / 2.0);
+      simCtx.fillText('Chỉnh I_kd', knob2X, knobY + 36);
+
+      addHitbox('knob7a', EQUIPMENT_INFO[7] + ' — Kéo trái/phải hoặc bấm để chỉnh I_nc', knob1X - 24, knobY - 24, 48, 48, {
+        type: 'I_mag',
+        stepAction: (dir = 1) => {
+          const next = Math.max(0, Math.min(2.0, parseFloat((state.I_mag_set + dir * 0.1).toFixed(2))));
+          updateParam('I_mag', next);
+          document.getElementById('sliderIn').value = next;
+        }
+      });
+      addHitbox('knob7b', EQUIPMENT_INFO[7] + ' — Kéo trái/phải hoặc bấm để chỉnh I_kd', knob2X - 24, knobY - 24, 48, 48, {
+        type: 'I_coil',
+        stepAction: (dir = 1) => {
+          const next = Math.max(0, Math.min(2.0, parseFloat((state.I_coil_set + dir * 0.1).toFixed(2))));
+          updateParam('I_coil', next);
+          document.getElementById('sliderIk').value = next;
+        }
+      });
+      drawCallout(simCtx, 8, sw8X, revSwY + 6, sw8X, boxY + boxH - 28);
+      drawCallout(simCtx, 5, m5X + 38, mY - 14, m5X + 64, mY - 38);
+      drawCallout(simCtx, 7, (knob1X + knob2X) / 2, knobY + 12, (knob1X + knob2X) / 2, boxY + boxH - 24);
+      drawCallout(simCtx, 6, m6X - 38, mY - 14, m6X - 64, mY - 38);
+      drawCallout(simCtx, 9, sw9X, revSwY + 6, sw9X, boxY + boxH - 28);
+
+      simCtx.restore();
+
+      // =====================================================================
+      // C. CENTRAL PILLAR, SPRING DYNAMOMETER (11), BEAM (2), MAGNET (1), COIL (10)
+      // =====================================================================
+      simCtx.save();
+      const beamPivotX = pillarX;
+      const beamPivotY = 74;
+
+      const pillarGrad = simCtx.createLinearGradient(pillarX - 14, 0, pillarX + 14, 0);
+      pillarGrad.addColorStop(0, '#94a3b8');
+      pillarGrad.addColorStop(0.5, '#f1f5f9');
+      pillarGrad.addColorStop(1, '#64748b');
+      simCtx.fillStyle = pillarGrad;
+      simCtx.strokeStyle = '#334155';
+      simCtx.lineWidth = 1.5;
+      simCtx.fillRect(pillarX - 11, beamPivotY + 8, 22, pillarBottomY - beamPivotY - 8);
+      simCtx.strokeRect(pillarX - 11, beamPivotY + 8, 22, pillarBottomY - beamPivotY - 8);
+
+      simCtx.fillStyle = '#cbd5e1';
+      roundRect(simCtx, pillarX - 26, pillarBottomY - 10, 52, 10, 2, true, true);
+
+      // Pointer scale near bottom of pillar
+      const ptrY = pillarBottomY - 56;
+      simCtx.fillStyle = '#ffffff';
+      simCtx.strokeStyle = '#475569';
+      simCtx.fillRect(pillarX - 14, ptrY - 12, 28, 24);
+      simCtx.strokeRect(pillarX - 14, ptrY - 12, 28, 24);
+      const ptrOffset = Math.max(-9, Math.min(9, state.beamAngle * 55));
+      simCtx.fillStyle = '#dc2626';
+      simCtx.beginPath();
+      simCtx.moveTo(pillarX, ptrY + ptrOffset);
+      simCtx.lineTo(pillarX - 5, ptrY + ptrOffset - 6);
+      simCtx.lineTo(pillarX + 5, ptrY + ptrOffset - 6);
+      simCtx.closePath();
+      simCtx.fill();
+
+      // Rotating Beam (2)
+      const armLen = 176;
+      simCtx.save();
+      simCtx.translate(beamPivotX, beamPivotY);
+      simCtx.rotate(state.beamAngle);
+
+      simCtx.fillStyle = '#f8fafc';
+      simCtx.strokeStyle = '#475569';
+      simCtx.lineWidth = 1.8;
+      roundRect(simCtx, -armLen - 26, -8, armLen * 2 + 52, 16, 4, true, true);
+
+      // Counterweight (3) on left end
+      const cwX = -armLen - 34;
+      simCtx.fillStyle = '#94a3b8';
+      simCtx.strokeStyle = '#334155';
+      roundRect(simCtx, cwX - 14, -14, 22, 28, 3, true, true);
+
+      // Swivel joint (4) on right end
+      simCtx.fillStyle = '#cbd5e1';
+      simCtx.beginPath();
+      simCtx.arc(armLen, 0, 12, 0, Math.PI * 2);
+      simCtx.fill();
+      simCtx.stroke();
+
+      simCtx.fillStyle = '#1e293b';
+      simCtx.beginPath();
+      simCtx.arc(0, 0, 7, 0, Math.PI * 2);
+      simCtx.fill();
+
+      const leftHookLocalX = -armLen * 0.68;
+      const rightHookLocalX = armLen;
+      simCtx.restore();
+
+      // Compute world coordinates of left & right beam attachment points
+      const cosA = Math.cos(state.beamAngle);
+      const sinA = Math.sin(state.beamAngle);
+
+      const leftHookX = beamPivotX + leftHookLocalX * cosA;
+      const leftHookY = beamPivotY + leftHookLocalX * sinA + 8;
+
+      const rightHookX = beamPivotX + rightHookLocalX * cosA;
+      const rightHookY = beamPivotY + rightHookLocalX * sinA + 8;
+
+      // Spring Dynamometer (11) suspended on the left arm
+      const dynTopY = leftHookY + 26;
+      const dynW = 24;
+      const dynH = 98;
+
+      simCtx.strokeStyle = '#475569';
+      simCtx.lineWidth = 1.5;
+      simCtx.beginPath();
+      simCtx.moveTo(leftHookX, leftHookY);
+      simCtx.lineTo(leftHookX, dynTopY);
+      simCtx.stroke();
+
+      simCtx.fillStyle = '#dc2626';
+      roundRect(simCtx, leftHookX - dynW / 2 - 1, dynTopY - 14, dynW + 2, 16, 3, true, true);
+
+      simCtx.fillStyle = '#f8fafc';
+      simCtx.strokeStyle = '#334155';
+      roundRect(simCtx, leftHookX - dynW / 2, dynTopY, dynW, dynH, 3, true, true);
+
+      const maxScaleN = 0.60;
+      const fracF = Math.max(0, Math.min(1, state.F_tare / maxScaleN));
+      const indY = dynTopY + 10 + fracF * (dynH - 20);
+
+      for (let t = 0; t <= 12; t++) {
+        const ty = dynTopY + 10 + (t / 12) * (dynH - 20);
+        const isMaj = t % 3 === 0;
+        simCtx.strokeStyle = isMaj ? '#1e293b' : '#94a3b8';
+        simCtx.lineWidth = isMaj ? 1.2 : 0.8;
+        simCtx.beginPath();
+        simCtx.moveTo(leftHookX - dynW / 2 + 2, ty);
+        simCtx.lineTo(leftHookX - dynW / 2 + (isMaj ? 9 : 5), ty);
+        simCtx.stroke();
+      }
+
+      simCtx.fillStyle = '#ef4444';
+      simCtx.fillRect(leftHookX - dynW / 2 + 1, indY - 2, dynW - 2, 4);
+
+      const lowerRodBottomY = boxY - 12;
+      simCtx.strokeStyle = '#64748b';
+      simCtx.lineWidth = 2;
+      simCtx.beginPath();
+      simCtx.moveTo(leftHookX, dynTopY + dynH);
+      simCtx.lineTo(leftHookX, lowerRodBottomY);
+      simCtx.stroke();
+
+      simCtx.fillStyle = '#f8fafc';
+      simCtx.strokeStyle = '#475569';
+      roundRect(simCtx, leftHookX - 10, lowerRodBottomY - 24, 20, 12, 2, true, true);
+
+      simCtx.fillStyle = '#94a3b8';
+      simCtx.strokeStyle = '#334155';
+      roundRect(simCtx, leftHookX - 16, lowerRodBottomY - 10, 32, 10, 2, true, true);
+
+      // Draw 3D U-Electromagnet (1) and Rotating Coil (10)
+      const magCenterX = rightHookX;
+      const magBaseY = boxY - 8;
+      draw3DMagnetAndCoil(simCtx, magCenterX, magBaseY, rightHookX, rightHookY);
+
+      addHitbox('dyn11', EQUIPMENT_INFO[11], leftHookX - 20, dynTopY - 14, 40, dynH + 100, null);
+      addHitbox('mag1', EQUIPMENT_INFO[1], magCenterX - 68, magBaseY - 118, 136, 122, null);
+      addHitbox('coil10', EQUIPMENT_INFO[10], rightHookX - 26, rightHookY, 52, 92, null);
+      simCtx.restore();
+
+      // =====================================================================
+      // D. NUMBERED CALLOUT BADGES (1) - (13) MATCHING FIGURE 15.1
+      // =====================================================================
+      drawCallout(simCtx, 13, psX + 124, psY - 10, psX + 124, psY - 42);
+      drawCallout(simCtx, 3, pillarX - armLen - 38, beamPivotY, pillarX - armLen - 76, beamPivotY - 8);
+      drawCallout(simCtx, 11, leftHookX - 10, dynTopY + 36, leftHookX - 56, dynTopY + 52);
+      drawCallout(simCtx, 2, pillarX + 115, beamPivotY + 4, pillarX + 135, beamPivotY + 42);
+      drawCallout(simCtx, 4, pillarX + armLen + 6, beamPivotY - 4, pillarX + armLen + 56, beamPivotY - 24);
+      drawCallout(simCtx, 10, rightHookX + 12, rightHookY + 46, rightHookX + 68, rightHookY + 34);
+      drawCallout(simCtx, 1, rightHookX + 56, boxY - 76, rightHookX + 98, boxY - 82);
+      drawCallout(simCtx, 12, rightHookX + 74, boxY - 14, rightHookX + 98, boxY - 26);
+
+      drawCallout(simCtx, 8, sw8X, swY + 6, sw8X, boxY + boxH - 28);
+      drawCallout(simCtx, 5, m5X + 38, mY - 14, m5X + 64, mY - 38);
+      drawCallout(simCtx, 7, (knob1X + knob2X) / 2, knobY + 12, (knob1X + knob2X) / 2, boxY + boxH - 24);
+      drawCallout(simCtx, 6, m6X - 38, mY - 14, m6X - 64, mY - 38);
+      drawCallout(simCtx, 9, sw9X, swY + 6, sw9X, boxY + boxH - 28);
+
+      simCtx.restore();
+
+      renderZoomInset();
+    }
+
+    function renderZoomInset() {
+      const W = zoomCanvas.width;
+      const H = zoomCanvas.height;
+      zoomCtx.clearRect(0, 0, W, H);
+
+      zoomCtx.fillStyle = '#f8fafc';
+      zoomCtx.fillRect(0, 0, W, H);
+
+      if (state.zoomTarget === 'dynamometer' || state.zoomTarget === 'all') {
+        const lx = state.zoomTarget === 'all' ? 16 : 40;
+        const topY = 12;
+        const scaleH = H - 24;
+
+        zoomCtx.fillStyle = '#ffffff';
+        zoomCtx.strokeStyle = '#334155';
+        zoomCtx.lineWidth = 1.5;
+        roundRect(zoomCtx, lx, topY, 36, scaleH, 4, true, true);
+
+        const maxN = 0.60;
+        for (let i = 0; i <= 30; i++) {
+          const frac = i / 30;
+          const y = topY + 8 + frac * (scaleH - 16);
+          const isMaj = i % 5 === 0;
+          zoomCtx.strokeStyle = isMaj ? '#0f172a' : '#94a3b8';
+          zoomCtx.lineWidth = isMaj ? 1.4 : 0.8;
+          zoomCtx.beginPath();
+          zoomCtx.moveTo(lx + 3, y);
+          zoomCtx.lineTo(lx + (isMaj ? 15 : 9), y);
+          zoomCtx.stroke();
+
+          if (isMaj) {
+            const valN = (frac * maxN).toFixed(2);
+            zoomCtx.fillStyle = '#1e293b';
+            zoomCtx.font = 'bold 9px JetBrains Mono, monospace';
+            zoomCtx.textAlign = 'left';
+            zoomCtx.textBaseline = 'middle';
+            zoomCtx.fillText(valN, lx + 42, y);
+          }
+        }
+
+        const clampedF = Math.max(0, Math.min(maxN, state.F_tare));
+        const redY = topY + 8 + (clampedF / maxN) * (scaleH - 16);
+        zoomCtx.fillStyle = '#ef4444';
+        zoomCtx.fillRect(lx + 2, redY - 2, 32, 4);
+
+        zoomCtx.fillStyle = '#475569';
+        zoomCtx.font = 'bold 9px Inter, sans-serif';
+        zoomCtx.textAlign = 'left';
+        zoomCtx.fillText('LỰC KẾ (11)', lx, 8);
+      }
+
+      if (state.zoomTarget === 'ammeters' || state.zoomTarget === 'all') {
+        const baseX = state.zoomTarget === 'all' ? 112 : 24;
+        const boxW = state.zoomTarget === 'all' ? 138 : 210;
+
+        zoomCtx.fillStyle = '#eff6ff';
+        zoomCtx.strokeStyle = '#bfdbfe';
+        zoomCtx.lineWidth = 1;
+        roundRect(zoomCtx, baseX, 14, boxW, 40, 6, true, true);
+        zoomCtx.fillStyle = '#1e40af';
+        zoomCtx.font = 'bold 9px Inter, sans-serif';
+        zoomCtx.textAlign = 'left';
+        zoomCtx.fillText('Ampe kế (5) I_nc:', baseX + 8, 27);
+        zoomCtx.font = 'bold 14px JetBrains Mono, monospace';
+        zoomCtx.fillText(state.I_mag_actual.toFixed(2) + ' A', baseX + 8, 45);
+
+        zoomCtx.fillStyle = '#fff1f2';
+        zoomCtx.strokeStyle = '#fecdd3';
+        roundRect(zoomCtx, baseX, 60, boxW, 40, 6, true, true);
+        zoomCtx.fillStyle = '#be123c';
+        zoomCtx.font = 'bold 9px Inter, sans-serif';
+        zoomCtx.fillText('Ampe kế (6) I_kd:', baseX + 8, 73);
+        zoomCtx.font = 'bold 14px JetBrains Mono, monospace';
+        zoomCtx.fillText(state.I_coil_actual.toFixed(2) + ' A', baseX + 8, 91);
+      }
+    }
+
+    /**
+     * =========================================================================
+     * 4. ANIMATION LOOP & MECHANICAL BEAM PHYSICS
+     * =========================================================================
+     */
+    let lastTime = performance.now();
+
+    function animate(now) {
+      const dt = Math.min(0.05, (now - lastTime) / 1000);
+      lastTime = now;
+
+      state.needleMagAnim += (state.I_mag_actual - state.needleMagAnim) * 12 * dt;
+      state.needleCoilAnim += (state.I_coil_actual - state.needleCoilAnim) * 12 * dt;
+
+      const netForceImbalance = state.F_mag_signed - (state.F_tare - state.F_zero_ref);
+      const targetAngle = Math.max(-0.18, Math.min(0.18, netForceImbalance * 0.85));
+
+      const stiffness = 45.0;
+      const damping = 9.5;
+      const accel = stiffness * (targetAngle - state.beamAngle) - damping * state.beamVel;
+      state.beamVel += accel * dt;
+      state.beamAngle += state.beamVel * dt;
+
+      const devMm = state.beamAngle * 195;
+      const dot = document.getElementById('balanceDot');
+      const txt = document.getElementById('balanceText');
+      if (dot && txt) {
+        if (Math.abs(devMm) < 1.2) {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+          txt.textContent = `Đòn cân: Thăng bằng (Δy = ${devMm.toFixed(1)} mm)`;
+        } else {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping';
+          const side = devMm > 0 ? 'Lệch phải ↓' : 'Lệch trái ↓';
+          txt.textContent = `Đòn cân: ${side} (${Math.abs(devMm).toFixed(1)} mm)`;
+        }
+      }
+
+      renderScene();
+      requestAnimationFrame(animate);
+    }
+
+    /**
+     * =========================================================================
+     * 5. CANVAS MOUSE / TOUCH INTERACTIVITY
+     * =========================================================================
+     */
+    let pointerMovedDistance = 0;
+
+    function getPointerPos(evt) {
+      const rect = simCanvas.getBoundingClientRect();
+      const touch = (evt.touches && evt.touches[0]) || (evt.changedTouches && evt.changedTouches[0]);
+      const clientX = touch ? touch.clientX : evt.clientX;
+      const clientY = touch ? touch.clientY : evt.clientY;
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
+
+    function applyKnobDragDelta(controlType, dx, dy) {
+      const delta = dx - dy;
+      if (controlType === 'I_mag') {
+        const next = Math.max(0, Math.min(2.0, parseFloat((state.dragStartVal + delta * 0.015).toFixed(2))));
+        updateParam('I_mag', next);
+        document.getElementById('sliderIn').value = next;
+      } else if (controlType === 'I_coil') {
+        const next = Math.max(0, Math.min(2.0, parseFloat((state.dragStartVal + delta * 0.015).toFixed(2))));
+        updateParam('I_coil', next);
+        document.getElementById('sliderIk').value = next;
+      } else if (controlType === 'volt') {
+        const volts = [3, 6, 9, 12];
+        const rawIdx = Math.round(state.dragStartVal + delta * 0.03);
+        const clampedIdx = Math.max(0, Math.min(volts.length - 1, rawIdx));
+        if (volts[clampedIdx] !== state.voltage) {
+          setVoltage(volts[clampedIdx]);
+          showToast('Điện áp bộ nguồn: ' + volts[clampedIdx] + 'V');
+        }
+      }
+    }
+
+    function handlePointerDown(e) {
+      const pos = getPointerPos(e);
+      pointerMovedDistance = 0;
+
+      const knobHit = state.hitboxes.find(b =>
+        b.action && typeof b.action === 'object' &&
+        pos.x >= b.x && pos.x <= b.x + b.w && pos.y >= b.y && pos.y <= b.y + b.h
+      );
+
+      if (knobHit) {
+        state.draggingControl = knobHit;
+        state.dragStartX = pos.x;
+        state.dragStartY = pos.y;
+        if (knobHit.action.type === 'I_mag') state.dragStartVal = state.I_mag_set;
+        else if (knobHit.action.type === 'I_coil') state.dragStartVal = state.I_coil_set;
+        else if (knobHit.action.type === 'volt') {
+          const volts = [3, 6, 9, 12];
+          const idx = volts.indexOf(state.voltage);
+          state.dragStartVal = idx === -1 ? 3 : idx;
+        }
+        simCanvas.style.cursor = 'ew-resize';
+      }
+    }
+
+    function handlePointerMove(e) {
+      const pos = getPointerPos(e);
+      if (state.draggingControl) {
+        const dx = pos.x - state.dragStartX;
+        const dy = pos.y - state.dragStartY;
+        pointerMovedDistance = Math.hypot(dx, dy);
+        applyKnobDragDelta(state.draggingControl.action.type, dx, dy);
+        return;
+      }
+
+      const hit = state.hitboxes.find(b => pos.x >= b.x && pos.x <= b.x + b.w && pos.y >= b.y && pos.y <= b.y + b.h);
+      const tooltip = document.getElementById('hoverPartTooltip');
+      if (hit) {
+        const isKnob = hit.action && typeof hit.action === 'object';
+        simCanvas.style.cursor = isKnob ? 'ew-resize' : (hit.action ? 'pointer' : 'help');
+        tooltip.textContent = hit.label;
+        tooltip.classList.remove('hidden');
+      } else {
+        simCanvas.style.cursor = 'default';
+        tooltip.classList.add('hidden');
+      }
+    }
+
+    function handlePointerUp(e) {
+      const wasDraggingKnob = state.draggingControl;
+      const moved = pointerMovedDistance;
+      state.draggingControl = null;
+
+      if (wasDraggingKnob && moved > 5) {
+        return;
+      }
+
+      const pos = getPointerPos(e);
+      const knobHit = state.hitboxes.find(b =>
+        b.action && typeof b.action === 'object' &&
+        pos.x >= b.x && pos.x <= b.x + b.w && pos.y >= b.y && pos.y <= b.y + b.h
+      );
+      if (knobHit) {
+        knobHit.action.stepAction(1);
+        return;
+      }
+
+      const hit = state.hitboxes.find(b => pos.x >= b.x && pos.x <= b.x + b.w && pos.y >= b.y && pos.y <= b.y + b.h);
+      if (hit && typeof hit.action === 'function') {
+        hit.action();
+      }
+    }
+
+    simCanvas.addEventListener('mousedown', handlePointerDown);
+    window.addEventListener('mousemove', handlePointerMove);
+    window.addEventListener('mouseup', handlePointerUp);
+
+    simCanvas.addEventListener('touchstart', handlePointerDown, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+      if (state.draggingControl) {
+        handlePointerMove(e);
+      }
+    }, { passive: true });
+    window.addEventListener('touchend', handlePointerUp);
+
+    simCanvas.addEventListener('contextmenu', (e) => {
+      const pos = getPointerPos(e);
+      const knobHit = state.hitboxes.find(b =>
+        b.action && typeof b.action === 'object' &&
+        pos.x >= b.x && pos.x <= b.x + b.w && pos.y >= b.y && pos.y <= b.y + b.h
+      );
+      if (knobHit) {
+        e.preventDefault();
+        knobHit.action.stepAction(-1);
+      }
+    });
+
+    simCanvas.addEventListener('wheel', (e) => {
+      const pos = getPointerPos(e);
+      const knobHit = state.hitboxes.find(b =>
+        b.action && typeof b.action === 'object' &&
+        pos.x >= b.x && pos.x <= b.x + b.w && pos.y >= b.y && pos.y <= b.y + b.h
+      );
+      if (knobHit) {
+        e.preventDefault();
+        knobHit.action.stepAction(e.deltaY < 0 ? 1 : -1);
+      }
+    }, { passive: false });
+
+    /**
+     * =========================================================================
+     * 6. DRAGGABLE & COLLAPSIBLE MAGNIFIER BOX
+     * =========================================================================
+     */
+    let magnifierCollapsed = false;
+
+    function toggleMagnifierCollapse(e) {
+      if (e) e.stopPropagation();
+      magnifierCollapsed = !magnifierCollapsed;
+      const body = document.getElementById('magnifierBody');
+      const header = document.getElementById('magnifierHeader');
+      const btn = document.getElementById('btnCollapseMagnifier');
+      if (magnifierCollapsed) {
+        body.classList.add('hidden');
+        header.classList.remove('rounded-t-xl', 'border-b');
+        header.classList.add('rounded-xl');
+        btn.textContent = '+';
+      } else {
+        body.classList.remove('hidden');
+        header.classList.remove('rounded-xl');
+        header.classList.add('rounded-t-xl', 'border-b');
+        btn.textContent = '—';
+      }
+      clampMagnifierToViewport();
+    }
+
+    function clampMagnifierToViewport() {
+      const box = document.getElementById('magnifierBox');
+      const container = document.getElementById('canvasContainer');
+      if (!box || !container || box.style.left === '') return;
+
+      const cRect = container.getBoundingClientRect();
+      const bRect = box.getBoundingClientRect();
+      const maxLeft = Math.max(6, cRect.width - bRect.width - 6);
+      const maxTop = Math.max(6, cRect.height - bRect.height - 6);
+
+      const curLeft = parseFloat(box.style.left) || 0;
+      const curTop = parseFloat(box.style.top) || 0;
+      box.style.left = Math.max(6, Math.min(maxLeft, curLeft)) + 'px';
+      box.style.top = Math.max(6, Math.min(maxTop, curTop)) + 'px';
+    }
+
+    function initDraggableMagnifier() {
+      const box = document.getElementById('magnifierBox');
+      const header = document.getElementById('magnifierHeader');
+      const container = document.getElementById('canvasContainer');
+      if (!box || !header || !container) return;
+
+      let isDragging = false;
+      let startX = 0, startY = 0;
+      let origLeft = 0, origTop = 0;
+
+      const onDragStart = (clientX, clientY) => {
+        const cRect = container.getBoundingClientRect();
+        const bRect = box.getBoundingClientRect();
+        origLeft = bRect.left - cRect.left;
+        origTop = bRect.top - cRect.top;
+        box.style.right = 'auto';
+        box.style.left = origLeft + 'px';
+        box.style.top = origTop + 'px';
+
+        startX = clientX;
+        startY = clientY;
+        isDragging = true;
+        box.classList.add('ring-2', 'ring-blue-500/60', 'shadow-2xl');
+      };
+
+      const onDragMove = (clientX, clientY) => {
+        if (!isDragging) return;
+        const cRect = container.getBoundingClientRect();
+        const bRect = box.getBoundingClientRect();
+
+        let newLeft = origLeft + (clientX - startX);
+        let newTop = origTop + (clientY - startY);
+
+        const maxLeft = Math.max(6, cRect.width - bRect.width - 6);
+        const maxTop = Math.max(6, cRect.height - bRect.height - 6);
+
+        newLeft = Math.max(6, Math.min(maxLeft, newLeft));
+        newTop = Math.max(6, Math.min(maxTop, newTop));
+
+        box.style.left = newLeft + 'px';
+        box.style.top = newTop + 'px';
+      };
+
+      const onDragEnd = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        box.classList.remove('ring-2', 'ring-blue-500/60', 'shadow-2xl');
+      };
+
+      header.addEventListener('mousedown', (e) => {
+        if (e.target.closest('button')) return;
+        e.preventDefault();
+        onDragStart(e.clientX, e.clientY);
+      });
+      window.addEventListener('mousemove', (e) => onDragMove(e.clientX, e.clientY));
+      window.addEventListener('mouseup', onDragEnd);
+
+      header.addEventListener('touchstart', (e) => {
+        if (e.target.closest('button')) return;
+        if (e.touches.length === 1) {
+          onDragStart(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: true });
+      window.addEventListener('touchmove', (e) => {
+        if (isDragging && e.touches.length === 1) {
+          onDragMove(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: true });
+      window.addEventListener('touchend', onDragEnd);
+
+      window.addEventListener('resize', clampMagnifierToViewport);
+    }
+
+    window.addEventListener('load', () => {
+      resizeSimCanvas();
+      initDraggableMagnifier();
+      recalcPhysics();
+      drawVerificationChart();
+      requestAnimationFrame(animate);
+    });
+  </script>
+</body>
+</html>
