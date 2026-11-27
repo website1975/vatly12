@@ -341,7 +341,8 @@
         }
 
         // Solenoid: Ống dây nằm dọc trục X từ x = -4.5 đến x = +4.5, bán kính R = 2.0
-        // dir = 1: mặt trước (z > 0) dòng đi lên (+Y) -> nắm tay phải: 4 ngón đi lên ở mặt trước => ngón cái chỉ +X (cực Bắc N bên phải)
+        // Khi dir = -1 ("Mặt trước đi xuống"): nhìn từ trái (-X) vào thấy dòng điện chạy cùng chiều kim đồng hồ
+        // => Quy tắc nắm tay phải: 4 ngón khum đi xuống ở mặt trước (+Z), ngón cái chỉ sang PHẢI (+X) -> B hướng +X (cực Bắc N bên phải)
         const L = 9.0;
         const R = 2.0;
         const turns = 12;
@@ -352,13 +353,15 @@
           for (let i = 0; i < segsPerTurn; i++) {
             const a = (i / segsPerTurn) * Math.PI * 2;
             // Góc a=0 tại +Z (mặt trước), a=PI/2 tại +Y (đỉnh trên)
-            // Khi dir=1, tại a=0 (+Z) dòng đi lên (+Y) -> dl = (0, cos(a), -sin(a)) * dir
+            // Khi dir = 1: tại +Z dòng đi lên (+Y); khi dir = -1: tại +Z dòng đi xuống (-Y)
             const dlPos = new THREE.Vector3(xLoop, R * Math.sin(a), R * Math.cos(a));
             const dl = new THREE.Vector3(0, Math.cos(a), -Math.sin(a)).multiplyScalar(dir * ((2 * Math.PI * R) / segsPerTurn));
             const rVec = new THREE.Vector3().subVectors(pos, dlPos);
             const dist = Math.max(rVec.length(), 0.55);
-            // Đảo chiều rVec -> dl (tức rVec x dl) để khớp chuẩn hệ tọa độ tay phải của Three.js
-            const dB = new THREE.Vector3().crossVectors(rVec, dl).multiplyScalar(I / Math.pow(dist, 3));
+            // Định luật Biot-Savart chuẩn: dB ~ (dl x rVec) / dist^3
+            // Kiểm tra tại tâm (0,0,0) với điểm trên mặt trước (0,0,+R): rVec = (0,0,-R).
+            // Nếu dir = -1 (mặt trước đi xuống: dl = (0,-1,0)), dl x rVec = (0,-1,0) x (0,0,-R) = (+R, 0, 0) => hướng sang PHẢI (+X)!
+            const dB = new THREE.Vector3().crossVectors(dl, rVec).multiplyScalar(I / Math.pow(dist, 3));
             B.add(dB);
           }
         }
@@ -805,16 +808,18 @@
           handModel.quaternion.setFromUnitVectors(yAxis, targetDir);
         } else {
           // Ống dây nằm dọc trục X:
-          // - dirVal > 0: mặt trước (+Z) dòng đi lên (+Y) => B và cực Bắc N hướng sang phải (+X)
-          // - dirVal < 0: mặt trước (+Z) dòng đi xuống (-Y) => B và cực Bắc N hướng sang trái (-X)
-          handModel.position.set(0, 2.15, 0.1);
-          if (dirVal > 0) {
-            handModel.quaternion.setFromUnitVectors(yAxis, new THREE.Vector3(1, 0, 0));
-          } else {
-            // Xoay +Y sang -X đồng thời giữ mu bàn tay ở mặt trước (+Z) và ngón tay khum đi xuống ở mặt trước
-            const q1 = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2);
+          // - dirVal < 0 ("Mặt trước đi xuống", nhìn từ trái vào chạy cùng KĐH) => 4 ngón khum đi xuống ở mặt trước (+Z) => ngón cái chỉ sang PHẢI (+X)
+          // - dirVal > 0 ("Mặt trước đi lên", nhìn từ trái vào chạy ngược KĐH) => 4 ngón khum đi lên ở mặt trước (+Z) => ngón cái chỉ sang TRÁI (-X)
+          handModel.position.set(0, 2.15, 0.15);
+          if (dirVal < 0) {
+            // Xoay +Y sang +X đồng thời lật 180° quanh X để lòng bàn tay ôm từ trên xuống và 4 ngón khum đi xuống ở mặt trước (+Z)
+            const q1 = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), -Math.PI / 2);
             const q2 = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI);
             handModel.quaternion.copy(q2).multiply(q1);
+          } else {
+            // Xoay +Y sang -X: lòng bàn tay úp từ trên xuống, 4 ngón khum đi lên ở mặt trước (+Z), ngón cái chỉ sang TRÁI (-X)
+            const q1 = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2);
+            handModel.quaternion.copy(q1);
           }
         }
 
